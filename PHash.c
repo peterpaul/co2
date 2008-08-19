@@ -29,19 +29,6 @@ P_END_OBJECT
 #undef P_SUPER
 #define P_SUPER PObject()
 
-/* djb2 hashing function */
-static inline unsigned long
-hash_function (const unsigned char *str)
-{
-        unsigned long hash = 5381;
-        int c;
-
-        while ((c = *str++))
-		hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
-
-        return hash;
-}
-
 static inline struct PTuple *search(const struct PHash *hash,
 				   const char *key, unsigned long index)
 {
