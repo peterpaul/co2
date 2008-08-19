@@ -7,14 +7,14 @@
 #define assertFalse(p,msg,...)						\
 	((p) 								\
 	 ? (message(msg, ## __VA_ARGS__),				\
-	    __assert_fail(__STRING(p), __FILE__,			\
+	    __assert_fail("!" __STRING(p), __FILE__,			\
 			  __LINE__, __ASSERT_FUNCTION))			\
 	 : __ASSERT_VOID_CAST(0))
 #define assertTrue(p,msg,...)						\
 	((p)								\
 	 ? __ASSERT_VOID_CAST(0)					\
 	 : (message(msg, ## __VA_ARGS__),				\
-	    __assert_fail("!" __STRING(p), __FILE__,			\
+	    __assert_fail(__STRING(p), __FILE__,			\
 			  __LINE__, __ASSERT_FUNCTION)))
 
 void __write_message(const char * fmt,
@@ -23,6 +23,8 @@ void __write_message(const char * fmt,
 		     const char * function,
 		     ...)
 	__attribute__ ((format (printf, 1, 5)));
+
+unsigned long hash_function (const unsigned char *str);
 
 #ifndef false
 typedef int bool;

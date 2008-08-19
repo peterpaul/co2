@@ -93,10 +93,35 @@
  * @return This is dependent on the method
  */
 #define P_CALL(x,msg,...)						\
-	(assertTrue((x)->class->msg,					\
+	(x = x,								\
+	 assertTrue((x)->class->msg,					\
 		    "runtime error: %s at %p doesn't respond to %s.",	\
 		    (x)->class->name, (void *)x, __STRING(msg)),	\
 	 (x)->class->msg(x, ## __VA_ARGS__))
+
+#define P_CALL_NESTED(type,x,msg,...) \
+	({type _tmp = x; \
+	 assertTrue(_tmp->class->msg,					\
+				"runtime error: %s at %p doesn't respond to %s.",	\
+				_tmp->class->name, (void *)_tmp, __STRING(msg));	\
+	 _tmp->class->msg(_tmp, ## __VA_ARGS__);})
+
+
+/**
+ * @brief Calls a static method of a PObject
+ *
+ * When the method isn't initialized, a runtime error is raised
+ * and the application aborts.
+ * @param x The PObject class
+ * @param msg The method to call
+ * @param ... Additional parameters of the method
+ * @return This is dependent on the method
+ */
+#define P_STATIC_CALL(x,msg,...)					\
+	(assertTrue((x)->msg,						\
+		    "runtime error: %s at %p doesn't respond to %s.",	\
+		    (x)->name, (void *)x, __STRING(msg)),		\
+	 (x)->msg(NULL, ## __VA_ARGS__))
 
 /**
  * @brief Checks if the supplied argument is a PObjectClass
@@ -151,6 +176,26 @@
 		klass##_Attr;						\
 	}
 
+/**
+ * @brief Generates the header of a function that returns the Class
+ * for this Object.
+ *
+ * The generated function will create the Class for the specific Object
+ * and initialize it's values. The following invocations will just
+ * return a pointer to the class.
+ *
+ * This macro must be used in combination with P_END_OBJECT that creates
+ * the footer of the function. Between these two macros, the methods
+ * for this class must be bound to a specific function. This is done in
+ * the following way:
+ *
+ * <code>
+ * self->METHOD = IMPLEMENTATION_OF_METHOD;
+ * </code>
+ *
+ * @param klass The Class name
+ * @param supper The Class name of the super class
+ */
 #define P_OBJECT(klass,supper)						\
 	struct klass##Class *klass() {					\
 		static struct klass##Class _self;			\
@@ -161,12 +206,19 @@
 			memcpy(self, super_class, sizeof(struct supper##Class)); \
 			self->super = super_class;			\
 			self->size = sizeof(struct klass);		\
-			self->name = #klass
+			self->name = #klass; \
+			p_add_class(self)
 
+/**
+ * @brief Generates the footer of a function that returns the Class
+ * for this Object.
+ *
+ * Used in combination with P_OBJECT.
+ */
 #define P_END_OBJECT							\
-	}								\
-		return self;						\
-		}
+		}							\
+	return self;							\
+	}
 
 /* These macros are dependent on DEBUG */
 #ifdef P_DEBUG
@@ -189,10 +241,20 @@
  * like this:
  *
  * <code>
- * self = P_SUPER()->ctor(self, app);
+ * self = P_SUPER->ctor(self, app);
  * </code>
  */
 P_METHOD_DEF(PObject, void *, ctor, (void *_self, va_list * app));
+/**
+ * @brief Destructor
+ *
+ * The constructor must always call the constructor of the super class.
+ * Thist can be done with the following line:
+ *
+ * <code> 
+ * return P_SUPER->dtor(self);
+ * </code>
+ */
 P_METHOD_DEF(PObject, void *, dtor, (void *_self));
 P_METHOD_DEF(PObject, void *, clone, (void *_self));
 P_METHOD_DEF(PObject, struct PString *, toString, (void *_self));
@@ -210,6 +272,8 @@ P_METHOD_DEF(PObject, struct PString *, toString, (void *_self));
 
 P_CLASS(PObject,PObject);
 
+#define P_NEW_CTOR(x,y,...) p_new_with_ctor(x(), x##_##y, __VA_ARGS__)
+
 void *p_new(const void *_class, ...);
 void *p_new_with_ctor(const void *_class, PObject_ctor_t ctor, ...);
 void *p_init(void *_self, const void *_class, ...);
@@ -220,5 +284,9 @@ int p_isA(void *_self, void *_class);
 int p_isOf(void *_self, void *_class);
 void *p_cast_class(void *_self, void *_class);
 void *p_super_ctor(void *_self, void *_super, ...);
+
+void * p_get_class(const char * class_name);
+void p_add_class(void * _class);
+void p_print_classes(FILE * fp);
 
 #endif				/* OBJECT_H */

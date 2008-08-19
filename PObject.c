@@ -55,6 +55,7 @@ struct PObjectClass *PObject()
 		self->magic = P_CLASS_MAGIC;
 		self->size = sizeof(struct PObject);
 		self->name = "PObject";
+		p_add_class(self);
 		self->ctor = PObject_ctor;
 		self->dtor = PObject_dtor;
 		self->clone = PObject_clone;
@@ -172,4 +173,74 @@ int p_isOf(void *_self, void *_class)
 	while (myClass != class && myClass != object)
 		myClass = myClass->super;
 	return myClass == class;
+}
+
+/* *** Struct for class hashmap *** */
+struct ClassHashmapTuple {
+	struct ClassHashmapTuple * next;
+	struct PObjectClass * class;
+};
+
+static struct ClassHashmapTuple * p_new_class_hashmap_tuple(struct ClassHashmapTuple * next, struct PObjectClass * class)
+{
+	assertTrue(class != NULL, "parameter class may not be NULL");
+
+	struct ClassHashmapTuple * tuple = calloc (1, sizeof(struct ClassHashmapTuple));
+	assertTrue(tuple != NULL, "failed allocating memory for struct ClassHashmapTuple");
+
+	tuple->next = next;
+	tuple->class = class;
+	return tuple;
+}
+
+static struct ClassHashmapTuple * p_find_class_hashmap_tuple(struct ClassHashmapTuple * head, const char * class_name)
+{
+	while (head != NULL
+	       && strcmp(class_name, head->class->name) != 0) {
+		head = head->next;
+	}
+	return head;
+}
+
+/* *** Functions for class registration *** */
+#define CLASS_HASHMAP_SIZE 1024
+struct ClassHashmapTuple ** class_hashmap = NULL;
+
+void p_add_class(void * _class)
+{
+	struct PObjectClass * class = P_ISCLASS(_class);
+
+	if (!class_hashmap) {
+		/* create class_hashmap */
+		class_hashmap = calloc (CLASS_HASHMAP_SIZE, sizeof (struct ClassHashmapTuple *));
+	}
+
+	unsigned long index = hash_function((unsigned char *)class->name) % CLASS_HASHMAP_SIZE;
+
+	class_hashmap[index] = p_new_class_hashmap_tuple(class_hashmap[index], class);
+}
+
+void * p_get_class(const char * class_name)
+{
+	if (!class_hashmap) {
+		return NULL;
+	}
+
+	unsigned long index = hash_function((unsigned char *)class_name) % CLASS_HASHMAP_SIZE;
+
+	struct ClassHashmapTuple * tuple = p_find_class_hashmap_tuple(class_hashmap[index], class_name);
+
+	return tuple->class;;
+}
+
+void p_print_classes(FILE * fp)
+{
+	int i;
+
+	for (i = 0; i < CLASS_HASHMAP_SIZE; i++)
+	{
+		if (class_hashmap[i]) {
+			fprintf(fp, "%s\n", class_hashmap[i]->class->name);
+		}
+	}
 }

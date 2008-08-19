@@ -30,3 +30,15 @@ void __write_message(const char * fmt,
 	fprintf(stderr, "\n");
 	va_end(ap);
 }
+
+/* djb2 hashing function */
+unsigned long hash_function (const unsigned char *str)
+{
+        unsigned long hash = 5381;
+        int c;
+
+        while ((c = *str++))
+		hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+
+        return hash;
+}
