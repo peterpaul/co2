@@ -93,17 +93,23 @@
  * @return This is dependent on the method
  */
 #define P_CALL(x,msg,...)						\
+	(assertTrue((x)->class->msg,					\
+		    "runtime error: %s at %p doesn't respond to %s.",	\
+		    (x)->class->name, (void *)x, __STRING(msg)),	\
+	 (x)->class->msg(x, ## __VA_ARGS__))
+
+#define P_CALL_SAFE(x,msg,...)						\
 	(x = x,								\
 	 assertTrue((x)->class->msg,					\
 		    "runtime error: %s at %p doesn't respond to %s.",	\
 		    (x)->class->name, (void *)x, __STRING(msg)),	\
 	 (x)->class->msg(x, ## __VA_ARGS__))
 
-#define P_CALL_NESTED(type,x,msg,...) \
-	({type _tmp = x; \
+#define P_CALL_NESTED(type,x,msg,...)					\
+	({type _tmp = x;						\
 	 assertTrue(_tmp->class->msg,					\
-				"runtime error: %s at %p doesn't respond to %s.",	\
-				_tmp->class->name, (void *)_tmp, __STRING(msg));	\
+		    "runtime error: %s at %p doesn't respond to %s.",	\
+		    _tmp->class->name, (void *)_tmp, __STRING(msg));	\
 	 _tmp->class->msg(_tmp, ## __VA_ARGS__);})
 
 
@@ -133,8 +139,9 @@
  * @return x
  */
 #define P_ISCLASS(x)							\
-	(assert(x),							\
-	 assert(((struct PObjectClass *)x)->magic == P_CLASS_MAGIC), x)
+	(assertTrue(x, "P_ISCLASS: expected non NULL pointer"),							\
+	 assertTrue(((struct PObjectClass *)x)->magic == P_CLASS_MAGIC, "P_ISCLASS: expected P_CLASS_MAGIC"),	\
+	 x)
 
 /**
  * @brief Checks if the supplied argument is a PObject
@@ -146,10 +153,15 @@
  * @return x
  */
 #define P_ISOBJECT(x)							\
-	(assert(x),							\
-	 assert(((struct PObject *)x)->class),				\
-	 assert(((struct PObject *)x)->class->magic == P_CLASS_MAGIC),	\
+	(assertTrue(x, "P_ISOBJECT: expected non NULL pointer"),		\
+	 assertTrue(((struct PObject *)x)->class, "P_ISOBJECT; expected non NULL class pointer"),				\
+	 assertTrue(((struct PObject *)x)->class->magic == P_CLASS_MAGIC, "P_ISOBJECT: expected P_CLASS_MAGIC"),	\
 	 x)
+/* #define P_ISOBJECT(x)							\ */
+/* 	(assert(x != NULL),						\ */
+/* 	 assert(((struct PObject *)x)->class != NULL),			\ */
+/* 	 assert(((struct PObject *)x)->class->magic == P_CLASS_MAGIC),	\ */
+/* 	 x) */
 
 /**
  * @brief Defines a PObject
