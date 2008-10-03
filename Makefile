@@ -14,9 +14,9 @@ OPTFLAGS	= -O2
 CFLAGS		= -Wall $(OPTFLAGS) $(DEBUGFLG)
 LFLAGS		= 
 
-LIBSRCS		= PObject.c PList.c PString.c PHash.c utils.c PLinkedList.c PListList.c
+LIBSRCS		= PObject.c PList.c PString.c PHash.c utils.c PLinkedList.c PListList.c PInterface.c
 
-LIBHDRS		= PObject.h PList.h Pstring.h PHash.h utils.h PLinkedList.h PListList.h
+LIBHDRS		= PObject.h PList.h Pstring.h PHash.h utils.h PLinkedList.h PListList.h PInterface.h
 
 LIBOBJS		= $(LIBSRCS:%.c=%.o)
 

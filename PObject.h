@@ -275,6 +275,7 @@ P_METHOD_DEF(PObject, struct PString *, toString, (void *_self));
 	long magic;							\
 	size_t size;							\
 	char *name;							\
+	struct PInterface * interfaces;					\
 	P_METHOD (PObject, ctor);					\
 	P_METHOD (PObject, dtor);					\
 	P_METHOD (PObject, clone);					\
@@ -300,5 +301,7 @@ void *p_super_ctor(void *_self, void *_super, ...);
 void * p_get_class(const char * class_name);
 void p_add_class(void * _class);
 void p_print_classes(FILE * fp);
+
+#include "PInterface.h"
 
 #endif				/* OBJECT_H */
