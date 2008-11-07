@@ -14,9 +14,9 @@ OPTFLAGS	= -O2
 CFLAGS		= -Wall $(OPTFLAGS) $(DEBUGFLG)
 LFLAGS		= 
 
-LIBSRCS		= PObject.c PList.c PString.c PHash.c utils.c PLinkedList.c PListList.c
+LIBSRCS		= Object.c List.c String.c Hash.c utils.c LinkedList.c ListList.c
 
-LIBHDRS		= PObject.h PList.h Pstring.h PHash.h utils.h PLinkedList.h PListList.h
+LIBHDRS		= Object.h List.h string.h Hash.h utils.h LinkedList.h ListList.h
 
 LIBOBJS		= $(LIBSRCS:%.c=%.o)
 
@@ -26,7 +26,7 @@ SRCS		= $(LIBSRCS) $(BINSRCS)
 HDRS		= $(LIBHDRS)
 OBJS		= $(LIBOBJS) $(BINOBJS)
 
-LIBS		= libPObject.a
+LIBS		= libObject.a
 BINS		=
 
 FILES		= $(SRCS) $(HDRS) Makefile
@@ -41,12 +41,12 @@ clean::
 tar::
 		indent $(SRCS)
 		rm *~
-		tar -czvf PObject.tar.gz $(FILES)	
+		tar -czvf Object.tar.gz $(FILES)	
 
 doc::
 		doxygen Doxyfile
 
-libPObject.a:	$(LIBOBJS)
+libObject.a:	$(LIBOBJS)
 		$(AR) rc $@ $(LIBOBJS)
 		$(RANLIB) $@
 
