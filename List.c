@@ -1,5 +1,5 @@
-#include "PList.h"
-#include "PString.h"
+#include "List.h"
+#include "String.h"
 
 #define P_SUPER PObject()
 

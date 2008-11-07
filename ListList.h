@@ -1,7 +1,7 @@
 #ifndef PLIST_LIST_H
 #define PLIST_LIST_H
 
-#include "PLinkedList.h"
+#include "LinkedList.h"
 
 #define PListList_Class				\
 	PLinkedList_Class

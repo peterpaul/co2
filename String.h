@@ -1,7 +1,7 @@
 #ifndef PSTRING_H
 #define PSTRING_H
 
-#include "PObject.h"
+#include "Object.h"
 
 P_METHOD_DEF(PString, void *, resize, (void *_self, int size));
 P_METHOD_DEF(PString, void *, ensure, (void *_self, int size));

@@ -1,4 +1,4 @@
-#include "PHash.h"
+#include "Hash.h"
 
 #define P_SUPER PObject()
 

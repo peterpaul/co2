@@ -1,7 +1,7 @@
 #ifndef LIST_H
 #define LIST_H
 
-#include "PObject.h"
+#include "Object.h"
 P_METHOD_DEF(PList, void *, resize, (void *_self, unsigned size));
 P_METHOD_DEF(PList, void *, append, (void *_self, void *item));
 P_METHOD_DEF(PList, void *, append_list, (void *_self, void *_list));

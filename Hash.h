@@ -1,7 +1,7 @@
 #ifndef PHASH_H
 #define PHASH_H
 
-#include "PObject.h"
+#include "Object.h"
 
 /* The Tuple is used to store key value pairs 
  * and manage a list of Tuples.

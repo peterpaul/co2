@@ -1,7 +1,7 @@
 #ifndef PLINKED_LIST_H
 #define PLINKED_LIST_H
 
-#include "PObject.h"
+#include "Object.h"
 
 /* This macro appends a linked list with item x.
  */

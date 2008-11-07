@@ -1,5 +1,5 @@
-#include "PObject.h"
-#include "PString.h"
+#include "Object.h"
+#include "String.h"
 
 P_IMPLEMENT(PObject, struct PString *, toString, (void *_self))
 {
