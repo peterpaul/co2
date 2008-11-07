@@ -92,7 +92,13 @@
  * @param ... Additional parameters of the method
  * @return This is dependent on the method
  */
-#define P_CALL(x,msg,...)						\
+#if(__GCC__)
+#error "Compiling with gcc!"
+#else
+#define P_CALL P_CALL_UNSAFE
+#endif
+
+#define P_CALL_UNSAFE(x,msg,...)						\
 	(assertTrue((x)->class->msg,					\
 		    "runtime error: %s at %p doesn't respond to %s.",	\
 		    (x)->class->name, (void *)x, __STRING(msg)),	\
@@ -112,6 +118,12 @@
 		    _tmp->class->name, (void *)_tmp, __STRING(msg));	\
 	 _tmp->class->msg(_tmp, ## __VA_ARGS__);})
 
+#define P_CALL_OBJECT(o,x,msg,...)					\
+	({struct o * _tmp = x;						\
+	 assertTrue(_tmp->class->msg,					\
+		    "runtime error: %s at %p doesn't respond to %s.",	\
+		    _tmp->class->name, (void *)_tmp, __STRING(msg));	\
+	 _tmp->class->msg(_tmp, ## __VA_ARGS__);})
 
 /**
  * @brief Calls a static method of a PObject
@@ -270,6 +282,7 @@ P_METHOD_DEF(PObject, void *, ctor, (void *_self, va_list * app));
 P_METHOD_DEF(PObject, void *, dtor, (void *_self));
 P_METHOD_DEF(PObject, void *, clone, (void *_self));
 P_METHOD_DEF(PObject, struct PString *, toString, (void *_self));
+P_METHOD_DEF(PObject, void *, getInterface, (void *_self, const char * interface));
 
 #define PObject_Class							\
 	long magic;							\
@@ -279,7 +292,8 @@ P_METHOD_DEF(PObject, struct PString *, toString, (void *_self));
 	P_METHOD (PObject, ctor);					\
 	P_METHOD (PObject, dtor);					\
 	P_METHOD (PObject, clone);					\
-	P_METHOD (PObject, toString)
+	P_METHOD (PObject, toString);					\
+	P_METHOD (PObject, getInterface)
 
 #define PObject_Attr
 
@@ -301,7 +315,5 @@ void *p_super_ctor(void *_self, void *_super, ...);
 void * p_get_class(const char * class_name);
 void p_add_class(void * _class);
 void p_print_classes(FILE * fp);
-
-#include "PInterface.h"
 
 #endif				/* OBJECT_H */

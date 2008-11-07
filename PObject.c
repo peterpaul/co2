@@ -1,5 +1,6 @@
 #include "PObject.h"
 #include "PString.h"
+#include "PInterface.h"
 
 P_IMPLEMENT(PObject, struct PString *, toString, (void *_self))
 {
@@ -43,6 +44,18 @@ P_IMPLEMENT(PObject, void *, clone, (void *_self))
 	return clone;
 }
 
+P_IMPLEMENT(PObject, void *, getInterface, (void *_self, const char * interface))
+{
+	P_DEBUG_IMPLEMENT(PObject, void *, get_interface, (void *_self, const char * interface));
+	struct PObject * self = P_CAST(_self, PObject());
+	struct PInterface * head = self->class->interfaces;
+	
+	while (head && strcmp(head->name, interface) != 0) {
+		head = head->next;
+	}
+	return head;
+}
+
 struct PObjectClass *PObject()
 {
 	/* return a class */
@@ -60,6 +73,7 @@ struct PObjectClass *PObject()
 		self->dtor = PObject_dtor;
 		self->clone = PObject_clone;
 		self->toString = PObject_toString;
+		self->getInterface = PObject_getInterface;
 	}
 	return self;
 }
