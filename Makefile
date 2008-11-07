@@ -14,9 +14,9 @@ OPTFLAGS	= -O2
 CFLAGS		= -Wall $(OPTFLAGS) $(DEBUGFLG)
 LFLAGS		= 
 
-LIBSRCS		= Object.c List.c String.c Hash.c utils.c LinkedList.c ListList.c
+LIBSRCS		= Object.c List.c String.c Hash.c utils.c LinkedList.c ListList.c Interface.c Singleton.c
 
-LIBHDRS		= Object.h List.h string.h Hash.h utils.h LinkedList.h ListList.h
+LIBHDRS		= Object.h List.h string.h Hash.h utils.h LinkedList.h ListList.h Interface.h Singleton.h
 
 LIBOBJS		= $(LIBSRCS:%.c=%.o)
 
