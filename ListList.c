@@ -1,15 +1,15 @@
 #include "ListList.h"
 
-#define P_SUPER PLinkedList()
+#define O_SUPER LinkedList()
 
-P_IMPLEMENT(PListList, void *, ctor, (void *_self, va_list * app))
+O_IMPLEMENT(ListList, void *, ctor, (void *_self, va_list * app))
 {
-	struct PListList *self = P_CAST(_self, PListList());
-	self = P_SUPER->ctor(self, app);
-	self->item = va_arg(*app, struct PLinkedList *);
+	struct ListList *self = O_CAST(_self, ListList());
+	self = O_SUPER->ctor(self, app);
+	self->item = va_arg(*app, struct LinkedList *);
 	return self;
 }
 
-P_OBJECT(PListList, PLinkedList);
-self->ctor = PListList_ctor;
-P_END_OBJECT
+O_OBJECT(ListList, LinkedList);
+self->ctor = ListList_ctor;
+O_END_OBJECT

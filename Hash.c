@@ -1,45 +1,45 @@
 #include "Hash.h"
 
-#define P_SUPER PObject()
+#define O_SUPER Object()
 
-P_IMPLEMENT(PTuple, void *, ctor, (void *_self, va_list * app))
+O_IMPLEMENT(Tuple, void *, ctor, (void *_self, va_list * app))
 {
-	P_DEBUG_IMPLEMENT(PTuple, void *, ctor, (void *_self, va_list * app));
-	struct PTuple * self = P_CAST(_self, PTuple ());
-	self = P_SUPER->ctor(self, app);
+	O_DEBUG_IMPLEMENT(Tuple, void *, ctor, (void *_self, va_list * app));
+	struct Tuple * self = O_CAST(_self, Tuple ());
+	self = O_SUPER->ctor(self, app);
 	self->key = (char *) strdup(va_arg(*app, char *));
 	self->value = va_arg(*app, void *);
-	p_cast(self->value, PObject ());
+	o_cast(self->value, Object ());
 	return self;
 }
 
-P_IMPLEMENT(PTuple, void *, dtor, (void *_self))
+O_IMPLEMENT(Tuple, void *, dtor, (void *_self))
 {
-	P_DEBUG_IMPLEMENT(PTuple, void *, dtor, (void *_self));
-	struct PTuple * self = P_CAST(_self, PTuple ());
+	O_DEBUG_IMPLEMENT(Tuple, void *, dtor, (void *_self));
+	struct Tuple * self = O_CAST(_self, Tuple ());
 	free (self->key);
-	return P_SUPER->dtor(self);
+	return O_SUPER->dtor(self);
 }
 
-P_OBJECT(PTuple, PObject);
-self->ctor = PTuple_ctor;
-self->dtor = PTuple_dtor;
-P_END_OBJECT
+O_OBJECT(Tuple, Object);
+self->ctor = Tuple_ctor;
+self->dtor = Tuple_dtor;
+O_END_OBJECT
 
-#undef P_SUPER
-#define P_SUPER PObject()
+#undef O_SUPER
+#define O_SUPER Object()
 
-static inline struct PTuple *search(const struct PHash *hash,
+static inline struct Tuple *search(const struct Hash *hash,
 				   const char *key, unsigned long index)
 {
-	struct PTuple *head = hash->map[index];
+	struct Tuple *head = hash->map[index];
 	while (head && strcmp(head->key, key) != 0) {
 		head = head->next;
 	}
 	return head;
 }
 
-static struct PTuple *remove_tuple(struct PTuple *head, const char *key)
+static struct Tuple *remove_tuple(struct Tuple *head, const char *key)
 {
 	if (head) {
 		if (strcmp(head->key, key) != 0) {
@@ -48,21 +48,21 @@ static struct PTuple *remove_tuple(struct PTuple *head, const char *key)
 			return head;
 		} else {
 			/* found */
-			struct PTuple *tuple = head->next;
-			p_delete(head);
+			struct Tuple *tuple = head->next;
+			head->class->delete(head);
 			return tuple;
 		}
 	} else
 		return NULL;
 }
 
-P_IMPLEMENT(PHash, void *, add, (void *_self, char * key, void *_item))
+O_IMPLEMENT(Hash, void *, add, (void *_self, char * key, void *_item))
 {
-	P_DEBUG_IMPLEMENT(PHash, void *, add, (void *_self, char * key, void *_item));
-	struct PHash * self = P_CAST(_self, PHash());
-	struct PObject * item = p_cast(_item, PObject());
+	O_DEBUG_IMPLEMENT(Hash, void *, add, (void *_self, char * key, void *_item));
+	struct Hash * self = O_CAST(_self, Hash());
+	struct Object * item = o_cast(_item, Object());
 	unsigned long index = hash_function((unsigned char *)key) % HASH_SIZE;
-	struct PTuple * tuple;
+	struct Tuple * tuple;
 
 	if (search (self, key, index)) {
 		fprintf (stderr, "%s:%d: Adding item with duplicate key '%s'\n",
@@ -72,7 +72,7 @@ P_IMPLEMENT(PHash, void *, add, (void *_self, char * key, void *_item))
 		exit(EXIT_FAILURE);
 	}
 
-	tuple = p_new (PTuple(), key, item);
+	tuple = Tuple()->new (Tuple(), key, item);
 	tuple->next = self->map[index];
 	self->map[index] = tuple;
 	return item;
@@ -82,31 +82,31 @@ P_IMPLEMENT(PHash, void *, add, (void *_self, char * key, void *_item))
  * Set the value of a Hash Tuple to a certain value or add it if it doesn't
  * exist in the Hash yet.
  */
-P_IMPLEMENT(PHash, void *, set, (void *_self, char * key, void *_item))
+O_IMPLEMENT(Hash, void *, set, (void *_self, char * key, void *_item))
 {
-	P_DEBUG_IMPLEMENT(PHash, void *, set, (void *_self, char * key, void *_item));
-	struct PHash * self = P_CAST(_self, PHash());
-	struct PObject * item = p_cast(_item, PObject());
+	O_DEBUG_IMPLEMENT(Hash, void *, set, (void *_self, char * key, void *_item));
+	struct Hash * self = O_CAST(_self, Hash());
+	struct Object * item = o_cast(_item, Object());
 	unsigned long index = hash_function((unsigned char *)key) % HASH_SIZE;
-	struct PTuple * tuple;
+	struct Tuple * tuple;
 
 	tuple = search (self, key, index);
 	if (tuple) {
 		tuple->value = item;
 	} else {
-		tuple = p_new (PTuple(), key, item);
+		tuple = Tuple()->new (Tuple(), key, item);
 		tuple->next = self->map[index];
 		self->map[index] = tuple;
 	}
 	return item;
 }
 
-P_IMPLEMENT(PHash, void *, get, (void *_self, char * key))
+O_IMPLEMENT(Hash, void *, get, (void *_self, char * key))
 {
-	P_DEBUG_IMPLEMENT(PHash, void *, get, (void *_self, char * key));
-	struct PHash * self = P_CAST(_self, PHash());
+	O_DEBUG_IMPLEMENT(Hash, void *, get, (void *_self, char * key));
+	struct Hash * self = O_CAST(_self, Hash());
 	unsigned long index = hash_function((unsigned char *)key) % HASH_SIZE;
-	const struct PTuple *tuple = search(self, key, index);
+	const struct Tuple *tuple = search(self, key, index);
 	if (tuple) {
 		return tuple->value;
 	} else {
@@ -114,35 +114,35 @@ P_IMPLEMENT(PHash, void *, get, (void *_self, char * key))
 	}
 }
 
-P_IMPLEMENT(PHash, void *, del, (void *_self, char * key))
+O_IMPLEMENT(Hash, void *, del, (void *_self, char * key))
 {
-	struct PHash * self = P_CAST (_self, PHash ());
+	struct Hash * self = O_CAST (_self, Hash ());
 	unsigned long index = hash_function((unsigned char *)key) % HASH_SIZE;
 	self->map[index] = remove_tuple (self->map[index], key);
 	return self;
 }
 
-P_IMPLEMENT(PHash, void *, dtor, (void *_self))
+O_IMPLEMENT(Hash, void *, dtor, (void *_self))
 {
-	P_DEBUG_IMPLEMENT(PHash, void *, dtor, (void *_self));
-	struct PHash * self = P_CAST(_self, PHash());
+	O_DEBUG_IMPLEMENT(Hash, void *, dtor, (void *_self));
+	struct Hash * self = O_CAST(_self, Hash());
 	int i;
 	for (i = 0; i < HASH_SIZE; i++) {
-		struct PTuple * tuple = self->map[i];
+		struct Tuple * tuple = self->map[i];
 		while (tuple) {
-			struct PTuple * next = tuple->next;
-			p_delete (tuple);
+			struct Tuple * next = tuple->next;
+			tuple->class->delete (tuple);
 			tuple = next;
 		}
 	}
-	return P_SUPER->dtor(self);
+	return O_SUPER->dtor(self);
 }
 
-P_OBJECT(PHash, PObject);
-self->add = PHash_add;
-self->del = PHash_del;
-self->set = PHash_set;
-self->get = PHash_get;
-self->dtor = PHash_dtor;
-P_END_OBJECT
+O_OBJECT(Hash, Object);
+self->add = Hash_add;
+self->del = Hash_del;
+self->set = Hash_set;
+self->get = Hash_get;
+self->dtor = Hash_dtor;
+O_END_OBJECT
 

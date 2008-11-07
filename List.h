@@ -2,40 +2,40 @@
 #define LIST_H
 
 #include "Object.h"
-P_METHOD_DEF(PList, void *, resize, (void *_self, unsigned size));
-P_METHOD_DEF(PList, void *, append, (void *_self, void *item));
-P_METHOD_DEF(PList, void *, append_list, (void *_self, void *_list));
-P_METHOD_DEF(PList, void *, merge, (void *_self, void *_other));
-P_METHOD_DEF(PList, void *, remove, (void *self));
-P_METHOD_DEF(PList, void *, get, (void *_self, unsigned index));
-P_METHOD_DEF(PList, void *, set, (void *_self, unsigned index, void *item));
-P_METHOD_DEF(PList, void *, map, (void *_self, void (*fun) (void *)));
-P_METHOD_DEF(PList, void *, map_args, (void *_self, void (*fun) (void *, va_list *), ...));
-P_METHOD_DEF(PList, void *, filter, (void *_self, int (*filter) (void *)));
-P_METHOD_DEF(PList, void *, filter_args, (void *_self, int (*filter) (void *, va_list *), ...));
-P_METHOD_DEF(PList, void *, destroy, (void *_self));
+O_METHOD_DEF(List, void *, resize, (void *_self, unsigned size));
+O_METHOD_DEF(List, void *, append, (void *_self, void *item));
+O_METHOD_DEF(List, void *, append_list, (void *_self, void *_list));
+O_METHOD_DEF(List, void *, merge, (void *_self, void *_other));
+O_METHOD_DEF(List, void *, remove, (void *self));
+O_METHOD_DEF(List, void *, get, (void *_self, unsigned index));
+O_METHOD_DEF(List, void *, set, (void *_self, unsigned index, void *item));
+O_METHOD_DEF(List, void *, map, (void *_self, void (*fun) (void *)));
+O_METHOD_DEF(List, void *, map_args, (void *_self, void (*fun) (void *, va_list *), ...));
+O_METHOD_DEF(List, void *, filter, (void *_self, int (*filter) (void *)));
+O_METHOD_DEF(List, void *, filter_args, (void *_self, int (*filter) (void *, va_list *), ...));
+O_METHOD_DEF(List, void *, destroy, (void *_self));
 
-#define PList_Class \
-PObject_Class; \
-P_METHOD (PList, resize); \
-P_METHOD (PList, append); \
-P_METHOD (PList, append_list); \
-P_METHOD (PList, merge); \
-P_METHOD (PList, remove); \
-P_METHOD (PList, get); \
-P_METHOD (PList, set); \
-P_METHOD (PList, map); \
-P_METHOD (PList, map_args); \
-P_METHOD (PList, filter); \
-P_METHOD (PList, filter_args); \
-P_METHOD (PList, destroy)
+#define ListClass_Attr							\
+	ObjectClass_Attr;							\
+	O_METHOD (List, resize);					\
+	O_METHOD (List, append);					\
+	O_METHOD (List, append_list);				\
+	O_METHOD (List, merge);					\
+	O_METHOD (List, remove);					\
+	O_METHOD (List, get);						\
+	O_METHOD (List, set);						\
+	O_METHOD (List, map);						\
+	O_METHOD (List, map_args);					\
+	O_METHOD (List, filter);					\
+	O_METHOD (List, filter_args);				\
+	O_METHOD (List, destroy)
 
-#define PList_Attr \
-PObject_Attr; \
-struct PObjectClass * type; \
-void **data; \
-unsigned length, max
+#define List_Attr								\
+	Object_Attr;								\
+	struct Class * type;						\
+	void **data;								\
+	unsigned length, max
 
-P_CLASS(PList,PObject);
+O_CLASS(List,Object);
 
 #endif				/* not LIST_H */

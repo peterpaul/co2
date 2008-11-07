@@ -1,43 +1,43 @@
-#ifndef PHASH_H
-#define PHASH_H
+#ifndef Hash_H
+#define Hash_H
 
 #include "Object.h"
 
-/* The Tuple is used to store key value pairs 
+/* The Tuple is used to store key value pairs
  * and manage a list of Tuples.
  */
-#define PTuple_Class \
-PObject_Class
+#define TupleClass_Attr							\
+	ObjectClass_Attr
 
-#define PTuple_Attr \
-PObject_Attr; \
-char * key; \
-struct PObject * value; \
-struct PTuple * next
+#define Tuple_Attr								\
+	Object_Attr;								\
+	char * key;									\
+	struct Object * value;						\
+	struct Tuple * next
 
-P_CLASS(PTuple, PObject);
+O_CLASS(Tuple, Object);
 
 /* The Hash */
 #ifndef HASH_SIZE
 #define HASH_SIZE 32
 #endif
 
-P_METHOD_DEF(PHash, void *, add, (void *_self, char * key, void * _item));
-P_METHOD_DEF(PHash, void *, get, (void *_self, char * key));
-P_METHOD_DEF(PHash, void *, set, (void *_self, char * key, void * _item));
-P_METHOD_DEF(PHash, void *, del, (void *_self, char * key));
+O_METHOD_DEF(Hash, void *, add, (void *_self, char * key, void * _item));
+O_METHOD_DEF(Hash, void *, get, (void *_self, char * key));
+O_METHOD_DEF(Hash, void *, set, (void *_self, char * key, void * _item));
+O_METHOD_DEF(Hash, void *, del, (void *_self, char * key));
 
-#define PHash_Class \
-PObject_Class; \
-P_METHOD (PHash, add); \
-P_METHOD (PHash, get); \
-P_METHOD (PHash, set); \
-P_METHOD (PHash, del)
+#define HashClass_Attr							\
+	ObjectClass_Attr;							\
+	O_METHOD (Hash, add);						\
+	O_METHOD (Hash, get);						\
+	O_METHOD (Hash, set);						\
+	O_METHOD (Hash, del)
 
-#define PHash_Attr \
-PObject_Attr; \
-struct PTuple *map[HASH_SIZE]
+#define Hash_Attr								\
+	Object_Attr;								\
+	struct Tuple *map[HASH_SIZE]
 
-P_CLASS(PHash, PObject);
+O_CLASS(Hash, Object);
 
-#endif /* PHASH_H */
+#endif /* Hash_H */

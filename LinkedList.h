@@ -1,44 +1,44 @@
-#ifndef PLINKED_LIST_H
-#define PLINKED_LIST_H
+#ifndef LINKEDLIST_H
+#define LINKEDLIST_H
 
 #include "Object.h"
 
 /* This macro appends a linked list with item x.
  */
-#define APPEND_LIST_HT(head,tail,item)		\
-	if (!head) {				\
-		tail = head = item;		\
-	} else {				\
-		(tail)->next = item;		\
-		tail = (tail)->next;		\
+#define APPEND_LIST_HT(head,tail,item)			\
+	if (!head) {								\
+		tail = head = item;						\
+	} else {									\
+		(tail)->next = item;					\
+		tail = (tail)->next;					\
 	}
 
 /* This macro appends a linked list with item x.
  */
-#define APPEND_LIST(item)			\
-	if (!head) {				\
-		tail = head = item;		\
-	} else {				\
-		tail->next = item;		\
-		tail = tail->next;	\
+#define APPEND_LIST(item)						\
+	if (!head) {								\
+		tail = head = item;						\
+	} else {									\
+		tail->next = item;						\
+		tail = tail->next;						\
 	}
 
-P_METHOD_DEF(PLinkedList, void *, sort, (void *_self));
-P_METHOD_DEF(PLinkedList, void *, merge_sorted, (void *_self, void *_other));
-P_METHOD_DEF(PLinkedList, void *, map, (void *_self, void (*fun)(void *)));
-P_METHOD_DEF(PLinkedList, int, compare, (const void *_self, const void *_other));
+O_METHOD_DEF(LinkedList, void *, sort, (void *_self));
+O_METHOD_DEF(LinkedList, void *, merge_sorted, (void *_self, void *_other));
+O_METHOD_DEF(LinkedList, void *, map, (void *_self, void (*fun)(void *)));
+O_METHOD_DEF(LinkedList, int, compare, (const void *_self, const void *_other));
 
-#define PLinkedList_Class			\
-	PObject_Class;				\
-	P_METHOD(PLinkedList, sort);		\
-	P_METHOD(PLinkedList, merge_sorted);	\
-	P_METHOD(PLinkedList, map);		\
-	P_METHOD(PLinkedList, compare)
-	     
-#define PLinkedList_Attr			\
-	PObject_Attr;				\
+#define LinkedListClass_Attr					\
+	ObjectClass_Attr;							\
+	O_METHOD(LinkedList, sort);				\
+	O_METHOD(LinkedList, merge_sorted);		\
+	O_METHOD(LinkedList, map);					\
+	O_METHOD(LinkedList, compare)
+
+#define LinkedList_Attr						\
+	Object_Attr;								\
 	void * next
 
-P_CLASS(PLinkedList, PObject);
+O_CLASS(LinkedList, Object);
 
-#endif /* PLINKED_LIST_H */
+#endif /* LINKEDLIST_H */

@@ -1,107 +1,107 @@
 #include "List.h"
 #include "String.h"
 
-#define P_SUPER PObject()
+#define O_SUPER Object()
 
 /**
  * This implements a list where the entries may be empty.
- * Also, a type (class) may be provided, so that entries 
+ * Also, a type (class) may be provided, so that entries
  * entered into the list can be cast to this type.
  */
 
-P_IMPLEMENT(PList, void *, ctor, (void *_self, va_list * app))
+O_IMPLEMENT(List, void *, ctor, (void *_self, va_list * app))
 {
-	P_DEBUG_IMPLEMENT(PList, void *, ctor, (void *_self, va_list * app));
-	struct PList *self = P_CAST(_self, PList());
-	self = P_SUPER->ctor(self, app);
+	O_DEBUG_IMPLEMENT(List, void *, ctor, (void *_self, va_list * app));
+	struct List *self = O_CAST(_self, List());
+	self = O_SUPER->ctor(self, app);
 	self->max = va_arg(*app, unsigned);
-	self->type = va_arg(*app, struct PObjectClass *);
+	self->type = va_arg(*app, struct ObjectClass *);
 	self->data = calloc(self->max, sizeof(void *));
 	self->length = 0;
 	return self;
 }
 
-P_IMPLEMENT(PList, void *, resize, (void *_self, unsigned size))
+O_IMPLEMENT(List, void *, resize, (void *_self, unsigned size))
 {
-	P_DEBUG_IMPLEMENT(PList, void *, resize, (void *_self, unsigned size));
-	struct PList *self = P_CAST(_self, PList());
+	O_DEBUG_IMPLEMENT(List, void *, resize, (void *_self, unsigned size));
+	struct List *self = O_CAST(_self, List());
 	assert(size >= self->length);
 	self->data = realloc(self->data, sizeof(void *[size]));
 	self->max = size;
 	return self;
 }
 
-P_IMPLEMENT(PList, void *, append, (void *_self, void *item))
+O_IMPLEMENT(List, void *, append, (void *_self, void *item))
 {
-	P_DEBUG_IMPLEMENT(PList, void *, append, (void *_self, void *item));
-	struct PList *self = P_CAST(_self, PList());
+	O_DEBUG_IMPLEMENT(List, void *, append, (void *_self, void *item));
+	struct List *self = O_CAST(_self, List());
 	/* if item and type, cast item to type */
 	if (item && self->type)
-		p_cast (item, self->type);
+		o_cast (item, self->type);
 	/* check if need to be resized */
 	if (self->length == self->max)
-		self = P_CALL(self, resize, self->max << 1);
+		self = self->class->resize(self, self->max << 1);
 	/* append item */
 	self->data[self->length] = item;
 	self->length++;
 	return item;
 }
 
-static void PList_append_item (void *_item, va_list * ap)
+static void List_append_item (void *_item, va_list * ap)
 {
-	struct PList * list = p_cast (va_arg (*ap, struct PList *), PList ());
-	P_CALL(list, append, _item);
+	struct List * list = o_cast (va_arg (*ap, struct List *), List ());
+	list->class->append(list, _item);
 }
 
-P_IMPLEMENT(PList, void *, append_list, (void *_self, void *_list))
+O_IMPLEMENT(List, void *, append_list, (void *_self, void *_list))
 {
-	P_DEBUG_IMPLEMENT(PList, void *, append_list, (void *_self, void *_list));
-	struct PList *self = P_CAST(_self, PList());
-	struct PList *list = p_cast(_list, PList());
-	P_CALL(list, map_args, PList_append_item, self);
+	O_DEBUG_IMPLEMENT(List, void *, append_list, (void *_self, void *_list));
+	struct List *self = O_CAST(_self, List());
+	struct List *list = o_cast(_list, List());
+	list->class->map_args(list, List_append_item, self);
 	return self;
 }
 
-P_IMPLEMENT(PList, void *, merge, (void *_self, void *_other))
+O_IMPLEMENT(List, void *, merge, (void *_self, void *_other))
 {
-	P_DEBUG_IMPLEMENT(PList, void *, merge, (void *_self, void *_other));
-	struct PList *self = P_CAST(_self, PList());
-	struct PList *other = P_CAST(_other, PList());
-	P_CALL(self, append_list, other);
+	O_DEBUG_IMPLEMENT(List, void *, merge, (void *_self, void *_other));
+	struct List *self = O_CAST(_self, List());
+	struct List *other = O_CAST(_other, List());
+	self->class->append_list(self, other);
 	/* delete other list */
 	other->length = 0;
-	p_delete (other);
+	other->class->delete(other);
 	/* return result */
 	return self;
 }
 
-P_IMPLEMENT(PList, void *, remove, (void *_self))
+O_IMPLEMENT(List, void *, remove, (void *_self))
 {
-	P_DEBUG_IMPLEMENT(PList, void *, remove, (void *_self));
-	struct PList *self = P_CAST(_self, PList());
+	O_DEBUG_IMPLEMENT(List, void *, remove, (void *_self));
+	struct List *self = O_CAST(_self, List());
 	self->length --;
 	return self->data[self->length];
 }
 
-P_IMPLEMENT(PList, void *, get, (void *_self, unsigned index))
+O_IMPLEMENT(List, void *, get, (void *_self, unsigned index))
 {
-	P_DEBUG_IMPLEMENT(PList, void *, get, (void *_self, unsigned index));
-	struct PList *self = P_CAST(_self, PList());
+	O_DEBUG_IMPLEMENT(List, void *, get, (void *_self, unsigned index));
+	struct List *self = O_CAST(_self, List());
 	assert(index < self->length);
 	return self->data[index];
 }
 
-P_IMPLEMENT(PList, void *, set, (void *_self, unsigned index, void *item))
+O_IMPLEMENT(List, void *, set, (void *_self, unsigned index, void *item))
 {
-	P_DEBUG_IMPLEMENT(PList, void *, set, (void *_self, unsigned index, void *item));
-	struct PList *self = P_CAST(_self, PList());
+	O_DEBUG_IMPLEMENT(List, void *, set, (void *_self, unsigned index, void *item));
+	struct List *self = O_CAST(_self, List());
 	assert(index < self->length && item);
-	return self->data[index] = self->type ? p_cast (item, self->type) : item;
+	return self->data[index] = self->type ? o_cast (item, self->type) : item;
 }
 
-P_IMPLEMENT(PList, void *, map, (void *_self, void (*fun) (void *)))
+O_IMPLEMENT(List, void *, map, (void *_self, void (*fun) (void *)))
 {
-	struct PList *self = P_CAST(_self, PList());
+	struct List *self = O_CAST(_self, List());
 	int i;
 	const unsigned length = self->length;
 	for (i = 0; i < length; i++) {
@@ -110,9 +110,9 @@ P_IMPLEMENT(PList, void *, map, (void *_self, void (*fun) (void *)))
 	return self;
 }
 
-P_IMPLEMENT(PList, void *, map_args, (void *_self, void (*fun) (void *, va_list *), ...))
+O_IMPLEMENT(List, void *, map_args, (void *_self, void (*fun) (void *, va_list *), ...))
 {
-	struct PList *self = P_CAST(_self, PList());
+	struct List *self = O_CAST(_self, List());
 	int i;
 	va_list ap;
 	va_start(ap, fun);
@@ -127,34 +127,34 @@ P_IMPLEMENT(PList, void *, map_args, (void *_self, void (*fun) (void *, va_list 
 	return self;
 }
 
-P_IMPLEMENT(PList, void *, filter, (void *_self, int (*filter) (void *)))
+O_IMPLEMENT(List, void *, filter, (void *_self, int (*filter) (void *)))
 {
-	P_DEBUG_IMPLEMENT(PList, void *, filter, (void *_self, int (*filter) (void *)));
-	struct PList *self = P_CAST(_self, PList());
+	O_DEBUG_IMPLEMENT(List, void *, filter, (void *_self, int (*filter) (void *)));
+	struct List *self = O_CAST(_self, List());
 	int i;
 	const unsigned length = self->length;
-	struct PList *result = p_new(PList(), self->length / 2);
+	struct List *result = List()->new(List(), self->length / 2);
 	for (i = 0; i < length; i++) {
 		if (filter(self->data[i]))
-			P_CALL(result, append, self->data[i]);
+			result->class->append(result, self->data[i]);
 	}
 	return self;
 }
 
-P_IMPLEMENT(PList, void *, filter_args, (void *_self, int (*filter) (void *, va_list *), ...))
+O_IMPLEMENT(List, void *, filter_args, (void *_self, int (*filter) (void *, va_list *), ...))
 {
-	P_DEBUG_IMPLEMENT(PList, void *, filter_args, (void *_self, int (*filter) (void *, va_list), ...));
-	struct PList *self = P_CAST(_self, PList());
+	O_DEBUG_IMPLEMENT(List, void *, filter_args, (void *_self, int (*filter) (void *, va_list), ...));
+	struct List *self = O_CAST(_self, List());
 	int i;
 	va_list ap;
 	va_start (ap, filter);
 	const unsigned length = self->length;
-	struct PList *result = p_new(PList(), self->length / 2);
+	struct List *result = List()->new(List(), self->length / 2);
 	for (i = 0; i < length; i++) {
 		va_list aq;
 		va_copy(aq, ap);
 		if (filter(self->data[i], &aq))
-			P_CALL(result, append, self->data[i]);
+			result->class->append(result, self->data[i]);
 		va_end(aq);
 	}
 	va_end(ap);
@@ -162,65 +162,64 @@ P_IMPLEMENT(PList, void *, filter_args, (void *_self, int (*filter) (void *, va_
 }
 
 /* hook for deletion of members */
-static void PList_delete_items(void * item)
+static void List_delete_items(void * _item)
 {
-	if (p_isOf (item, PObject())) {
-		p_delete (item);
-	}
+	struct Object * item = o_cast(_item, Object());
+	item->class->delete (item);
 }
 
-P_IMPLEMENT(PList, void *, dtor, (void *_self))
+O_IMPLEMENT(List, void *, dtor, (void *_self))
 {
-	P_DEBUG_IMPLEMENT(PList, void *, dtor, (void *_self));
-	struct PList *self = P_CAST(_self, PList());
-	P_CALL(self, map, PList_delete_items);
+	O_DEBUG_IMPLEMENT(List, void *, dtor, (void *_self));
+	struct List *self = O_CAST(_self, List());
+	self->class->map(self, List_delete_items);
 	free(self->data);
 	self->data = NULL;
-	return P_SUPER->dtor(self);
+	return O_SUPER->dtor(self);
 }
 
-P_IMPLEMENT(PList, struct PString *, toString, (void *_self))
+O_IMPLEMENT(List, struct String *, toString, (void *_self))
 {
-	P_DEBUG_IMPLEMENT(PList, struct PString *, toString, (void *_self));
-	struct PList *self = P_CAST(_self, PList());
-	struct PString *str = P_SUPER->toString(self);
-	
-	struct PString *enter = p_new (PString (), "\n");
-	struct PString *item_enter = p_new (PString (), "\n\t");
+	O_DEBUG_IMPLEMENT(List, struct String *, toString, (void *_self));
+	struct List *self = O_CAST(_self, List());
+	struct String *str = O_SUPER->toString(self);
+
+	struct String *enter = String()->new (String (), "\n");
+	struct String *item_enter = String()->new (String (), "\n\t");
 
 	int i;
 	const unsigned length = self->length;
-	P_CALL(str, append_str, " [\n");
+	str->class->append_str(str, " [\n");
 	for (i = 0; i < length; i++) {
-		struct PObject * item = P_CALL(self, get, i);
-		struct PString * item_str = P_CALL(item, toString);
-		P_CALL(item_str, replace, enter, item_enter);
-		P_CALL(str, append_str, "\t");
-		P_CALL(str, append, item_str);
-		p_delete (item_str);
-		P_CALL(str, append_str, ";\n");
+		struct Object * item = self->class->get(self, i);
+		struct String * item_str = self->class->toString(item);
+		item_str->class->replace(item_str, enter, item_enter);
+		str->class->append_str(str, "\t");
+		str->class->append(str, item_str);
+		item_str->class->delete(item_str);
+		str->class->append_str(str, ";\n");
 	}
-	P_CALL(str, append_str, "]");
+	str->class->append_str(str, "]");
 
-	p_delete (enter);
-	p_delete (item_enter);
+	enter->class->delete (enter);
+	item_enter->class->delete (item_enter);
 
 	return str;
 }
 
-P_OBJECT(PList,PObject);
-self->ctor = PList_ctor;
-self->dtor = PList_dtor;
-self->resize = PList_resize;
-self->append = PList_append;
-self->append_list = PList_append_list;
-self->merge = PList_merge;
-self->remove = PList_remove;
-self->get = PList_get;
-self->set = PList_set;
-self->map = PList_map;
-self->map_args = PList_map_args;
-self->filter = PList_filter;
-self->filter_args = PList_filter_args;
-self->toString = PList_toString;
-P_END_OBJECT
+O_OBJECT(List,Object);
+self->ctor = List_ctor;
+self->dtor = List_dtor;
+self->resize = List_resize;
+self->append = List_append;
+self->append_list = List_append_list;
+self->merge = List_merge;
+self->remove = List_remove;
+self->get = List_get;
+self->set = List_set;
+self->map = List_map;
+self->map_args = List_map_args;
+self->filter = List_filter;
+self->filter_args = List_filter_args;
+self->toString = List_toString;
+O_END_OBJECT

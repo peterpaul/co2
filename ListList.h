@@ -1,15 +1,15 @@
-#ifndef PLIST_LIST_H
-#define PLIST_LIST_H
+#ifndef LIST_LIST_H
+#define LIST_LIST_H
 
 #include "LinkedList.h"
 
-#define PListList_Class				\
-	PLinkedList_Class
+#define ListListClass_Attr						\
+	LinkedListClass_Attr
 
-#define PListList_Attr				\
-	PLinkedList_Attr;			\
-	struct PLinkedList * item
+#define ListList_Attr							\
+	LinkedList_Attr;							\
+	struct LinkedList * item
 
-P_CLASS(PListList, PLinkedList);
+O_CLASS(ListList, LinkedList);
 
-#endif /* PLIST_LIST_H */
+#endif /* LIST_LIST_H */

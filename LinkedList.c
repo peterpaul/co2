@@ -1,40 +1,41 @@
 #include "LinkedList.h"
 #include "ListList.h"
 
-#define P_SUPER PObject()
+#define O_SUPER Object()
 
-P_IMPLEMENT(PLinkedList, void *, ctor, (void *_self, va_list * app))
+O_IMPLEMENT(LinkedList, void *, ctor, (void *_self, va_list * app))
 {
-	struct PLinkedList *self = P_CAST(_self, PLinkedList());
-	self = P_SUPER->ctor(self, app);
+	struct LinkedList *self = O_CAST(_self, LinkedList());
+	self = O_SUPER->ctor(self, app);
 	self->next = NULL;
 	return self;
 }
 
-P_IMPLEMENT(PLinkedList, void *, dtor, (void *_self))
+O_IMPLEMENT(LinkedList, void *, dtor, (void *_self))
 {
-	struct PLinkedList *self = P_CAST(_self, PLinkedList());
-	struct PLinkedList *next = self->next;
+	struct LinkedList *self = O_CAST(_self, LinkedList());
+	struct LinkedList *next = self->next;
 	self->next = NULL;
 	/* Free the rest of the list iteratively instead of recursively,
 	 * as for large lists it might run out of stack space.
 	 */
 	while (next) {
-		struct PLinkedList *curr = next;
+		struct LinkedList *curr = next;
 		next = next->next;
 		curr->next = NULL;
-		p_delete(curr);
+		curr->class->delete(curr);
 	}
-	return P_SUPER->dtor(self);
+	return O_SUPER->dtor(self);
 }
 
-P_IMPLEMENT(PLinkedList, void *, merge_sorted, (void *_self, void *_other))
+O_IMPLEMENT(LinkedList, void *, merge_sorted, (void *_self, void *_other))
 {
-	struct PLinkedList * self = P_CAST(_self, PLinkedList());
-	struct PLinkedList * other = P_CAST(_other, PLinkedList());
-	struct PLinkedList * head = NULL, * tail = NULL;
+	struct LinkedList * self = O_CAST(_self, LinkedList());
+	struct LinkedList * other = O_CAST(_other, LinkedList());
+	struct LinkedList * head = NULL, * tail = NULL;
 	while (self && other) {
-		if (P_CALL(self, compare, other) <= 0) {
+		if (self->class->compare(self, other) <= 0) {
+			/* if (O_CALL(self, compare, other) <= 0) { */
 			APPEND_LIST(self);
 			self = self->next;
 		} else {
@@ -52,14 +53,14 @@ P_IMPLEMENT(PLinkedList, void *, merge_sorted, (void *_self, void *_other))
 	return head;
 }
 
-static struct PListList * prepare_sort(struct PLinkedList * list)
+static struct ListList * prepare_sort(struct LinkedList * list)
 {
-	struct PListList * head = NULL, * tail = NULL;
-	struct PLinkedList * last;
+	struct ListList * head = NULL, * tail = NULL;
+	struct LinkedList * last;
 	assert(list);
 	while(list && list->next) {
-		APPEND_LIST(p_new(PListList(), list));
-		while (list && list->next && P_CALL(list, compare, list->next) <= 0) {
+		APPEND_LIST(ListList()->new(ListList(), list));
+		while (list && list->next && list->class->compare(list, list->next) <= 0) {
 			list = list->next;
 		}
 		last = list;
@@ -67,50 +68,52 @@ static struct PListList * prepare_sort(struct PLinkedList * list)
 		last->next = NULL;
 	}
 	if (list) {
-		APPEND_LIST(p_new(PListList(), list));
+		APPEND_LIST(ListList()->new(ListList(), list));
 	}
 	return head;
 }
 
-P_IMPLEMENT(PLinkedList, void *, sort, (void *_self))
+O_IMPLEMENT(LinkedList, void *, sort, (void *_self))
 {
-	struct PLinkedList * self = P_CAST(_self, PLinkedList());
-	struct PListList * head = prepare_sort(self), * tail;
-	
+	struct LinkedList * self = O_CAST(_self, LinkedList());
+	struct ListList * head = prepare_sort(self), * tail;
+
 	while (head->next) {
 		tail = head;
 		while (tail && tail->next) {
-			struct PListList * tmp = tail->next;
-			tail->item = (struct PLinkedList *)P_CALL(tail->item, merge_sorted, tmp->item);
+			struct ListList * tmp = tail->next;
+			tail->item = (struct LinkedList *)tail->item->class->merge_sorted(tail->item, tmp->item);
+			/* O_CALL(tail->item, merge_sorted, tmp->item); */
 			tail->next = tmp->next;
 			tail = tmp->next;
 			/* delete node */
 			tmp->next = NULL;
-			p_delete(tmp);
+			tmp->class->delete(tmp);
 		}
 	}
 	self = head->item;
 	/* delete node */
 	head->next = NULL;
-	p_delete(head);
-	
+	head->class->delete(head);
+
 	return self;
 }
 
-P_IMPLEMENT(PLinkedList, void *, map, (void *_self, void (*fun) (void *)))
+O_IMPLEMENT(LinkedList, void *, map, (void *_self, void (*fun) (void *)))
 {
-	struct PLinkedList * self = P_CAST(_self, PLinkedList());
+	struct LinkedList * self = O_CAST(_self, LinkedList());
 	if (self->next) {
-		struct PLinkedList * next = self->next;
-		P_CALL(next, map, fun);
+		struct LinkedList * next = self->next;
+		next->class->map(next, fun);
+		/* O_CALL(next, map, fun); */
 	}
 	return self;
 }
 
-P_OBJECT(PLinkedList,PObject);
-self->ctor = PLinkedList_ctor;
-self->dtor = PLinkedList_dtor;
-self->sort = PLinkedList_sort;
-self->merge_sorted = PLinkedList_merge_sorted;
-self->map = PLinkedList_map;
-P_END_OBJECT
+O_OBJECT(LinkedList,Object);
+self->ctor = LinkedList_ctor;
+self->dtor = LinkedList_dtor;
+self->sort = LinkedList_sort;
+self->merge_sorted = LinkedList_merge_sorted;
+self->map = LinkedList_map;
+O_END_OBJECT

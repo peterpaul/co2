@@ -1,187 +1,259 @@
+/*
+ * Object.c
+ *
+ *  Created on: Oct 22, 2008
+ *      Author: epetkle
+ */
+
 #include "Object.h"
 #include "String.h"
+#include "Interface.h"
 
-P_IMPLEMENT(PObject, struct PString *, toString, (void *_self))
+/* General functions */
+void * o_cast(void * _object, void * _class)
 {
-	P_DEBUG_IMPLEMENT(PObject, struct PString *, toString, (void *_self));
-	struct PObject *self = P_CAST(_self, PObject());
-	return p_new (PString(), "%s at %p", self->class->name, _self);
+	struct Object * object = O_IS_OBJECT(_object);
+	struct Class * class = O_IS_CLASS(_class);
+	struct Class * myClass = object->class;
+	struct Class * o = Object();
+	while(myClass != class && myClass != o)
+		myClass = myClass->super;
+	assert (myClass == class);
+	return _object;
 }
 
-P_IMPLEMENT(PObject, void *, ctor, (void *_self, va_list * app))
+void * o_alloc(const void *_class)
 {
-	P_DEBUG_IMPLEMENT(PObject, void *, ctor,
-			  (void *_self, va_list * app));
-	struct PObject *self = P_CAST(_self, PObject());
+	const struct Class *class = O_IS_CLASS(_class);
+	struct Object *self = calloc(1, class->size);
+	assert (self);
+	self->class = (struct Class *) class;
 	return self;
 }
 
-void *p_super_ctor(void *_self, void *_super, ...)
+int o_is_a(void *_self, void *_class)
 {
-	struct PObject *self = P_CAST(_self, PObject());
-	struct PObjectClass *super = P_CAST_CLASS(_super, PObject());
+	struct Object *self = O_IS_OBJECT(_self);
+	struct ObjectClass *class = O_IS_CLASS(_class);
+	const struct ObjectClass *myClass = self->class;
+	return myClass == class;
+}
+
+int o_is_of(void *_self, void *_class)
+{
+	struct Object *self = O_IS_OBJECT(_self);
+	struct ObjectClass *class = O_IS_CLASS(_class);
+	const struct ObjectClass *myClass = self->class;
+	void *object = Object();
+	while (myClass != class && myClass != object) {
+		myClass = myClass->super;
+	}
+	return myClass == class;
+}
+
+void * o_get_interface(void * _self, void * _interface)
+{
+	struct Object *self = O_IS_OBJECT(_self);
+	struct Interface *IF = self->class->interface_list;
+	while (IF && !o_is_of(IF, _interface)) {
+		IF = IF->next;
+	}
+	return IF;
+}
+
+/* Object methods */
+void * Object_ctor(void *_self, va_list *argp)
+{
+	struct Object * self = o_cast(_self, Object());
+	return self;
+}
+
+void * Object_dtor(void *_self)
+{
+	struct Object * self = o_cast(_self, Object());
+	self->class = NULL;
+	return self;
+}
+
+void * Object_new(void *_self, ...)
+{
+	struct Class * self = o_cast(_self, Class());
+	struct Object * object = o_alloc(self);
+	assertTrue(object, "Allocating memory failed.");
 	va_list ap;
-	va_start(ap, _super);
-	super->ctor(self, &ap);
+	object->class = self;
+	va_start(ap, _self);
+	/* Call ctor method */
+	object->class->ctor(object, &ap);
+	va_end(ap);
+	return object;
+}
+
+void * Object_new_ctor(void *_self, Object_ctor_t ctor, ...)
+{
+	struct Class * self = o_cast(_self, Class());
+	struct Object * object = o_alloc(self);
+	assertTrue(object, "Allocating memory failed.");
+	va_list ap;
+	object->class = self;
+	va_start(ap, ctor);
+	/* Call ctor method */
+	ctor(object, &ap);
+	va_end(ap);
+	return object;
+}
+
+void * Object_delete(void *_self)
+{
+	struct Object * self = o_cast(_self, Object());
+	self = self->class->dtor(self);
+	free(self);
+	return NULL;
+}
+
+void * Object_init(void *_self, const void *_class, ...)
+{
+	va_list ap;
+	struct Object * self = _self;
+	const struct ObjectClass *class = O_IS_CLASS(_class);
+
+	assert (self);
+	self->class = (struct Class *)class;
+	va_start(ap, _class);
+	self->class->ctor(self, &ap);
 	va_end(ap);
 	return self;
 }
 
-P_IMPLEMENT(PObject, void *, dtor, (void *_self))
+void * Object_init_ctor(void *_self, const void *_class, Object_ctor_t ctor, ...)
 {
-	P_DEBUG_IMPLEMENT(PObject, void *, dtor, (void *_self));
-	struct PObject *self = P_CAST(_self, PObject());
+	va_list ap;
+	struct Object * self = _self;
+	const struct ObjectClass *class = O_IS_CLASS(_class);
+
+	assert (self);
+	self->class = (struct Class *)class;
+	va_start(ap, ctor);
+	ctor(self, &ap);
+	va_end(ap);
 	return self;
 }
 
-P_IMPLEMENT(PObject, void *, clone, (void *_self))
+struct String * Object_toString(void *_self)
 {
-	P_DEBUG_IMPLEMENT(PObject, void *, dtor, (void *_self));
-	struct PObject *self = P_CAST(_self, PObject());
-	struct PObject *clone = p_alloc(self->class);
+	struct Object *self = O_CAST(_self, Object());
+	return String()->new(String(), "%s at %p", self->class->name, _self);
+}
+
+void * Object_clone(void *_self)
+{
+	struct Object *self = O_CAST(_self, Object());
+	struct Object *clone = o_alloc(self->class);
 	memcpy (clone, self, self->class->size);
 	return clone;
 }
 
-struct PObjectClass *PObject()
+/* Class methods */
+#define O_SUPER Object()
+
+void * Class_ctor(void *_self, va_list *argp)
 {
-	/* return a class */
-	static struct PObjectClass _self;
-	static struct PObjectClass *self = NULL;
-	if (!self) {
-/* 		self = calloc(1, sizeof(struct PObjectClass)); */
-		self = &_self;
-		self->super = self;
-		self->magic = P_CLASS_MAGIC;
-		self->size = sizeof(struct PObject);
-		self->name = "PObject";
-		p_add_class(self);
-		self->ctor = PObject_ctor;
-		self->dtor = PObject_dtor;
-		self->clone = PObject_clone;
-		self->toString = PObject_toString;
-	}
-	return self;
-}
-
-void *p_new(const void *_class, ...)
-{
-	va_list ap;
-	struct PObject *self = p_alloc(_class);
-
-	va_start(ap, _class);
-	P_CALL(self, ctor, &ap);
-	va_end(ap);
-
-	return self;
-}
-
-void *p_new_with_ctor(const void *_class, PObject_ctor_t ctor, ...)
-{
-	va_list ap;
-	struct PObject *self = p_alloc(_class);
-
-	va_start(ap, ctor);
-	ctor (self, &ap);
-	va_end(ap);
-
-	return self;
-}
-
-void *p_init(void *_self, const void *_class, ...)
-{
-	va_list ap;
-	struct PObject * self = _self;
-	const struct PObjectClass *class = P_ISCLASS(_class);
-
-	assert (self);
+	struct Class * self = o_cast(_self, Class());
+	self = O_SUPER->ctor(self, argp);
+	/* remember class, as memcpy will override it */
+	void * class = self->class;
+	size_t size = va_arg(*argp, size_t);
+	const char * name = va_arg(*argp, char *);
+	struct Class * super = o_cast(va_arg(*argp, void *), Class());
+	memcpy(self, super, super->class->size);
 	self->class = class;
-	va_start(ap, _class);
-	P_CALL(self, ctor, &ap);
-	va_end(ap);
+	self->size = size;
+	self->name = name;
+	self->super = (struct ObjectClass *) super;
+	o_add_class(self);
 	return self;
 }
 
-void *p_alloc(const void *_class)
+void * Class_dtor(void *_self)
 {
-	const struct PObjectClass *class = P_ISCLASS(_class);
-	struct PObject *self = calloc(1, class->size);
-	assert (self);
-	self->class = (struct PObjectClass *) class;
+	o_cast(_self, Class());
+	fprintf(stderr, "--- BAD PROGRAMMER ALERT ---\n");
+	fprintf(stderr, "You should never destruct a Class!\n");
+	assert(0);
+	return NULL;
+}
+
+void * Class_delete(void *_self)
+{
+	o_cast(_self, Class());
+	fprintf(stderr, "--- BAD PROGRAMMER ALERT ---\n");
+	fprintf(stderr, "You should never delete a Class!\n");
+	assert(0);
+	return NULL;
+}
+
+#undef O_SUPER
+
+/* Class accessors */
+struct Class * Object()
+{
+	static struct Class _self;
+	static struct Class * self = NULL;
+	if (self == NULL) {
+		self = &_self;
+		_self.class = Class();
+		_self.magic = O_MAGIC;
+		_self.size = sizeof (struct Object);
+		_self.name = "Object";
+		_self.super = self;
+		_self.interface_list = NULL;
+		o_add_class(self);
+		_self.ctor = Object_ctor;
+		_self.dtor = Object_dtor;
+		_self.new = Object_new;
+		_self.new_ctor = Object_new_ctor;
+		_self.init = Object_init;
+		_self.init_ctor = Object_init_ctor;
+		_self.delete = Object_delete;
+		_self.toString = Object_toString;
+		_self.clone = Object_clone;
+	}
 	return self;
 }
 
-void p_delete(void *_self)
+struct Class * Class()
 {
-	struct PObject *self = P_ISOBJECT(_self);
-	P_CALL(self, dtor);
-	free(self);
-}
-
-void *p_cast_class(void *_self, void *_class)
-{
-	struct PObjectClass *myClass = P_ISCLASS(_self);
-	struct PObjectClass *class = P_ISCLASS(_class);
-	void *object = PObject();
-	while (myClass != class && myClass != object)
-		myClass = myClass->super;
-	if (myClass != class) {
-		fflush(stdout);
-		fprintf(stderr, "runtime error: Couldn't cast %s to %s.\n",
-			((struct PObjectClass *)_self)->name, class->name);
-		fflush(stderr);
-		assert(myClass == class);
+	static struct Class _self;
+	static struct Class * self = NULL;
+	if (self == NULL) {
+		self = &_self;
+		_self.class = self;
+		_self.magic = O_MAGIC;
+		_self.size = sizeof (struct Class);
+		_self.name = "Class";
+		_self.super = Object();
+		_self.interface_list = NULL;
+		o_add_class(self);
+		_self.ctor = Class_ctor;
+		_self.dtor = Class_dtor;
+		_self.new = Object_new;
+		_self.new_ctor = Object_new_ctor;
+		_self.init = Object_init;
+		_self.init_ctor = Object_init_ctor;
+		_self.delete = Class_delete;
+		_self.toString = Object_toString;
+		/* _self.clone = Object_clone; */
 	}
-	return _self;
-}
-
-void *p_cast(void *_self, void *_class)
-{
-	struct PObject *self = P_ISOBJECT(_self);
-	struct PObjectClass *class = P_ISCLASS(_class);
-	const struct PObjectClass *myClass = self->class;
-	void *object = PObject();
-	while (myClass != class && myClass != object)
-		myClass = myClass->super;
-	if (myClass != class) {
-		fflush(stdout);
-		fprintf(stderr, "runtime error: Couldn't cast %s to %s.\n",
-			self->class->name, class->name);
-		fflush(stderr);
-		assert(myClass == class);
-	}
-	return _self;
-}
-
-int p_isA(void *_self, void *_class)
-{
-	struct PObject *self = P_ISOBJECT(_self);
-	struct PObjectClass *class = P_ISCLASS(_class);
-	const struct PObjectClass *myClass = self->class;
-/* 	void *object = PObject(); */
-/* 	while (myClass != class && myClass != object) */
-/* 		myClass = myClass->super; */
-	return myClass == class;
-}
-
-int p_isOf(void *_self, void *_class)
-{
-	struct PObject *self = P_ISOBJECT(_self);
-	struct PObjectClass *class = P_ISCLASS(_class);
-	const struct PObjectClass *myClass = self->class;
-	void *object = PObject();
-	while (myClass != class && myClass != object)
-		myClass = myClass->super;
-	return myClass == class;
+	return self;
 }
 
 /* *** Struct for class hashmap *** */
 struct ClassHashmapTuple {
 	struct ClassHashmapTuple * next;
-	struct PObjectClass * class;
+	struct ObjectClass * class;
 };
 
-static struct ClassHashmapTuple * p_new_class_hashmap_tuple(struct ClassHashmapTuple * next, struct PObjectClass * class)
+static struct ClassHashmapTuple * o_new_class_hashmap_tuple(struct ClassHashmapTuple * next, struct ObjectClass * class)
 {
 	assertTrue(class != NULL, "parameter class may not be NULL");
 
@@ -193,7 +265,7 @@ static struct ClassHashmapTuple * p_new_class_hashmap_tuple(struct ClassHashmapT
 	return tuple;
 }
 
-static struct ClassHashmapTuple * p_find_class_hashmap_tuple(struct ClassHashmapTuple * head, const char * class_name)
+static struct ClassHashmapTuple * o_find_class_hashmap_tuple(struct ClassHashmapTuple * head, const char * class_name)
 {
 	while (head != NULL
 	       && strcmp(class_name, head->class->name) != 0) {
@@ -206,9 +278,9 @@ static struct ClassHashmapTuple * p_find_class_hashmap_tuple(struct ClassHashmap
 #define CLASS_HASHMAP_SIZE 1024
 struct ClassHashmapTuple ** class_hashmap = NULL;
 
-void p_add_class(void * _class)
+void o_add_class(void * _class)
 {
-	struct PObjectClass * class = P_ISCLASS(_class);
+	struct ObjectClass * class = O_IS_CLASS(_class);
 
 	if (!class_hashmap) {
 		/* create class_hashmap */
@@ -217,10 +289,10 @@ void p_add_class(void * _class)
 
 	unsigned long index = hash_function((unsigned char *)class->name) % CLASS_HASHMAP_SIZE;
 
-	class_hashmap[index] = p_new_class_hashmap_tuple(class_hashmap[index], class);
+	class_hashmap[index] = o_new_class_hashmap_tuple(class_hashmap[index], class);
 }
 
-void * p_get_class(const char * class_name)
+void * o_get_class(const char * class_name)
 {
 	if (!class_hashmap) {
 		return NULL;
@@ -228,12 +300,12 @@ void * p_get_class(const char * class_name)
 
 	unsigned long index = hash_function((unsigned char *)class_name) % CLASS_HASHMAP_SIZE;
 
-	struct ClassHashmapTuple * tuple = p_find_class_hashmap_tuple(class_hashmap[index], class_name);
+	struct ClassHashmapTuple * tuple = o_find_class_hashmap_tuple(class_hashmap[index], class_name);
 
 	return tuple->class;;
 }
 
-void p_print_classes(FILE * fp)
+void o_print_classes(FILE * fp)
 {
 	int i;
 

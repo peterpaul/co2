@@ -4,7 +4,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#define P_SUPER PObject()
+#define O_SUPER Object()
 
 static size_t strnlen(const char * str, size_t n)
 {
@@ -13,16 +13,16 @@ static size_t strnlen(const char * str, size_t n)
 	return i;
 }
 
-P_IMPLEMENT(PString, void *, ctor_from_file, (void *_self, va_list *app))
+O_IMPLEMENT(String, void *, ctor_from_file, (void *_self, va_list *app))
 {
-	struct PString *self = P_CAST(_self, PString());
-	self = P_SUPER->ctor(self, app);
+	struct String *self = O_CAST(_self, String());
+	self = O_SUPER->ctor(self, app);
 	const char * filename = va_arg (*app, const char *);
 	struct stat buffer;
 	FILE *fp;
 
 	if (stat (filename, &buffer) == -1) {
-		P_SUPER->dtor(self);
+		O_SUPER->dtor(self);
 		free (self);
 		return NULL;
 	}
@@ -32,7 +32,7 @@ P_IMPLEMENT(PString, void *, ctor_from_file, (void *_self, va_list *app))
 	/* open the file */
 	fp = fopen (filename, "r");
 	if (fp == 0) {
-		p_delete(self);
+		self->class->delete(self);
 		return NULL;
 	}
 	/* read contents of file, and terminate string */
@@ -40,15 +40,15 @@ P_IMPLEMENT(PString, void *, ctor_from_file, (void *_self, va_list *app))
 	self->data[self->length] = '\0';
 	/* close the file */
 	fclose (fp);
-	
+
 	return self;
 }
 
-P_IMPLEMENT(PString, void *, ctor, (void *_self, va_list *app))
+O_IMPLEMENT(String, void *, ctor, (void *_self, va_list *app))
 {
-	P_DEBUG_IMPLEMENT(PString, void *, ctor, (void *_self, va_list *app));
-	struct PString *self = P_CAST(_self, PString());
-	self = P_SUPER->ctor(self, app);
+	O_DEBUG_IMPLEMENT(String, void *, ctor, (void *_self, va_list *app));
+	struct String *self = O_CAST(_self, String());
+	self = O_SUPER->ctor(self, app);
 	char * format = va_arg(*app, char *);
 	int n, size = strlen (format) + 1;
 
@@ -69,7 +69,7 @@ P_IMPLEMENT(PString, void *, ctor, (void *_self, va_list *app))
 		else		/* glibc 2.0 */
 			size *= 2;	/* twice the old size */
 
-		P_CALL(self, ensure, size);
+		self->class->ensure(self, size);
 		va_end(ap);
 	}
 
@@ -81,46 +81,46 @@ P_IMPLEMENT(PString, void *, ctor, (void *_self, va_list *app))
 	return self;
 }
 
-P_IMPLEMENT(PString, void *, resize, (void *_self, int size))
+O_IMPLEMENT(String, void *, resize, (void *_self, int size))
 {
-	P_DEBUG_IMPLEMENT(PString, void *, resize, (void *_self, int size));
-	struct PString *self = P_CAST(_self, PString());
+	O_DEBUG_IMPLEMENT(String, void *, resize, (void *_self, int size));
+	struct String *self = O_CAST(_self, String());
 	self->data = realloc(self->data, size);
 	self->max = size;
 	return self;
 }
 
-P_IMPLEMENT(PString, void *, ensure, (void *_self, int size))
+O_IMPLEMENT(String, void *, ensure, (void *_self, int size))
 {
-	P_DEBUG_IMPLEMENT(PString, void *, ensure, (void *_self, int size));
-	struct PString *self = P_CAST(_self, PString());
+	O_DEBUG_IMPLEMENT(String, void *, ensure, (void *_self, int size));
+	struct String *self = O_CAST(_self, String());
 	if (size > self->max)
-		return P_CALL(self, resize, size);
+		return self->class->resize(self, size);
 	return self;
 }
 
-P_IMPLEMENT(PString, void *, append, (void *_self, struct PString *str))
+O_IMPLEMENT(String, void *, append, (void *_self, struct String *str))
 {
-	P_DEBUG_IMPLEMENT(PString, void *, append, (void *_self, struct PString *str));
-	struct PString *self = P_CAST(_self, PString());
-	P_CALL(self, ensure, self->length + str->length + 1);
+	O_DEBUG_IMPLEMENT(String, void *, append, (void *_self, struct String *str));
+	struct String *self = O_CAST(_self, String());
+	self->class->ensure(self, self->length + str->length + 1);
 	strcpy(self->data + self->length, str->data);
 	self->length += str->length;
 	return self;
 }
 
-P_IMPLEMENT(PString, void *, append_str, (void *_self, char *str, ...))
+O_IMPLEMENT(String, void *, append_str, (void *_self, char *str, ...))
 {
-	P_DEBUG_IMPLEMENT(PString, void *, append_str, (void *_self, char *str));
-	struct PString *self = P_CAST(_self, PString());
+	O_DEBUG_IMPLEMENT(String, void *, append_str, (void *_self, char *str));
+	struct String *self = O_CAST(_self, String());
 	int n, nn = strlen(str);
 	va_list ap;
-	P_CALL(self, ensure, self->length + nn + 1);	
+	self->class->ensure(self, self->length + nn + 1);
 	va_start(ap, str);
 	while (1) {
 		va_list ap2;
 		va_copy(ap2, ap);
-		P_CALL(self, ensure, nn + self->length);
+		self->class->ensure(self, nn + self->length);
 		n = vsnprintf(self->data + self->length, nn, str, ap2);
 		if (n > -1 && n < nn)
 			break;
@@ -131,7 +131,7 @@ P_IMPLEMENT(PString, void *, append_str, (void *_self, char *str, ...))
 		va_end(ap2);
 	}
 	va_end(ap);
-	
+
 	if (n > -1)
 		self->length += n;
 	else
@@ -141,16 +141,16 @@ P_IMPLEMENT(PString, void *, append_str, (void *_self, char *str, ...))
 	return self;
 }
 
-P_IMPLEMENT(PString, void *, append_str_n, (void *_self, char *str, int n))
+O_IMPLEMENT(String, void *, append_str_n, (void *_self, char *str, int n))
 {
-	P_DEBUG_IMPLEMENT(PString, void *, append_str_n, (void *_self, char *str, int n));
-	struct PString *self = P_CAST(_self, PString());
+	O_DEBUG_IMPLEMENT(String, void *, append_str_n, (void *_self, char *str, int n));
+	struct String *self = O_CAST(_self, String());
 	if (n == 0)
 		return self;
 	int nn = strnlen(str, n);
 /* 	if (nn > n) */
 /* 		nn = n; */
-	P_CALL(self, ensure, self->length + nn + 1);	
+	self->class->ensure(self, self->length + nn + 1);
 	strncpy(self->data + self->length, str, nn);
 	self->length += nn;
 	return self;
@@ -159,70 +159,70 @@ P_IMPLEMENT(PString, void *, append_str_n, (void *_self, char *str, int n))
 /**
  * This method replaces all occurrences of that with this.
  */
-P_IMPLEMENT(PString, void *, replace, (void *_self, struct PString *that, struct PString *this))
+O_IMPLEMENT(String, void *, replace, (void *_self, struct String *that, struct String *this))
 {
-	P_DEBUG_IMPLEMENT(PString, void *, replace, (void *_self, struct PString *that, struct PString *this));
-	struct PString *self = P_CAST(_self, PString());
+	O_DEBUG_IMPLEMENT(String, void *, replace, (void *_self, struct String *that, struct String *this));
+	struct String *self = O_CAST(_self, String());
 	/* backup original string data, and truncate self */
-	struct PString *orig = p_new (PString(), self->data);
+	struct String *orig = String()->new (String(), self->data);
 	self->length = 0;
 
 	char *curr = orig->data;
 	char *prev = orig->data;
 	while ((curr = strstr (curr, that->data))) {
-		P_CALL(self, append_str_n, prev, curr - prev);
-		P_CALL(self, append, this);
+		self->class->append_str_n(self, prev, curr - prev);
+		self->class->append(self, this);
 		curr = curr + that->length;
 		prev = curr;
 	}
-	P_CALL(self, append_str, prev);
+	self->class->append_str(self, prev);
 	/* delete backup */
-	p_delete(orig);
+	orig->class->delete(orig);
 	return self;
 }
 
-P_IMPLEMENT(PString, int, fprint, (void *_self, FILE *fp))
+O_IMPLEMENT(String, int, fprint, (void *_self, FILE *fp))
 {
-	struct PString *self = P_CAST(_self, PString());
+	struct String *self = O_CAST(_self, String());
 	return fprintf(fp, "%s", self->data);
 }
 
-P_IMPLEMENT(PString, int, snprint, (void *_self, char *str, int size))
+O_IMPLEMENT(String, int, snprint, (void *_self, char *str, int size))
 {
-	struct PString *self = P_CAST(_self, PString());
+	struct String *self = O_CAST(_self, String());
 	return snprintf(str, size, "%s", self->data);
 }
 
-P_IMPLEMENT(PString, void *, clone, (void *_self))
+O_IMPLEMENT(String, void *, clone, (void *_self))
 {
-	struct PString *self = P_CAST(_self, PString());
-	struct PString *clone = P_SUPER->clone(self);
+	struct String *self = O_CAST(_self, String());
+	struct String *clone = O_SUPER->clone(self);
 	clone->data = strdup(self->data);
 	clone->max = self->length + 1;
 	clone->length = self->length;
 	return clone;
 }
 
-P_IMPLEMENT(PString, void *, dtor, (void *_self))
+O_IMPLEMENT(String, void *, dtor, (void *_self))
 {
-	P_DEBUG_IMPLEMENT(PString, void *, dtor, (void *_self));
-	struct PString *self = P_CAST(_self, PString());
+	O_DEBUG_IMPLEMENT(String, void *, dtor, (void *_self));
+	struct String *self = O_CAST(_self, String());
 	free (self->data);
 	self->data = NULL;
-	return P_SUPER->dtor(self);
+	return O_SUPER->dtor(self);
 }
 
-P_OBJECT(PString,PObject);
-self->ctor = PString_ctor;
-self->dtor = PString_dtor;
-self->clone = PString_clone;
-self->resize = PString_resize;
-self->ensure = PString_ensure;
-self->append = PString_append;
-self->append_str = PString_append_str;
-self->append_str_n = PString_append_str_n;
-self->replace = PString_replace;
-self->fprint = PString_fprint;
-self->snprint = PString_snprint;
-self->ctor_from_file = PString_ctor_from_file;
-P_END_OBJECT
+O_OBJECT(String,Object);
+self->ctor = String_ctor;
+self->dtor = String_dtor;
+self->clone = String_clone;
+self->resize = String_resize;
+self->ensure = String_ensure;
+self->append = String_append;
+self->append_str = String_append_str;
+self->append_str_n = String_append_str_n;
+self->replace = String_replace;
+self->fprint = String_fprint;
+self->snprint = String_snprint;
+self->ctor_from_file = String_ctor_from_file;
+O_END_OBJECT
