@@ -20,6 +20,8 @@ LIBHDRS		= Object.h List.h string.h Hash.h utils.h LinkedList.h ListList.h Inter
 
 LIBOBJS		= $(LIBSRCS:%.c=%.o)
 
+SUBDIRS		= lexer sudoku web test
+
 BINOBJS		= $(TESTSRCS:%.c=%.o)
 
 SRCS		= $(LIBSRCS) $(BINSRCS)
@@ -37,6 +39,10 @@ all::		$(LIBS)
 
 clean::
 		$(RM) -f $(BINS) $(LIBS) $(OBJS) $(DEPENDENCIES)
+		make clean -C lexer
+		make clean -C sudoku
+		make clean -C web
+		make clean -C test
 
 tar::
 		indent $(SRCS)
