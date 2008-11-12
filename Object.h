@@ -29,18 +29,15 @@
 #define O_METHOD(klass,name)					\
 	klass##_##name##_##t name
 
-#define O_FUNCTION_DEF(klass,type,name,args)		\
+#define O_FUNCTION_DEF(klass,type,name,args)	\
 	type klass##_##name args
 
-#define O_FUNCTION_DEF(klass,type,name,args)		\
-	type klass##_##name args
-
-#define O_IMPLEMENT(klass,type,name,args,act_args)	\
+#define O_IMPLEMENT(klass,type,name,args,act_args)				\
 	O_FUNCTION_DEF(klass,type,name##_,args) {					\
-		struct klass * self = O_CAST(_self, klass());		\
-		return self->class->name act_args;					\
-	}														\
-	static O_FUNCTION_DEF(klass,type,name,args)
+		struct klass * self = O_CAST(_self, klass());			\
+		return self->class->name act_args;						\
+	}															\
+	static O_FUNCTION_DEF(_##klass,type,name,args)
 
 #define O_OBJECT_DEF(name,klass)				\
 	struct klass * name();						\
@@ -88,7 +85,7 @@
 			self = klass##Class()->new(klass##Class(), sizeof(struct klass), O_STRING(klass), O_SUPER)
 
 #define O_OBJECT_METHOD(klass,method)			\
-	self->method = klass##_##method
+	self->method = _##klass##_##method
 
 #define O_OBJECT_END													\
 		}																\

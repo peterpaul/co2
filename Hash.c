@@ -20,8 +20,8 @@ O_IMPLEMENT(Tuple, void *, dtor, (void *_self), (_self))
 }
 
 O_OBJECT(Tuple, Object);
-self->ctor = Tuple_ctor;
-self->dtor = Tuple_dtor;
+O_OBJECT_METHOD(Tuple, ctor);
+O_OBJECT_METHOD(Tuple, dtor);
 O_END_OBJECT
 
 #undef O_SUPER
@@ -133,10 +133,10 @@ O_IMPLEMENT(Hash, void *, dtor, (void *_self), (_self))
 }
 
 O_OBJECT(Hash, Object);
-self->add = Hash_add;
-self->del = Hash_del;
-self->set = Hash_set;
-self->get = Hash_get;
-self->dtor = Hash_dtor;
+O_OBJECT_METHOD(Hash, add);
+O_OBJECT_METHOD(Hash, del);
+O_OBJECT_METHOD(Hash, set);
+O_OBJECT_METHOD(Hash, get);
+O_OBJECT_METHOD(Hash, dtor);
 O_END_OBJECT
 

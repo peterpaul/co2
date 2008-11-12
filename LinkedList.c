@@ -111,9 +111,9 @@ O_IMPLEMENT(LinkedList, void *, map, (void *_self, void (*fun) (void *)), (_self
 }
 
 O_OBJECT(LinkedList,Object);
-self->ctor = LinkedList_ctor;
-self->dtor = LinkedList_dtor;
-self->sort = LinkedList_sort;
-self->merge_sorted = LinkedList_merge_sorted;
-self->map = LinkedList_map;
+O_OBJECT_METHOD(LinkedList, ctor);
+O_OBJECT_METHOD(LinkedList, dtor);
+O_OBJECT_METHOD(LinkedList, sort);
+O_OBJECT_METHOD(LinkedList, merge_sorted);
+O_OBJECT_METHOD(LinkedList, map);
 O_END_OBJECT

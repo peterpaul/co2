@@ -12,7 +12,7 @@
 		struct klass * self = O_CAST(_self, klass());				\
 		return self->class->name act_args;							\
 	}																\
-	static O_FUNCTION_DEF(klass,type,name,args)
+	static O_FUNCTION_DEF(_##klass,type,name,args)
 
 #define O_OBJECT_IF(IF)													\
 	{																	\

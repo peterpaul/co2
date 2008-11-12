@@ -13,5 +13,5 @@ O_IMPLEMENT(Interface, void *, ctor, (void *_self, va_list * app), (_self, app))
 }
 
 O_OBJECT(Interface,Object);
-self->ctor = Interface_ctor;
+O_OBJECT_METHOD(Interface, ctor);
 O_END_OBJECT

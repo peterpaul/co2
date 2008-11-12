@@ -11,5 +11,5 @@ O_IMPLEMENT(ListList, void *, ctor, (void *_self, va_list * app), (_self, app))
 }
 
 O_OBJECT(ListList, LinkedList);
-self->ctor = ListList_ctor;
+O_OBJECT_METHOD(ListList, ctor);
 O_END_OBJECT

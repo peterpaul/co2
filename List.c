@@ -196,18 +196,18 @@ O_IMPLEMENT(List, struct String *, toString, (void *_self), (_self))
 }
 
 O_OBJECT(List,Object);
-self->ctor = List_ctor;
-self->dtor = List_dtor;
-self->resize = List_resize;
-self->append = List_append;
-self->append_list = List_append_list;
-self->merge = List_merge;
-self->remove = List_remove;
-self->get = List_get;
-self->set = List_set;
-self->map = List_map;
-self->map_args = List_map_args;
-self->filter = List_filter;
-self->filter_args = List_filter_args;
-self->toString = List_toString;
+O_OBJECT_METHOD(List, ctor);
+O_OBJECT_METHOD(List, dtor);
+O_OBJECT_METHOD(List, resize);
+O_OBJECT_METHOD(List, append);
+O_OBJECT_METHOD(List, append_list);
+O_OBJECT_METHOD(List, merge);
+O_OBJECT_METHOD(List, remove);
+O_OBJECT_METHOD(List, get);
+O_OBJECT_METHOD(List, set);
+O_OBJECT_METHOD(List, map);
+O_OBJECT_METHOD(List, map_args);
+O_OBJECT_METHOD(List, filter);
+O_OBJECT_METHOD(List, filter_args);
+O_OBJECT_METHOD(List, toString);
 O_END_OBJECT

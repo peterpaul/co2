@@ -205,16 +205,16 @@ O_IMPLEMENT(String, void *, dtor, (void *_self), (_self))
 }
 
 O_OBJECT(String,Object);
-self->ctor = String_ctor;
-self->dtor = String_dtor;
-self->clone = String_clone;
-self->resize = String_resize;
-self->ensure = String_ensure;
-self->append = String_append;
-self->append_str = String_append_str;
-self->append_str_n = String_append_str_n;
-self->replace = String_replace;
-self->fprint = String_fprint;
-self->snprint = String_snprint;
-self->ctor_from_file = String_ctor_from_file;
+O_OBJECT_METHOD(String, ctor);
+O_OBJECT_METHOD(String, dtor);
+O_OBJECT_METHOD(String, clone);
+O_OBJECT_METHOD(String, resize);
+O_OBJECT_METHOD(String, ensure);
+O_OBJECT_METHOD(String, append);
+O_OBJECT_METHOD(String, append_str);
+O_OBJECT_METHOD(String, append_str_n);
+O_OBJECT_METHOD(String, replace);
+O_OBJECT_METHOD(String, fprint);
+O_OBJECT_METHOD(String, snprint);
+O_OBJECT_METHOD(String, ctor_from_file);
 O_END_OBJECT

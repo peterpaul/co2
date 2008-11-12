@@ -77,7 +77,7 @@ O_IMPLEMENT(Object, void *, dtor, (void *_self), (_self))
 	return self;
 }
 
-void * Object_new(void *_self, ...)
+void * _Object_new(void *_self, ...)
 {
 	struct Class * self = o_cast(_self, Class());
 	struct Object * object = o_alloc(self);
@@ -91,7 +91,7 @@ void * Object_new(void *_self, ...)
 	return object;
 }
 
-void * Object_new_ctor(void *_self, Object_ctor_t ctor, ...)
+void * _Object_new_ctor(void *_self, Object_ctor_t ctor, ...)
 {
 	struct Class * self = o_cast(_self, Class());
 	struct Object * object = o_alloc(self);
@@ -113,7 +113,7 @@ O_IMPLEMENT(Object, void *, delete, (void *_self), (_self))
 	return NULL;
 }
 
-void * Object_init(void *_self, const void *_class, ...)
+void * _Object_init(void *_self, const void *_class, ...)
 {
 	va_list ap;
 	struct Object * self = _self;
@@ -127,7 +127,7 @@ void * Object_init(void *_self, const void *_class, ...)
 	return self;
 }
 
-void * Object_init_ctor(void *_self, const void *_class, Object_ctor_t ctor, ...)
+void * _Object_init_ctor(void *_self, const void *_class, Object_ctor_t ctor, ...)
 {
 	va_list ap;
 	struct Object * self = _self;
