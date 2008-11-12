@@ -2,9 +2,8 @@
 
 #define O_SUPER Object()
 
-O_IMPLEMENT(Tuple, void *, ctor, (void *_self, va_list * app))
+O_IMPLEMENT(Tuple, void *, ctor, (void *_self, va_list * app), (_self, app))
 {
-	O_DEBUG_IMPLEMENT(Tuple, void *, ctor, (void *_self, va_list * app));
 	struct Tuple * self = O_CAST(_self, Tuple ());
 	self = O_SUPER->ctor(self, app);
 	self->key = (char *) strdup(va_arg(*app, char *));
@@ -13,9 +12,8 @@ O_IMPLEMENT(Tuple, void *, ctor, (void *_self, va_list * app))
 	return self;
 }
 
-O_IMPLEMENT(Tuple, void *, dtor, (void *_self))
+O_IMPLEMENT(Tuple, void *, dtor, (void *_self), (_self))
 {
-	O_DEBUG_IMPLEMENT(Tuple, void *, dtor, (void *_self));
 	struct Tuple * self = O_CAST(_self, Tuple ());
 	free (self->key);
 	return O_SUPER->dtor(self);
@@ -56,9 +54,8 @@ static struct Tuple *remove_tuple(struct Tuple *head, const char *key)
 		return NULL;
 }
 
-O_IMPLEMENT(Hash, void *, add, (void *_self, char * key, void *_item))
+O_IMPLEMENT(Hash, void *, add, (void *_self, char * key, void *_item), (_self, key, _item))
 {
-	O_DEBUG_IMPLEMENT(Hash, void *, add, (void *_self, char * key, void *_item));
 	struct Hash * self = O_CAST(_self, Hash());
 	struct Object * item = o_cast(_item, Object());
 	unsigned long index = hash_function((unsigned char *)key) % HASH_SIZE;
@@ -82,9 +79,8 @@ O_IMPLEMENT(Hash, void *, add, (void *_self, char * key, void *_item))
  * Set the value of a Hash Tuple to a certain value or add it if it doesn't
  * exist in the Hash yet.
  */
-O_IMPLEMENT(Hash, void *, set, (void *_self, char * key, void *_item))
+O_IMPLEMENT(Hash, void *, set, (void *_self, char * key, void *_item), (_self, key, _item))
 {
-	O_DEBUG_IMPLEMENT(Hash, void *, set, (void *_self, char * key, void *_item));
 	struct Hash * self = O_CAST(_self, Hash());
 	struct Object * item = o_cast(_item, Object());
 	unsigned long index = hash_function((unsigned char *)key) % HASH_SIZE;
@@ -101,9 +97,8 @@ O_IMPLEMENT(Hash, void *, set, (void *_self, char * key, void *_item))
 	return item;
 }
 
-O_IMPLEMENT(Hash, void *, get, (void *_self, char * key))
+O_IMPLEMENT(Hash, void *, get, (void *_self, char * key), (_self, key))
 {
-	O_DEBUG_IMPLEMENT(Hash, void *, get, (void *_self, char * key));
 	struct Hash * self = O_CAST(_self, Hash());
 	unsigned long index = hash_function((unsigned char *)key) % HASH_SIZE;
 	const struct Tuple *tuple = search(self, key, index);
@@ -114,7 +109,7 @@ O_IMPLEMENT(Hash, void *, get, (void *_self, char * key))
 	}
 }
 
-O_IMPLEMENT(Hash, void *, del, (void *_self, char * key))
+O_IMPLEMENT(Hash, void *, del, (void *_self, char * key), (_self, key))
 {
 	struct Hash * self = O_CAST (_self, Hash ());
 	unsigned long index = hash_function((unsigned char *)key) % HASH_SIZE;
@@ -122,9 +117,8 @@ O_IMPLEMENT(Hash, void *, del, (void *_self, char * key))
 	return self;
 }
 
-O_IMPLEMENT(Hash, void *, dtor, (void *_self))
+O_IMPLEMENT(Hash, void *, dtor, (void *_self), (_self))
 {
-	O_DEBUG_IMPLEMENT(Hash, void *, dtor, (void *_self));
 	struct Hash * self = O_CAST(_self, Hash());
 	int i;
 	for (i = 0; i < HASH_SIZE; i++) {

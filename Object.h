@@ -29,8 +29,18 @@
 #define O_METHOD(klass,name)					\
 	klass##_##name##_##t name
 
-#define O_IMPLEMENT(klass,type,name,args)		\
+#define O_FUNCTION_DEF(klass,type,name,args)		\
 	type klass##_##name args
+
+#define O_FUNCTION_DEF(klass,type,name,args)		\
+	type klass##_##name args
+
+#define O_IMPLEMENT(klass,type,name,args,act_args)	\
+	O_FUNCTION_DEF(klass,type,name##_,args) {					\
+		struct klass * self = O_CAST(_self, klass());		\
+		return self->class->name act_args;					\
+	}														\
+	static O_FUNCTION_DEF(klass,type,name,args)
 
 #define O_OBJECT_DEF(name,klass)				\
 	struct klass * name();						\
@@ -77,6 +87,9 @@
 		if (self == NULL) {												\
 			self = klass##Class()->new(klass##Class(), sizeof(struct klass), O_STRING(klass), O_SUPER)
 
+#define O_OBJECT_METHOD(klass,method)			\
+	self->method = klass##_##method
+
 #define O_OBJECT_END													\
 		}																\
 		return self;													\
@@ -86,8 +99,6 @@
 
 #define O_CAST(o,c)								\
 	o_cast(o,c)
-
-#define O_DEBUG_IMPLEMENT(klass,type,name,args)
 
 /* Functions */
 void * o_cast(void * _object, void * _class);
@@ -129,7 +140,8 @@ O_METHOD_DEF(Object, void *, clone, (void *_self));
 	O_METHOD(Object, toString);					\
 	O_METHOD(Object, clone)
 
-#define Class ObjectClass
+// #define Class ObjectClass
+#define ObjectClass Class
 
 O_CLASS(Object, Object);
 

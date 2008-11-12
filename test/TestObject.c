@@ -29,6 +29,7 @@ int main(void)
 
 	printf("."); fflush(stdout);
 
+
 	printf("%d", singleton->value);
 
 	printf("."); fflush(stdout);

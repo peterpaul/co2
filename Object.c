@@ -54,21 +54,23 @@ int o_is_of(void *_self, void *_class)
 void * o_get_interface(void * _self, void * _interface)
 {
 	struct Object *self = O_IS_OBJECT(_self);
+	struct Interface *interface = O_IS_OBJECT(_interface);
 	struct Interface *IF = self->class->interface_list;
-	while (IF && !o_is_of(IF, _interface)) {
+	while (IF && !o_is_of(IF, interface)) {
 		IF = IF->next;
 	}
+	assertTrue(IF, "%s at 0x%x does not implement %s.", self->class->name, (int)self, interface->class->name);
 	return IF;
 }
 
 /* Object methods */
-void * Object_ctor(void *_self, va_list *argp)
+O_IMPLEMENT(Object, void *, ctor, (void *_self, va_list *argp), (_self, argp))
 {
 	struct Object * self = o_cast(_self, Object());
 	return self;
 }
 
-void * Object_dtor(void *_self)
+O_IMPLEMENT(Object, void *, dtor, (void *_self), (_self))
 {
 	struct Object * self = o_cast(_self, Object());
 	self->class = NULL;
@@ -103,7 +105,7 @@ void * Object_new_ctor(void *_self, Object_ctor_t ctor, ...)
 	return object;
 }
 
-void * Object_delete(void *_self)
+O_IMPLEMENT(Object, void *, delete, (void *_self), (_self))
 {
 	struct Object * self = o_cast(_self, Object());
 	self = self->class->dtor(self);
@@ -139,13 +141,13 @@ void * Object_init_ctor(void *_self, const void *_class, Object_ctor_t ctor, ...
 	return self;
 }
 
-struct String * Object_toString(void *_self)
+O_IMPLEMENT(Object, struct String *, toString, (void *_self), (_self))
 {
 	struct Object *self = O_CAST(_self, Object());
 	return String()->new(String(), "%s at %p", self->class->name, _self);
 }
 
-void * Object_clone(void *_self)
+O_IMPLEMENT(Object, void *, clone, (void *_self), (_self))
 {
 	struct Object *self = O_CAST(_self, Object());
 	struct Object *clone = o_alloc(self->class);
@@ -156,7 +158,7 @@ void * Object_clone(void *_self)
 /* Class methods */
 #define O_SUPER Object()
 
-void * Class_ctor(void *_self, va_list *argp)
+O_IMPLEMENT(Class, void *, ctor, (void *_self, va_list *argp), (_self, argp))
 {
 	struct Class * self = o_cast(_self, Class());
 	self = O_SUPER->ctor(self, argp);
@@ -174,7 +176,7 @@ void * Class_ctor(void *_self, va_list *argp)
 	return self;
 }
 
-void * Class_dtor(void *_self)
+O_IMPLEMENT(Class, void *, dtor, (void *_self), (_self))
 {
 	o_cast(_self, Class());
 	fprintf(stderr, "--- BAD PROGRAMMER ALERT ---\n");
@@ -183,7 +185,7 @@ void * Class_dtor(void *_self)
 	return NULL;
 }
 
-void * Class_delete(void *_self)
+O_IMPLEMENT(Class, void *, delete, (void *_self), (_self))
 {
 	o_cast(_self, Class());
 	fprintf(stderr, "--- BAD PROGRAMMER ALERT ---\n");
@@ -208,15 +210,15 @@ struct Class * Object()
 		_self.super = self;
 		_self.interface_list = NULL;
 		o_add_class(self);
-		_self.ctor = Object_ctor;
-		_self.dtor = Object_dtor;
-		_self.new = Object_new;
-		_self.new_ctor = Object_new_ctor;
-		_self.init = Object_init;
-		_self.init_ctor = Object_init_ctor;
-		_self.delete = Object_delete;
-		_self.toString = Object_toString;
-		_self.clone = Object_clone;
+		O_OBJECT_METHOD(Object,ctor);
+		O_OBJECT_METHOD(Object,dtor);
+		O_OBJECT_METHOD(Object,new);
+		O_OBJECT_METHOD(Object,new_ctor);
+		O_OBJECT_METHOD(Object,init);
+		O_OBJECT_METHOD(Object,init_ctor);
+		O_OBJECT_METHOD(Object,delete);
+		O_OBJECT_METHOD(Object,toString);
+		O_OBJECT_METHOD(Object,clone);
 	}
 	return self;
 }
@@ -234,15 +236,15 @@ struct Class * Class()
 		_self.super = Object();
 		_self.interface_list = NULL;
 		o_add_class(self);
-		_self.ctor = Class_ctor;
-		_self.dtor = Class_dtor;
-		_self.new = Object_new;
-		_self.new_ctor = Object_new_ctor;
-		_self.init = Object_init;
-		_self.init_ctor = Object_init_ctor;
-		_self.delete = Class_delete;
-		_self.toString = Object_toString;
-		/* _self.clone = Object_clone; */
+		O_OBJECT_METHOD(Class,ctor);
+		O_OBJECT_METHOD(Class,dtor);
+		O_OBJECT_METHOD(Object,new);
+		O_OBJECT_METHOD(Object,new_ctor);
+		O_OBJECT_METHOD(Object,init);
+		O_OBJECT_METHOD(Object,init_ctor);
+		O_OBJECT_METHOD(Class,delete);
+		O_OBJECT_METHOD(Object,toString);
+		/* O_OBJECT_METHOD(Object,clone); */
 	}
 	return self;
 }

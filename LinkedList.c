@@ -3,7 +3,7 @@
 
 #define O_SUPER Object()
 
-O_IMPLEMENT(LinkedList, void *, ctor, (void *_self, va_list * app))
+O_IMPLEMENT(LinkedList, void *, ctor, (void *_self, va_list * app), (_self, app))
 {
 	struct LinkedList *self = O_CAST(_self, LinkedList());
 	self = O_SUPER->ctor(self, app);
@@ -11,7 +11,7 @@ O_IMPLEMENT(LinkedList, void *, ctor, (void *_self, va_list * app))
 	return self;
 }
 
-O_IMPLEMENT(LinkedList, void *, dtor, (void *_self))
+O_IMPLEMENT(LinkedList, void *, dtor, (void *_self), (_self))
 {
 	struct LinkedList *self = O_CAST(_self, LinkedList());
 	struct LinkedList *next = self->next;
@@ -28,7 +28,7 @@ O_IMPLEMENT(LinkedList, void *, dtor, (void *_self))
 	return O_SUPER->dtor(self);
 }
 
-O_IMPLEMENT(LinkedList, void *, merge_sorted, (void *_self, void *_other))
+O_IMPLEMENT(LinkedList, void *, merge_sorted, (void *_self, void *_other), (_self, _other))
 {
 	struct LinkedList * self = O_CAST(_self, LinkedList());
 	struct LinkedList * other = O_CAST(_other, LinkedList());
@@ -73,7 +73,7 @@ static struct ListList * prepare_sort(struct LinkedList * list)
 	return head;
 }
 
-O_IMPLEMENT(LinkedList, void *, sort, (void *_self))
+O_IMPLEMENT(LinkedList, void *, sort, (void *_self), (_self))
 {
 	struct LinkedList * self = O_CAST(_self, LinkedList());
 	struct ListList * head = prepare_sort(self), * tail;
@@ -99,7 +99,7 @@ O_IMPLEMENT(LinkedList, void *, sort, (void *_self))
 	return self;
 }
 
-O_IMPLEMENT(LinkedList, void *, map, (void *_self, void (*fun) (void *)))
+O_IMPLEMENT(LinkedList, void *, map, (void *_self, void (*fun) (void *)), (_self, fun))
 {
 	struct LinkedList * self = O_CAST(_self, LinkedList());
 	if (self->next) {
