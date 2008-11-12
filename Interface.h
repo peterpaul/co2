@@ -4,7 +4,7 @@
 #include "Object.h"
 
 #define O_IMPLEMENT_IF(klass,type,name,args,act_args,IF)			\
-	O_FUNCTION_DEF(klass,type,name##_,args) {						\
+	O_FUNCTION_DEF(klass,type,name,args) {						\
 		struct IF * interface = o_get_interface(_self, IF());		\
 		return interface->name act_args;							\
 	}																\

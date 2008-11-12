@@ -33,7 +33,7 @@
 	type klass##_##name args
 
 #define O_IMPLEMENT(klass,type,name,args,act_args)				\
-	O_FUNCTION_DEF(klass,type,name##_,args) {					\
+	O_FUNCTION_DEF(klass,type,name,args) {					\
 		struct klass * self = O_CAST(_self, klass());			\
 		return self->class->name act_args;						\
 	}															\
