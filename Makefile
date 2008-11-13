@@ -35,7 +35,11 @@ FILES		= $(SRCS) $(HDRS) Makefile
 
 DEPENDENCIES	=$(SRCS:%.c=%.d)
 
-all::		$(LIBS) 
+all::		$(LIBS)
+		make -C lexer && \
+			make -C sudoku && \
+			make -C web && \
+			make -C test
 
 clean::
 		$(RM) -f $(BINS) $(LIBS) $(OBJS) $(DEPENDENCIES)
