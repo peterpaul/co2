@@ -113,32 +113,32 @@ O_IMPLEMENT(Object, void *, delete, (void *_self), (_self))
 	return NULL;
 }
 
-void * _Object_init(void *_self, const void *_class, ...)
+void * _Object_init(const void *_self, void *_object, ...)
 {
 	va_list ap;
-	struct Object * self = _self;
-	const struct ObjectClass *class = O_IS_CLASS(_class);
+	struct Object * object = _object;
+	const struct ObjectClass *self = O_IS_CLASS(_self);
 
-	assert (self);
-	self->class = (struct Class *)class;
-	va_start(ap, _class);
-	self->class->ctor(self, &ap);
+	assert (object);
+	object->class = (struct Class *)self;
+	va_start(ap, _object);
+	object->class->ctor(object, &ap);
 	va_end(ap);
-	return self;
+	return object;
 }
 
-void * _Object_init_ctor(void *_self, const void *_class, Object_ctor_t ctor, ...)
+void * _Object_init_ctor(const void *_self, void *_object, Object_ctor_t ctor, ...)
 {
 	va_list ap;
-	struct Object * self = _self;
-	const struct ObjectClass *class = O_IS_CLASS(_class);
+	struct Object * object = _object;
+	const struct ObjectClass *self = O_IS_CLASS(_self);
 
-	assert (self);
-	self->class = (struct Class *)class;
+	assert (object);
+	object->class = (struct Class *)self;
 	va_start(ap, ctor);
-	ctor(self, &ap);
+	ctor(object, &ap);
 	va_end(ap);
-	return self;
+	return object;
 }
 
 O_IMPLEMENT(Object, struct String *, toString, (void *_self), (_self))

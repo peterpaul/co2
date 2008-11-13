@@ -73,16 +73,26 @@
 
 #define O_OBJECT(klass,supper)											\
 	struct Class * klass##Class() {										\
+		static struct Class _self;										\
 		static struct Class * self = NULL;								\
 		if (self == NULL) {												\
-			self = Class()->new(Class(), sizeof(struct klass##Class), O_STRING(klass##Class), O_SUPER->class); \
+			self = &_self;												\
+			self = Class()->init(Class(), self,							\
+								 sizeof(struct klass##Class),			\
+								 O_STRING(klass##Class),				\
+								 O_SUPER->class);						\
 		}																\
 		return self;													\
 	}																	\
 	struct klass##Class * klass() {										\
+		static struct klass##Class _self;								\
 		static struct klass##Class * self = NULL;						\
 		if (self == NULL) {												\
-			self = klass##Class()->new(klass##Class(), sizeof(struct klass), O_STRING(klass), O_SUPER)
+			self = &_self;												\
+			self = klass##Class()->init(klass##Class(), self,			\
+										sizeof(struct klass),			\
+										O_STRING(klass),				\
+										O_SUPER)
 
 #define O_OBJECT_METHOD(klass,method)			\
 	self->method = _##klass##_##method
@@ -111,8 +121,8 @@ void o_print_classes(FILE * fp);
 O_METHOD_DEF(Object, void *, ctor, (void *_self, va_list * argp));
 O_METHOD_DEF(Object, void *, new, (void *_self, ...));
 O_METHOD_DEF(Object, void *, new_ctor, (void *_self, Object_ctor_t ctor, ...));
-O_METHOD_DEF(Object, void *, init, (void *_self, const void *_class, ...));
-O_METHOD_DEF(Object, void *, init_ctor, (void *_self, const void *_class, Object_ctor_t ctor, ...));
+O_METHOD_DEF(Object, void *, init, (const void *_class, void *_self, ...));
+O_METHOD_DEF(Object, void *, init_ctor, (const void *_class, void *_self, Object_ctor_t ctor, ...));
 O_METHOD_DEF(Object, void *, dtor, (void *_self));
 O_METHOD_DEF(Object, void *, delete, (void *_self));
 O_METHOD_DEF(Object, struct String *, toString, (void *_self));
