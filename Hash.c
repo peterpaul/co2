@@ -27,7 +27,9 @@ O_END_OBJECT
 #undef O_SUPER
 #define O_SUPER Object()
 
-static inline struct Tuple *search(const struct Hash *hash,
+static
+/* inline */
+struct Tuple *search(const struct Hash *hash,
 				   const char *key, unsigned long index)
 {
 	struct Tuple *head = hash->map[index];

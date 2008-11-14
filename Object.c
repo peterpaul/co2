@@ -276,6 +276,14 @@ static struct ClassHashmapTuple * o_find_class_hashmap_tuple(struct ClassHashmap
 	return head;
 }
 
+void o_cleanup_class_hashmap_tuple(struct ClassHashmapTuple * tuple)
+{
+	while (tuple->next) {
+		o_cleanup_class_hashmap_tuple(tuple->next);
+	}
+	free(tuple);
+}
+
 /* *** Functions for class registration *** */
 #define CLASS_HASHMAP_SIZE 1024
 struct ClassHashmapTuple ** class_hashmap = NULL;
@@ -317,4 +325,17 @@ void o_print_classes(FILE * fp)
 			fprintf(fp, "%s\n", class_hashmap[i]->class->name);
 		}
 	}
+}
+
+void o_cleanup_class_hashmap()
+{
+	int i;
+	for (i = 0; i < CLASS_HASHMAP_SIZE; i++)
+	{
+		if (class_hashmap[i]) {
+			o_cleanup_class_hashmap_tuple(class_hashmap[i]);
+		}
+	}
+	free(class_hashmap);
+	class_hashmap = NULL;
 }

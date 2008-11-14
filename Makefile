@@ -1,18 +1,4 @@
-CC		= gcc
-AR		= ar
-RANLIB		= ranlib
-#CC		= llvmgcc
-#AR		= llvm-ar
-#RANLIB		= llvm-ranlib
-DEP_FLAGS	= -MM -MG -MMD
-DEBUGFLG	= -g3
-#DEBUGFLG	= -g3 -DP_DEBUG
-ANSIFLGS	= -ansi -pedantic
-#OPTFLAGS	= -O9 -march=i686 -ffast-math -funroll-loops -fomit-frame-pointer
-#OPTFLAGS	= -O9 -mfpmath=sse -ffast-math -funroll-loops -fomit-frame-pointer
-OPTFLAGS	= -O2
-CFLAGS		= -Wall $(OPTFLAGS) $(DEBUGFLG)
-LFLAGS		= 
+include Makefile.include
 
 LIBSRCS		= Object.c List.c String.c Hash.c utils.c LinkedList.c ListList.c Interface.c Singleton.c
 

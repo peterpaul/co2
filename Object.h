@@ -147,7 +147,6 @@ O_METHOD_DEF(Object, void *, clone, (void *_self));
 	O_METHOD(Object, toString);					\
 	O_METHOD(Object, clone)
 
-// #define Class ObjectClass
 #define ObjectClass Class
 
 O_CLASS(Object, Object);

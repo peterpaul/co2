@@ -1,40 +1,19 @@
-CC		=gcc
-DEP_FLAGS	= -MM -MG -MMD
 INCLUDE		=-I../
-CFLAGS		=-W -Wall -g3 -O0 $(INCLUDE) -DDEBUG=2
-LD		=gcc
-LIBRARIES	=-L../ -lObject
+LIBRARIES	=-L../ -L./ -ltest -lObject
 
-SRCS		=MyInterface.c MyObject.c MySingleton.c TestInterface.c TestObject.c
+LIBSRCS		=MyInterface.c MyObject.c MySingleton.c TestInterface.c
+LIBHDRS		=${LIBSRCS:%.c=%.h}
+LIBOBJS		=${LIBSRCS:%.c=%.o}
 
-CC_SRCS		= $(GEN_SRCS) $(SRCS)
+SRCS		=TestObject.c
+
+CC_SRCS		= $(SRCS)
 
 OBJS		=$(CC_SRCS:%.c=%.o)
-BINS		=test
-LIBS		=../libObject.a
+BINS		=TestObject.bin
+LIBS		=../libObject.a ./libtest.a
 
-DEPENDENCIES	=$(OBJS:%.o=%.d)
-
-all::		$(BINS)
-
-clean::
-		$(RM) -f $(BINS) $(OBJS) $(GEN) $(DEPENDENCIES)
-
-doc::
-		doxywizard Doxyfile
-
-$(BINS):	$(OBJS) $(LIBS)
-		$(LD) $(LDFLAGS) $(OBJS) -o $@ $(LIBRARIES)
+include ../Makefile.include
 
 ../libObject.a:
 		make -C ../ libObject.a
-
-%.o:		%.c
-		$(CC) $(CFLAGS) -c $< -o $@
-
-%.d:		%.c
-		$(CC) $(CFLAGS) $(DEP_FLAGS) $< > $@
-
-ifeq		($(filter clean tar doc, $(MAKECMDGOALS)),)
--include	$(DEPENDENCIES)
-endif
