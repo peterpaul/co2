@@ -8,13 +8,11 @@
 #ifndef OBJECT_H_
 #define OBJECT_H_
 
-#include "stdlib.h"
-#include "stdio.h"
-#include "string.h"
-#include "stdarg.h"
-#include "assert.h"
-
-#include "linux/stddef.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdarg.h>
+#include <assert.h>
 
 #include "utils.h"
 

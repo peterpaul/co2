@@ -1,18 +1,27 @@
 CC		= gcc
 AR		= ar
 RANLIB		= ranlib
+GCC			= gcc
 #CC		= llvmgcc
 #AR		= llvm-ar
 #RANLIB		= llvm-ranlib
+
 DEP_FLAGS	= -MM -MG -MMD
-DEBUGFLG	= -g3
+
+DEBUGFLG	=
+#DEBUGFLG	= -g3
 #DEBUGFLG	= -g3 -DP_DEBUG
-ANSIFLGS	= -ansi -pedantic
+
+ANSIFLGS	=
+#ANSIFLGS	= -ansi -pedantic
+
+OPTFLAGS	=
 #OPTFLAGS	= -O9 -march=i686 -ffast-math -funroll-loops -fomit-frame-pointer
 #OPTFLAGS	= -O9 -mfpmath=sse -ffast-math -funroll-loops -fomit-frame-pointer
-OPTFLAGS	= -O2
-CFLAGS		= -Wall $(OPTFLAGS) $(DEBUGFLG) $(INCLUDE)
-#CFLAGS		= -Wall $(OPTFLAGS) $(DEBUGFLG) $(ANSIFLGS) $(INCLUDE)
+#OPTFLAGS	= -O2
+
+CFLAGS		= -Wall $(OPTFLAGS) $(DEBUGFLG) $(ANSIFLGS) $(INCLUDE)
+
 LFLAGS		= 
 
 LD		=gcc
@@ -36,7 +45,7 @@ doc::
 		$(CC) $(CFLAGS) -c $< -o $@
 
 %.d:		%.c
-		$(CC) $(CFLAGS) $(DEP_FLAGS) $< > $@
+		$(GCC) $(CFLAGS) $(DEP_FLAGS) $< > $@
 
 %.a: ${LIBOBJS}
 		${AR} rc $@ ${LIBOBJS}

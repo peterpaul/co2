@@ -1,5 +1,3 @@
-include Makefile.include
-
 LIBSRCS		= Object.c List.c String.c Hash.c utils.c LinkedList.c ListList.c Interface.c Singleton.c
 
 LIBHDRS		= Object.h List.h string.h Hash.h utils.h LinkedList.h ListList.h Interface.h Singleton.h
@@ -19,7 +17,7 @@ BINS		=
 
 FILES		= $(SRCS) $(HDRS) Makefile
 
-DEPENDENCIES	=$(SRCS:%.c=%.d)
+include Makefile.include
 
 all::		$(LIBS)
 		make -C lexer && \
@@ -39,19 +37,6 @@ tar::
 		rm *~
 		tar -czvf Object.tar.gz $(FILES)	
 
-doc::
-		doxygen Doxyfile
-
 libObject.a:	$(LIBOBJS)
 		$(AR) rc $@ $(LIBOBJS)
 		$(RANLIB) $@
-
-%.o:		%.c
-		$(CC) $(CFLAGS) -c $< -o $@
-
-%.d:		%.c
-		$(CC) $(CFLAGS) $(DEP_FLAGS) $< > $@
-
-ifeq		($(filter clean tar doc, $(MAKECMDGOALS)),)
--include	$(DEPENDENCIES)
-endif
