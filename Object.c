@@ -10,16 +10,16 @@
 #include "Interface.h"
 
 /* General functions */
-void * o_cast(void * _object, void * _class)
+void * o_cast(const void * _object, const void * _class)
 {
-	struct Object * object = O_IS_OBJECT(_object);
-	struct Class * class = O_IS_CLASS(_class);
-	struct Class * myClass = object->class;
-	struct Class * o = Object();
+	const struct Object * object = O_IS_OBJECT(_object);
+	const struct Class * class = O_IS_CLASS(_class);
+	const struct Class * myClass = object->class;
+	const struct Class * o = Object();
 	while(myClass != class && myClass != o)
 		myClass = myClass->super;
 	assert (myClass == class);
-	return _object;
+	return (void *)_object;
 }
 
 void * o_alloc(const void *_class)
@@ -31,18 +31,18 @@ void * o_alloc(const void *_class)
 	return self;
 }
 
-int o_is_a(void *_self, void *_class)
+int o_is_a(const void *_self, const void *_class)
 {
-	struct Object *self = O_IS_OBJECT(_self);
-	struct ObjectClass *class = O_IS_CLASS(_class);
+	const struct Object *self = O_IS_OBJECT(_self);
+	const struct ObjectClass *class = O_IS_CLASS(_class);
 	const struct ObjectClass *myClass = self->class;
 	return myClass == class;
 }
 
-int o_is_of(void *_self, void *_class)
+int o_is_of(const void *_self, const void *_class)
 {
-	struct Object *self = O_IS_OBJECT(_self);
-	struct ObjectClass *class = O_IS_CLASS(_class);
+	const struct Object *self = O_IS_OBJECT(_self);
+	const struct ObjectClass *class = O_IS_CLASS(_class);
 	const struct ObjectClass *myClass = self->class;
 	void *object = Object();
 	while (myClass != class && myClass != object) {
@@ -61,6 +61,17 @@ void * o_get_interface(void * _self, void * _interface)
 	}
 	assertTrue(IF, "%s at 0x%x does not implement %s.", self->class->name, (int)self, interface->class->name);
 	return IF;
+}
+
+void * o_super_ctor(void *_self, const void *_class, ...)
+{
+	struct Object *self = O_IS_OBJECT(_self);
+	const struct ObjectClass *class = O_IS_CLASS(_class);
+	va_list ap;
+	va_start(ap, _class);
+	self = class->ctor(self, &ap);
+	va_end(ap);
+	return self;
 }
 
 /* Object methods */
