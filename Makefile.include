@@ -8,19 +8,23 @@ GCC			= gcc
 
 DEP_FLAGS	= -MM -MG -MMD
 
-DEBUGFLG	=
+DEBUGFLG	= -g3
 #DEBUGFLG	= -g3
 #DEBUGFLG	= -g3 -DP_DEBUG
 
 ANSIFLGS	=
 #ANSIFLGS	= -ansi -pedantic
 
-OPTFLAGS	=
+OPTFLAGS	= -O1
 #OPTFLAGS	= -O9 -march=i686 -ffast-math -funroll-loops -fomit-frame-pointer
 #OPTFLAGS	= -O9 -mfpmath=sse -ffast-math -funroll-loops -fomit-frame-pointer
 #OPTFLAGS	= -O2
+#OPTFLAGS	= -O9 -march=athlon-xp -mfpmath=sse -funroll-loops -ffast-math -malign-double -fomit-frame-pointer
+#OPTFLAGS	= -mfpmath=sse -msse
 
-CFLAGS		= -Wall $(OPTFLAGS) $(DEBUGFLG) $(ANSIFLGS) $(INCLUDE)
+PROFLAGS	= -g3 -pg -fprofile-arcs
+
+CFLAGS		= $(OPTFLAGS) $(DEBUGFLG) $(ANSIFLGS) $(INCLUDE)
 
 LFLAGS		= 
 
