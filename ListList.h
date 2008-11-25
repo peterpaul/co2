@@ -12,4 +12,4 @@
 
 O_CLASS(ListList, LinkedList);
 
-#endif /* LIST_LIST_H */
+#endif				/* LIST_LIST_H */

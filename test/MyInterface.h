@@ -14,4 +14,4 @@ O_METHOD_DEF(MyInterface, int, getValue, (void *_self));
 
 O_CLASS(MyInterface, Interface);
 
-#endif /* _MY_INTERFACE_H */
+#endif				/* _MY_INTERFACE_H */

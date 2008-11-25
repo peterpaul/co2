@@ -9,11 +9,11 @@
 
 #define O_SUPER Object()
 
-void * Singleton_new(void *_self, ...)
+void *Singleton_new(void *_self, ...)
 {
-	struct SingletonClass * self = o_cast(_self, SingletonClass());
+	struct SingletonClass *self = o_cast(_self, SingletonClass());
 	if (!self->singleton) {
-		struct Singleton * object = calloc(1, self->size);
+		struct Singleton *object = calloc(1, self->size);
 		self->singleton = object;
 		va_list ap;
 		object->class = self;
@@ -25,14 +25,14 @@ void * Singleton_new(void *_self, ...)
 	return self->singleton;
 }
 
-void * Singleton_delete(void *_self)
+void *Singleton_delete(void *_self)
 {
-	struct Singleton * self = o_cast(_self, Singleton());
+	struct Singleton *self = o_cast(_self, Singleton());
 	self->class->singleton = NULL;
 	return O_SUPER->delete(self);
 }
 
-O_OBJECT(Singleton,Object);
+O_OBJECT(Singleton, Object);
 self->new = Singleton_new;
 self->delete = Singleton_delete;
 O_OBJECT_END

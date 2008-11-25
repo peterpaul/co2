@@ -5,11 +5,13 @@
 
 O_METHOD_DEF(String, void *, resize, (void *_self, int size));
 O_METHOD_DEF(String, void *, ensure, (void *_self, int size));
-O_METHOD_DEF(String, void *, append, (void *_self, struct String *str));
+O_METHOD_DEF(String, void *, append, (void *_self, struct String * str));
 O_METHOD_DEF(String, void *, append_str, (void *_self, char *str, ...));
-O_METHOD_DEF(String, void *, append_str_n, (void *_self, char *str, int n));
-O_METHOD_DEF(String, void *, replace, (void *_self, struct String *that, struct String *this));
-O_METHOD_DEF(String, void *, ctor_from_file, (void *_self, va_list *app));
+O_METHOD_DEF(String, void *, append_str_n,
+	     (void *_self, char *str, int n));
+O_METHOD_DEF(String, void *, replace,
+	     (void *_self, struct String * that, struct String * this));
+O_METHOD_DEF(String, void *, ctor_from_file, (void *_self, va_list * app));
 /**
  * @brief Prints this String to a file.
  *
@@ -19,7 +21,7 @@ O_METHOD_DEF(String, void *, ctor_from_file, (void *_self, va_list *app));
  * @param fp The FILE to write to
  * @return The number of characters written to the FILE
  */
-O_METHOD_DEF(String, int, fprint, (void *_self, FILE *fp));
+O_METHOD_DEF(String, int, fprint, (void *_self, FILE * fp));
 /**
  * @brief Prints this String to a string.
  *
@@ -54,6 +56,6 @@ O_METHOD_DEF(String, int, snprint, (void *_self, char *str, int size));
 	char * data;								\
 	int length, max
 
-O_CLASS (String,Object);
+O_CLASS(String, Object);
 
 #endif

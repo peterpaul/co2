@@ -109,23 +109,25 @@
 	o_cast(o,c)
 
 /* Functions */
-void * o_cast(const void * _object, const void * _class);
+void *o_cast(const void *_object, const void *_class);
 int o_is_a(const void *_self, const void *_class);
 int o_is_of(const void *_self, const void *_class);
-void * o_get_interface(void * _self, void * _interface);
+void *o_get_interface(void *_self, void *_interface);
 
-void * o_get_class(const char * class_name);
-void o_add_class(void * _class);
+void *o_get_class(const char *class_name);
+void o_add_class(void *_class);
 void o_print_classes(FILE * fp);
 
-void * o_super_ctor(void *_self, const void *_class, ...);
+void *o_super_ctor(void *_self, const void *_class, ...);
 
 /* Object methods definition */
 O_METHOD_DEF(Object, void *, ctor, (void *_self, va_list * argp));
 O_METHOD_DEF(Object, void *, new, (void *_self, ...));
-O_METHOD_DEF(Object, void *, new_ctor, (void *_self, Object_ctor_t ctor, ...));
+O_METHOD_DEF(Object, void *, new_ctor,
+	     (void *_self, Object_ctor_t ctor, ...));
 O_METHOD_DEF(Object, void *, init, (const void *_class, void *_self, ...));
-O_METHOD_DEF(Object, void *, init_ctor, (const void *_class, void *_self, Object_ctor_t ctor, ...));
+O_METHOD_DEF(Object, void *, init_ctor,
+	     (const void *_class, void *_self, Object_ctor_t ctor, ...));
 O_METHOD_DEF(Object, void *, dtor, (void *_self));
 O_METHOD_DEF(Object, void *, delete, (void *_self));
 O_METHOD_DEF(Object, struct String *, toString, (void *_self));
@@ -154,4 +156,4 @@ O_METHOD_DEF(Object, void *, clone, (void *_self));
 
 O_CLASS(Object, Object);
 
-#endif /* OBJECT_H_ */
+#endif				/* OBJECT_H_ */

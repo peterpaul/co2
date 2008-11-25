@@ -22,10 +22,10 @@ O_CLASS(Tuple, Object);
 #define HASH_SIZE 32
 #endif
 
-O_METHOD_DEF(Hash, void *, add, (void *_self, char * key, void * _item));
-O_METHOD_DEF(Hash, void *, get, (void *_self, char * key));
-O_METHOD_DEF(Hash, void *, set, (void *_self, char * key, void * _item));
-O_METHOD_DEF(Hash, void *, del, (void *_self, char * key));
+O_METHOD_DEF(Hash, void *, add, (void *_self, char *key, void *_item));
+O_METHOD_DEF(Hash, void *, get, (void *_self, char *key));
+O_METHOD_DEF(Hash, void *, set, (void *_self, char *key, void *_item));
+O_METHOD_DEF(Hash, void *, del, (void *_self, char *key));
 
 #define HashClass_Attr							\
 	ObjectClass_Attr;							\
@@ -40,4 +40,4 @@ O_METHOD_DEF(Hash, void *, del, (void *_self, char * key));
 
 O_CLASS(Hash, Object);
 
-#endif /* Hash_H */
+#endif				/* Hash_H */

@@ -10,9 +10,11 @@ O_METHOD_DEF(List, void *, remove, (void *self));
 O_METHOD_DEF(List, void *, get, (void *_self, unsigned index));
 O_METHOD_DEF(List, void *, set, (void *_self, unsigned index, void *item));
 O_METHOD_DEF(List, void *, map, (void *_self, void (*fun) (void *)));
-O_METHOD_DEF(List, void *, map_args, (void *_self, void (*fun) (void *, va_list *), ...));
+O_METHOD_DEF(List, void *, map_args,
+	     (void *_self, void (*fun) (void *, va_list *), ...));
 O_METHOD_DEF(List, void *, filter, (void *_self, int (*filter) (void *)));
-O_METHOD_DEF(List, void *, filter_args, (void *_self, int (*filter) (void *, va_list *), ...));
+O_METHOD_DEF(List, void *, filter_args,
+	     (void *_self, int (*filter) (void *, va_list *), ...));
 O_METHOD_DEF(List, void *, destroy, (void *_self));
 
 #define ListClass_Attr							\
@@ -36,6 +38,6 @@ O_METHOD_DEF(List, void *, destroy, (void *_self));
 	void **data;								\
 	unsigned length, max
 
-O_CLASS(List,Object);
+O_CLASS(List, Object);
 
 #endif				/* not LIST_H */

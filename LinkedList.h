@@ -24,9 +24,11 @@
 	}
 
 O_METHOD_DEF(LinkedList, void *, sort, (void *_self));
-O_METHOD_DEF(LinkedList, void *, merge_sorted, (void *_self, void *_other));
-O_METHOD_DEF(LinkedList, void *, map, (void *_self, void (*fun)(void *)));
-O_METHOD_DEF(LinkedList, int, compare, (const void *_self, const void *_other));
+O_METHOD_DEF(LinkedList, void *, merge_sorted,
+	     (void *_self, void *_other));
+O_METHOD_DEF(LinkedList, void *, map, (void *_self, void (*fun) (void *)));
+O_METHOD_DEF(LinkedList, int, compare,
+	     (const void *_self, const void *_other));
 
 #define LinkedListClass_Attr					\
 	ObjectClass_Attr;							\
@@ -41,4 +43,4 @@ O_METHOD_DEF(LinkedList, int, compare, (const void *_self, const void *_other));
 
 O_CLASS(LinkedList, Object);
 
-#endif /* LINKEDLIST_H */
+#endif				/* LINKEDLIST_H */

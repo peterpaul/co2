@@ -6,52 +6,54 @@
 
 #define O_SUPER Object()
 
-static size_t strnlen(const char * str, size_t n)
+static size_t strnlen(const char *str, size_t n)
 {
 	size_t i;
 	for (i = 0; str[i] && i < n; i++);
 	return i;
 }
 
-O_IMPLEMENT(String, void *, ctor_from_file, (void *_self, va_list *app), (_self, app))
+O_IMPLEMENT(String, void *, ctor_from_file, (void *_self, va_list * app),
+	    (_self, app))
 {
 	struct String *self = O_CAST(_self, String());
 	self = O_SUPER->ctor(self, app);
-	const char * filename = va_arg (*app, const char *);
+	const char *filename = va_arg(*app, const char *);
 	struct stat buffer;
 	FILE *fp;
 
-	if (stat (filename, &buffer) == -1) {
+	if (stat(filename, &buffer) == -1) {
 		O_SUPER->dtor(self);
-		free (self);
+		free(self);
 		return NULL;
 	}
 	/* allocate buffer large enough to hold file contents */
-	self->data = malloc (buffer.st_size + 1);
+	self->data = malloc(buffer.st_size + 1);
 	self->max = buffer.st_size + 1;
 	/* open the file */
-	fp = fopen (filename, "r");
+	fp = fopen(filename, "r");
 	if (fp == 0) {
 		self->class->delete(self);
 		return NULL;
 	}
 	/* read contents of file, and terminate string */
-	self->length = fread (self->data, 1, buffer.st_size, fp);
+	self->length = fread(self->data, 1, buffer.st_size, fp);
 	self->data[self->length] = '\0';
 	/* close the file */
-	fclose (fp);
+	fclose(fp);
 
 	return self;
 }
 
-O_IMPLEMENT(String, void *, ctor, (void *_self, va_list *app), (_self, app))
+O_IMPLEMENT(String, void *, ctor, (void *_self, va_list * app),
+	    (_self, app))
 {
 	struct String *self = O_CAST(_self, String());
 	self = O_SUPER->ctor(self, app);
-	char * format = va_arg(*app, char *);
-	int n, size = strlen (format) + 1;
+	char *format = va_arg(*app, char *);
+	int n, size = strlen(format) + 1;
 
-	self->data = malloc (size);
+	self->data = malloc(size);
 	self->max = size;
 
 	while (1) {
@@ -75,7 +77,7 @@ O_IMPLEMENT(String, void *, ctor, (void *_self, va_list *app), (_self, app))
 	if (n > -1)
 		self->length = n;
 	else
-		self->length = strlen (self->data);
+		self->length = strlen(self->data);
 
 	return self;
 }
@@ -96,7 +98,8 @@ O_IMPLEMENT(String, void *, ensure, (void *_self, int size), (_self, size))
 	return self;
 }
 
-O_IMPLEMENT(String, void *, append, (void *_self, struct String *str), (_self, str))
+O_IMPLEMENT(String, void *, append, (void *_self, struct String * str),
+	    (_self, str))
 {
 	struct String *self = O_CAST(_self, String());
 	self->class->ensure(self, self->length + str->length + 1);
@@ -105,7 +108,8 @@ O_IMPLEMENT(String, void *, append, (void *_self, struct String *str), (_self, s
 	return self;
 }
 
-O_IMPLEMENT(String, void *, append_str, (void *_self, char *str, ...), (_self, str))
+O_IMPLEMENT(String, void *, append_str, (void *_self, char *str,...),
+	    (_self, str))
 {
 	struct String *self = O_CAST(_self, String());
 	int n, nn = strlen(str);
@@ -130,13 +134,14 @@ O_IMPLEMENT(String, void *, append_str, (void *_self, char *str, ...), (_self, s
 	if (n > -1)
 		self->length += n;
 	else
-		self->length = strlen (self->data);
+		self->length = strlen(self->data);
 /* 	strcpy(self->data + self->length, str); */
 /* 	self->length += nn; */
 	return self;
 }
 
-O_IMPLEMENT(String, void *, append_str_n, (void *_self, char *str, int n), (_self, str, n))
+O_IMPLEMENT(String, void *, append_str_n, (void *_self, char *str, int n),
+	    (_self, str, n))
 {
 	struct String *self = O_CAST(_self, String());
 	if (n == 0)
@@ -153,16 +158,18 @@ O_IMPLEMENT(String, void *, append_str_n, (void *_self, char *str, int n), (_sel
 /**
  * This method replaces all occurrences of that with this.
  */
-O_IMPLEMENT(String, void *, replace, (void *_self, struct String *that, struct String *this), (_self, that, this))
+O_IMPLEMENT(String, void *, replace,
+	    (void *_self, struct String * that, struct String * this),
+	    (_self, that, this))
 {
 	struct String *self = O_CAST(_self, String());
 	/* backup original string data, and truncate self */
-	struct String *orig = String()->new (String(), self->data);
+	struct String *orig = String()->new(String(), self->data);
 	self->length = 0;
 
 	char *curr = orig->data;
 	char *prev = orig->data;
-	while ((curr = strstr (curr, that->data))) {
+	while ((curr = strstr(curr, that->data))) {
 		self->class->append_str_n(self, prev, curr - prev);
 		self->class->append(self, this);
 		curr = curr + that->length;
@@ -174,13 +181,14 @@ O_IMPLEMENT(String, void *, replace, (void *_self, struct String *that, struct S
 	return self;
 }
 
-O_IMPLEMENT(String, int, fprint, (void *_self, FILE *fp), (_self, fp))
+O_IMPLEMENT(String, int, fprint, (void *_self, FILE * fp), (_self, fp))
 {
 	struct String *self = O_CAST(_self, String());
 	return fprintf(fp, "%s", self->data);
 }
 
-O_IMPLEMENT(String, int, snprint, (void *_self, char *str, int size), (_self, str, size))
+O_IMPLEMENT(String, int, snprint, (void *_self, char *str, int size),
+	    (_self, str, size))
 {
 	struct String *self = O_CAST(_self, String());
 	return snprintf(str, size, "%s", self->data);
@@ -199,12 +207,12 @@ O_IMPLEMENT(String, void *, clone, (void *_self), (_self))
 O_IMPLEMENT(String, void *, dtor, (void *_self), (_self))
 {
 	struct String *self = O_CAST(_self, String());
-	free (self->data);
+	free(self->data);
 	self->data = NULL;
 	return O_SUPER->dtor(self);
 }
 
-O_OBJECT(String,Object);
+O_OBJECT(String, Object);
 O_OBJECT_METHOD(String, ctor);
 O_OBJECT_METHOD(String, dtor);
 O_OBJECT_METHOD(String, clone);

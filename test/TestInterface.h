@@ -15,4 +15,4 @@
 
 O_CLASS(TestInterface, Object);
 
-#endif /* _TESTINTERFACE_H */
+#endif				/* _TESTINTERFACE_H */

@@ -17,14 +17,12 @@
 	    __assert_fail(__STRING(p), __FILE__,			\
 					  __LINE__, __ASSERT_FUNCTION)))
 
-void __write_message(const char * fmt,
-					 const char * file,
-					 unsigned int line,
-					 const char * function,
-					 ...)
-	__attribute__ ((format (printf, 1, 5)));
+void __write_message(const char *fmt,
+		     const char *file,
+		     unsigned int line, const char *function, ...)
+    __attribute__ ((format(printf, 1, 5)));
 
-unsigned long hash_function (const unsigned char *str);
+unsigned long hash_function(const unsigned char *str);
 
 #ifndef false
 typedef int bool;
@@ -32,4 +30,4 @@ typedef int bool;
 #define true !false
 #endif
 
-#endif /* UTILS_H */
+#endif				/* UTILS_H */

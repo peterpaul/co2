@@ -19,4 +19,4 @@
 
 O_CLASS(Singleton, Object);
 
-#endif /* SINGLETON_H_ */
+#endif				/* SINGLETON_H_ */

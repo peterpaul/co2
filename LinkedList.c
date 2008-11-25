@@ -3,7 +3,8 @@
 
 #define O_SUPER Object()
 
-O_IMPLEMENT(LinkedList, void *, ctor, (void *_self, va_list * app), (_self, app))
+O_IMPLEMENT(LinkedList, void *, ctor, (void *_self, va_list * app),
+	    (_self, app))
 {
 	struct LinkedList *self = O_CAST(_self, LinkedList());
 	self = O_SUPER->ctor(self, app);
@@ -28,11 +29,12 @@ O_IMPLEMENT(LinkedList, void *, dtor, (void *_self), (_self))
 	return O_SUPER->dtor(self);
 }
 
-O_IMPLEMENT(LinkedList, void *, merge_sorted, (void *_self, void *_other), (_self, _other))
+O_IMPLEMENT(LinkedList, void *, merge_sorted, (void *_self, void *_other),
+	    (_self, _other))
 {
-	struct LinkedList * self = O_CAST(_self, LinkedList());
-	struct LinkedList * other = O_CAST(_other, LinkedList());
-	struct LinkedList * head = NULL, * tail = NULL;
+	struct LinkedList *self = O_CAST(_self, LinkedList());
+	struct LinkedList *other = O_CAST(_other, LinkedList());
+	struct LinkedList *head = NULL, *tail = NULL;
 	while (self && other) {
 		if (self->class->compare(self, other) <= 0) {
 			/* if (O_CALL(self, compare, other) <= 0) { */
@@ -53,14 +55,15 @@ O_IMPLEMENT(LinkedList, void *, merge_sorted, (void *_self, void *_other), (_sel
 	return head;
 }
 
-static struct ListList * prepare_sort(struct LinkedList * list)
+static struct ListList *prepare_sort(struct LinkedList *list)
 {
-	struct ListList * head = NULL, * tail = NULL;
-	struct LinkedList * last;
+	struct ListList *head = NULL, *tail = NULL;
+	struct LinkedList *last;
 	assert(list);
-	while(list && list->next) {
+	while (list && list->next) {
 		APPEND_LIST(ListList()->new(ListList(), list));
-		while (list && list->next && list->class->compare(list, list->next) <= 0) {
+		while (list && list->next
+		       && list->class->compare(list, list->next) <= 0) {
 			list = list->next;
 		}
 		last = list;
@@ -75,14 +78,16 @@ static struct ListList * prepare_sort(struct LinkedList * list)
 
 O_IMPLEMENT(LinkedList, void *, sort, (void *_self), (_self))
 {
-	struct LinkedList * self = O_CAST(_self, LinkedList());
-	struct ListList * head = prepare_sort(self), * tail;
+	struct LinkedList *self = O_CAST(_self, LinkedList());
+	struct ListList *head = prepare_sort(self), *tail;
 
 	while (head->next) {
 		tail = head;
 		while (tail && tail->next) {
-			struct ListList * tmp = tail->next;
-			tail->item = (struct LinkedList *)tail->item->class->merge_sorted(tail->item, tmp->item);
+			struct ListList *tmp = tail->next;
+			tail->item =
+			    (struct LinkedList *) tail->item->class->
+			    merge_sorted(tail->item, tmp->item);
 			/* O_CALL(tail->item, merge_sorted, tmp->item); */
 			tail->next = tmp->next;
 			tail = tmp->next;
@@ -99,18 +104,19 @@ O_IMPLEMENT(LinkedList, void *, sort, (void *_self), (_self))
 	return self;
 }
 
-O_IMPLEMENT(LinkedList, void *, map, (void *_self, void (*fun) (void *)), (_self, fun))
+O_IMPLEMENT(LinkedList, void *, map, (void *_self, void (*fun) (void *)),
+	    (_self, fun))
 {
-	struct LinkedList * self = O_CAST(_self, LinkedList());
+	struct LinkedList *self = O_CAST(_self, LinkedList());
 	if (self->next) {
-		struct LinkedList * next = self->next;
+		struct LinkedList *next = self->next;
 		next->class->map(next, fun);
 		/* O_CALL(next, map, fun); */
 	}
 	return self;
 }
 
-O_OBJECT(LinkedList,Object);
+O_OBJECT(LinkedList, Object);
 O_OBJECT_METHOD(LinkedList, ctor);
 O_OBJECT_METHOD(LinkedList, dtor);
 O_OBJECT_METHOD(LinkedList, sort);

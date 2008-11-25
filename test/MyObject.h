@@ -31,6 +31,6 @@ O_METHOD_DEF(MyObject, int, setValue, (void *_self, int value));
 	Object_Attr;							\
 	int value
 
-O_CLASS(MyObject,Object);
+O_CLASS(MyObject, Object);
 
-#endif /* _MYOBJECT_H */
+#endif				/* _MYOBJECT_H */
