@@ -1,0 +1,60 @@
+CC		= gcc
+AR		= ar
+RANLIB		= ranlib
+GCC			= gcc
+#CC		= llvmgcc
+#AR		= llvm-ar
+#RANLIB		= llvm-ranlib
+
+DEP_FLAGS	= -MM -MG -MMD
+
+DEBUGFLG	= -g3
+#DEBUGFLG	= -g3
+#DEBUGFLG	= -g3 -DP_DEBUG
+
+ANSIFLGS	=
+#ANSIFLGS	= -ansi -pedantic
+
+OPTFLAGS	= -O1
+#OPTFLAGS	= -O9 -march=i686 -ffast-math -funroll-loops -fomit-frame-pointer
+#OPTFLAGS	= -O9 -mfpmath=sse -ffast-math -funroll-loops -fomit-frame-pointer
+#OPTFLAGS	= -O2
+#OPTFLAGS	= -O9 -march=athlon-xp -mfpmath=sse -funroll-loops -ffast-math -malign-double -fomit-frame-pointer
+#OPTFLAGS	= -mfpmath=sse -msse
+
+PROFLAGS	= -g3 -pg -fprofile-arcs
+
+CFLAGS		= $(OPTFLAGS) $(DEBUGFLG) $(ANSIFLGS) $(INCLUDE)
+
+LFLAGS		= 
+
+LD		=gcc
+
+DEPENDENCIES	=$(OBJS:%.o=%.d)
+
+.DEFAULT: all
+
+all::		$(BINS)
+
+clean::
+		$(RM) -f $(BINS) $(OBJS) $(GEN) $(DEPENDENCIES)
+
+doc::
+		doxywizard Doxyfile
+
+%.bin:	%.o $(LIBS)
+		$(LD) $(LDFLAGS) $< -o $@ $(LIBRARIES)
+
+%.o:		%.c
+		$(CC) $(CFLAGS) -c $< -o $@
+
+%.d:		%.c
+		$(GCC) $(CFLAGS) $(DEP_FLAGS) $< > $@
+
+%.a: ${LIBOBJS}
+		${AR} rc $@ ${LIBOBJS}
+		${RANLIB} $@
+
+ifeq		($(filter clean tar doc, $(MAKECMDGOALS)),)
+-include	$(DEPENDENCIES)
+endif
