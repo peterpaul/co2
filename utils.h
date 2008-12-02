@@ -30,4 +30,7 @@ typedef int bool;
 #define true !false
 #endif
 
+#define MAX_FUN(type) type max_##type(type a, type b){return (a > b ? a : b);}
+#define MIN_FUN(type) type min_##type(type a, type b){return (a < b ? a : b);}
+
 #endif				/* UTILS_H */

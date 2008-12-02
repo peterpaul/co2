@@ -15,8 +15,8 @@ DEBUGFLG	= -g3
 ANSIFLGS	=
 #ANSIFLGS	= -ansi -pedantic
 
-OPTFLAGS	= -O1
-#OPTFLAGS	= -O9 -march=i686 -ffast-math -funroll-loops -fomit-frame-pointer
+#OPTFLAGS	= -O0
+OPTFLAGS	= -O9 -march=i686 -ffast-math -funroll-loops -fomit-frame-pointer
 #OPTFLAGS	= -O9 -mfpmath=sse -ffast-math -funroll-loops -fomit-frame-pointer
 #OPTFLAGS	= -O2
 #OPTFLAGS	= -O9 -march=athlon-xp -mfpmath=sse -funroll-loops -ffast-math -malign-double -fomit-frame-pointer
@@ -54,6 +54,9 @@ doc::
 %.a: ${LIBOBJS}
 		${AR} rc $@ ${LIBOBJS}
 		${RANLIB} $@
+
+%.c.txt:	%.c
+		$(CC) $(CFLAGS) -E $< > $(<:.c=.c.txt)
 
 ifeq		($(filter clean tar doc, $(MAKECMDGOALS)),)
 -include	$(DEPENDENCIES)
