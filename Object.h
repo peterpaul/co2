@@ -22,7 +22,9 @@
 #define O_MAGIC 0xCAFEBABE
 
 #define O_METHOD_DEF(klass,type,name,args)		\
-	typedef type (*klass##_##name##_##t) args
+	typedef type (*klass##_##name##_##t) args;	\
+	type _##klass##_##name args
+
 
 #define O_METHOD(klass,name)			\
 	klass##_##name##_##t name
@@ -35,7 +37,7 @@
 		struct klass * self = O_CAST(_self, klass());	\
 		return self->class->name act_args;		\
 	}							\
-	static O_FUNCTION_DEF(_##klass,type,name,args)
+	O_FUNCTION_DEF(_##klass,type,name,args)
 
 #define O_OBJECT_DEF(name,klass)		\
 	struct klass * name();			\
