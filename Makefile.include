@@ -30,14 +30,14 @@ LFLAGS		=
 
 LD		=gcc
 
-DEPENDENCIES	=$(OBJS:%.o=%.d)
+DEPENDENCIES	=$(OBJS:%.o=%.d) $(LIBOBJS:%.o=%.d)
 
 .DEFAULT: all
 
 all::		$(BINS)
 
 clean::
-		$(RM) -f $(BINS) $(OBJS) $(GEN) $(DEPENDENCIES)
+		$(RM) -f $(BINS) $(OBJS) $(LIBOBJS) $(GEN) $(DEPENDENCIES)
 
 doc::
 		doxywizard Doxyfile

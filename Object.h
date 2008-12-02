@@ -21,16 +21,15 @@
 
 #define O_MAGIC 0xCAFEBABE
 
-#define O_METHOD_DEF(klass,type,name,args)		\
-	typedef type (*klass##_##name##_##t) args;	\
-	type _##klass##_##name args
-
-
 #define O_METHOD(klass,name)			\
 	klass##_##name##_##t name
 
 #define O_FUNCTION_DEF(klass,type,name,args)	\
 	type klass##_##name args
+
+#define O_METHOD_DEF(klass,type,name,args)		\
+	typedef type (*klass##_##name##_##t) args;	\
+        O_FUNCTION_DEF(klass, type, name, args)
 
 #define O_IMPLEMENT(klass,type,name,args,act_args)		\
 	O_FUNCTION_DEF(klass,type,name,args) {			\
