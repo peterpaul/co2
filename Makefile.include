@@ -26,7 +26,7 @@ PROFLAGS	= -g3 -pg -fprofile-arcs
 
 CFLAGS		= $(OPTFLAGS) $(DEBUGFLG) $(ANSIFLGS) $(INCLUDE)
 
-LFLAGS		= 
+LDFLAGS		=
 
 LD		=gcc
 
@@ -43,7 +43,7 @@ doc::
 		doxywizard Doxyfile
 
 %.bin:	%.o $(LIBS)
-		$(LD) $(LDFLAGS) $< -o $@ $(LIBRARIES)
+		$(LD) $(LDFLAGS) $< $(LIBRARIES) -o $@
 
 %.o:		%.c
 		$(CC) $(CFLAGS) -c $< -o $@
