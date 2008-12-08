@@ -21,9 +21,11 @@ include Makefile.include
 
 all::		$(LIBS)
 		make -C lexer && \
+			make clean -C config_parser && \
 			make -C sudoku && \
 			make -C web && \
-			make -C test
+			make -C test && \
+			make clean -C slime
 
 clean::
 		$(RM) -f $(BINS) $(LIBS) $(OBJS) $(DEPENDENCIES)
@@ -31,7 +33,8 @@ clean::
 		make clean -C sudoku
 		make clean -C web
 		make clean -C test
-
+		make clean -C slime
+		make clean -C config_parser
 tar::
 		indent $(SRCS)
 		rm *~
