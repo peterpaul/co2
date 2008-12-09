@@ -90,7 +90,8 @@ O_IMPLEMENT(Object, void *, dtor, (void *_self), (_self))
 	return self;
 }
 
-void *_Object_new(void *_self, ...)
+O_IMPLEMENT_VA(Object, void *, new, (void *_self,...), (_self, &ap),
+	       (_self))
 {
 	struct Class *self = o_cast(_self, Class());
 	struct Object *object = o_alloc(self);
@@ -104,7 +105,9 @@ void *_Object_new(void *_self, ...)
 	return object;
 }
 
-void *_Object_new_ctor(void *_self, Object_ctor_t ctor, ...)
+O_IMPLEMENT_VA(Object, void *, new_ctor,
+	       (void *_self, Object_ctor_t ctor,...), (_self, ctor, &ap),
+	       (ctor))
 {
 	struct Class *self = o_cast(_self, Class());
 	struct Object *object = o_alloc(self);
@@ -126,7 +129,9 @@ O_IMPLEMENT(Object, void *, delete, (void *_self), (_self))
 	return NULL;
 }
 
-void *_Object_init(const void *_self, void *_object, ...)
+O_IMPLEMENT_VA(Object, void *, init,
+	       (const void *_self, void *_object,...), (_self, _object,
+							&ap), (_object))
 {
 	va_list ap;
 	struct Object *object = _object;
@@ -140,8 +145,9 @@ void *_Object_init(const void *_self, void *_object, ...)
 	return object;
 }
 
-void *_Object_init_ctor(const void *_self, void *_object,
-			Object_ctor_t ctor, ...)
+O_IMPLEMENT_VA(Object, void *, init_ctor,
+	       (const void *_self, void *_object, Object_ctor_t ctor,...),
+	       (_self, _object, ctor, &ap), (ctor))
 {
 	va_list ap;
 	struct Object *object = _object;
@@ -273,8 +279,7 @@ struct ClassHashmapTuple {
 
 static struct ClassHashmapTuple *o_new_class_hashmap_tuple(struct
 							   ClassHashmapTuple
-							   *next,
-							   struct
+							   *next, struct
 							   ObjectClass
 							   *class)
 {
@@ -292,8 +297,7 @@ static struct ClassHashmapTuple *o_new_class_hashmap_tuple(struct
 
 static struct ClassHashmapTuple *o_find_class_hashmap_tuple(struct
 							    ClassHashmapTuple
-							    *head,
-							    const char
+							    *head, const char
 							    *class_name)
 {
 	while (head != NULL && strcmp(class_name, head->class->name) != 0) {
