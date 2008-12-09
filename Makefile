@@ -21,11 +21,11 @@ include Makefile.include
 
 all::		$(LIBS)
 		make -C lexer && \
-			make clean -C config_parser && \
+			make -C config_parser && \
 			make -C sudoku && \
 			make -C web && \
 			make -C test && \
-			make clean -C slime
+			make -C slime
 
 clean::
 		$(RM) -f $(BINS) $(LIBS) $(OBJS) $(DEPENDENCIES)
