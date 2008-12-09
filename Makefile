@@ -30,11 +30,12 @@ all::		$(LIBS)
 clean::
 		$(RM) -f $(BINS) $(LIBS) $(OBJS) $(DEPENDENCIES)
 		make clean -C lexer
+		make clean -C config_parser
 		make clean -C sudoku
 		make clean -C web
 		make clean -C test
 		make clean -C slime
-		make clean -C config_parser
+
 tar::
 		indent $(SRCS)
 		rm *~
