@@ -49,6 +49,16 @@
 	}							\
 	O_FUNCTION_DEF(_##klass,type,name,args)
 
+#define O_IMPLEMENT_VA_PROC(klass,name,args,act_args,last)	\
+	O_FUNCTION_DEF(klass,void,name,args) {			\
+                va_list ap;                                     \
+		struct klass * self = O_CAST(_self, klass());	\
+                va_start(ap, last);                             \
+                self->class->name act_args;			\
+                va_end(ap);                                     \
+	}							\
+	O_FUNCTION_DEF(_##klass,void,name,args)
+
 #define O_OBJECT_DEF(name,klass)		\
 	struct klass * name();			\
 	struct name {				\
