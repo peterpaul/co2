@@ -91,7 +91,7 @@ O_IMPLEMENT(Object, void *, dtor, (void *_self), (_self))
 }
 
 O_IMPLEMENT_VA(Object, void *, new, (void *_self,...), (_self, &ap),
-	       (_self))
+	       _self)
 {
 	struct Class *self = o_cast(_self, Class());
 	struct Object *object = o_alloc(self);
@@ -107,7 +107,7 @@ O_IMPLEMENT_VA(Object, void *, new, (void *_self,...), (_self, &ap),
 
 O_IMPLEMENT_VA(Object, void *, new_ctor,
 	       (void *_self, Object_ctor_t ctor,...), (_self, ctor, &ap),
-	       (ctor))
+	       ctor)
 {
 	struct Class *self = o_cast(_self, Class());
 	struct Object *object = o_alloc(self);
@@ -131,7 +131,7 @@ O_IMPLEMENT(Object, void *, delete, (void *_self), (_self))
 
 O_IMPLEMENT_VA(Object, void *, init,
 	       (const void *_self, void *_object,...), (_self, _object,
-							&ap), (_object))
+							&ap), _object)
 {
 	va_list ap;
 	struct Object *object = _object;
@@ -147,7 +147,7 @@ O_IMPLEMENT_VA(Object, void *, init,
 
 O_IMPLEMENT_VA(Object, void *, init_ctor,
 	       (const void *_self, void *_object, Object_ctor_t ctor,...),
-	       (_self, _object, ctor, &ap), (ctor))
+	       (_self, _object, ctor, &ap), ctor)
 {
 	va_list ap;
 	struct Object *object = _object;

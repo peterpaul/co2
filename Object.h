@@ -127,6 +127,20 @@
 
 #define O_END_OBJECT O_OBJECT_END
 
+#define O_CALL(o,msg,...)						\
+	({typeof(o) _tmp = o;						\
+		assertTrue(_tmp->class->msg,				\
+			   "runtime error: %s at %p doesn't respond to %s.", \
+			   _tmp->class->name, (void *)_tmp, __STRING(msg)); \
+		_tmp->class->msg(_tmp,##__VA_ARGS__);})
+
+#define O_CALL_CLASS(o,msg,...)						\
+	({typeof(o) _tmp = o;						\
+		assertTrue(_tmp->msg,					\
+			   "runtime error: %s at %p doesn't respond to %s.", \
+			   _tmp->name, (void *)_tmp, __STRING(msg));	\
+		_tmp->msg(_tmp,##__VA_ARGS__);})
+
 #define O_CAST(o,c)				\
 	o_cast(o,c)
 
@@ -135,7 +149,6 @@ void *o_cast(const void *_object, const void *_class);
 int o_is_a(const void *_self, const void *_class);
 int o_is_of(const void *_self, const void *_class);
 void *o_get_interface(void *_self, void *_interface);
-
 void *o_get_class(const char *class_name);
 void o_add_class(void *_class);
 void o_print_classes(FILE * fp);
