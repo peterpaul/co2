@@ -1,4 +1,5 @@
 #include "String.h"
+#include "List.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -212,6 +213,24 @@ O_IMPLEMENT(String, void *, dtor, (void *_self), (_self))
 	return O_SUPER->dtor(self);
 }
 
+O_IMPLEMENT(String, struct List *, split, (void *_self, const char * delim), (_self, delim))
+{
+	struct String *self = O_CAST(_self, String());
+	struct List *list = List()->new(List(), 8, String());
+	char * saveptr;
+	char * str, * token, * data;
+	data = strdup(self->data);
+	for (str = data; ;str = NULL) {
+		token = strtok_r(str, delim, &saveptr);
+		if (token == NULL)
+			break;
+
+		list->class->append(list, String()->new(String, "%s", token));
+	}
+	free (data);
+	return list;			    
+}
+
 O_OBJECT(String, Object);
 O_OBJECT_METHOD(String, ctor);
 O_OBJECT_METHOD(String, dtor);
@@ -225,4 +244,5 @@ O_OBJECT_METHOD(String, replace);
 O_OBJECT_METHOD(String, fprint);
 O_OBJECT_METHOD(String, snprint);
 O_OBJECT_METHOD(String, ctor_from_file);
+O_OBJECT_METHOD(String, split);
 O_END_OBJECT
