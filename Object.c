@@ -51,6 +51,17 @@ int o_is_of(const void *_self, const void *_class)
 	return myClass == class;
 }
 
+int o_implements(void *_self, void *_interface)
+{
+	struct Object *self = O_IS_OBJECT(_self);
+	struct Interface *interface = O_IS_OBJECT(_interface);
+	struct Interface *IF = self->class->interface_list;
+	while (IF && !o_is_of(IF, interface)) {
+		IF = IF->next;
+	}
+	return IF != NULL;
+}
+
 void *o_get_interface(void *_self, void *_interface)
 {
 	struct Object *self = O_IS_OBJECT(_self);
