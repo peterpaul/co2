@@ -3,11 +3,14 @@
 
 #include "Object.h"
 
-#define O_IMPLEMENT_IF(klass,type,name,args,act_args,IF)		\
+#define O_METHOD_IF(klass,type,name,args,act_args)			\
 	O_FUNCTION_DEF(klass,type,name,args) {				\
-		struct IF * interface = o_get_interface(_self, IF());	\
+		struct klass * interface =				\
+			o_get_interface(_self, klass());		\
 		return interface->name act_args;			\
-	}								\
+	}
+
+#define O_IMPLEMENT_IF(klass,type,name,args,act_args)			\
 	static O_FUNCTION_DEF(klass,type,name##_impl,args) {		\
 		struct klass * self = O_CAST(_self, klass());		\
 		return self->class->name act_args;			\

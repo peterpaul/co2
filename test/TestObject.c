@@ -91,7 +91,7 @@ int main(void)
 
 	struct TestInterface *IF =
 	    TestInterface()->new(TestInterface(), 8);
-	printf("test_if returned: %d\n", test_if(IF));
+	printf("test_if returned: %d\n", MyInterface_getValue(IF));
 
 	o_cleanup_class_hashmap();
 

@@ -11,7 +11,7 @@ O_IMPLEMENT(ListIterator, void *, ctor, (void *_self, va_list *argp), (_self, ar
 	return self;
 }
 
-O_IMPLEMENT_IF(ListIterator, void *, getNext, (void *_self), (_self), Iterator)
+O_IMPLEMENT_IF(ListIterator, void *, getNext, (void *_self), (_self))
 {
 	struct ListIterator * self = O_CAST(_self, ListIterator());
 	void * result = NULL;
@@ -25,7 +25,7 @@ O_IMPLEMENT_IF(ListIterator, void *, getNext, (void *_self), (_self), Iterator)
 	return NULL;
 }
 
-O_IMPLEMENT_IF(ListIterator, bool, hasNext, (void *_self), (_self), Iterator)
+O_IMPLEMENT_IF(ListIterator, bool, hasNext, (void *_self), (_self))
 {
 	struct ListIterator * self = O_CAST(_self, ListIterator());
 	while (self->pos < self->list->length && self->list->data[self->pos] == NULL) {
