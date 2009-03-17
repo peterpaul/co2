@@ -1,5 +1,6 @@
 #include "List.h"
 #include "String.h"
+#include "ListIterator.h"
 
 #define O_SUPER Object()
 
@@ -207,6 +208,12 @@ O_IMPLEMENT(List, struct String *, toString, (void *_self), (_self))
 	return str;
 }
 
+O_IMPLEMENT(List, void *, getIterator, (void *_self), (_self))
+{
+	struct List *self = O_CAST(_self, List());
+	return ListIterator()->new(ListIterator(), self);
+}
+
 O_OBJECT(List, Object);
 O_OBJECT_METHOD(List, ctor);
 O_OBJECT_METHOD(List, dtor);
@@ -222,4 +229,5 @@ O_OBJECT_METHOD(List, map_args);
 O_OBJECT_METHOD(List, filter);
 O_OBJECT_METHOD(List, filter_args);
 O_OBJECT_METHOD(List, toString);
+O_OBJECT_METHOD(List, getIterator);
 O_END_OBJECT
