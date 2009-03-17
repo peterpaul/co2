@@ -30,6 +30,8 @@ LDFLAGS		=
 
 LD		=gcc
 
+PREFIX		=${HOME}/local/Object-0.0.1
+
 DEPENDENCIES	=$(OBJS:%.o=%.d) $(LIBOBJS:%.o=%.d)
 
 .DEFAULT: all
@@ -57,6 +59,12 @@ doc::
 
 %.c.txt:	%.c
 		$(CC) $(CFLAGS) -E $< > $(<:.c=.c.txt)
+
+install::	${LIBS} ${BINS}
+		install -d ${PREFIX}/include ${PREFIX}/lib ${PREFIX}/bin
+		if [ -n "${LIBHDRS}" ]; then install ${LIBHDRS} ${PREFIX}/include; fi
+		if [ -n "${LIBS}" ]; then install ${LIBS} ${PREFIX}/lib; fi
+		if [ -n "${BINS}" ]; then install ${BINS} ${PREFIX}/bin; fi
 
 ifeq		($(filter clean tar doc, $(MAKECMDGOALS)),)
 -include	$(DEPENDENCIES)
