@@ -45,12 +45,12 @@ function rewrite_method_call(line, macro, splitter, method_prefix) {
 	}
 	return result;
 }
-/.*->class->.*\(.*\)/ {
+/.*->class->[a-zA-Z_]*\(.*\)/ {
 	print rewrite_method_call($0, "O_CALL", "->class->", "");
 }
-/.*\(\)->new.*\(.*\)/ {
+/.*\(\)->new[a-zA-Z_]*\(.*\)/ {
 	print rewrite_method_call($0, "O_CALL_CLASS", "->new", "new");
 }
-! (/.*->class->.*\(.*\)/||/.*\(\)->new.*\(.*\)/) {
+! (/.*->class->[a-zA-Z_]*\(.*\)/||/.*\(\)->new[a-zA-Z_]*\(.*\)/) {
 	print $0;
 }
