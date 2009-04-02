@@ -35,7 +35,7 @@ function rewrite_method_call(line, macro, splitter, method_prefix) {
 
 	parameters = substr(object_list[2], index(object_list[2], ",")+1);
 
-	result = sprintf("%s, %s%s(%s", trim(object), method_prefix, trim(method), parameters);
+	result = sprintf("%s, %s%s,%s", trim(object), method_prefix, trim(method), parameters);
 	result = sprintf("%s(%s", macro, result);
 	if (lvalue) {
 		result = sprintf("%s= %s", lvalue, result);
