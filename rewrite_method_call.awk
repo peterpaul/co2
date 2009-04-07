@@ -96,6 +96,16 @@ function unnest(line, begin, middle, end) {
 	end = substr (line, end_bracket);
 	return rewrite_call(begin,middle) unnest(end);
 }
-{
+#{
+#	print unnest($0);
+#}
+/.*->class->[a-zA-Z_]*\(.*\)/ {
 	print unnest($0);
 }
+/.*\(\)->new[a-zA-Z_]*\(.*\)/ {
+	print unnest($0);
+}
+(/.*->class->[a-zA-Z_]*\(.*\)/||/.*\(\)->new[a-zA-Z_]*\(.*\)/) {
+	print $0;
+}
+
