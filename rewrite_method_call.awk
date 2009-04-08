@@ -127,7 +127,7 @@ function unnest(line, begin, middle, end) {
 	return rewrite_call(begin,middle) unnest(end);
 }
 BEGIN {
-	debug_level = 1;
+	debug_level = 0;
 }
 #{
 #	print unnest($0);
