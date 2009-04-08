@@ -23,23 +23,17 @@ function debug(string) {
 function rewrite_method(method, splitter, object, macro, method_prefix) {
 	debug("rewrite_method(\""method"\", \""splitter"\", \""object"\")");
 
-	split(method, list, splitter);	
+	split(method, list, object splitter);	
 	if (array_length(list) != 2) {
 		debug("ERROR: Expected list of size 2!");
-		return method;
-	}
-
-	split(list[1], prefix, object);
-	if (array_length(prefix) != 1) {
-		debug("WARNING: Expected prefix of size 1!");
-		for (offset = 1; offset < array_length(prefix); offset ++) {
-			debug("prefix["offset"] = "prefix[offset]);
+		for (offset = 1; offset < array_length(list); offset ++) {
+			debug("list["offset"] = "list[offset]);
 		}
-		# return method;
+		return method;
 	}
 	
 	meth = substr(list[2],1,length(list[2])-1);
-	return prefix[1] macro "(" object", " method_prefix meth;
+	return list[1] macro "(" object", " method_prefix meth;
 }
 function rewrite_method_call(method,parameters, pos, parameter_length, result) {
 	debug("rewrite_method_call(\""method"\", \""parameters"\")");
@@ -127,7 +121,7 @@ function unnest(line, begin, middle, end) {
 	return rewrite_call(begin,middle) unnest(end);
 }
 BEGIN {
-	debug_level = 0;
+	debug_level = 1;
 }
 #{
 #	print unnest($0);
