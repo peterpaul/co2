@@ -93,7 +93,13 @@ function unnest(line, begin, middle, end) {
 	for (i = start_bracket + 1; i <= line_length && end_bracket < start_bracket; i++) {
 		char = substr(line, i, 1);
 		if (char == "(") {
-			nest_level ++;
+			if (i < line_length) {
+				if  (substr(line, i + 1, 1) != ")") {
+					nest_level ++;
+				} else {
+					i ++;
+				}
+			} else 
 		} else if (char == ")") {
 			if (nest_level > 0) {
 				nest_level --;
