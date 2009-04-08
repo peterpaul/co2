@@ -20,13 +20,13 @@ function rewrite_method(method, splitter, object, macro, method_prefix) {
 
 	split(method, list, splitter);	
 	if (array_length(list) != 2) {
-		print "ERROR: Expected list of size 2!";
+		# print "ERROR: Expected list of size 2!";
 		return method;
 	}
 
 	split(list[1], prefix, object);
 	if (array_length(prefix) != 1) {
-		print "WARNING: Expected prefix of size 1!";
+		# print "WARNING: Expected prefix of size 1!";
 		for (offset = 1; offset < array_length(prefix); offset ++) {
 			# print "prefix["offset"] = "prefix[offset];
 		}
