@@ -99,7 +99,7 @@ function unnest(line, begin, middle, end) {
 				} else {
 					i ++;
 				}
-			} else 
+			}
 		} else if (char == ")") {
 			if (nest_level > 0) {
 				nest_level --;
