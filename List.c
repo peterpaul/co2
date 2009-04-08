@@ -193,7 +193,7 @@ O_IMPLEMENT(List, struct String *, toString, (void *_self), (_self))
 	str->class->append_str(str, " [\n");
 	for (i = 0; i < length; i++) {
 		struct Object *item = self->class->get(self, i);
-		struct String *item_str = self->class->toString(item);
+		struct String *item_str = item->class->toString(item);
 		item_str->class->replace(item_str, enter, item_enter);
 		str->class->append_str(str, "\t");
 		str->class->append(str, item_str);
