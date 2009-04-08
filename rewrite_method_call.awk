@@ -41,7 +41,7 @@ function rewrite_method_call(method,parameters, pos, parameter_length, result) {
 	parameters = unnest(parameters);
 	comma = index(parameters, ",");
 	if (comma == 0) {
-		comma = length(parameters);
+		comma = length(parameters) + 1;
 	}
 	object = substr(parameters, 1, comma - 1);
 	parameters = substr(parameters, comma + 1);
@@ -101,7 +101,7 @@ function unnest(line, begin, middle, end) {
 		}
 	}
 	if (end_bracket < start_bracket) {
-		end_bracket = line_length;
+		end_bracket = line_length + 1;
 	}
 	begin = substr (line, 1, start_bracket);
 	middle = substr (line, start_bracket+1, end_bracket - start_bracket - 1);
@@ -109,7 +109,7 @@ function unnest(line, begin, middle, end) {
 	return rewrite_call(begin,middle) unnest(end);
 }
 #{
-#	print unnest($0);
+#	# print unnest($0);
 #}
 /.*->class->[a-zA-Z_]*\(.*\)/ {
 	print unnest($0);
@@ -120,4 +120,3 @@ function unnest(line, begin, middle, end) {
 ! (/.*->class->[a-zA-Z_]*\(.*\)/||/.*\(\)->new[a-zA-Z_]*\(.*\)/) {
 	print $0;
 }
-
