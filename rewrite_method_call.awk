@@ -91,7 +91,7 @@ function unnest(line, begin, middle, end) {
 	}
 	start_bracket = 0;
 	end_bracket = 0;
-	nest_level = 1;
+	nest_level = 0;
 	for (i = 1; i <= line_length; i++) {
 		char = substr(line, i, 1);
 		if (char == "(") {
