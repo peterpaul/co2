@@ -16,7 +16,7 @@ function array_length(a) {
 	return n;
 }
 function rewrite_method(method, splitter, object, macro, method_prefix) {
-	print "rewrite_method(\""method"\", \""splitter"\", \""object"\")";
+	# print "rewrite_method(\""method"\", \""splitter"\", \""object"\")";
 
 	split(method, list, splitter);	
 	if (array_length(list) != 2) {
@@ -28,7 +28,7 @@ function rewrite_method(method, splitter, object, macro, method_prefix) {
 	if (array_length(prefix) != 1) {
 		print "WARNING: Expected prefix of size 1!";
 		for (offset = 1; offset < array_length(prefix); offset ++) {
-			print "prefix["offset"] = "prefix[offset];
+			# print "prefix["offset"] = "prefix[offset];
 		}
 		# return method;
 	}
@@ -37,29 +37,29 @@ function rewrite_method(method, splitter, object, macro, method_prefix) {
 	return prefix[1] macro "(" object", " method_prefix meth;
 }
 function rewrite_method_call(method,parameters, pos, parameter_length, result) {
-	print "rewrite_method_call(\""method"\", \""parameters"\")";
+	# print "rewrite_method_call(\""method"\", \""parameters"\")";
 	parameters = unnest(parameters);
 	comma = index(parameters, ",");
 	object = substr(parameters, 1, comma - 1);
 	parameters = substr(parameters, comma + 1);
-	print "parameters = "parameters;
+	# print "parameters = "parameters;
 	method = rewrite_method(method, "->class->", object, "O_CALL");
-	print "method = "method;
+	# print "method = "method;
 	return method "," parameters;
 }
 function rewrite_new_call(method, parameters) {
-	print "rewrite_new_call(\""method"\", \""parameters"\")";
+	# print "rewrite_new_call(\""method"\", \""parameters"\")";
 	parameters = unnest(parameters);
 	comma = index(parameters, ",");
 	object = substr(parameters, 1, comma - 1);
 	parameters = substr(parameters, comma + 1);
-	print "parameters = "parameters;
+	# print "parameters = "parameters;
 	method = rewrite_method(method, "->new", object, "O_CALL_CLASS", "new");
-	print "method = "method;
+	# print "method = "method;
 	return method "," parameters;
 }
 function rewrite_call(method,parameters) {
-	print "rewrite_call(\""method"\", \""parameters"\")";
+	# print "rewrite_call(\""method"\", \""parameters"\")";
 	if (index(method, "->new") > 0) {
 		return rewrite_new_call(method, parameters);
 	} else if (index(method, "->class->") > 0) {
@@ -69,7 +69,7 @@ function rewrite_call(method,parameters) {
 	}
 }
 function unnest(line, begin, middle, end) {
-	print "unnest(\""line"\")";
+	# print "unnest(\""line"\")";
 	line_length = length(line);
 	if (line_length == 0) {
 		return line;
