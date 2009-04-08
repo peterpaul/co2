@@ -48,7 +48,11 @@ function rewrite_method_call(method,parameters, pos, parameter_length, result) {
 	# print "parameters = "parameters;
 	method = rewrite_method(method, "->class->", object, "O_CALL");
 	# print "method = "method;
-	return method "," parameters;
+	if (trim(parameters) == "") {
+		return method;
+	} else {
+		return method "," parameters;
+	}
 }
 function rewrite_new_call(method, parameters) {
 	# print "rewrite_new_call(\""method"\", \""parameters"\")";
