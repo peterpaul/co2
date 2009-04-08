@@ -40,6 +40,9 @@ function rewrite_method_call(method,parameters, pos, parameter_length, result) {
 	# print "rewrite_method_call(\""method"\", \""parameters"\")";
 	parameters = unnest(parameters);
 	comma = index(parameters, ",");
+	if (comma == 0) {
+		comma = length(parameters);
+	}
 	object = substr(parameters, 1, comma - 1);
 	parameters = substr(parameters, comma + 1);
 	# print "parameters = "parameters;
