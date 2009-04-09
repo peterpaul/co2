@@ -225,7 +225,7 @@ O_IMPLEMENT(String, struct List *, split, (void *_self, const char * delim), (_s
 		if (token == NULL)
 			break;
 
-		list->class->append(list, String()->new(String, "%s", token));
+		list->class->append(list, String()->new(String(), "%s", token));
 	}
 	free (data);
 	return list;			    
