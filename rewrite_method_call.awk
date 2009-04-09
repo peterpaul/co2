@@ -128,9 +128,9 @@ BEGIN {
 # {
 # 	print unnest($0);
 # }
-(/.*->class->[a-zA-Z_]*\(.*\)/||/.*\(\)->new[a-zA-Z_]*\(.*\)/) {
+(/.*->class->[a-zA-Z_]*\(/||/.*\(\)->new[a-zA-Z_]*\(/) {
 	print unnest($0);
 }
-! (/.*->class->[a-zA-Z_]*\(.*\)/||/.*\(\)->new[a-zA-Z_]*\(.*\)/) {
+! (/.*->class->[a-zA-Z_]*\(/||/.*\(\)->new[a-zA-Z_]*\(/) {
 	print $0;
 }
