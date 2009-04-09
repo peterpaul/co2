@@ -123,15 +123,12 @@ function unnest(line, begin, middle, end) {
 	return rewrite_call(begin,middle) unnest(end);
 }
 BEGIN {
-	debug_level = 1;
+	debug_level = 0;
 }
-#{
-#	print unnest($0);
-#}
-/.*->class->[a-zA-Z_]*\(.*\)/ {
-	print unnest($0);
-}
-/.*\(\)->new[a-zA-Z_]*\(.*\)/ {
+# {
+# 	print unnest($0);
+# }
+(/.*->class->[a-zA-Z_]*\(.*\)/||/.*\(\)->new[a-zA-Z_]*\(.*\)/) {
 	print unnest($0);
 }
 ! (/.*->class->[a-zA-Z_]*\(.*\)/||/.*\(\)->new[a-zA-Z_]*\(.*\)/) {
