@@ -34,7 +34,7 @@ O_IMPLEMENT(String, void *, ctor_from_file, (void *_self, va_list * app),
 	/* open the file */
 	fp = fopen(filename, "r");
 	if (fp == 0) {
-		self->class->delete(self);
+		O_CALL(self, delete);
 		return NULL;
 	}
 	/* read contents of file, and terminate string */
@@ -46,8 +46,7 @@ O_IMPLEMENT(String, void *, ctor_from_file, (void *_self, va_list * app),
 	return self;
 }
 
-O_IMPLEMENT(String, void *, ctor, (void *_self, va_list * app),
-	    (_self, app))
+O_IMPLEMENT(String, void *, ctor, (void *_self, va_list * app), (_self, app))
 {
 	struct String *self = O_CAST(_self, String());
 	self = O_SUPER->ctor(self, app);
@@ -71,7 +70,7 @@ O_IMPLEMENT(String, void *, ctor, (void *_self, va_list * app),
 		else		/* glibc 2.0 */
 			size *= 2;	/* twice the old size */
 
-		self->class->ensure(self, size);
+		O_CALL(self, ensure, size);
 		va_end(ap);
 	}
 
@@ -95,7 +94,7 @@ O_IMPLEMENT(String, void *, ensure, (void *_self, int size), (_self, size))
 {
 	struct String *self = O_CAST(_self, String());
 	if (size > self->max)
-		return self->class->resize(self, size);
+		return O_CALL(self, resize, size);
 	return self;
 }
 
@@ -103,7 +102,7 @@ O_IMPLEMENT(String, void *, append, (void *_self, struct String * str),
 	    (_self, str))
 {
 	struct String *self = O_CAST(_self, String());
-	self->class->ensure(self, self->length + str->length + 1);
+	O_CALL(self, ensure, self->length + str->length + 1);
 	strcpy(self->data + self->length, str->data);
 	self->length += str->length;
 	return self;
@@ -115,12 +114,12 @@ O_IMPLEMENT(String, void *, append_str, (void *_self, char *str,...),
 	struct String *self = O_CAST(_self, String());
 	int n, nn = strlen(str);
 	va_list ap;
-	self->class->ensure(self, self->length + nn + 1);
+	O_CALL(self, ensure, self->length + nn + 1);
 	va_start(ap, str);
 	while (1) {
 		va_list ap2;
 		va_copy(ap2, ap);
-		self->class->ensure(self, nn + self->length);
+		O_CALL(self, ensure, nn + self->length);
 		n = vsnprintf(self->data + self->length, nn, str, ap2);
 		if (n > -1 && n < nn)
 			break;
@@ -150,7 +149,7 @@ O_IMPLEMENT(String, void *, append_str_n, (void *_self, char *str, int n),
 	int nn = strnlen(str, n);
 /* 	if (nn > n) */
 /* 		nn = n; */
-	self->class->ensure(self, self->length + nn + 1);
+	O_CALL(self, ensure, self->length + nn + 1);
 	strncpy(self->data + self->length, str, nn);
 	self->length += nn;
 	return self;
@@ -160,25 +159,26 @@ O_IMPLEMENT(String, void *, append_str_n, (void *_self, char *str, int n),
  * This method replaces all occurrences of that with this.
  */
 O_IMPLEMENT(String, void *, replace,
-	    (void *_self, struct String * that, struct String * this),
-	    (_self, that, this))
+	    (void *_self, struct String * that, struct String * this), (_self,
+									that,
+									this))
 {
 	struct String *self = O_CAST(_self, String());
 	/* backup original string data, and truncate self */
-	struct String *orig = String()->new(String(), self->data);
+	struct String *orig = O_CALL_CLASS(String(), new, self->data);
 	self->length = 0;
 
 	char *curr = orig->data;
 	char *prev = orig->data;
 	while ((curr = strstr(curr, that->data))) {
-		self->class->append_str_n(self, prev, curr - prev);
-		self->class->append(self, this);
+		O_CALL(self, append_str_n, prev, curr - prev);
+		O_CALL(self, append, this);
 		curr = curr + that->length;
 		prev = curr;
 	}
-	self->class->append_str(self, prev);
+	O_CALL(self, append_str, prev);
 	/* delete backup */
-	orig->class->delete(orig);
+	O_CALL(orig, delete);
 	return self;
 }
 
@@ -213,22 +213,23 @@ O_IMPLEMENT(String, void *, dtor, (void *_self), (_self))
 	return O_SUPER->dtor(self);
 }
 
-O_IMPLEMENT(String, struct List *, split, (void *_self, const char * delim), (_self, delim))
+O_IMPLEMENT(String, struct List *, split, (void *_self, const char *delim),
+	    (_self, delim))
 {
 	struct String *self = O_CAST(_self, String());
-	struct List *list = List()->new(List(), 8, String());
-	char * saveptr;
-	char * str, * token, * data;
+	struct List *list = O_CALL_CLASS(List(), new, 8, String());
+	char *saveptr;
+	char *str, *token, *data;
 	data = strdup(self->data);
-	for (str = data; ;str = NULL) {
+	for (str = data;; str = NULL) {
 		token = strtok_r(str, delim, &saveptr);
 		if (token == NULL)
 			break;
 
-		list->class->append(list, String()->new(String, "%s", token));
+		O_CALL(list, append, O_CALL_CLASS(String(), new, "%s", token));
 	}
-	free (data);
-	return list;			    
+	free(data);
+	return list;
 }
 
 O_OBJECT(String, Object);

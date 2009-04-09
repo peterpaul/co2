@@ -19,7 +19,7 @@
 
 #define O_OBJECT_IF(IF)							\
 	{								\
-	struct IF * interface = IF()->new(IF(), O_STRING(IF), self->interface_list); \
+	struct IF * interface = O_CALL_CLASS(IF(), new, O_STRING(IF), self->interface_list); \
 	self->interface_list = interface
 
 #define O_OBJECT_IF_METHOD(klass,method)		\

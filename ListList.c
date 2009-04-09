@@ -2,8 +2,7 @@
 
 #define O_SUPER LinkedList()
 
-O_IMPLEMENT(ListList, void *, ctor, (void *_self, va_list * app),
-	    (_self, app))
+O_IMPLEMENT(ListList, void *, ctor, (void *_self, va_list * app), (_self, app))
 {
 	struct ListList *self = O_CAST(_self, ListList());
 	self = O_SUPER->ctor(self, app);

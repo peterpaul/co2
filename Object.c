@@ -70,8 +70,8 @@ void *o_get_interface(void *_self, void *_interface)
 	while (IF && !o_is_of(IF, interface)) {
 		IF = IF->next;
 	}
-	assertTrue(IF, "%s at 0x%x does not implement %s.",
-		   self->class->name, (int) self, interface->class->name);
+	assertTrue(IF, "%s at 0x%x does not implement %s.", self->class->name,
+		   (int) self, interface->class->name);
 	return IF;
 }
 
@@ -87,8 +87,7 @@ void *o_super_ctor(void *_self, const void *_class, ...)
 }
 
 /* Object methods */
-O_IMPLEMENT(Object, void *, ctor, (void *_self, va_list * argp),
-	    (_self, argp))
+O_IMPLEMENT(Object, void *, ctor, (void *_self, va_list * argp), (_self, argp))
 {
 	struct Object *self = o_cast(_self, Object());
 	return self;
@@ -101,8 +100,7 @@ O_IMPLEMENT(Object, void *, dtor, (void *_self), (_self))
 	return self;
 }
 
-O_IMPLEMENT_VA(Object, void *, new, (void *_self,...), (_self, &ap),
-	       _self)
+O_IMPLEMENT_VA(Object, void *, new, (void *_self,...), (_self, &ap), _self)
 {
 	struct Class *self = o_cast(_self, Class());
 	struct Object *object = o_alloc(self);
@@ -111,14 +109,13 @@ O_IMPLEMENT_VA(Object, void *, new, (void *_self,...), (_self, &ap),
 	object->class = self;
 	va_start(ap, _self);
 	/* Call ctor method */
-	object->class->ctor(object, &ap);
+	O_CALL(object, ctor, &ap);
 	va_end(ap);
 	return object;
 }
 
-O_IMPLEMENT_VA(Object, void *, new_ctor,
-	       (void *_self, Object_ctor_t ctor,...), (_self, ctor, &ap),
-	       ctor)
+O_IMPLEMENT_VA(Object, void *, new_ctor, (void *_self, Object_ctor_t ctor,...),
+	       (_self, ctor, &ap), ctor)
 {
 	struct Class *self = o_cast(_self, Class());
 	struct Object *object = o_alloc(self);
@@ -135,14 +132,13 @@ O_IMPLEMENT_VA(Object, void *, new_ctor,
 O_IMPLEMENT(Object, void *, delete, (void *_self), (_self))
 {
 	struct Object *self = o_cast(_self, Object());
-	self = self->class->dtor(self);
+	self = O_CALL(self, dtor);
 	free(self);
 	return NULL;
 }
 
-O_IMPLEMENT_VA(Object, void *, init,
-	       (const void *_self, void *_object,...), (_self, _object,
-							&ap), _object)
+O_IMPLEMENT_VA(Object, void *, init, (const void *_self, void *_object,...),
+	       (_self, _object, &ap), _object)
 {
 	va_list ap;
 	struct Object *object = _object;
@@ -151,7 +147,7 @@ O_IMPLEMENT_VA(Object, void *, init,
 	assert(object);
 	object->class = (struct Class *) self;
 	va_start(ap, _object);
-	object->class->ctor(object, &ap);
+	O_CALL(object, ctor, &ap);
 	va_end(ap);
 	return object;
 }
@@ -175,8 +171,8 @@ O_IMPLEMENT_VA(Object, void *, init_ctor,
 O_IMPLEMENT(Object, struct String *, toString, (void *_self), (_self))
 {
 	struct Object *self = O_CAST(_self, Object());
-	return String()->new(String(), "%s at %p", self->class->name,
-			     _self);
+	return O_CALL_CLASS(String(), new, "%s at %p", self->class->name,
+			    _self);
 }
 
 O_IMPLEMENT(Object, void *, clone, (void *_self), (_self))
@@ -190,8 +186,7 @@ O_IMPLEMENT(Object, void *, clone, (void *_self), (_self))
 /* Class methods */
 #define O_SUPER Object()
 
-O_IMPLEMENT(Class, void *, ctor, (void *_self, va_list * argp),
-	    (_self, argp))
+O_IMPLEMENT(Class, void *, ctor, (void *_self, va_list * argp), (_self, argp))
 {
 	struct Class *self = o_cast(_self, Class());
 	self = O_SUPER->ctor(self, argp);
@@ -343,8 +338,7 @@ void o_add_class(void *_class)
 	/* } */
 
 	unsigned long index =
-	    hash_function((unsigned char *) class->name) %
-	    CLASS_HASHMAP_SIZE;
+	    hash_function((unsigned char *) class->name) % CLASS_HASHMAP_SIZE;
 
 	class_hashmap[index] =
 	    o_new_class_hashmap_tuple(class_hashmap[index], class);
@@ -357,8 +351,7 @@ void *o_get_class(const char *class_name)
 	}
 
 	unsigned long index =
-	    hash_function((unsigned char *) class_name) %
-	    CLASS_HASHMAP_SIZE;
+	    hash_function((unsigned char *) class_name) % CLASS_HASHMAP_SIZE;
 
 	struct ClassHashmapTuple *tuple =
 	    o_find_class_hashmap_tuple(class_hashmap[index], class_name);

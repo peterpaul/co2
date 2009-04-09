@@ -24,7 +24,7 @@ O_IMPLEMENT(LinkedList, void *, dtor, (void *_self), (_self))
 		struct LinkedList *curr = next;
 		next = next->next;
 		curr->next = NULL;
-		curr->class->delete(curr);
+		O_CALL(curr, delete);
 	}
 	return O_SUPER->dtor(self);
 }
@@ -36,7 +36,7 @@ O_IMPLEMENT(LinkedList, void *, merge_sorted, (void *_self, void *_other),
 	struct LinkedList *other = O_CAST(_other, LinkedList());
 	struct LinkedList *head = NULL, *tail = NULL;
 	while (self && other) {
-		if (self->class->compare(self, other) <= 0) {
+		if (O_CALL(self, compare, other) <= 0) {
 			/* if (O_CALL(self, compare, other) <= 0) { */
 			APPEND_LIST(self);
 			self = self->next;
@@ -61,9 +61,9 @@ static struct ListList *prepare_sort(struct LinkedList *list)
 	struct LinkedList *last;
 	assert(list);
 	while (list && list->next) {
-		APPEND_LIST(ListList()->new(ListList(), list));
+		APPEND_LIST(O_CALL_CLASS(ListList(), new, list));
 		while (list && list->next
-		       && list->class->compare(list, list->next) <= 0) {
+		       && O_CALL(list, compare, list->next) <= 0) {
 			list = list->next;
 		}
 		last = list;
@@ -71,7 +71,7 @@ static struct ListList *prepare_sort(struct LinkedList *list)
 		last->next = NULL;
 	}
 	if (list) {
-		APPEND_LIST(ListList()->new(ListList(), list));
+		APPEND_LIST(O_CALL_CLASS(ListList(), new, list));
 	}
 	return head;
 }
@@ -86,20 +86,21 @@ O_IMPLEMENT(LinkedList, void *, sort, (void *_self), (_self))
 		while (tail && tail->next) {
 			struct ListList *tmp = tail->next;
 			tail->item =
-			    (struct LinkedList *) tail->item->class->
-			    merge_sorted(tail->item, tmp->item);
+			    (struct LinkedList *) O_CALL(tail->item,
+							 merge_sorted,
+							 tmp->item);
 			/* O_CALL(tail->item, merge_sorted, tmp->item); */
 			tail->next = tmp->next;
 			tail = tmp->next;
 			/* delete node */
 			tmp->next = NULL;
-			tmp->class->delete(tmp);
+			O_CALL(tmp, delete);
 		}
 	}
 	self = head->item;
 	/* delete node */
 	head->next = NULL;
-	head->class->delete(head);
+	O_CALL(head, delete);
 
 	return self;
 }
@@ -110,7 +111,7 @@ O_IMPLEMENT(LinkedList, void *, map, (void *_self, void (*fun) (void *)),
 	struct LinkedList *self = O_CAST(_self, LinkedList());
 	if (self->next) {
 		struct LinkedList *next = self->next;
-		next->class->map(next, fun);
+		O_CALL(next, map, fun);
 		/* O_CALL(next, map, fun); */
 	}
 	return self;

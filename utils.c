@@ -5,20 +5,18 @@
 
 #include "utils.h"
 
-void __assert_fail(const char *assertion,
-		   const char *file,
-		   unsigned int line, const char *function)
+void __assert_fail(const char *assertion, const char *file, unsigned int line,
+		   const char *function)
 {
-	fprintf(stderr, "%s:%d: %s: Assertion `%s' failed.\n",
-		file, line, function, assertion);
+	fprintf(stderr, "%s:%d: %s: Assertion `%s' failed.\n", file, line,
+		function, assertion);
 	fflush(stdout);
 	fflush(stderr);
 	abort();
 }
 
-void __write_message(const char *fmt,
-		     const char *file,
-		     unsigned int line, const char *function, ...)
+void __write_message(const char *fmt, const char *file, unsigned int line,
+		     const char *function, ...)
 {
 	va_list ap;
 	fprintf(stderr, "%s:%d: %s: ", file, line, function);
