@@ -45,15 +45,11 @@ function rewrite_method_call(method,parameters, pos, parameter_length, result) {
 		comma = length(parameters) + 1;
 	}
 	object = substr(parameters, 1, comma - 1);
-	parameters = substr(parameters, comma + 1);
+	parameters = substr(parameters, comma);
 	debug("parameters = "parameters);
 	method = rewrite_method(method, "->class->", object, "O_CALL");
 	debug("method = "method);
-	if (trim(parameters) == "") {
-		return method;
-	} else {
-		return method "," parameters;
-	}
+	return method parameters;
 }
 function rewrite_new_call(method, parameters) {
 	debug("rewrite_new_call(\""method"\", \""parameters"\")");
