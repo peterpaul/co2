@@ -65,10 +65,26 @@ function rewrite_new_call(method, parameters) {
 	debug("method = "method);
 	return method "," parameters;
 }
+function rewrite_init_call(method, parameters) {
+	debug("rewrite_init_call(\""method"\", \""parameters"\")");
+	parameters = unnest(parameters);
+	comma = index(parameters, ",");
+	if (comma == 0) {
+		comma = length(parameters);
+	}
+	object = substr(parameters, 1, comma - 1);
+	parameters = substr(parameters, comma + 1);
+	debug("parameters = "parameters);
+	method = rewrite_method(method, "->init", object, "O_CALL_CLASS", "init");
+	debug("method = "method);
+	return method "," parameters;
+}
 function rewrite_call(method,parameters) {
 	debug("rewrite_call(\""method"\", \""parameters"\")");
 	if (index(method, "->new") > 0) {
 		return rewrite_new_call(method, parameters);
+	} else 	if (index(method, "->init") > 0) {
+		return rewrite_init_call(method, parameters);
 	} else if (index(method, "->class->") > 0) {
 		return rewrite_method_call(method, parameters);
 	} else {
@@ -124,9 +140,9 @@ BEGIN {
 # {
 # 	print unnest($0);
 # }
-(/.*->class->[a-zA-Z_]*\(/||/.*\(\)->new[a-zA-Z_]*\(/) {
+(/.*->class->[a-zA-Z_]*\(/||/.*\(\)->new[a-zA-Z_]*\(/||/.*\(\)->init[a-zA-Z_]*\(/) {
 	print unnest($0);
 }
-! (/.*->class->[a-zA-Z_]*\(/||/.*\(\)->new[a-zA-Z_]*\(/) {
+! (/.*->class->[a-zA-Z_]*\(/||/.*\(\)->new[a-zA-Z_]*\(/||/.*\(\)->init[a-zA-Z_]*\(/) {
 	print $0;
 }

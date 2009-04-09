@@ -26,8 +26,7 @@ int main(void)
 	printf("Hello world");
 	fflush(stdout);
 
-	struct MySingleton *singleton =
-	    MySingleton()->new(MySingleton(), 5);
+	struct MySingleton *singleton = O_CALL_CLASS(MySingleton(), new, 5);
 
 	printf(".");
 	fflush(stdout);
@@ -38,7 +37,7 @@ int main(void)
 	printf(".");
 	fflush(stdout);
 /*
-	singleton->class->delete(singleton);
+	O_CALL(singleton, delete);
 */
 	printf(".");
 	fflush(stdout);
@@ -50,17 +49,17 @@ int main(void)
 	printf("Hello world");
 	fflush(stdout);
 
-	struct MyObject *object = MyObject()->new(MyObject(), 5);
+	struct MyObject *object = O_CALL_CLASS(MyObject(), new, 5);
 
 	printf(".");
 	fflush(stdout);
 
-	printf("%d", object->class->getValue(object));
+	printf("%d", O_CALL(object, getValue));
 
 	printf(".");
 	fflush(stdout);
 
-	object->class->delete(object);
+	O_CALL(object, delete);
 
 	printf(".");
 	fflush(stdout);
@@ -72,7 +71,7 @@ int main(void)
 	printf("Hello world");
 	fflush(stdout);
 
-	singleton = MySingleton()->new(MySingleton(), 9);
+	singleton = O_CALL_CLASS(MySingleton(), new, 9);
 
 	printf(".");
 	fflush(stdout);
@@ -82,15 +81,14 @@ int main(void)
 	printf(".");
 	fflush(stdout);
 
-	singleton->class->delete(singleton);
+	O_CALL(singleton, delete);
 
 	printf(".");
 	fflush(stdout);
 	printf("\n");
 	fflush(stdout);
 
-	struct TestInterface *IF =
-	    TestInterface()->new(TestInterface(), 8);
+	struct TestInterface *IF = O_CALL_CLASS(TestInterface(), new, 8);
 	printf("test_if returned: %d\n", MyInterface_getValue(IF));
 
 	o_cleanup_class_hashmap();

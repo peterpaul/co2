@@ -19,7 +19,7 @@ void *Singleton_new(void *_self, ...)
 		object->class = self;
 		va_start(ap, _self);
 		/* Call ctor method */
-		object->class->ctor(object, &ap);
+		O_CALL(object, ctor, &ap);
 		va_end(ap);
 	}
 	return self->singleton;

@@ -23,5 +23,4 @@ O_OBJECT_METHOD(TestInterface, getValue);
 /* implement MyInterface */
 O_OBJECT_IF(MyInterface);
 O_OBJECT_IF_METHOD(TestInterface, getValue);
-O_OBJECT_IF_END
-O_END_OBJECT
+O_OBJECT_IF_END O_END_OBJECT
