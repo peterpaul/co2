@@ -97,7 +97,7 @@
 		static struct Class * self = NULL;			\
 		if (self == NULL) {					\
 			self = &_self;					\
-			self = Class()->init(Class(), self,		\
+			self = O_CALL_CLASS(Class(), init, self,		\
 					     sizeof(struct klass##Class), \
 					     O_STRING(klass##Class),	\
 					     O_SUPER->class);		\
@@ -109,7 +109,7 @@
 	static struct klass##Class * self = NULL;			\
 	if (self == NULL) {						\
 	self = &_self;							\
-	self = klass##Class()->init(klass##Class(), self,		\
+	self = O_CALL_CLASS(klass##Class(), init, self,		\
 				    sizeof(struct klass),		\
 				    O_STRING(klass),			\
 				    O_SUPER)

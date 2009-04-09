@@ -51,8 +51,8 @@ function rewrite_method_call(method,parameters, pos, parameter_length, result) {
 	debug("method = "method);
 	return method parameters;
 }
-function rewrite_new_call(method, parameters) {
-	debug("rewrite_new_call(\""method"\", \""parameters"\")");
+function rewrite_class_call(method, parameters, func) {
+	debug("rewrite_class_call(\""method"\", \""parameters"\")");
 	parameters = unnest(parameters);
 	comma = index(parameters, ",");
 	if (comma == 0) {
@@ -61,30 +61,16 @@ function rewrite_new_call(method, parameters) {
 	object = substr(parameters, 1, comma - 1);
 	parameters = substr(parameters, comma + 1);
 	debug("parameters = "parameters);
-	method = rewrite_method(method, "->new", object, "O_CALL_CLASS", "new");
-	debug("method = "method);
-	return method "," parameters;
-}
-function rewrite_init_call(method, parameters) {
-	debug("rewrite_init_call(\""method"\", \""parameters"\")");
-	parameters = unnest(parameters);
-	comma = index(parameters, ",");
-	if (comma == 0) {
-		comma = length(parameters);
-	}
-	object = substr(parameters, 1, comma - 1);
-	parameters = substr(parameters, comma + 1);
-	debug("parameters = "parameters);
-	method = rewrite_method(method, "->init", object, "O_CALL_CLASS", "init");
+	method = rewrite_method(method, "->" func, object, "O_CALL_CLASS", func);
 	debug("method = "method);
 	return method "," parameters;
 }
 function rewrite_call(method,parameters) {
 	debug("rewrite_call(\""method"\", \""parameters"\")");
 	if (index(method, "->new") > 0) {
-		return rewrite_new_call(method, parameters);
+		return rewrite_class_call(method, parameters, "new");
 	} else 	if (index(method, "->init") > 0) {
-		return rewrite_init_call(method, parameters);
+		return rewrite_class_call(method, parameters, "init");
 	} else if (index(method, "->class->") > 0) {
 		return rewrite_method_call(method, parameters);
 	} else {
