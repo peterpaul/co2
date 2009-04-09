@@ -23,15 +23,15 @@ function debug(string) {
 function rewrite_method(method, splitter, object, macro, method_prefix) {
 	debug("rewrite_method(\""method"\", \""splitter"\", \""object"\")");
 
-	split(method, list, object splitter);	
-	if (array_length(list) != 2) {
-		debug("ERROR: Expected list of size 2!");
-		for (offset = 1; offset < array_length(list); offset ++) {
-			debug("list["offset"] = "list[offset]);
-		}
+	split_expr = object splitter;
+
+	split_offset = index(method, split_expr);
+	if (split_offset == 0) {
 		return method;
 	}
-	
+	prefix = substr(method, 1, split_offset - 1);
+	postfix = substr(method, split_offset + length(split_expr) + 1);
+
 	meth = substr(list[2],1,length(list[2])-1);
 	return list[1] macro "(" object", " method_prefix meth;
 }
@@ -121,7 +121,7 @@ function unnest(line, begin, middle, end) {
 	return rewrite_call(begin,middle) unnest(end);
 }
 BEGIN {
-	debug_level = 0;
+	debug_level = 1;
 }
 #{
 #	print unnest($0);
