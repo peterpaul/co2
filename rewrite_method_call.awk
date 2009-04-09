@@ -30,10 +30,12 @@ function rewrite_method(method, splitter, object, macro, method_prefix) {
 		return method;
 	}
 	prefix = substr(method, 1, split_offset - 1);
-	postfix = substr(method, split_offset + length(split_expr) + 1);
+	postfix = substr(method, split_offset + length(split_expr));
+	postfix = substr(postfix, 1, length(postfix) - 1);
 
-	meth = substr(list[2],1,length(list[2])-1);
-	return list[1] macro "(" object", " method_prefix meth;
+	debug("prefix = "prefix", postfix = "postfix);
+
+	return prefix macro "(" object", " method_prefix postfix;
 }
 function rewrite_method_call(method,parameters, pos, parameter_length, result) {
 	debug("rewrite_method_call(\""method"\", \""parameters"\")");
