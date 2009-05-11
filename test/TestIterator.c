@@ -9,7 +9,6 @@ void testIterator(struct List *list)
 		String_fprint(Iterator_getNext(iterator), stdout);
 	}
 	Object_delete(iterator);
-
 }
 
 int main(int argc, char **argv)
