@@ -322,20 +322,12 @@ void o_cleanup_class_hashmap_tuple(struct ClassHashmapTuple *tuple)
 
 /* *** Functions for class registration *** */
 #define CLASS_HASHMAP_SIZE 1024
-//struct ClassHashmapTuple **class_hashmap = NULL;
 
 struct ClassHashmapTuple *class_hashmap[CLASS_HASHMAP_SIZE];
 
 void o_add_class(void *_class)
 {
 	struct ObjectClass *class = O_IS_CLASS(_class);
-
-	/* if (!class_hashmap) { */
-	/* create class_hashmap */
-	/* class_hashmap = */
-	/*     calloc(CLASS_HASHMAP_SIZE, */
-	/*         sizeof(struct ClassHashmapTuple *)); */
-	/* } */
 
 	unsigned long index =
 	    hash_function((unsigned char *) class->name) % CLASS_HASHMAP_SIZE;
@@ -378,6 +370,4 @@ void o_cleanup_class_hashmap()
 			o_cleanup_class_hashmap_tuple(class_hashmap[i]);
 		}
 	}
-	/* free(class_hashmap); */
-	/* class_hashmap = NULL; */
 }
