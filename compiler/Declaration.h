@@ -8,8 +8,7 @@
   RefObjectClass_Attr
 
 #define Declaration_Attr			\
-  RefObject_Attr;				\
-  struct Token * token
+  RefObject_Attr
 
 O_CLASS(Declaration, RefObject);
 

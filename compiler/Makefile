@@ -14,7 +14,7 @@ LEX_GEN_H	=
 
 GEN		= ${YACC_GEN_C} ${YACC_GEN_H} ${LEX_GEN_C} ${LEX_GEN_H}
 
-LIBSRCS		=Compiler.c Token.c Declaration.c
+LIBSRCS		=Compiler.c Token.c Declaration.c VarDeclaration.c Type.c
 LIBHDRS		=${LIBSRCS:%.c=%.h}
 LIBOBJS		=${LIBSRCS:%.c=%.o}
 
