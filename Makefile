@@ -1,6 +1,6 @@
-LIBSRCS		= Object.c List.c String.c Hash.c utils.c LinkedList.c ListList.c Interface.c Singleton.c Iterator.c ListIterator.c Thread.c
+LIBSRCS		= Object.c List.c String.c Hash.c utils.c LinkedList.c ListList.c Interface.c Singleton.c Iterator.c ListIterator.c Thread.c RefObject.c ReleasePool.c ReleasePoolItem.c
 
-LIBHDRS		= Object.h List.h String.h Hash.h utils.h LinkedList.h ListList.h Interface.h Singleton.h Iterator.h ListIterator.h Thread.h
+LIBHDRS		= Object.h List.h String.h Hash.h utils.h LinkedList.h ListList.h Interface.h Singleton.h Iterator.h ListIterator.h Thread.h RefObject.h ReleasePool.h ReleasePoolItem.h
 
 LIBOBJS		= $(LIBSRCS:%.c=%.o)
 
@@ -17,15 +17,17 @@ BINS		=
 
 FILES		= $(SRCS) $(HDRS) Makefile
 
+MAKEOPTS	= -j3
+
 include Makefile.include
 
 all::		$(LIBS)
 		make -C lexer && \
-			make -C config_parser && \
-			make -C sudoku && \
-			make -C web && \
-			make -C test && \
-			make -C slime
+			make ${MAKEOPTS} -C config_parser && \
+			make ${MAKEOPTS} -C sudoku && \
+			make ${MAKEOPTS} -C web && \
+			make ${MAKEOPTS} -C test && \
+			make ${MAKEOPTS} -C slime
 
 clean::
 		$(RM) -f $(BINS) $(LIBS) $(OBJS) $(DEPENDENCIES)
