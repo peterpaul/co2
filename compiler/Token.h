@@ -13,4 +13,6 @@
   struct String * file;				\
   int line
 
+O_CLASS(Token, RefObject);
+
 #endif /* TOKEN_H */

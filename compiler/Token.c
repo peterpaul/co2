@@ -13,8 +13,6 @@ O_IMPLEMENT(Token, void *, ctor, (void *_self, va_list *app), (_self, app))
   return self;
 }
 
-
-
-O_OBJECT(Token, Object);
+O_OBJECT(Token, RefObject);
 O_OBJECT_METHOD(Token, ctor);
 O_END_OBJECT
