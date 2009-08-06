@@ -144,6 +144,15 @@
 #define O_CAST(o,c)				\
 	o_cast(o,c)
 
+#define O_BRANCH_CAST(o,c)			\
+  ({typeof(o) _tmp = o;				\
+    _tmp ? O_CAST(_tmp,c) : _tmp;})
+
+#define O_BRANCH_CALL(o,msg,...)			\
+  ({typeof(o) _tmp = o;					\
+    _tmp ? O_CALL(_tmp,msg,##__VA_ARGS__) : NULL;})
+  
+
 /* Functions */
 void *o_cast(const void *_object, const void *_class);
 int o_is_a(const void *_self, const void *_class);
