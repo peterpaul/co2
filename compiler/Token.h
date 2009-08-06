@@ -2,6 +2,7 @@
 #define TOKEN_H
 
 #include "RefObject.h"
+#include "String.h"
 
 #define TokenClass_Attr				\
   RefObjectClass_Attr

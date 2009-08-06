@@ -1,4 +1,5 @@
 #include "Token.h"
+#include "String.h"
 
 #define O_SUPER RefObject()
 
@@ -6,10 +7,13 @@ O_IMPLEMENT(Token, void *, ctor, (void *_self, va_list *app), (_self, app))
 {
   struct Token *self = O_CAST(_self, Token());
   self = O_SUPER->ctor(self, app);
-  self->name = va_arg(*app, struct String *);
+  self->name = O_CALL_CLASS(String(), new, "%s", va_arg(*app, char *));
   self->type = va_arg(*app, int);
-  self->file = va_arg(*app, struct String *);
+  self->file = O_CALL_CLASS(String(), new, "%s", va_arg(*app, char *));
   self->line = va_arg(*app, int);
+
+  printf("Created token: \"%s\".\n", self->name->data);
+
   return self;
 }
 

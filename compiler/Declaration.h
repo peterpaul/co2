@@ -1,15 +1,14 @@
 #ifndef DECLARATION_H
 #define DECLARATION_H
 
-#include "RefObject.h"
-#include "Token.h"
+#include "CompileObject.h"
 
 #define DeclarationClass_Attr			\
-  RefObjectClass_Attr
+  CompileObjectClass_Attr
 
 #define Declaration_Attr			\
-  RefObject_Attr
+  CompileObject_Attr
 
-O_CLASS(Declaration, RefObject);
+O_CLASS(Declaration, CompileObject);
 
 #endif /* DECLARATION_H */

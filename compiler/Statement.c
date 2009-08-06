@@ -1,6 +1,6 @@
 #include "Statement.h"
 
-#define O_SUPER RefObject()
+#define O_SUPER CompileObject()
 
-O_OBJECT(Statement, RefObject);
+O_OBJECT(Statement, CompileObject);
 O_END_OBJECT

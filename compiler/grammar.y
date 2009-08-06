@@ -1,27 +1,98 @@
 %{
-  include "Object.h"
-%}
+#include "RefList.h"
+#include "Declaration.h"
+#include "VarDeclaration.h"
+#include "FunDeclaration.h"
+#include "ClassDeclaration.h"
+#include "ArgDeclaration.h"
+#include "InterfaceDeclaration.h"
+#include "MacroDeclaration.h"
+#include "Statement.h"
+#include "IfStatement.h"
+#include "DoStatement.h"
+#include "WhileStatement.h"
+#include "ForStatement.h"
+#include "ForEachStatement.h"
+#include "ExpressionStatement.h"
+#include "CompoundStatement.h"
+#include "ReturnStatement.h"
+#include "Expression.h"
+#include "Token.h"
+#include "Type.h"
+#include "ArrayType.h"
 
-%token CHAR
-%token CHAR_CONSTANT
-%token CLASS
-%token DO
-%token ELSE
-%token FLOAT
-%token FLOAT_CONSTANT
-%token FOR
-%token FOREACH
-%token IDENTIFIER
-%token IF
-%token INT
-%token INT_CONSTANT
-%token INTERFACE
-%token MACRO
-%token MACRO_IDENTIFIER
-%token STRING_CONSTANT
-%token TYPE_IDENTIFIER
-%token VA_ARG /* '...' */
-%token WHILE
+  extern void yyerror (const char *);
+  extern int yywrap (void);
+  extern char *yytext;
+  extern struct RefList *global_declarations;
+
+  %}
+
+%union {
+  struct RefList * list;
+  struct Declaration * declaration;
+  struct Statement * statement;
+  struct Expression * expression;
+  struct Token * token;
+  struct RefObject * object;
+  struct Type * type;
+}
+
+%token <token> CHAR
+%token <token> CHAR_CONSTANT
+%token <token> CLASS
+%token <token> DO
+%token <token> ELSE
+%token <token> FLOAT
+%token <token> FLOAT_CONSTANT
+%token <token> FOR
+%token <token> FOREACH
+%token <token> IDENTIFIER
+%token <token> IF
+%token <token> INT
+%token <token> INT_CONSTANT
+%token <token> INTERFACE
+%token <token> MACRO
+%token <token> MACRO_IDENTIFIER
+%token <token> RETURN
+%token <token> STRING_CONSTANT
+%token <token> TYPE_IDENTIFIER
+%token <token> UNSIGNED
+%token <token> VA_ARG /* '...' */
+%token <token> WHILE
+
+%type	<list>		input
+%type	<list>		declaration_list
+%type	<declaration>	declaration
+%type	<declaration>	variable_declaration
+%type	<declaration>	function_declaration
+%type	<declaration>	class_declaration
+%type	<declaration>	interface_declaration
+%type	<declaration>	macro_declaration
+%type	<declaration>	var_id_decl
+%type	<declaration>	function_header
+%type	<list>		formal_arg_list_var
+%type	<list>		formal_arg_list
+%type	<declaration>	formal_arg
+%type	<list>		interface_list
+%type	<statement>	statement
+%type	<statement>	compound_statement
+%type	<statement>	if_statement
+%type	<statement>	expression_statement
+%type	<statement>	do_statement
+%type	<statement>	while_statement
+%type	<statement>	for_statement
+%type	<statement>	foreach_statement
+%type	<statement>	return_statement
+%type	<list>		compound_content_list
+%type	<object>	compound_content
+%type	<type>		type
+%type	<list>		interface_method_declaration_list
+%type	<expression>	expression
+%type	<expression>	constant
+%type	<list>		actual_arg_list
+%type	<token>	string_constant
+%type	<list>		macro_identifier_list
 
 %left		<token>	','
 %right		<token>	'='
@@ -42,11 +113,22 @@
 
 input
 :	declaration_list
+{
+  global_declarations = $1;
+}
 ;
 
 declaration_list
 :	declaration_list declaration
-|	declaration
+{
+  O_CALL($$, append, $2);
+}
+|	declaration 
+{ 
+  struct RefList * result = O_CALL_CLASS(RefList(), new, 8, Declaration()); 
+  O_CALL(result, append, $1); 
+  $$ = result;
+}
 ;
 
 declaration
@@ -58,50 +140,100 @@ declaration
 ;
 
 variable_declaration
-:	type var_id_decl_list ';'
-;
-
-var_id_decl_list
-:	var_id_decl_list ',' var_id_decl
-|	var_id_decl
+:	type var_id_decl ';' 
+{
+  O_CALL((struct VarDeclaration *)$2, set_type, $1);
+  $$ = $2;
+}
 ;
 
 var_id_decl
-:	IDENTIFIER 
-|	IDENTIFIER '=' constant
+:	IDENTIFIER
+{
+  $$ = O_CALL_CLASS(VarDeclaration(), new, $1, NULL);
+}
+|	IDENTIFIER '=' expression
+{
+  $$ = O_CALL_CLASS(VarDeclaration(), new, $1, $3);
+}
 ;
 
 function_declaration
 :	function_header statement
+{
+  struct FunDeclaration * decl = o_cast($1, FunDeclaration());
+  decl->body = $2;
+}
 ;
 
 function_header
 :	type IDENTIFIER '(' formal_arg_list_var ')'
+{
+  $$ = O_CALL_CLASS(FunDeclaration(), new, $1, $2, $4, NULL);
+}
 ;
 
 formal_arg_list_var
 :	formal_arg_list ',' VA_ARG
+{
+  struct ArgDeclaration * arg = O_CALL_CLASS(ArgDeclaration(), new, NULL, $3);
+  O_CALL($$, append, arg);
+}
 |	formal_arg_list
 |	VA_ARG
+{
+  $$ = O_CALL_CLASS(RefList(), new, 8, ArgDeclaration());
+  struct ArgDeclaration * arg = O_CALL_CLASS(ArgDeclaration(), new, NULL, $1);
+  O_CALL($$, append, arg);
+}
+|
+	/* empty */
+{
+  $$ = O_CALL_CLASS(RefList(), new, 8, ArgDeclaration());
+}
 ;
 
 formal_arg_list
 :	formal_arg_list formal_arg
+{
+  O_CALL($$, append, $2);
+}
 |	formal_arg
+{
+  struct RefList * result = O_CALL_CLASS(RefList(), new, 8, ArgDeclaration());
+  O_CALL(result, append, $1);
+  $$ = result;
+}
 ;
 
 formal_arg
 :	type IDENTIFIER
+{
+  $$ = O_CALL_CLASS(ArgDeclaration(), new, $1, $2);
+}
 ;
 
 class_declaration
 :	CLASS TYPE_IDENTIFIER ':' TYPE_IDENTIFIER '<' interface_list '>' '{' declaration_list '}'
+{
+  $$ = O_CALL_CLASS(ClassDeclaration(), new, $2, $4, $6, $9);
+}
 |	CLASS TYPE_IDENTIFIER ':' TYPE_IDENTIFIER '{' declaration_list '}'
+{
+  $$ = O_CALL_CLASS(ClassDeclaration(), new, $2, $4, NULL, $6);
+}
 ;
 
 interface_list
 :	interface_list ',' TYPE_IDENTIFIER
+{
+  O_CALL($$, append, $3);
+}
 |	TYPE_IDENTIFIER
+{
+  $$ = O_CALL_CLASS(RefList(), new, 8, Token());
+  O_CALL($$, append, $1);
+}
 ;
 
 statement
@@ -112,73 +244,133 @@ statement
 |	while_statement
 |	for_statement
 |	foreach_statement
-|	assignment_statement
+|	return_statement
 ;
 
 compound_statement
 :	'{' compound_content_list '}'
+{
+  $$ = O_CALL_CLASS(CompoundStatement(), new, $2);
+}
 ;
 
 compound_content_list
 :	compound_content_list compound_content
 |	compound_content
+{
+  $$ = O_CALL_CLASS(RefList(), new, 8, CompileObject());
+  O_CALL($$, append, $1);
+}
 ;
 
 compound_content
-:	variable_declaration
-|	statement
+:	variable_declaration { $$ = (struct RefObject *) $1; }
+|	statement { $$ = (struct RefObject *) $1; }
 ;
 
 if_statement
 :	IF '(' expression ')' statement
+{
+  $$ = O_CALL_CLASS(IfStatement(), new, $3, $5, NULL);
+}
 |	IF '(' expression ')' statement ELSE statement
+{
+  $$ = O_CALL_CLASS(IfStatement(), new, $3, $5, $7);
+}
 ;
 
 expression_statement
 :	expression ';'
+{
+  $$ = O_CALL_CLASS(ExpressionStatement(), new, $1);
+}
 ;
 
 do_statement
 :	DO statement WHILE expression ';'
+{
+  $$ = O_CALL_CLASS(DoStatement(), new, $2, $4);
+}
 ;
 
 while_statement
 :	WHILE '(' expression ')' statement
+{
+  $$ = O_CALL_CLASS(WhileStatement(), new, $3, $5);
+}
 ;
 
 for_statement
 :	FOR '(' expression ';' expression ';' expression ')' statement
+{
+  $$ = O_CALL_CLASS(ForStatement(), new, $3, $5, $7, $9);
+}
 ;
 
 foreach_statement
 :	FOREACH '(' IDENTIFIER ':' expression ')' statement
+{
+  $$ = O_CALL_CLASS(ForEachStatement(), new, $3, $5, $7);
+}
 ;
 
-assignment_statement
-:	expression '=' expression ';'
+return_statement
+:	RETURN expression ';'
+{
+  $$ = O_CALL_CLASS(ReturnStatement(), new, $2);
+}
 ;
 
 interface_declaration
 :	INTERFACE TYPE_IDENTIFIER '<' interface_list '>' '{' interface_method_declaration_list '}'
+{
+  $$ = O_CALL_CLASS(InterfaceDeclaration(), new, $2, $4, $7);
+}
 |	INTERFACE TYPE_IDENTIFIER '{' interface_method_declaration_list '}'
+{
+  $$ = O_CALL_CLASS(InterfaceDeclaration(), new, $2, NULL, $4);
+}
 ;
 
 interface_method_declaration_list
 :	interface_method_declaration_list function_header ';'
 |	function_header ';'
+{
+  $$ = O_CALL_CLASS(RefList(), new, 8, Declaration());
+  O_CALL($$, append, $1);
+}
 ;
 
 type
 :	TYPE_IDENTIFIER
+{
+  $$ = O_CALL_CLASS(Type(), new, $1);
+}
 |	INT
+{
+  $$ = O_CALL_CLASS(Type(), new, $1);
+}
+|	UNSIGNED
+{
+  $$ = O_CALL_CLASS(Type(), new, $1);
+}
 |	FLOAT
+{
+  $$ = O_CALL_CLASS(Type(), new, $1);
+}
 |	CHAR
+{
+  $$ = O_CALL_CLASS(Type(), new, $1);
+}
 |	type '[' ']'
+{
+  $$ = O_CALL_CLASS(ArrayType(), new, $1);
+}
 ;
 
 expression
 :	constant
-|	IDENTIFIER
+|	IDENTIFIER { $$ = O_CALL_CLASS(Expression(), new, $1, NULL, NULL); }
 |	expression '(' actual_arg_list ')'
 |	expression '.' expression
 |	expression '+' expression
@@ -190,6 +382,7 @@ expression
 |	expression '&' expression
 |	expression '|' expression
 |	expression '#' expression
+:	expression '=' expression
 |	expression AND expression
 |	expression OR expression
 |	expression XOR expression
@@ -201,36 +394,70 @@ expression
 |	expression GEQ expression
 |	expression SHIFTR expression
 |	expression SHIFTL expression
-|	'-' expression %prec UNARY_MINUS
-|	'+' expression %prec UNARY_PLUS
-|	'!' expression 
-|	'(' expression ')'	
+|	'-' expression %prec UNARY_MINUS { $$ = O_CALL_CLASS(Expression(), new, $2, $1, NULL); }
+|	'+' expression %prec UNARY_PLUS { $$ = O_CALL_CLASS(Expression(), new, $2, $1, NULL); }
+|	'!' expression { $$ = O_CALL_CLASS(Expression(), new, $2, $1, NULL); }
+|	'(' expression ')' { $$ = $2; }
 ;
 
 constant
-:	CHAR_CONSTANT
-|	FLOAT_CONSTANT
-|	INT_CONSTANT
-|	string_constant
+:	CHAR_CONSTANT { $$ = O_CALL_CLASS(Expression(), new, $1, NULL, NULL); }
+|	FLOAT_CONSTANT { $$ = O_CALL_CLASS(Expression(), new, $1, NULL, NULL); }
+|	INT_CONSTANT { $$ = O_CALL_CLASS(Expression(), new, $1, NULL, NULL); }
+|	string_constant { $$ = O_CALL_CLASS(Expression(), new, $1, NULL, NULL); }
 ;
 
 actual_arg_list
 :	actual_arg_list ',' expression
+{
+  O_CALL($$, append, $3);
+
+}
 |	expression
+{
+  $$ = O_CALL_CLASS(RefList(), new, 8, Expression());
+  O_CALL($$, append, $1);
+}
 ;
 
 string_constant
 :	string_constant STRING_CONSTANT
+{
+  O_CALL($1->name, append, $2->name);
+  O_CALL($2, delete);
+}
 |	STRING_CONSTANT
 ;
 
 macro_declaration
 :	MACRO IDENTIFIER '(' macro_identifier_list ')' statement
+{
+  $$ = O_CALL_CLASS(MacroDeclaration(), new, $2, $4, $6);
+}
 ;
 
 macro_identifier_list
 :	macro_identifier_list ',' IDENTIFIER
+{
+  O_CALL($$, append, $3);
+}
 |	IDENTIFIER
+{
+  $$ = O_CALL_CLASS(RefList(), new, 8, Token());
+  O_CALL($$, append, $1);
+}
 ;
 
 %%
+void yyerror (const char * msg)
+{
+  error (yylval.token, "%s near \"%s\"\n", msg, yytext);
+}
+int yywrap ()
+{
+  return 1;
+}
+int parse ()
+{
+  return yyparse ();
+}
