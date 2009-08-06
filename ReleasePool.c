@@ -39,7 +39,10 @@ O_IMPLEMENT(ReleasePool, void *, add, (void *_self, void *_item), (_self, _item)
   struct ReleasePool *self = O_CAST(_self, ReleasePool());
   size_t index = ((size_t)_item) % RELEASEPOOL_HASH_SIZE;
   struct ReleasePoolItem *item = O_CALL_CLASS(ReleasePoolItem(), new, _item);
-  self->hashmap[index] = O_CALL(self->hashmap[index], add, item);
+  if (self->hashmap[index] == NULL)
+    self->hashmap[index] = item;
+  else
+    self->hashmap[index] = O_CALL(self->hashmap[index], add, item);
   return _item;
 }
 
