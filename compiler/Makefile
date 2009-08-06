@@ -1,41 +1,43 @@
 INCLUDE		=-I../ -I../lexer/
-LIBRARIES	=-L./ -L../ -L../lexer/ -lCompiler -lLexer -lObject 
+LIBRARIES	=-L./ -L../ -lCompiler -lObject 
 
-YACC		= bison -d -v
+YACC		= bison
 LEX		= flex
 
 YACC_SRC	= grammar.y
 YACC_GEN_C	= ${YACC_SRC:%.y=%.tab.c}
 YACC_GEN_H	= ${YACC_SRC:%.y=%.tab.h}
+YACC_FLAGS	= -d -v
 
 LEX_SRC		= lex.l
 LEX_GEN_C	= ${LEX_SRC:%.l=%.yy.c}
-LEX_GEN_H	=
+LEX_GEN_H	= ${LEX_SRC:%.l=%.yy.h}
+LEX_FLAGS	=--header-file=${LEX_GEN_H}
 
 GEN		= ${YACC_GEN_C} ${YACC_GEN_H} ${LEX_GEN_C} ${LEX_GEN_H}
 
-LIBSRCS		=Compiler.c Token.c Declaration.c VarDeclaration.c Type.c
+CC_SRCS		=ArgDeclaration.c ArrayType.c ClassDeclaration.c CompileObject.c Compiler.c CompoundStatement.c \
+		Declaration.c DoStatement.c error.c Expression.c ExpressionStatement.c ForEachStatement.c \
+		ForStatement.c FunDeclaration.c IfStatement.c InterfaceDeclaration.c io.c MacroDeclaration.c \
+		RefList.c ReturnStatement.c Statement.c Token.c Type.c VarDeclaration.c \
+		WhileStatement.c
+LIBSRCS		=$(CC_SRCS) $(YACC_GEN_C) ${LEX_GEN_C}
 LIBHDRS		=${LIBSRCS:%.c=%.h}
 LIBOBJS		=${LIBSRCS:%.c=%.o}
 
 SRCS		=Compiler.c
 
-CC_SRCS		=$(SRCS) $(YACC_GEN_C) $(LEX_GEN_C)
-
-OBJS		=$(CC_SRCS:%.c=%.o)
+OBJS		=${SRCS:%.c=%.o}
 BINS		=Compiler.bin
-LIBS		=../libObject.a ./libCompiler.a ../lexer/libLexer.a
-
-%.tab.c %.tab.h: %.y
-	${YACC} $<
-
-%.yy.c: %.l grammar.tab.h
-	${LEX} $<
+LIBS		=./libCompiler.a ../libObject.a
 
 include ../Makefile.include
 
+%.tab.c %.tab.h: %.y
+	${YACC} ${YACC_FLAGS} $<
+
+%.yy.c: %.l grammar.tab.h
+	${LEX} ${LEX_FLAGS} $<
+
 ../libObject.a:
 		make -C ../ libObject.a
-
-../lexer/libLexer.a:
-		make -C ../lexer libLexer.a
