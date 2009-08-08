@@ -7,7 +7,8 @@
   DeclarationClass_Attr
 
 #define ArgDeclaration_Attr				\
-  Declaration_Attr
+  Declaration_Attr;					\
+  struct Type * type
 
 O_CLASS(ArgDeclaration, Declaration);
 

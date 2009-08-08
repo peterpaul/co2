@@ -10,7 +10,6 @@ O_IMPLEMENT(FunDeclaration, void *, ctor, (void *_self, va_list *app), (_self, a
   struct FunDeclaration * self = O_CAST(_self, FunDeclaration());
   self = O_SUPER->ctor(self, app);
   self->type = o_cast(va_arg(*app, struct Type *), Type());
-  self->name = o_cast(va_arg(*app, struct Token *), Token());
   self->formal_arguments = o_cast(va_arg(*app, struct RefList *), RefList());
   self->body = O_BRANCH_CAST(va_arg(*app, struct Statement *), Statement());
   return self;

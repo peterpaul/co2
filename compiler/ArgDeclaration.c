@@ -1,4 +1,5 @@
 #include "ArgDeclaration.h"
+#include "Type.h"
 
 #define O_SUPER Declaration()
 
@@ -7,6 +8,7 @@ O_IMPLEMENT(ArgDeclaration, void *, ctor, (void *_self, va_list *app), (_self, a
   struct ArgDeclaration * self = O_CAST(_self, ArgDeclaration());
   self = O_SUPER->ctor(self, app);
   /* TODO initialize */
+  self->type = O_CAST(va_arg(*app, struct Type *), Type());
   return self;
 }
 

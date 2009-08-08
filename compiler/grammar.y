@@ -241,7 +241,7 @@ formal_arg_list
 formal_arg
 :	type IDENTIFIER
 {
-  $$ = O_CALL_CLASS(ArgDeclaration(), new, $1, $2);
+  $$ = O_CALL_CLASS(ArgDeclaration(), new, $2, $1);
 }
 ;
 
@@ -283,6 +283,11 @@ compound_statement
 :	'{' compound_content_list '}'
 {
   $$ = O_CALL_CLASS(CompoundStatement(), new, $2);
+}
+|	'{' '}'
+{
+  struct RefList * list = O_CALL_CLASS(RefList(), new, 0, CompileObject());
+  $$ = O_CALL_CLASS(CompoundStatement(), new, list);
 }
 ;
 
@@ -368,8 +373,9 @@ interface_method_declaration_list
 :	interface_method_declaration_list function_header ';'
 |	function_header ';'
 {
-  $$ = O_CALL_CLASS(RefList(), new, 8, Declaration());
-  O_CALL($$, append, $1);
+  struct RefList * result = O_CALL_CLASS(RefList(), new, 8, Declaration());
+  O_CALL(result, append, $1);
+  $$ = result;
 }
 ;
 
@@ -404,28 +410,29 @@ expression
 :	constant
 |	IDENTIFIER { $$ = O_CALL_CLASS(Expression(), new, $1, NULL, NULL); }
 |	expression '(' actual_arg_list ')'
-|	expression '.' expression
-|	expression '+' expression
-|	expression '-' expression
-|	expression '/' expression
-|	expression '*' expression
-|	expression '^' expression
-|	expression '%' expression
-|	expression '&' expression
-|	expression '|' expression
-|	expression '#' expression
-:	expression '=' expression
-|	expression AND expression
-|	expression OR expression
-|	expression XOR expression
-|	expression EQ expression
-|	expression NEQ expression
-|	expression '<' expression
-|	expression '>' expression
-|	expression LEQ expression
-|	expression GEQ expression
-|	expression SHIFTR expression
-|	expression SHIFTL expression
+|	expression '[' expression ']'
+|	expression '.' expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
+|	expression '+' expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
+|	expression '-' expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
+|	expression '/' expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
+|	expression '*' expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
+|	expression '^' expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
+|	expression '%' expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
+|	expression '&' expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
+|	expression '|' expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
+|	expression '#' expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
+|	expression '=' expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
+|	expression AND expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
+|	expression OR expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
+|	expression XOR expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
+|	expression EQ expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
+|	expression NEQ expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
+|	expression '<' expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
+|	expression '>' expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
+|	expression LEQ expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
+|	expression GEQ expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
+|	expression SHIFTR expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
+|	expression SHIFTL expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
 |	'-' expression %prec UNARY_MINUS { $$ = O_CALL_CLASS(Expression(), new, $2, $1, NULL); }
 |	'+' expression %prec UNARY_PLUS { $$ = O_CALL_CLASS(Expression(), new, $2, $1, NULL); }
 |	'!' expression { $$ = O_CALL_CLASS(Expression(), new, $2, $1, NULL); }
