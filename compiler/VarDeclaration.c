@@ -9,7 +9,6 @@ O_IMPLEMENT(VarDeclaration, void *, ctor, (void *_self, va_list *app), (_self, a
 {
   struct VarDeclaration * self = O_CAST(_self, VarDeclaration());
   self = O_SUPER->ctor(self, app);
-  self->token = O_CALL(va_arg(*app, struct Token *), retain);
   self->expr = O_BRANCH_CALL(va_arg(*app, struct Expression *), retain);
   return self;
 }

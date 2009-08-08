@@ -8,7 +8,6 @@
 
 #define ClassDeclaration_Attr			\
   Declaration_Attr;				\
-  struct Token * name;				\
   struct Token * superclass;			\
   struct RefList * interfaces;			\
   struct RefList * members

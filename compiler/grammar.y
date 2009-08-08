@@ -20,11 +20,13 @@
 #include "Token.h"
 #include "Type.h"
 #include "ArrayType.h"
+#include "Scope.h"
 
   extern void yyerror (const char *);
   extern int yywrap (void);
   extern char *yytext;
   extern struct RefList *global_declarations;
+  extern void var_id_decl_set_type(void *_var, va_list *app);
 
   %}
 
@@ -34,7 +36,7 @@
   struct Statement * statement;
   struct Expression * expression;
   struct Token * token;
-  struct RefObject * object;
+  struct CompileObject * object;
   struct Type * type;
 }
 
@@ -63,13 +65,14 @@
 
 %type	<list>		input
 %type	<list>		declaration_list
+%type	<list>		variable_declaration_list
 %type	<declaration>	declaration
-%type	<declaration>	variable_declaration
 %type	<declaration>	function_declaration
 %type	<declaration>	class_declaration
 %type	<declaration>	interface_declaration
 %type	<declaration>	macro_declaration
 %type	<declaration>	var_id_decl
+%type	<list>		var_id_decl_list
 %type	<declaration>	function_header
 %type	<list>		formal_arg_list_var
 %type	<list>		formal_arg_list
@@ -121,40 +124,63 @@ input
 declaration_list
 :	declaration_list declaration
 {
+  O_CALL(current_scope, declare, $2);
   O_CALL($$, append, $2);
 }
 |	declaration 
-{ 
+{
+  O_CALL(current_scope, declare, $1);
   struct RefList * result = O_CALL_CLASS(RefList(), new, 8, Declaration()); 
   O_CALL(result, append, $1); 
   $$ = result;
 }
+|	declaration_list variable_declaration_list
+{
+  $$ = O_CALL($1, merge, $2);
+}
+|	variable_declaration_list
 ;
 
 declaration
-:	variable_declaration 
-|	function_declaration
+:	function_declaration
 |	class_declaration
 |	interface_declaration
 |	macro_declaration
 ;
 
-variable_declaration
-:	type var_id_decl ';' 
+variable_declaration_list
+:	type var_id_decl_list ';' 
 {
-  O_CALL((struct VarDeclaration *)$2, set_type, $1);
+  O_CALL($2, map_args, var_id_decl_set_type, $1);
   $$ = $2;
+}
+;
+
+var_id_decl_list
+:	var_id_decl_list ',' var_id_decl
+{
+  O_CALL($$, append, $3);
+}
+|	var_id_decl
+{
+  struct RefList * result = O_CALL_CLASS(RefList(), new, 8, Declaration());
+  O_CALL(result, append, $1);
+  $$ = result;
 }
 ;
 
 var_id_decl
 :	IDENTIFIER
 {
-  $$ = O_CALL_CLASS(VarDeclaration(), new, $1, NULL);
+  struct Declaration * result = O_CALL_CLASS(VarDeclaration(), new, $1, NULL);
+  O_CALL(current_scope, declare, result);
+  $$ = result;
 }
 |	IDENTIFIER '=' expression
 {
-  $$ = O_CALL_CLASS(VarDeclaration(), new, $1, $3);
+  struct Declaration * result = O_CALL_CLASS(VarDeclaration(), new, $1, $3);
+  O_CALL(current_scope, declare, result);
+  $$ = result;
 }
 ;
 
@@ -167,9 +193,14 @@ function_declaration
 ;
 
 function_header
-:	type IDENTIFIER '(' formal_arg_list_var ')'
+:	type IDENTIFIER '(' 
+{ 
+  O_CALL_CLASS(Scope(), new); 
+}
+formal_arg_list_var ')'
 {
-  $$ = O_CALL_CLASS(FunDeclaration(), new, $1, $2, $4, NULL);
+  struct Declaration * result = O_CALL_CLASS(FunDeclaration(), new, $2, $1, $5, NULL);
+  $$ = result;
 }
 ;
 
@@ -194,9 +225,10 @@ formal_arg_list_var
 ;
 
 formal_arg_list
-:	formal_arg_list formal_arg
+:	formal_arg_list ',' formal_arg
 {
-  O_CALL($$, append, $2);
+  
+  O_CALL($$, append, $3);
 }
 |	formal_arg
 {
@@ -264,8 +296,8 @@ compound_content_list
 ;
 
 compound_content
-:	variable_declaration { $$ = (struct RefObject *) $1; }
-|	statement { $$ = (struct RefObject *) $1; }
+:	declaration { $$ = (struct CompileObject *) $1; }
+|	statement { $$ = (struct CompileObject *) $1; }
 ;
 
 if_statement
@@ -459,5 +491,11 @@ int yywrap ()
 }
 int parse ()
 {
+  O_CALL_CLASS(Scope(), new);
   return yyparse ();
+}
+void var_id_decl_set_type(void *_var, va_list *app)
+{
+  struct VarDeclaration * var = O_CAST(_var, VarDeclaration());
+  O_CALL(var, set_type, va_arg(*app, struct Type *));
 }

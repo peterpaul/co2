@@ -8,7 +8,6 @@
 
 #define FunDeclaration_Attr			\
   Declaration_Attr;				\
-  struct Token * name;				\
   struct Type * type;				\
   struct RefList * formal_arguments;		\
   struct Statement * body

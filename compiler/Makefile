@@ -19,7 +19,7 @@ GEN		= ${YACC_GEN_C} ${YACC_GEN_H} ${LEX_GEN_C} ${LEX_GEN_H}
 CC_SRCS		=ArgDeclaration.c ArrayType.c ClassDeclaration.c CompileObject.c Compiler.c CompoundStatement.c \
 		Declaration.c DoStatement.c error.c Expression.c ExpressionStatement.c ForEachStatement.c \
 		ForStatement.c FunDeclaration.c IfStatement.c InterfaceDeclaration.c io.c MacroDeclaration.c \
-		RefList.c ReturnStatement.c Statement.c Token.c Type.c VarDeclaration.c \
+		RefList.c ReturnStatement.c Scope.c Statement.c Token.c Type.c VarDeclaration.c \
 		WhileStatement.c
 LIBSRCS		=$(CC_SRCS) $(YACC_GEN_C) ${LEX_GEN_C}
 LIBHDRS		=${LIBSRCS:%.c=%.h}
