@@ -7,7 +7,7 @@
 
 #define O_SUPER Object()
 
-static size_t strnlen(const char *str, size_t n)
+static size_t __strnlen(const char *str, size_t n)
 {
 	size_t i;
 	for (i = 0; str[i] && i < n; i++);
@@ -146,7 +146,7 @@ O_IMPLEMENT(String, void *, append_str_n, (void *_self, char *str, int n),
 	struct String *self = O_CAST(_self, String());
 	if (n == 0)
 		return self;
-	int nn = strnlen(str, n);
+	int nn = __strnlen(str, n);
 /* 	if (nn > n) */
 /* 		nn = n; */
 	O_CALL(self, ensure, self->length + nn + 1);
