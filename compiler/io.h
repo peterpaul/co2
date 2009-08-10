@@ -7,6 +7,8 @@
 extern FILE * in;
 extern FILE * out;
 
+extern char * filename;
+
 FILE * open_input (const char * filename);
 FILE * open_output (const char * filename);
 
