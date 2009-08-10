@@ -41,10 +41,7 @@ O_IMPLEMENT(ReleasePoolItem, void *, remove, (void *_self, void *_item), (_self,
 O_IMPLEMENT(ReleasePoolItem, void, clear_list, (void *_self), (_self))
 {
   struct ReleasePoolItem *self = O_CAST(_self, ReleasePoolItem());
-  if (self->next)
-    {
-      O_CALL(self->next, clear_list);
-    }
+  O_BRANCH_CALL(self->next, clear_list);
   O_CALL(self->item, delete);
   O_CALL(self, delete);;
 }

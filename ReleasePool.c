@@ -23,8 +23,9 @@ O_IMPLEMENT(ReleasePool, void *, dtor, (void *_self), (_self))
   int i;
   for (i=0; i<RELEASEPOOL_HASH_SIZE; i++)
     {
-      O_CALL(self->hashmap[i], clear_list);
+      struct ReleasePoolItem * list = self->hashmap[i];
       self->hashmap[i] = NULL;
+      O_BRANCH_CALL(list, clear_list);
     }
   free(self->hashmap);
   current_release_pool = self->parent;
@@ -50,7 +51,7 @@ O_IMPLEMENT(ReleasePool, void *, remove, (void *_self, void *_item), (_self, _it
 {
   struct ReleasePool *self = O_CAST(_self, ReleasePool());
   size_t index = ((size_t)_item) % RELEASEPOOL_HASH_SIZE;
-  self->hashmap[index] = O_CALL(self->hashmap[index], remove, _item);
+  self->hashmap[index] = O_BRANCH_CALL(self->hashmap[index], remove, _item);
   return _item;
 }
 

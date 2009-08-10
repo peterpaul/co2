@@ -146,11 +146,11 @@
 
 #define O_BRANCH_CAST(o,c)			\
   ({typeof(o) _tmp = o;				\
-    _tmp ? O_CAST(_tmp,c) : _tmp;})
+    _tmp ? o_cast(_tmp,c) : _tmp;})
 
 #define O_BRANCH_CALL(o,msg,...)					\
   ({typeof(o) _tmp = o;							\
-    assertTrue(_tmp == NULL || _tmp->class->msg,			\
+    assertTrue(_tmp == (typeof(_tmp))0 || _tmp->class->msg,		\
 	       "runtime error: %s at %p doesn't respond to %s.",	\
 	       _tmp->class->name, (void *)_tmp, __STRING(msg));		\
     _tmp ? _tmp->class->msg(_tmp,##__VA_ARGS__) : (typeof(_tmp->class->msg(_tmp,##__VA_ARGS__)))0;})
