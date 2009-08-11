@@ -53,12 +53,26 @@ O_IMPLEMENT(Scope, struct Declaration *, lookup, (void *_self, struct Token * to
 {
   struct Scope *self = O_CAST(_self, Scope());
   struct Declaration * result = O_CALL(self, lookup_in_this_scope, token);
-  if (result == NULL && self->parent != NULL)
+  if (result == NULL)
     {
-      result = O_CALL(self->parent, lookup, token);
+      if (self->parent == NULL)
+	{
+	  O_CALL(self, error_not_found, token);
+	}
+      else
+	{
+	  result = O_CALL(self->parent, lookup, token);
+	}
     }
   return result;
 }
+
+O_IMPLEMENT(Scope, void, error_not_found, (void *_self, struct Token * token), (_self, token))
+{
+  struct Scope *self = O_CAST(_self, Scope());
+  error(token, "'%s' not declared.\n", token->name->data);
+}
+
 
 O_OBJECT(Scope, Hash);
 O_OBJECT_METHOD(Scope, ctor);
