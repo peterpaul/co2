@@ -7,7 +7,7 @@ LEX		= flex
 YACC_SRC	= grammar.y
 YACC_GEN_C	= ${YACC_SRC:%.y=%.tab.c}
 YACC_GEN_H	= ${YACC_SRC:%.y=%.tab.h}
-YACC_FLAGS	= -d -v
+YACC_FLAGS	= -d -v -k
 
 LEX_SRC		= lex.l
 LEX_GEN_C	= ${LEX_SRC:%.l=%.yy.c}
