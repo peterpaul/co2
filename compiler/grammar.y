@@ -200,6 +200,7 @@ function_declaration
 {
   struct FunDeclaration * decl = o_cast($1, FunDeclaration());
   decl->body = $2;
+  O_CALL(current_scope, leave);
 }
 ;
 
@@ -298,7 +299,15 @@ compound_statement
 ;
 
 opt_compound_content_list
-:	compound_content_list
+:
+{
+  O_CALL_CLASS(Scope(), new);
+}
+compound_content_list
+{
+  $$ = $2;
+  O_CALL(current_scope, leave);
+}
 |	/* empty */
 {
   $$ = O_CALL_CLASS(RefList(), new, 0, CompileObject());
@@ -331,6 +340,11 @@ compound_content_list
   $$ = result;
 }
 |	variable_declaration_list
+{
+  struct RefList * result = O_CALL_CLASS(RefList(), new, 8, CompileObject());
+  O_CALL(result, merge, $1);
+  $$ = result;
+}
 ;
 
 if_statement
@@ -436,7 +450,7 @@ type
 
 expression
 :	constant
-|	IDENTIFIER { $$ = O_CALL_CLASS(Expression(), new, $1, NULL, NULL); }
+|	IDENTIFIER { $$ = O_CALL_CLASS(Expression(), new, NULL, $1, NULL); }
 |	expression '(' opt_actual_arg_list ')'
 |	expression '[' expression ']'
 |	expression '.' expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
@@ -468,10 +482,10 @@ expression
 ;
 
 constant
-:	CHAR_CONSTANT { $$ = O_CALL_CLASS(Expression(), new, $1, NULL, NULL); }
-|	FLOAT_CONSTANT { $$ = O_CALL_CLASS(Expression(), new, $1, NULL, NULL); }
-|	INT_CONSTANT { $$ = O_CALL_CLASS(Expression(), new, $1, NULL, NULL); }
-|	string_constant { $$ = O_CALL_CLASS(Expression(), new, $1, NULL, NULL); }
+:	CHAR_CONSTANT { $$ = O_CALL_CLASS(Expression(), new, NULL, $1, NULL); }
+|	FLOAT_CONSTANT { $$ = O_CALL_CLASS(Expression(), new, NULL, $1, NULL); }
+|	INT_CONSTANT { $$ = O_CALL_CLASS(Expression(), new, NULL, $1, NULL); }
+|	string_constant { $$ = O_CALL_CLASS(Expression(), new, NULL, $1, NULL); }
 ;
 
 opt_actual_arg_list
@@ -535,7 +549,10 @@ int yywrap ()
 int parse ()
 {
   O_CALL_CLASS(Scope(), new);
-  return yyparse ();
+  int result = yyparse ();
+  O_CALL(current_scope, leave);
+  assertTrue(current_scope == NULL, "current_scope is not NULL");
+  return result;
 }
 void var_id_decl_set_type(void *_var, va_list *app)
 {
