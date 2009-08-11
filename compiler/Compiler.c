@@ -1,7 +1,7 @@
 #include "RefList.h"
 #include "grammar.tab.h"
-#include "lex.h"
 #include "RefObject.h"
+#include "Declaration.h"
 #include "io.h"
 
 extern int parse (void);
@@ -17,6 +17,8 @@ void optimize(void *_declaration)
 
 void generate(void *_declaration)
 {
+  struct Declaration * declaration = O_CAST(_declaration, Declaration());
+  O_CALL(declaration, generate);
 }
 
 int main(int argc, char ** argv)
@@ -30,6 +32,11 @@ int main(int argc, char ** argv)
     yyin = open_input (NULL);
   /* syntax analysis */
   parse ();
+  if (global_declarations == NULL)
+    {
+      O_CALL(current_release_pool, delete);
+      return 1;
+    }
   /* semantic analysis */
   O_CALL (global_declarations, map, type_check);
   /* optimization */
