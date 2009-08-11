@@ -3,6 +3,7 @@
 #include "RefObject.h"
 #include "Declaration.h"
 #include "io.h"
+#include "error.h"
 
 extern int parse (void);
 struct RefList *global_declarations;
@@ -39,8 +40,18 @@ int main(int argc, char ** argv)
     }
   /* semantic analysis */
   O_CALL (global_declarations, map, type_check);
+  if (errors != 0)
+    {
+      O_CALL(current_release_pool, delete);
+      return 1;
+    }
   /* optimization */
   O_CALL (global_declarations, map, optimize);
+  if (errors != 0)
+    {
+      O_CALL(current_release_pool, delete);
+      return 1;
+    }
   /* code generation */
   if (argc >= 3) 
     open_output (argv[2]);
