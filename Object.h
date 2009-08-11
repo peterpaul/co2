@@ -145,8 +145,7 @@
 	o_cast(o,c)
 
 #define O_BRANCH_CAST(o,c)			\
-  ({typeof(o) _tmp = o;				\
-    _tmp ? o_cast(_tmp,c) : _tmp;})
+  o_branch_cast(o,c)
 
 #define O_BRANCH_CALL(o,msg,...)					\
   ({typeof(o) _tmp = o;							\
@@ -158,6 +157,7 @@
 
 /* Functions */
 void *o_cast(const void *_object, const void *_class);
+void *o_branch_cast(const void *_object, const void *_class);
 int o_is_a(const void *_self, const void *_class);
 int o_is_of(const void *_self, const void *_class);
 int o_implements(void *_self, void *_interface);

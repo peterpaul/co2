@@ -10,6 +10,15 @@
 #include "Interface.h"
 
 /* General functions */
+void *o_branch_cast(const void *_object, const void *_class)
+{
+	if (_object == NULL) {
+		return (void *) _object;
+	} else {
+		return o_cast(_object, _class);
+	}
+}
+
 void *o_cast(const void *_object, const void *_class)
 {
 	const struct Object *object = O_IS_OBJECT(_object);
