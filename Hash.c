@@ -54,7 +54,7 @@ static struct Tuple *remove_tuple(struct Tuple *head, const char *key)
 		return NULL;
 }
 
-O_IMPLEMENT(Hash, void *, add, (void *_self, char *key, void *_item),
+O_IMPLEMENT(Hash, void *, add, (void *_self, const char *key, const void *_item),
 	    (_self, key, _item))
 {
 	struct Hash *self = O_CAST(_self, Hash());
@@ -63,9 +63,7 @@ O_IMPLEMENT(Hash, void *, add, (void *_self, char *key, void *_item),
 	struct Tuple *tuple;
 
 	if (search(self, key, index)) {
-		fprintf(stderr, "%s:%d: Adding item with duplicate key '%s'\n",
-			__FILE__, __LINE__, key);
-		exit(EXIT_FAILURE);
+		O_CALL(self, error_already_declared, key, item);
 	}
 
 	tuple = O_CALL_CLASS(Tuple(), new, key, item);
@@ -78,7 +76,7 @@ O_IMPLEMENT(Hash, void *, add, (void *_self, char *key, void *_item),
  * Set the value of a Hash Tuple to a certain value or add it if it doesn't
  * exist in the Hash yet.
  */
-O_IMPLEMENT(Hash, void *, set, (void *_self, char *key, void *_item),
+O_IMPLEMENT(Hash, void *, set, (void *_self, const char *key, const void *_item),
 	    (_self, key, _item))
 {
 	struct Hash *self = O_CAST(_self, Hash());
@@ -97,7 +95,7 @@ O_IMPLEMENT(Hash, void *, set, (void *_self, char *key, void *_item),
 	return item;
 }
 
-O_IMPLEMENT(Hash, void *, get, (void *_self, char *key), (_self, key))
+O_IMPLEMENT(Hash, void *, get, (void *_self, const char *key), (_self, key))
 {
 	struct Hash *self = O_CAST(_self, Hash());
 	unsigned long index = hash_function((unsigned char *) key) % HASH_SIZE;
@@ -109,7 +107,7 @@ O_IMPLEMENT(Hash, void *, get, (void *_self, char *key), (_self, key))
 	}
 }
 
-O_IMPLEMENT(Hash, void *, del, (void *_self, char *key), (_self, key))
+O_IMPLEMENT(Hash, void *, del, (void *_self, const char *key), (_self, key))
 {
 	struct Hash *self = O_CAST(_self, Hash());
 	unsigned long index = hash_function((unsigned char *) key) % HASH_SIZE;
@@ -132,10 +130,18 @@ O_IMPLEMENT(Hash, void *, dtor, (void *_self), (_self))
 	return O_SUPER->dtor(self);
 }
 
+O_IMPLEMENT(Hash, void, error_already_declared, (void *_self, const char * key, const void *_item), (_self, key, _item))
+{
+	struct Hash *self = O_CAST(_self, Hash());
+	fprintf(stderr, "Item with key '%s' already exists.\n", key);
+	exit(EXIT_FAILURE);
+}
+
 O_OBJECT(Hash, Object);
 O_OBJECT_METHOD(Hash, add);
 O_OBJECT_METHOD(Hash, del);
 O_OBJECT_METHOD(Hash, set);
 O_OBJECT_METHOD(Hash, get);
 O_OBJECT_METHOD(Hash, dtor);
+O_OBJECT_METHOD(Hash, error_already_declared);
 O_END_OBJECT
