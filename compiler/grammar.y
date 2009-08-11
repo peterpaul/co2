@@ -64,6 +64,7 @@
 %token <token> WHILE
 
 %type	<list>		input
+%type	<list>		opt_declaration_list
 %type	<list>		declaration_list
 %type	<list>		variable_declaration_list
 %type	<declaration>	declaration
@@ -88,12 +89,13 @@
 %type	<statement>	foreach_statement
 %type	<statement>	return_statement
 %type	<list>		compound_content_list
-%type	<object>	compound_content
+%type	<list>		opt_compound_content_list
 %type	<type>		type
 %type	<list>		interface_method_declaration_list
 %type	<expression>	expression
 %type	<expression>	constant
 %type	<list>		actual_arg_list
+%type	<list>		opt_actual_arg_list
 %type	<token>	string_constant
 %type	<list>		macro_identifier_list
 
@@ -118,6 +120,15 @@ input
 :	declaration_list
 {
   global_declarations = $1;
+}
+;
+
+opt_declaration_list
+:	declaration_list
+|
+	/* empty */
+{
+  $$ = O_CALL_CLASS(RefList(), new, 0, Declaration());
 }
 ;
 
@@ -246,11 +257,11 @@ formal_arg
 ;
 
 class_declaration
-:	CLASS TYPE_IDENTIFIER ':' TYPE_IDENTIFIER '<' interface_list '>' '{' declaration_list '}'
+:	CLASS TYPE_IDENTIFIER ':' TYPE_IDENTIFIER '<' interface_list '>' '{' opt_declaration_list '}'
 {
   $$ = O_CALL_CLASS(ClassDeclaration(), new, $2, $4, $6, $9);
 }
-|	CLASS TYPE_IDENTIFIER ':' TYPE_IDENTIFIER '{' declaration_list '}'
+|	CLASS TYPE_IDENTIFIER ':' TYPE_IDENTIFIER '{' opt_declaration_list '}'
 {
   $$ = O_CALL_CLASS(ClassDeclaration(), new, $2, $4, NULL, $6);
 }
@@ -280,29 +291,46 @@ statement
 ;
 
 compound_statement
-:	'{' compound_content_list '}'
+:	'{' opt_compound_content_list '}'
 {
   $$ = O_CALL_CLASS(CompoundStatement(), new, $2);
 }
-|	'{' '}'
+;
+
+opt_compound_content_list
+:	compound_content_list
+|	/* empty */
 {
-  struct RefList * list = O_CALL_CLASS(RefList(), new, 0, CompileObject());
-  $$ = O_CALL_CLASS(CompoundStatement(), new, list);
+  $$ = O_CALL_CLASS(RefList(), new, 0, CompileObject());
 }
 ;
 
 compound_content_list
-:	compound_content_list compound_content
-|	compound_content
+:	compound_content_list statement
 {
-  $$ = O_CALL_CLASS(RefList(), new, 8, CompileObject());
-  O_CALL($$, append, $1);
+  O_CALL($$, append, $2);
 }
-;
-
-compound_content
-:	declaration { $$ = (struct CompileObject *) $1; }
-|	statement { $$ = (struct CompileObject *) $1; }
+|	compound_content_list declaration
+{
+  O_CALL($$, append, $2);
+}
+|	compound_content_list variable_declaration_list
+{
+  O_CALL($$, merge, $2);
+}
+|	statement
+{
+  struct RefList * result = O_CALL_CLASS(RefList(), new, 8, CompileObject());
+  O_CALL(result, append, $1);
+  $$ = result;
+}
+|	declaration
+{
+  struct RefList * result = O_CALL_CLASS(RefList(), new, 8, CompileObject());
+  O_CALL(result, append, $1);
+  $$ = result;
+}
+|	variable_declaration_list
 ;
 
 if_statement
@@ -409,7 +437,7 @@ type
 expression
 :	constant
 |	IDENTIFIER { $$ = O_CALL_CLASS(Expression(), new, $1, NULL, NULL); }
-|	expression '(' actual_arg_list ')'
+|	expression '(' opt_actual_arg_list ')'
 |	expression '[' expression ']'
 |	expression '.' expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
 |	expression '+' expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
@@ -444,6 +472,14 @@ constant
 |	FLOAT_CONSTANT { $$ = O_CALL_CLASS(Expression(), new, $1, NULL, NULL); }
 |	INT_CONSTANT { $$ = O_CALL_CLASS(Expression(), new, $1, NULL, NULL); }
 |	string_constant { $$ = O_CALL_CLASS(Expression(), new, $1, NULL, NULL); }
+;
+
+opt_actual_arg_list
+:	actual_arg_list
+|	/* empty */
+{
+  $$ = O_CALL_CLASS(RefList(), new, 8, Expression());
+}
 ;
 
 actual_arg_list
