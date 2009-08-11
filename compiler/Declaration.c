@@ -1,4 +1,5 @@
 #include "Declaration.h"
+#include "Token.h"
 
 #define O_SUPER CompileObject()
 

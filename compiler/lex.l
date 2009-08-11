@@ -3,7 +3,7 @@
 #include "Token.h"
 
 int linenumber = 1;
-char * filename;
+const char * filename;
 %}
 
 DIGIT		[0-9]

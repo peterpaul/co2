@@ -1,4 +1,5 @@
 #include "Expression.h"
+#include "Token.h"
 
 #define O_SUPER CompileObject()
 
