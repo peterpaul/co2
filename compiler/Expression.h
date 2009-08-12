@@ -7,9 +7,7 @@
   CompileObjectClass_Attr
 
 #define Expression_Attr				\
-  CompileObject_Attr;				\
-  struct Expression * operand[2];		\
-  struct Token * operator
+  CompileObject_Attr
 
 O_CLASS(Expression, CompileObject);
 
