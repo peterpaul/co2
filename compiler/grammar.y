@@ -17,6 +17,8 @@
 #include "CompoundStatement.h"
 #include "ReturnStatement.h"
 #include "Expression.h"
+#include "BinaryExpression.h"
+#include "UnaryExpression.h"
 #include "Token.h"
 #include "Type.h"
 #include "ArrayType.h"
@@ -453,31 +455,31 @@ expression
 |	IDENTIFIER { $$ = O_CALL_CLASS(Expression(), new, NULL, $1, NULL); }
 |	expression '(' opt_actual_arg_list ')'
 |	expression '[' expression ']'
-|	expression '.' expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
-|	expression '+' expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
-|	expression '-' expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
-|	expression '/' expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
-|	expression '*' expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
-|	expression '^' expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
-|	expression '%' expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
-|	expression '&' expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
-|	expression '|' expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
-|	expression '#' expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
-|	expression '=' expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
-|	expression AND expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
-|	expression OR expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
-|	expression XOR expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
-|	expression EQ expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
-|	expression NEQ expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
-|	expression '<' expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
-|	expression '>' expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
-|	expression LEQ expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
-|	expression GEQ expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
-|	expression SHIFTR expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
-|	expression SHIFTL expression { $$ = O_CALL_CLASS(Expression(), new, $1, $<token>2, $3); }
-|	'-' expression %prec UNARY_MINUS { $$ = O_CALL_CLASS(Expression(), new, $2, $1, NULL); }
-|	'+' expression %prec UNARY_PLUS { $$ = O_CALL_CLASS(Expression(), new, $2, $1, NULL); }
-|	'!' expression { $$ = O_CALL_CLASS(Expression(), new, $2, $1, NULL); }
+|	expression '.' expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
+|	expression '+' expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
+|	expression '-' expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
+|	expression '/' expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
+|	expression '*' expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
+|	expression '^' expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
+|	expression '%' expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
+|	expression '&' expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
+|	expression '|' expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
+|	expression '#' expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
+|	expression '=' expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
+|	expression AND expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
+|	expression OR expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
+|	expression XOR expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
+|	expression EQ expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
+|	expression NEQ expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
+|	expression '<' expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
+|	expression '>' expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
+|	expression LEQ expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
+|	expression GEQ expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
+|	expression SHIFTR expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
+|	expression SHIFTL expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
+|	'-' expression %prec UNARY_MINUS { $$ = O_CALL_CLASS(UnaryExpression(), new, $2, $1, NULL); }
+|	'+' expression %prec UNARY_PLUS { $$ = O_CALL_CLASS(UnaryExpression(), new, $2, $1, NULL); }
+|	'!' expression { $$ = O_CALL_CLASS(UnaryExpression(), new, $2, $1, NULL); }
 |	'(' expression ')' { $$ = $2; }
 ;
 
