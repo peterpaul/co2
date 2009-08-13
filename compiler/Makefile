@@ -43,7 +43,7 @@ include ../Makefile.include
 		make -C ../ libObject.a
 
 # Tests
-test:		${BINS} test/target/OK
+test:		test/target/OK
 
-test/target/OK:
+test/target/OK:	${BINS}
 		scripts/run_tests.sh
