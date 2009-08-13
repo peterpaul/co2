@@ -209,7 +209,7 @@ function_declaration
 function_header
 :	type IDENTIFIER '(' 
 { 
-  O_CALL_CLASS(Scope(), new); 
+  O_CALL_CLASS(Scope(), new, ARGUMENT_SCOPE, $2); 
 }
 formal_arg_list_var ')'
 {
@@ -260,13 +260,23 @@ formal_arg
 ;
 
 class_declaration
-:	CLASS TYPE_IDENTIFIER ':' TYPE_IDENTIFIER '<' interface_list '>' '{' opt_declaration_list '}'
+:	CLASS TYPE_IDENTIFIER ':' TYPE_IDENTIFIER '<' interface_list '>' '{' 
 {
-  $$ = O_CALL_CLASS(ClassDeclaration(), new, $2, $4, $6, $9);
+  O_CALL_CLASS(Scope(), new, CLASS_SCOPE, $2);
 }
-|	CLASS TYPE_IDENTIFIER ':' TYPE_IDENTIFIER '{' opt_declaration_list '}'
+opt_declaration_list '}'
 {
-  $$ = O_CALL_CLASS(ClassDeclaration(), new, $2, $4, NULL, $6);
+  O_CALL(current_scope, leave);
+  $$ = O_CALL_CLASS(ClassDeclaration(), new, $2, $4, $6, $10);
+}
+|	CLASS TYPE_IDENTIFIER ':' TYPE_IDENTIFIER '{' 
+{
+  O_CALL_CLASS(Scope(), new, CLASS_SCOPE, $2);
+}
+opt_declaration_list '}'
+{
+  O_CALL(current_scope, leave);
+  $$ = O_CALL_CLASS(ClassDeclaration(), new, $2, $4, NULL, $7);
 }
 ;
 
@@ -303,7 +313,7 @@ compound_statement
 opt_compound_content_list
 :
 {
-  O_CALL_CLASS(Scope(), new);
+  O_CALL_CLASS(Scope(), new, COMPOUND_SCOPE, NULL);
 }
 compound_content_list
 {
@@ -550,7 +560,7 @@ int yywrap ()
 }
 int parse ()
 {
-  O_CALL_CLASS(Scope(), new);
+  O_CALL_CLASS(Scope(), new, GLOBAL_SCOPE, NULL);
   int result = yyparse ();
   O_CALL(current_scope, leave);
   if (result == 0)
