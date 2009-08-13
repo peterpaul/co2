@@ -553,7 +553,10 @@ int parse ()
   O_CALL_CLASS(Scope(), new);
   int result = yyparse ();
   O_CALL(current_scope, leave);
-  assertTrue(current_scope == NULL, "current_scope is not NULL");
+  if (result == 0)
+    {
+      assertTrue(current_scope == NULL, "current_scope is not NULL");
+    }
   return result;
 }
 void var_id_decl_set_type(void *_var, va_list *app)
