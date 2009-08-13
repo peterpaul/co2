@@ -1,0 +1,9 @@
+class MyObject:Object 
+{
+	int var;
+	int fun(int a, int b)
+	{
+		ind c = a + b;
+		return c;
+	}
+}

@@ -41,3 +41,9 @@ include ../Makefile.include
 
 ../libObject.a:
 		make -C ../ libObject.a
+
+# Tests
+test:		${BINS} test/target/OK
+
+test/target/OK:
+		scripts/run_tests.sh
