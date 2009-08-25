@@ -18,14 +18,22 @@ for TEST in ${TESTS}
 do
     BASENAME=`basename ${TEST} .test`
     TARGETNAME=${TARGET}/success/${BASENAME}
-    ${COMPILER} ${TEST} ${TARGETNAME}.out > ${TARGETNAME}.err 2>&1
+    ${COMPILER} ${TEST} ${TARGETNAME}.c > ${TARGETNAME}.err 2>&1
     if [[ "$?" != "0" ]]
     then
 	ERRORS=$(( ERRORS + 1 ))
 	cat ${TARGETNAME}.err
 	echo "ERROR: ${TEST} failed."
     else
-	rm ${TARGETNAME}.out ${TARGETNAME}.err
+	gcc ${TARGETNAME}.c -o ${TARGETNAME}.bin
+	if [[ "$?" != "0" ]]
+	then
+	    ERRORS=$(( ERRORS + 1 ))
+	    echo "ERROR: ${TEST} failed."
+	else
+	    ${TARGETNAME}.bin
+	fi
+	rm ${TARGETNAME}.c ${TARGETNAME}.err
     fi
 done
 
@@ -35,12 +43,14 @@ for TEST in ${TESTS}
 do
     BASENAME=`basename ${TEST} .test`
     TARGETNAME=${TARGET}/fail/${BASENAME}
-    ${COMPILER} ${TEST} ${TARGETNAME}.out > ${TARGETNAME}.err 2>&1
+    ${COMPILER} ${TEST} ${TARGETNAME}.c > ${TARGETNAME}.err 2>&1
     if [[ "$?" == "0" ]]
     then
 	ERRORS=$(( ERRORS + 1 ))
 	cat ${TARGETNAME}.err
 	echo "ERROR: ${TEST} failed."
+    else
+	rm -f ${TARGETNAME}.c ${TARGETNAME}.err
     fi
 done
 
