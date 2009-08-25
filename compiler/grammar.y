@@ -22,6 +22,7 @@
 #include "Token.h"
 #include "Type.h"
 #include "ArrayType.h"
+#include "PrimitiveType.h"
 #include "Scope.h"
 
   extern void yyerror (const char *);
@@ -436,23 +437,23 @@ interface_method_declaration_list
 type
 :	TYPE_IDENTIFIER
 {
-  $$ = O_CALL_CLASS(Type(), new, $1);
+  $$ = O_CALL_CLASS(PrimitiveType(), new, $1);
 }
 |	INT
 {
-  $$ = O_CALL_CLASS(Type(), new, $1);
+  $$ = O_CALL_CLASS(PrimitiveType(), new, $1);
 }
 |	UNSIGNED
 {
-  $$ = O_CALL_CLASS(Type(), new, $1);
+  $$ = O_CALL_CLASS(PrimitiveType(), new, $1);
 }
 |	FLOAT
 {
-  $$ = O_CALL_CLASS(Type(), new, $1);
+  $$ = O_CALL_CLASS(PrimitiveType(), new, $1);
 }
 |	CHAR
 {
-  $$ = O_CALL_CLASS(Type(), new, $1);
+  $$ = O_CALL_CLASS(PrimitiveType(), new, $1);
 }
 |	type '[' ']'
 {
