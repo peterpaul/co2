@@ -1,19 +1,19 @@
 #ifndef TOKEN_H
 #define TOKEN_H
 
-#include "RefObject.h"
+#include "CompileObject.h"
 #include "String.h"
 
 #define TokenClass_Attr				\
-  RefObjectClass_Attr
+  CompileObjectClass_Attr
 
 #define Token_Attr				\
-  RefObject_Attr;				\
+  CompileObject_Attr;				\
   struct String * name;				\
   int type;					\
   struct String * file;				\
   int line
 
-O_CLASS(Token, RefObject);
+O_CLASS(Token, CompileObject);
 
 #endif /* TOKEN_H */
