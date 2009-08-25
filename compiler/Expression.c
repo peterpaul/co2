@@ -17,7 +17,12 @@ O_IMPLEMENT(Expression, void *, dtor, (void *_self), (_self))
   return O_SUPER->dtor(self);
 }
 
+O_IMPLEMENT(Expression, void, generate, (void *_self), (_self))
+{
+}
+
 O_OBJECT(Expression, CompileObject);
 O_OBJECT_METHOD(Expression, ctor);
 O_OBJECT_METHOD(Expression, dtor);
+O_OBJECT_METHOD(Expression, generate);
 O_END_OBJECT

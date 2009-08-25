@@ -17,7 +17,12 @@ O_IMPLEMENT(ArrayType, void *, dtor, (void *_self), (_self))
   return O_SUPER->dtor(self);
 }
 
+O_IMPLEMENT(ArrayType, void, generate, (void *_self), (_self))
+{
+}
+
 O_OBJECT(ArrayType, Type);
 O_OBJECT_METHOD(ArrayType, ctor);
 O_OBJECT_METHOD(ArrayType, dtor);
+O_OBJECT_METHOD(ArrayType, generate);
 O_END_OBJECT
