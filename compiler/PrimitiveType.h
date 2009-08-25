@@ -6,8 +6,9 @@
 #define PrimitiveTypeClass_Attr			\
   TypeClass_Attr
 
-#define PrimitiveType_Attr				\
-  Type_Attr
+#define PrimitiveType_Attr		\
+  Type_Attr;				\
+  struct Token * token
 
 O_CLASS(PrimitiveType, Type);
 
