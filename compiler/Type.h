@@ -1,8 +1,7 @@
-#ifndef TYPE_H
-#define TYPE_H
+#ifndef Type_H
+#define Type_H
 
 #include "CompileObject.h"
-#include "Token.h"
 
 #define TypeClass_Attr				\
   CompileObjectClass_Attr
@@ -12,4 +11,4 @@
 
 O_CLASS(Type, CompileObject);
 
-#endif /* TYPE_H */
+#endif /* Type_H */
