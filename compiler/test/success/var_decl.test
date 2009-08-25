@@ -1,0 +1,7 @@
+int a, b = 5, c;
+int d;
+int e = 5;
+
+int[] f;
+
+char[] g = "Hoi";
