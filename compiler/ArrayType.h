@@ -7,7 +7,8 @@
   TypeClass_Attr
 
 #define ArrayType_Attr				\
-  Type_Attr
+  Type_Attr;					\
+  struct Type * base_type
 
 O_CLASS(ArrayType, Type);
 
