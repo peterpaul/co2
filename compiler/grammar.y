@@ -20,6 +20,7 @@
 #include "BinaryExpression.h"
 #include "UnaryExpression.h"
 #include "Token.h"
+#include "TokenExpression.h"
 #include "Type.h"
 #include "ArrayType.h"
 #include "PrimitiveType.h"
@@ -59,6 +60,7 @@
 %token <token> INTERFACE
 %token <token> MACRO
 %token <token> MACRO_IDENTIFIER
+%token <token> NEW
 %token <token> RETURN
 %token <token> STRING_CONSTANT
 %token <token> TYPE_IDENTIFIER
@@ -202,7 +204,7 @@ function_declaration
 :	function_header statement
 {
   struct FunDeclaration * decl = o_cast($1, FunDeclaration());
-  decl->body = $2;
+  decl->body = O_CALL($2, retain);
   O_CALL(current_scope, leave);
 }
 ;
@@ -411,6 +413,10 @@ return_statement
 {
   $$ = O_CALL_CLASS(ReturnStatement(), new, $2);
 }
+|	RETURN ';'
+{
+  $$ = O_CALL_CLASS(ReturnStatement(), new, NULL);
+}
 ;
 
 interface_declaration
@@ -463,7 +469,7 @@ type
 
 expression
 :	constant
-|	IDENTIFIER { $$ = O_CALL_CLASS(Expression(), new, NULL, $1, NULL); }
+|	IDENTIFIER { $$ = O_CALL_CLASS(TokenExpression(), new, $1); }
 |	expression '(' opt_actual_arg_list ')'
 |	expression '[' expression ']'
 |	expression '.' expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
@@ -488,17 +494,19 @@ expression
 |	expression GEQ expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
 |	expression SHIFTR expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
 |	expression SHIFTL expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
-|	'-' expression %prec UNARY_MINUS { $$ = O_CALL_CLASS(UnaryExpression(), new, $2, $1, NULL); }
-|	'+' expression %prec UNARY_PLUS { $$ = O_CALL_CLASS(UnaryExpression(), new, $2, $1, NULL); }
-|	'!' expression { $$ = O_CALL_CLASS(UnaryExpression(), new, $2, $1, NULL); }
+|	'-' expression %prec UNARY_MINUS { $$ = O_CALL_CLASS(UnaryExpression(), new, $2, $1); }
+|	'+' expression %prec UNARY_PLUS { $$ = O_CALL_CLASS(UnaryExpression(), new, $2, $1); }
+|	'!' expression { $$ = O_CALL_CLASS(UnaryExpression(), new, $2, $1); }
 |	'(' expression ')' { $$ = $2; }
+|	NEW type '[' expression ']'
+|	NEW type '(' opt_actual_arg_list ')'
 ;
 
 constant
-:	CHAR_CONSTANT { $$ = O_CALL_CLASS(Expression(), new, NULL, $1, NULL); }
-|	FLOAT_CONSTANT { $$ = O_CALL_CLASS(Expression(), new, NULL, $1, NULL); }
-|	INT_CONSTANT { $$ = O_CALL_CLASS(Expression(), new, NULL, $1, NULL); }
-|	string_constant { $$ = O_CALL_CLASS(Expression(), new, NULL, $1, NULL); }
+:	CHAR_CONSTANT { $$ = O_CALL_CLASS(TokenExpression(), new, $1); }
+|	FLOAT_CONSTANT { $$ = O_CALL_CLASS(TokenExpression(), new, $1); }
+|	INT_CONSTANT { $$ = O_CALL_CLASS(TokenExpression(), new, $1); }
+|	string_constant { $$ = O_CALL_CLASS(TokenExpression(), new, $1); }
 ;
 
 opt_actual_arg_list
