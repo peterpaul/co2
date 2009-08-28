@@ -1,5 +1,6 @@
 #include "Token.h"
 #include "String.h"
+#include "io.h"
 
 #define O_SUPER CompileObject()
 
@@ -14,6 +15,13 @@ O_IMPLEMENT(Token, void *, ctor, (void *_self, va_list *app), (_self, app))
   return self;
 }
 
+O_IMPLEMENT(Token, void, generate, (void *_self), (_self))
+{
+  struct Token *self = O_CAST(_self, Token());
+  fprintf(out, "%s", self->name->data);
+}
+
 O_OBJECT(Token, CompileObject);
 O_OBJECT_METHOD(Token, ctor);
+O_OBJECT_METHOD(Token, generate);
 O_END_OBJECT

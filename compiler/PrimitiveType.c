@@ -22,6 +22,7 @@ O_IMPLEMENT(PrimitiveType, void *, dtor, (void *_self), (_self))
 O_IMPLEMENT(PrimitiveType, void, generate, (void *_self), (_self))
 {
   struct PrimitiveType *self = O_CAST(_self, PrimitiveType());
+  O_CALL(self->token, generate);
 }
 
 O_OBJECT(PrimitiveType, Type);

@@ -22,7 +22,7 @@ O_IMPLEMENT(ArrayType, void, generate, (void *_self), (_self))
 {
   struct ArrayType *self = O_CAST(_self, ArrayType());
   O_CALL(self->base_type, generate);
-  fprintf(out, " *");
+  fprintf(out, "*");
 }
 
 O_OBJECT(ArrayType, Type);
