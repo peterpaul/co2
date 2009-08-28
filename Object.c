@@ -12,11 +12,10 @@
 /* General functions */
 void *o_branch_cast(const void *_object, const void *_class)
 {
-	if (_object == NULL) {
-		return (void *) _object;
-	} else {
+	if (_object != NULL) {
 		return o_cast(_object, _class);
 	}
+	return NULL;
 }
 
 void *o_cast(const void *_object, const void *_class)
@@ -27,7 +26,8 @@ void *o_cast(const void *_object, const void *_class)
 	const struct Class *o = Object();
 	while (myClass != class && myClass != o)
 		myClass = myClass->super;
-	assert(myClass == class);
+	assertTrue(myClass == class, "Could not cast %s to %s.", 
+		   object->class->name, class->name);
 	return (void *) _object;
 }
 
@@ -35,7 +35,7 @@ void *o_alloc(const void *_class)
 {
 	const struct Class *class = O_IS_CLASS(_class);
 	struct Object *self = calloc(1, class->size);
-	assert(self);
+	assertTrue(self, "Calloc failed.");
 	self->class = (struct Class *) class;
 	return self;
 }
