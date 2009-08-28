@@ -7,15 +7,15 @@ O_IMPLEMENT(Declaration, void *, ctor, (void *_self, va_list *app), (_self, app)
 {
   struct Declaration * self = O_CAST(_self, Declaration());
   self = O_SUPER->ctor(self, app);  
-  /* TODO initialize */
   self->name = o_cast(va_arg(*app, struct Token *), Token());
+  O_CALL(self->name, retain);
   return self;
 }
 
 O_IMPLEMENT(Declaration, void *, dtor, (void *_self), (_self))
 {
   struct Declaration *self = O_CAST(_self, Declaration());
-  /* TODO cleanup */
+  O_CALL(self->name, release);
   return O_SUPER->dtor(self);
 }
 
