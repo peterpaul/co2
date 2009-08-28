@@ -36,6 +36,7 @@ STRING_CONST	\"({CHAR_SYMBOL}|\')*\"
 "new"		return NEW;
 "return"	return RETURN;
 "unsigned"	return UNSIGNED;
+"void"		yylval.token = O_CALL_CLASS(Token(), new, yytext, VOID, filename, linenumber); return yylval.token->type;
 "while"		return WHILE;
 "..."		return VA_ARG;
 "&&"		yylval.token = O_CALL_CLASS(Token(), new, yytext, AND, filename, linenumber); return yylval.token->type;

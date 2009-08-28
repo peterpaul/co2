@@ -66,6 +66,7 @@
 %token <token> TYPE_IDENTIFIER
 %token <token> UNSIGNED
 %token <token> VA_ARG /* '...' */
+%token <token> VOID
 %token <token> WHILE
 
 %type	<list>		input
@@ -464,6 +465,10 @@ type
 |	type '[' ']'
 {
   $$ = O_CALL_CLASS(ArrayType(), new, $1);
+}
+|	VOID
+{
+  $$ = O_CALL_CLASS(PrimitiveType(), new, $1);
 }
 ;
 
