@@ -1,5 +1,6 @@
 #include "UnaryExpression.h"
 #include "Token.h"
+#include "io.h"
 
 #define O_SUPER Expression()
 
@@ -22,7 +23,15 @@ O_IMPLEMENT(UnaryExpression, void *, dtor, (void *_self), (_self))
   return O_SUPER->dtor(self);
 }
 
+O_IMPLEMENT(UnaryExpression, void, generate, (void *_self), (self))
+{
+  struct UnaryExpression *self = O_CAST(_self, UnaryExpression());
+  fprintf(out, "%s ", self->operator->name->data);
+  O_CALL(self->operand, generate);
+}
+
 O_OBJECT(UnaryExpression, Expression);
 O_OBJECT_METHOD(UnaryExpression, ctor);
 O_OBJECT_METHOD(UnaryExpression, dtor);
+O_OBJECT_METHOD(UnaryExpression, generate);
 O_END_OBJECT

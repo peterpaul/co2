@@ -7,10 +7,23 @@ TARGET=${TESTDIR}/target
 # Remove previous output
 rm -rf ${TARGET}
 
+# Define helper functions.
+function fail_test {
+    ERRORS=$(( ERRORS + 1 ))
+    echo $1
+}
+
+function test_separator {
+    echo "---------------------------------------------------------------------------"
+}
+
 # Create output folder
 mkdir -p ${TARGET}/success > /dev/null
 mkdir -p ${TARGET}/fail > /dev/null
 
+test_separator
+echo "Success test-cases"
+test_separator
 ERRORS=0
 # Testcases that should work
 TESTS=`find ${TESTDIR}/success -name "*.test"`
@@ -18,23 +31,25 @@ for TEST in ${TESTS}
 do
     # Compile the testcase
     BASENAME=`basename ${TEST} .test`
+    echo -n "${BASENAME}... "
     TARGETNAME=${TARGET}/success/${BASENAME}
     ${COMPILER} ${TEST} ${TARGETNAME}.c > ${TARGETNAME}.err 2>&1
     if [[ "$?" != "0" ]]
     then
-	ERRORS=$(( ERRORS + 1 ))
+	fail_test "ERROR: ${TEST} failed: Compiler error"
 	cat ${TARGETNAME}.err
-	echo "ERROR: ${TEST} failed: Compiler error"
+	test_separator
     else
 	# Compile the generated code with gcc
 	pushd `dirname ${TARGETNAME}.bin` > /dev/null 2>&1
-	gcc ${TARGETNAME}.c -o `basename ${TARGETNAME}.bin`
+	gcc ${TARGETNAME}.c -o `basename ${TARGETNAME}.bin` > ${TARGETNAME}.err 2>&1
 	GCC_STATUS=$?
 	popd > /dev/null 2>&1
 	if [[ "${GCC_STATUS}" != "0" ]]
 	then
-	    ERRORS=$(( ERRORS + 1 ))
-	    echo "ERROR: ${TEST} failed: GCC error"
+	    fail_test "ERROR: ${TEST} failed: GCC error"
+	    cat ${TARGETNAME}.err
+	    test_separator
 	else
 	    # When no input and output exists, create empty in/output.
 	    TESTINPUT=${TESTDIR}/success/${BASENAME}.in
@@ -46,37 +61,43 @@ do
 	    diff ${TESTOUTPUT} ${TARGETNAME}.out
 	    if [[ "$?" != "0" ]]
 	    then
-		ERRORS=$(( ERRORS + 1 ))
-		echo "ERROR: ${TEST} failed: output error"
+		fail_test "ERROR: ${TEST} failed: output error"
 	    else
+		echo "OK"
 		rm ${TARGETNAME}.err
 	    fi
 	fi
     fi
 done
 
+test_separator
+echo "Fail test-cases"
+test_separator
 # Testcases that should not work
 TESTS=`find ${TESTDIR}/fail -name "*.test"`
 for TEST in ${TESTS}
 do
     BASENAME=`basename ${TEST} .test`
+    echo -n "${BASENAME}... "
     TARGETNAME=${TARGET}/fail/${BASENAME}
     ${COMPILER} ${TEST} ${TARGETNAME}.c > ${TARGETNAME}.err 2>&1
     if [[ "$?" == "0" ]]
     then
-	ERRORS=$(( ERRORS + 1 ))
+	fail_test "ERROR: ${TEST} failed."
 	cat ${TARGETNAME}.err
-	echo "ERROR: ${TEST} failed."
+	test_separator
     else
+	echo "OK"
 	rm -f ${TARGETNAME}.err
     fi
 done
 
+test_separator
 # TODO add commandline flag to prevent deleting test results
 if [[ "${ERRORS}" == "0" ]]
 then
-    rm -rf ${TARGET}/success
-    rm -rf ${TARGET}/fail
+#    rm -rf ${TARGET}/success
+#    rm -rf ${TARGET}/fail
     touch ${TARGET}/OK
     echo "All tests passed."
 fi

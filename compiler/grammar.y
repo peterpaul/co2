@@ -500,9 +500,9 @@ expression
 |	expression GEQ expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
 |	expression SHIFTR expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
 |	expression SHIFTL expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
-|	'-' expression %prec UNARY_MINUS { $$ = O_CALL_CLASS(UnaryExpression(), new, $2, $1); }
-|	'+' expression %prec UNARY_PLUS { $$ = O_CALL_CLASS(UnaryExpression(), new, $2, $1); }
-|	'!' expression { $$ = O_CALL_CLASS(UnaryExpression(), new, $2, $1); }
+|	'-' expression %prec UNARY_MINUS { $$ = O_CALL_CLASS(UnaryExpression(), new, $1, $2); }
+|	'+' expression %prec UNARY_PLUS { $$ = O_CALL_CLASS(UnaryExpression(), new, $1, $2); }
+|	'!' expression { $$ = O_CALL_CLASS(UnaryExpression(), new, $1, $2); }
 |	'(' expression ')' { $$ = $2; }
 |	NEW type '[' expression ']'
 |	NEW type '(' opt_actual_arg_list ')'
