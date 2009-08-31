@@ -1,5 +1,6 @@
 #include "BinaryExpression.h"
 #include "Token.h"
+#include "io.h"
 
 #define O_SUPER Expression()
 
@@ -25,7 +26,16 @@ O_IMPLEMENT(BinaryExpression, void *, dtor, (void *_self), (_self))
   return O_SUPER->dtor(self);
 }
 
+O_IMPLEMENT(BinaryExpression, void, generate, (void *_self), (self))
+{
+  struct BinaryExpression *self = O_CAST(_self, BinaryExpression());
+  O_CALL(self->operand[0], generate);
+  fprintf(out, " %s ", self->operator->name->data);
+  O_CALL(self->operand[1], generate);
+}
+
 O_OBJECT(BinaryExpression, Expression);
 O_OBJECT_METHOD(BinaryExpression, ctor);
 O_OBJECT_METHOD(BinaryExpression, dtor);
+O_OBJECT_METHOD(BinaryExpression, generate);
 O_END_OBJECT

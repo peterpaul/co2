@@ -13,6 +13,7 @@
 #include "WhileStatement.h"
 #include "ForStatement.h"
 #include "ForEachStatement.h"
+#include "FunctionCallExpression.h"
 #include "ExpressionStatement.h"
 #include "CompoundStatement.h"
 #include "ReturnStatement.h"
@@ -475,7 +476,7 @@ type
 expression
 :	constant
 |	IDENTIFIER { $$ = O_CALL_CLASS(TokenExpression(), new, $1); }
-|	expression '(' opt_actual_arg_list ')'
+|	expression '(' opt_actual_arg_list ')' { $$ = O_CALL_CLASS(FunctionCallExpression(), new, $1, $3); }
 |	expression '[' expression ']'
 |	expression '.' expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
 |	expression '+' expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }

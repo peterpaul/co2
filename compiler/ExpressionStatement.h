@@ -2,12 +2,14 @@
 #define ExpressionStatement_H
 
 #include "Statement.h"
+#include "Expression.h"
 
-#define ExpressionStatementClass_Attr			\
+#define ExpressionStatementClass_Attr		\
   StatementClass_Attr
 
-#define ExpressionStatement_Attr				\
-  Statement_Attr
+#define ExpressionStatement_Attr		\
+  Statement_Attr;				\
+  struct Expression * expr
 
 O_CLASS(ExpressionStatement, Statement);
 
