@@ -1,0 +1,8 @@
+Code quality:
+* retain/release all members properly
+* run valgrind on testsuite
+
+Functionality:
+* add way to include c-code in syntax. (C-declaration)
+* add package keyword for bundling related classes
+* add import keyword for file inclusion
