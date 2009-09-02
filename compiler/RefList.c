@@ -147,12 +147,12 @@ O_IMPLEMENT(RefList, void *, filter, (void *_self, int (*filter) (void *)),
 	struct RefList *self = O_CAST(_self, RefList());
 	int i;
 	const unsigned length = self->length;
-	struct RefList *result = O_CALL_CLASS(RefList(), new, self->length / 2);
+	struct RefList *result = O_CALL_CLASS(RefList(), new, self->length / 2, self->type);
 	for (i = 0; i < length; i++) {
 		if (filter(self->data[i]))
 			O_CALL(result, append, self->data[i]);
 	}
-	return self;
+	return result;
 }
 
 O_IMPLEMENT(RefList, void *, filter_args,
@@ -164,7 +164,7 @@ O_IMPLEMENT(RefList, void *, filter_args,
 	va_list ap;
 	va_start(ap, filter);
 	const unsigned length = self->length;
-	struct RefList *result = O_CALL_CLASS(RefList(), new, self->length / 2);
+	struct RefList *result = O_CALL_CLASS(RefList(), new, self->length / 2, self->type);
 	for (i = 0; i < length; i++) {
 		va_list aq;
 		va_copy(aq, ap);
@@ -173,7 +173,7 @@ O_IMPLEMENT(RefList, void *, filter_args,
 		va_end(aq);
 	}
 	va_end(ap);
-	return self;
+	return result;
 }
 
 O_IMPLEMENT(RefList, struct String *, toString, (void *_self), (_self))
