@@ -130,12 +130,12 @@ O_IMPLEMENT(List, void *, filter, (void *_self, int (*filter) (void *)),
 	struct List *self = O_CAST(_self, List());
 	int i;
 	const unsigned length = self->length;
-	struct List *result = O_CALL_CLASS(List(), new, self->length / 2);
+	struct List *result = O_CALL_CLASS(List(), new, self->length / 2, self->type);
 	for (i = 0; i < length; i++) {
 		if (filter(self->data[i]))
 			O_CALL(result, append, self->data[i]);
 	}
-	return self;
+	return result;
 }
 
 O_IMPLEMENT(List, void *, filter_args,
@@ -147,7 +147,7 @@ O_IMPLEMENT(List, void *, filter_args,
 	va_list ap;
 	va_start(ap, filter);
 	const unsigned length = self->length;
-	struct List *result = O_CALL_CLASS(List(), new, self->length / 2);
+	struct List *result = O_CALL_CLASS(List(), new, self->length / 2, self->type);
 	for (i = 0; i < length; i++) {
 		va_list aq;
 		va_copy(aq, ap);
@@ -156,7 +156,7 @@ O_IMPLEMENT(List, void *, filter_args,
 		va_end(aq);
 	}
 	va_end(ap);
-	return self;
+	return result;
 }
 
 /* hook for deletion of members */
