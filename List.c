@@ -15,6 +15,8 @@ O_IMPLEMENT(List, void *, ctor, (void *_self, va_list * app), (_self, app))
 	struct List *self = O_CAST(_self, List());
 	self = O_SUPER->ctor(self, app);
 	self->max = va_arg(*app, unsigned);
+	if (self->max <= 0)
+		self->max = 1;
 	self->type = va_arg(*app, struct ObjectClass *);
 	self->data = calloc(self->max, sizeof(void *));
 	self->length = 0;
@@ -26,7 +28,8 @@ O_IMPLEMENT(List, void *, resize, (void *_self, unsigned size), (_self, size))
 	struct List *self = O_CAST(_self, List());
 	assert(size >= self->length);
 	self->data = realloc(self->data, sizeof(void *[size]));
-	self->max = size;
+	if (size > 0)
+		self->max = size;
 	return self;
 }
 
