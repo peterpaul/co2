@@ -28,5 +28,6 @@ FILE * open_output (const char * filename) {
     }
   fprintf (out, "#include <stdlib.h>\n");
   fprintf (out, "#include <stdio.h>\n");
+  fprintf (out, "#include \"Object.h\"\n");
   return out;
 }

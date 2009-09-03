@@ -18,6 +18,7 @@
 #include "CompoundStatement.h"
 #include "ReturnStatement.h"
 #include "Expression.h"
+#include "NewExpression.h"
 #include "BinaryExpression.h"
 #include "UnaryExpression.h"
 #include "Token.h"
@@ -26,6 +27,7 @@
 #include "ArrayType.h"
 #include "PrimitiveType.h"
 #include "Scope.h"
+#include "io.h"
 
   extern void yyerror (const char *);
   extern int yywrap (void);
@@ -56,13 +58,17 @@
 %token <token> FOREACH
 %token <token> IDENTIFIER
 %token <token> IF
+%token <token> IMPORT
+%token <token> IMPORT_PATH
 %token <token> INT
 %token <token> INT_CONSTANT
 %token <token> INTERFACE
 %token <token> MACRO
 %token <token> MACRO_IDENTIFIER
 %token <token> NEW
+%token <token> PACKAGE
 %token <token> RETURN
+%token <token> SELF
 %token <token> STRING_CONSTANT
 %token <token> TYPE_IDENTIFIER
 %token <token> UNSIGNED
@@ -89,6 +95,10 @@
 %type	<statement>	statement
 %type	<statement>	compound_statement
 %type	<statement>	if_statement
+%type	<token>		import
+%type	<list>		import_list
+%type	<list>		opt_import_list
+%type	<token>		package
 %type	<statement>	expression_statement
 %type	<statement>	do_statement
 %type	<statement>	while_statement
@@ -103,7 +113,7 @@
 %type	<expression>	constant
 %type	<list>		actual_arg_list
 %type	<list>		opt_actual_arg_list
-%type	<token>	string_constant
+%type	<token>		string_constant
 %type	<list>		macro_identifier_list
 
 %left		<token>	','
@@ -124,9 +134,45 @@
 %%
 
 input
-:	declaration_list
+:	package opt_import_list declaration_list
 {
-  global_declarations = $1;
+  global_declarations = $3;
+}
+;
+
+package
+:	PACKAGE IMPORT_PATH ';'
+{
+  $$ = $2;
+}
+;
+
+opt_import_list
+:	import_list
+|	/* empty */
+{
+  $$ = O_CALL_CLASS(RefList(), new, 0, Token());
+}
+;
+
+import_list
+:	import_list import
+{
+  O_CALL($1, append, $2);
+}
+|	import
+{
+  struct RefList * imports = O_CALL_CLASS(RefList(), new, 1, Token());
+  O_CALL(imports, append, $1);
+  $$ = imports;
+}
+;
+
+import
+:	IMPORT IMPORT_PATH ';'
+{
+  // TODO open new lexer, to parse the declarations of the imports, not to generate code for them
+  $$ = $2;
 }
 ;
 
@@ -504,8 +550,8 @@ expression
 |	'+' expression %prec UNARY_PLUS { $$ = O_CALL_CLASS(UnaryExpression(), new, $1, $2); }
 |	'!' expression { $$ = O_CALL_CLASS(UnaryExpression(), new, $1, $2); }
 |	'(' expression ')' { $$ = $2; }
-|	NEW type '[' expression ']'
-|	NEW type '(' opt_actual_arg_list ')'
+|	NEW type '[' expression ']' { $$ = O_CALL_CLASS(NewExpression(), new, $2, $4); }
+|	NEW type '(' opt_actual_arg_list ')' { $$ = O_CALL_CLASS(NewExpression(), new, $2, $4); }
 ;
 
 constant

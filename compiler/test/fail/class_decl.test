@@ -1,3 +1,5 @@
+package compiler.test;
+
 class MyObject:Object 
 {
 	int var;

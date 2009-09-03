@@ -1,3 +1,5 @@
+package compiler.test;
+
 int c;
 
 int fun_no_param()
