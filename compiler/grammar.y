@@ -14,6 +14,7 @@
 #include "ForStatement.h"
 #include "ForEachStatement.h"
 #include "FunctionCallExpression.h"
+#include "NestedExpression.h"
 #include "ExpressionStatement.h"
 #include "CompoundStatement.h"
 #include "ReturnStatement.h"
@@ -567,7 +568,7 @@ expression
 |	'-' expression %prec UNARY_MINUS { $$ = O_CALL_CLASS(UnaryExpression(), new, $1, $2); }
 |	'+' expression %prec UNARY_PLUS { $$ = O_CALL_CLASS(UnaryExpression(), new, $1, $2); }
 |	'!' expression { $$ = O_CALL_CLASS(UnaryExpression(), new, $1, $2); }
-|	'(' expression ')' { $$ = $2; }
+|	'(' expression ')' { $$ = O_CALL_CLASS(NestedExpression(), new, $2); }
 |	NEW type '[' expression ']' { $$ = O_CALL_CLASS(NewExpression(), new, $2, $4); }
 |	NEW type '(' opt_actual_arg_list ')' { $$ = O_CALL_CLASS(NewExpression(), new, $2, $4); }
 ;
