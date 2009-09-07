@@ -59,7 +59,6 @@
 %token <token> IDENTIFIER
 %token <token> IF
 %token <token> IMPORT
-%token <token> IMPORT_PATH
 %token <token> INT
 %token <token> INT_CONSTANT
 %token <token> INTERFACE
@@ -95,10 +94,11 @@
 %type	<statement>	statement
 %type	<statement>	compound_statement
 %type	<statement>	if_statement
-%type	<token>		import
+%type	<list>		import
 %type	<list>		import_list
+%type	<list>		import_path
 %type	<list>		opt_import_list
-%type	<token>		package
+%type	<list>		package
 %type	<statement>	expression_statement
 %type	<statement>	do_statement
 %type	<statement>	while_statement
@@ -127,7 +127,7 @@
 %left		<token>	'+' '-'
 %left		<token>	'*' '/' '%' '^'
 %right		<token>	'!' UNARY_MINUS UNARY_PLUS
-%left			'(' '[' '.'
+%left		<token>	'(' '[' '.'
 
 %start input
 %expect 1
@@ -141,7 +141,7 @@ input
 ;
 
 package
-:	PACKAGE IMPORT_PATH ';'
+:	PACKAGE import_path ';'
 {
   $$ = $2;
 }
@@ -162,17 +162,31 @@ import_list
 }
 |	import
 {
-  struct RefList * imports = O_CALL_CLASS(RefList(), new, 1, Token());
+  struct RefList * imports = O_CALL_CLASS(RefList(), new, 1, RefList());
   O_CALL(imports, append, $1);
   $$ = imports;
 }
 ;
 
 import
-:	IMPORT IMPORT_PATH ';'
+:	IMPORT import_path '.' TYPE_IDENTIFIER ';'
 {
   // TODO open new lexer, to parse the declarations of the imports, not to generate code for them
+  O_CALL($2, append, $4);
   $$ = $2;
+}
+;
+
+import_path
+: import_path '.' IDENTIFIER
+{
+  O_CALL($1, append, $3);
+}
+| IDENTIFIER
+{
+  struct RefList * result = O_CALL_CLASS(RefList(), new, 8, Token());
+  O_CALL(result, append, $1);
+  $$ = result;
 }
 ;
 
@@ -522,8 +536,12 @@ type
 expression
 :	constant
 |	IDENTIFIER { $$ = O_CALL_CLASS(TokenExpression(), new, $1); }
-|	expression '(' opt_actual_arg_list ')' { $$ = O_CALL_CLASS(FunctionCallExpression(), new, $1, $3); }
-|	expression '[' expression ']'
+|	expression '(' opt_actual_arg_list ')' 
+{
+  $$ = O_CALL_CLASS(FunctionCallExpression(), new, $1, $3);
+  $1->is_method = true;
+}
+|	expression '[' expression ']' { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
 |	expression '.' expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
 |	expression '+' expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
 |	expression '-' expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }

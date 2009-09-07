@@ -6,7 +6,7 @@ O_IMPLEMENT(Expression, void *, ctor, (void *_self, va_list *app), (_self, app))
 {
   struct Expression * self = O_CAST(_self, Expression());
   self = O_SUPER->ctor(self, app);
-  /* TODO initialize */
+  self->is_method = false;
   return self;
 }
 

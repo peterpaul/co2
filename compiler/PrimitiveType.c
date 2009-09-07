@@ -1,5 +1,7 @@
 #include "PrimitiveType.h"
 #include "Token.h"
+#include "io.h"
+#include "grammar.tab.h"
 
 #define O_SUPER Type()
 
@@ -22,7 +24,16 @@ O_IMPLEMENT(PrimitiveType, void *, dtor, (void *_self), (_self))
 O_IMPLEMENT(PrimitiveType, void, generate, (void *_self), (_self))
 {
   struct PrimitiveType *self = O_CAST(_self, PrimitiveType());
-  O_CALL(self->token, generate);
+  if (self->token->type == TYPE_IDENTIFIER) 
+    {
+      fprintf(out, "struct ");
+      O_CALL(self->token, generate);
+      fprintf(out, "*");
+    }
+  else
+    {
+      O_CALL(self->token, generate);
+    }
 }
 
 O_OBJECT(PrimitiveType, Type);

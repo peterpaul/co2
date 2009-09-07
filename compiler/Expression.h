@@ -7,7 +7,8 @@
   CompileObjectClass_Attr
 
 #define Expression_Attr				\
-  CompileObject_Attr
+  CompileObject_Attr;				\
+  bool is_method
 
 O_CLASS(Expression, CompileObject);
 

@@ -30,7 +30,19 @@ O_IMPLEMENT(BinaryExpression, void, generate, (void *_self), (self))
 {
   struct BinaryExpression *self = O_CAST(_self, BinaryExpression());
   O_CALL(self->operand[0], generate);
-  fprintf(out, " %s ", self->operator->name->data);
+  switch (self->operator->type) 
+    {
+    case '.':
+      if (self->is_method == true)
+	{
+	  fprintf(out, "->class");
+	}
+      fprintf(out, "->");
+      break;
+    default:
+      O_CALL(self->operator, generate);
+      break;
+    }
   O_CALL(self->operand[1], generate);
 }
 

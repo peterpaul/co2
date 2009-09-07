@@ -24,8 +24,6 @@ CHAR_CONST	\'({CHAR_SYMBOL}|\")\'
 CHAR_CONST_ERR	\'({CHAR_SYMBOL}|\")*\'
 STRING_CONST	\"({CHAR_SYMBOL}|\')*\"
 
-IMPORT_PATH	({LETTER}|{USCORE})+([.]({LETTER}|{USCORE})+)+
-
 %%
 "char"		yylval.token = O_CALL_CLASS(Token(), new, yytext, CHAR, filename, linenumber); return yylval.token->type;
 "class"		return CLASS;
@@ -55,7 +53,6 @@ IMPORT_PATH	({LETTER}|{USCORE})+([.]({LETTER}|{USCORE})+)+
 "<<"		yylval.token = O_CALL_CLASS(Token(), new, yytext, SHIFTL, filename, linenumber); return yylval.token->type;
 {INT_CONST}	yylval.token = O_CALL_CLASS(Token(), new, yytext, INT_CONSTANT, filename, linenumber); return yylval.token->type;
 {FLOAT_CONST}	yylval.token = O_CALL_CLASS(Token(), new, yytext, FLOAT_CONSTANT, filename, linenumber); return yylval.token->type;
-{IMPORT_PATH}	yylval.token = O_CALL_CLASS(Token(), new, yytext, IMPORT_PATH, filename, linenumber); return yylval.token->type;
 {IDENTIFIER}	yylval.token = O_CALL_CLASS(Token(), new, yytext, IDENTIFIER, filename, linenumber); return yylval.token->type;
 {TYPE_IDENT}	yylval.token = O_CALL_CLASS(Token(), new, yytext, TYPE_IDENTIFIER, filename, linenumber); return yylval.token->type;
 {MACRO_IDENT}	yylval.token = O_CALL_CLASS(Token(), new, yytext, MACRO_IDENTIFIER, filename, linenumber); return yylval.token->type;
@@ -65,6 +62,6 @@ IMPORT_PATH	({LETTER}|{USCORE})+([.]({LETTER}|{USCORE})+)+
 
 \n		linenumber++; /* count lines */
 [ \t]		/* eat whitespace */
-[\(\)\[\]\{\}\;\:\,\.]	return yytext[0]; /* no Token for these characters */
+[\(\)\]\{\}\;\:\,]	return yytext[0]; /* no Token for these characters */
 .		yylval.token = O_CALL_CLASS(Token(), new, yytext, yytext[0], filename, linenumber); return yylval.token->type;
 %%

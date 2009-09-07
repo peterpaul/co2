@@ -1,4 +1,6 @@
 #include "FunctionCallExpression.h"
+#include "BinaryExpression.h"
+#include "Token.h"
 #include "RefList.h"
 #include "io.h"
 
@@ -44,6 +46,15 @@ O_IMPLEMENT(FunctionCallExpression, void, generate, (void *_self), (_self))
   bool is_first_arg = true;
   O_CALL(self->function, generate);
   fprintf(out, "(");
+  if (o_is_of(self->function, BinaryExpression()))
+    {
+      struct BinaryExpression * function = (struct BinaryExpression *)self->function;
+      if (function->operator->type == '.') 
+	{
+	  O_CALL(function->operand[0], generate);
+	  is_first_arg = false;
+	}
+    }
   O_CALL(self->actual_arguments, map_args, FunctionCallExpression_generate_actual_arguments, &is_first_arg);
   fprintf(out, ")");
 }
