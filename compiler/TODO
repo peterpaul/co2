@@ -4,5 +4,5 @@ Code quality:
 
 Functionality:
 * add way to include c-code in syntax. (C-declaration)
-* add package keyword for bundling related classes
-* add import keyword for file inclusion
+* implement package keyword for bundling related classes
+* implement file inclusion (import)
