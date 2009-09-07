@@ -28,12 +28,14 @@
 #include "ArrayType.h"
 #include "PrimitiveType.h"
 #include "Scope.h"
+#include "Path.h"
+#include "File.h"
 #include "io.h"
 
   extern void yyerror (const char *);
   extern int yywrap (void);
   extern char *yytext;
-  extern struct RefList *global_declarations;
+  extern struct File * parsed_file;
   extern void var_id_decl_set_type(void *_var, va_list *app);
 
   %}
@@ -46,6 +48,8 @@
   struct Token * token;
   struct CompileObject * object;
   struct Type * type;
+  struct Path * path;
+  struct File * file;
 }
 
 %token <token> CHAR
@@ -76,7 +80,7 @@
 %token <token> VOID
 %token <token> WHILE
 
-%type	<list>		input
+%type	<file>		input
 %type	<list>		opt_declaration_list
 %type	<list>		declaration_list
 %type	<list>		variable_declaration_list
@@ -95,11 +99,11 @@
 %type	<statement>	statement
 %type	<statement>	compound_statement
 %type	<statement>	if_statement
-%type	<list>		import
+%type	<path>		import
 %type	<list>		import_list
-%type	<list>		import_path
+%type	<path>		import_path
 %type	<list>		opt_import_list
-%type	<list>		package
+%type	<path>		package
 %type	<statement>	expression_statement
 %type	<statement>	do_statement
 %type	<statement>	while_statement
@@ -137,7 +141,9 @@
 input
 :	package opt_import_list declaration_list
 {
-  global_declarations = $3;
+  struct File * result = O_CALL_CLASS(File(), new, $1, $2, $3);
+  $$ = result;
+  parsed_file = result;
 }
 ;
 
@@ -152,7 +158,7 @@ opt_import_list
 :	import_list
 |	/* empty */
 {
-  $$ = O_CALL_CLASS(RefList(), new, 0, Token());
+  $$ = O_CALL_CLASS(RefList(), new, 0, Path());
 }
 ;
 
@@ -163,7 +169,7 @@ import_list
 }
 |	import
 {
-  struct RefList * imports = O_CALL_CLASS(RefList(), new, 1, RefList());
+  struct RefList * imports = O_CALL_CLASS(RefList(), new, 1, Path());
   O_CALL(imports, append, $1);
   $$ = imports;
 }
@@ -173,7 +179,7 @@ import
 :	IMPORT import_path '.' TYPE_IDENTIFIER ';'
 {
   // TODO open new lexer, to parse the declarations of the imports, not to generate code for them
-  O_CALL($2, append, $4);
+  O_CALL($2->path_name, append, $4);
   $$ = $2;
 }
 ;
@@ -181,12 +187,13 @@ import
 import_path
 : import_path '.' IDENTIFIER
 {
-  O_CALL($1, append, $3);
+  O_CALL($1->path_name, append, $3);
 }
 | IDENTIFIER
 {
-  struct RefList * result = O_CALL_CLASS(RefList(), new, 8, Token());
-  O_CALL(result, append, $1);
+  struct RefList * path_dir = O_CALL_CLASS(RefList(), new, 8, Token());
+  O_CALL(path_dir, append, $1);
+  struct Path * result = O_CALL_CLASS(Path(), new, path_dir);
   $$ = result;
 }
 ;

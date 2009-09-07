@@ -2,11 +2,12 @@
 #include "grammar.tab.h"
 #include "RefObject.h"
 #include "Declaration.h"
+#include "File.h"
 #include "io.h"
 #include "error.h"
 
 extern int parse (void);
-struct RefList *global_declarations;
+struct File * parsed_file = NULL;
 
 void type_check(void *_declaration)
 {
@@ -33,20 +34,20 @@ int main(int argc, char ** argv)
     yyin = open_input (NULL);
   /* syntax analysis */
   parse ();
-  if (global_declarations == NULL)
+  if (parsed_file == NULL)
     {
       O_CALL(current_release_pool, delete);
       return 1;
     }
   /* semantic analysis */
-  O_CALL (global_declarations, map, type_check);
+  O_CALL (parsed_file->declarations, map, type_check);
   if (errors != 0)
     {
       O_CALL(current_release_pool, delete);
       return 1;
     }
   /* optimization */
-  O_CALL (global_declarations, map, optimize);
+  O_CALL (parsed_file->declarations, map, optimize);
   if (errors != 0)
     {
       O_CALL(current_release_pool, delete);
@@ -57,7 +58,7 @@ int main(int argc, char ** argv)
     open_output (argv[2]);
   else
     open_output (NULL);
-  O_CALL (global_declarations, map, generate);
+  O_CALL (parsed_file->declarations, map, generate);
 
   O_CALL(current_release_pool, delete);
 }
