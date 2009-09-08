@@ -1,6 +1,7 @@
 #include "File.h"
 #include "Path.h"
 #include "RefList.h"
+#include "Declaration.h"
 
 #define O_SUPER CompileObject()
 
@@ -26,7 +27,42 @@ O_IMPLEMENT(File, void *, dtor, (void *_self), (_self))
   return O_SUPER->dtor(self);
 }
 
+static void type_check(void *_declaration)
+{
+}
+
+static void optimize(void *_declaration)
+{
+}
+
+static void generate(void *_declaration)
+{
+  struct Declaration * declaration = O_CAST(_declaration, Declaration());
+  O_CALL(declaration, generate);
+}
+
+O_IMPLEMENT(File, void, type_check, (void *_self), (_self))
+{
+  struct File *self = O_CAST(_self, File());
+  O_CALL (self->declarations, map, type_check);
+}
+
+O_IMPLEMENT(File, void, optimize, (void *_self), (_self))
+{
+  struct File *self = O_CAST(_self, File());
+  O_CALL (self->declarations, map, optimize);
+}
+
+O_IMPLEMENT(File, void, generate, (void *_self), (_self))
+{
+  struct File *self = O_CAST(_self, File());
+  O_CALL (self->declarations, map, generate);
+}
+
 O_OBJECT(File, CompileObject);
 O_OBJECT_METHOD(File, ctor);
 O_OBJECT_METHOD(File, dtor);
+O_OBJECT_METHOD(File, type_check);
+O_OBJECT_METHOD(File, optimize);
+O_OBJECT_METHOD(File, generate);
 O_END_OBJECT

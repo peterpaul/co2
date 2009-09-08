@@ -9,20 +9,6 @@
 extern int parse (void);
 struct File * parsed_file = NULL;
 
-void type_check(void *_declaration)
-{
-}
-
-void optimize(void *_declaration)
-{
-}
-
-void generate(void *_declaration)
-{
-  struct Declaration * declaration = O_CAST(_declaration, Declaration());
-  O_CALL(declaration, generate);
-}
-
 int main(int argc, char ** argv)
 {
   O_CALL_CLASS(ReleasePool(), new);
@@ -40,14 +26,14 @@ int main(int argc, char ** argv)
       return 1;
     }
   /* semantic analysis */
-  O_CALL (parsed_file->declarations, map, type_check);
+  O_CALL(parsed_file, type_check);
   if (errors != 0)
     {
       O_CALL(current_release_pool, delete);
       return 1;
     }
   /* optimization */
-  O_CALL (parsed_file->declarations, map, optimize);
+  O_CALL(parsed_file, optimize);
   if (errors != 0)
     {
       O_CALL(current_release_pool, delete);
@@ -58,7 +44,8 @@ int main(int argc, char ** argv)
     open_output (argv[2]);
   else
     open_output (NULL);
-  O_CALL (parsed_file->declarations, map, generate);
+  O_CALL(parsed_file, generate);
 
   O_CALL(current_release_pool, delete);
+  return errors;
 }
