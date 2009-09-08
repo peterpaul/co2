@@ -1,6 +1,6 @@
 package compiler.test;
 
-import std.Object;
+import Object;
 
 class MyObject:Object 
 {

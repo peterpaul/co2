@@ -101,7 +101,7 @@
 %type	<statement>	if_statement
 %type	<path>		import
 %type	<list>		import_list
-%type	<path>		import_path
+%type	<list>		import_path
 %type	<list>		opt_import_list
 %type	<path>		package
 %type	<statement>	expression_statement
@@ -150,7 +150,7 @@ input
 package
 :	PACKAGE import_path ';'
 {
-  $$ = $2;
+  $$ = O_CALL_CLASS(Path(), new, $2);
 }
 ;
 
@@ -179,21 +179,26 @@ import
 :	IMPORT import_path '.' TYPE_IDENTIFIER ';'
 {
   // TODO open new lexer, to parse the declarations of the imports, not to generate code for them
-  O_CALL($2->path_name, append, $4);
-  $$ = $2;
+  O_CALL($2, append, $4);
+  $$ = O_CALL_CLASS(Path(), new, $2);
+}
+|	IMPORT TYPE_IDENTIFIER ';'
+{
+  struct RefList * list = O_CALL_CLASS(RefList(), new, 1, Token());
+  O_CALL(list, append, $2);
+  $$ = O_CALL_CLASS(Path(), new, list);
 }
 ;
 
 import_path
 : import_path '.' IDENTIFIER
 {
-  O_CALL($1->path_name, append, $3);
+  O_CALL($1, append, $3);
 }
 | IDENTIFIER
 {
-  struct RefList * path_dir = O_CALL_CLASS(RefList(), new, 8, Token());
-  O_CALL(path_dir, append, $1);
-  struct Path * result = O_CALL_CLASS(Path(), new, path_dir);
+  struct RefList * result = O_CALL_CLASS(RefList(), new, 8, Token());
+  O_CALL(result, append, $1);
   $$ = result;
 }
 ;

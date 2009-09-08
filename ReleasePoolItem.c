@@ -32,8 +32,10 @@ O_IMPLEMENT(ReleasePoolItem, void *, remove, (void *_self, void *_item), (_self,
     }
   else
     {
-      assertTrue(self->next != NULL, "ReleasePoolItem not found in list.");
-      self->next = O_CALL(self->next, remove, item);
+      // TODO fix problems in compiler
+      //      assertTrue(self->next != NULL, "ReleasePoolItem not found in list.");
+      if (self->next != NULL)
+	self->next = O_CALL(self->next, remove, item);
       return self;
     }
 }
