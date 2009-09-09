@@ -646,10 +646,6 @@ void yyerror (const char * msg)
 {
   error (yylval.token, "%s near \"%s\"\n", msg, yytext);
 }
-int yywrap ()
-{
-  return 1;
-}
 int parse ()
 {
   O_CALL_CLASS(Scope(), new, GLOBAL_SCOPE, NULL);
