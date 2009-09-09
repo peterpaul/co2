@@ -9,7 +9,8 @@
 #define File_Attr				\
   CompileObject_Attr;				\
   struct RefList * declarations;		\
-  struct RefList * imports;			\
+  struct RefList * import_statements;		\
+  struct RefList * imported_files;		\
   struct Path * package
 
 O_CLASS(File, CompileObject);
