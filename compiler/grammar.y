@@ -31,6 +31,7 @@
 #include "Path.h"
 #include "File.h"
 #include "io.h"
+#include "DeleteStatement.h"
 
   extern void yyerror (const char *);
   extern int yywrap (void);
@@ -56,6 +57,7 @@
 %token <token> CHAR_CONSTANT
 %token <token> CLASS
 %token <token> DO
+%token <token> DELETE
 %token <token> ELSE
 %token <token> FLOAT
 %token <token> FLOAT_CONSTANT
@@ -99,6 +101,7 @@
 %type	<statement>	statement
 %type	<statement>	compound_statement
 %type	<statement>	if_statement
+%type	<statement>	delete_statement
 %type	<path>		import
 %type	<list>		import_list
 %type	<list>		import_path
@@ -379,6 +382,7 @@ statement
 |	for_statement
 |	foreach_statement
 |	return_statement
+|	delete_statement
 ;
 
 compound_statement
@@ -491,6 +495,13 @@ return_statement
 |	RETURN ';'
 {
   $$ = O_CALL_CLASS(ReturnStatement(), new, NULL);
+}
+;
+
+delete_statement
+:	DELETE expression ';'
+{
+  $$ = O_CALL_CLASS(DeleteStatement(), new, $2);
 }
 ;
 

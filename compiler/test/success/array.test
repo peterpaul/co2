@@ -1,0 +1,11 @@
+package compiler.test;
+
+int main()
+{
+	int[] a = new int[3];
+	a[0] = 0;
+	a[1] = 1;
+	a[2] = 2;
+	delete a;
+	return 0;
+}

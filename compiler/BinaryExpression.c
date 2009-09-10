@@ -29,21 +29,29 @@ O_IMPLEMENT(BinaryExpression, void *, dtor, (void *_self), (_self))
 O_IMPLEMENT(BinaryExpression, void, generate, (void *_self), (self))
 {
   struct BinaryExpression *self = O_CAST(_self, BinaryExpression());
-  O_CALL(self->operand[0], generate);
   switch (self->operator->type) 
     {
     case '.':
+      O_CALL(self->operand[0], generate);
       if (self->is_method == true)
 	{
 	  fprintf(out, "->class");
 	}
       fprintf(out, "->");
+      O_CALL(self->operand[1], generate);
+      break;
+    case '[':
+      O_CALL(self->operand[0], generate);
+      O_CALL(self->operator, generate);
+      O_CALL(self->operand[1], generate);
+      fprintf(out, "]");
       break;
     default:
+      O_CALL(self->operand[0], generate);
       O_CALL(self->operator, generate);
+      O_CALL(self->operand[1], generate);
       break;
     }
-  O_CALL(self->operand[1], generate);
 }
 
 O_OBJECT(BinaryExpression, Expression);

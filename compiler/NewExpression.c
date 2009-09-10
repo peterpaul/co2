@@ -60,7 +60,11 @@ O_IMPLEMENT(NewExpression, void, generate, (void *_self), (_self))
     }
   else if (self->array_size)
     {
-      /* TODO */
+      fprintf(out, "calloc(");
+      O_CALL(self->array_size, generate);
+      fprintf(out, ", sizeof(");
+      O_CALL(self->new_type, generate);
+      fprintf(out, "))");
     }
   else
     {

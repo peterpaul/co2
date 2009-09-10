@@ -34,6 +34,7 @@ STRING_CONST	\"({CHAR_SYMBOL}|\')*\"
 %%
 "char"		yylval.token = O_CALL_CLASS(Token(), new, yytext, CHAR, filename, linenumber); return yylval.token->type;
 "class"		return CLASS;
+"delete"	return DELETE;
 "do"		return DO;
 "else"		return ELSE;
 "float"		yylval.token = O_CALL_CLASS(Token(), new, yytext, FLOAT, filename, linenumber); return yylval.token->type;
