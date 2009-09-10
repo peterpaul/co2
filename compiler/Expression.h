@@ -8,6 +8,7 @@
 
 #define Expression_Attr				\
   CompileObject_Attr;				\
+  struct Type * type;				\
   bool is_method
 
 O_CLASS(Expression, CompileObject);

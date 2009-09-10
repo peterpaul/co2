@@ -8,7 +8,7 @@
 
 #define NewExpression_Attr			\
   Expression_Attr;				\
-  struct Type * type;				\
+  struct Type * new_type;			\
   struct Expression * array_size;		\
   struct RefList * ctor_arguments
 
