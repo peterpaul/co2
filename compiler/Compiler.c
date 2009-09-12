@@ -31,7 +31,7 @@ int main(int argc, char ** argv)
 
   /* syntax analysis */
   parse ();
-  if (parsed_file == NULL)
+  if (parsed_file == NULL || errors != 0)
     {
       delete_release_pool();
       return 1;

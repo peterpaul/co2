@@ -336,7 +336,9 @@ formal_arg_list
 formal_arg
 :	type IDENTIFIER
 {
-  $$ = O_CALL_CLASS(ArgDeclaration(), new, $2, $1);
+  struct Declaration * result = O_CALL_CLASS(ArgDeclaration(), new, $2, $1);
+  O_CALL(current_scope, declare, result);
+  $$ = result;
 }
 ;
 
