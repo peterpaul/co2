@@ -40,6 +40,7 @@ O_METHOD_DEF(String, int, fprint, (void *_self, FILE * fp));
  */
 O_METHOD_DEF(String, int, snprint, (void *_self, char *str, int size));
 O_METHOD_DEF(String, struct List *, split, (void *_self, const char * delim));
+O_METHOD_DEF(String, int, compare, (void *_self, void *_other));
 
 #define StringClass_Attr						\
 	ObjectClass_Attr;						\
@@ -52,7 +53,8 @@ O_METHOD_DEF(String, struct List *, split, (void *_self, const char * delim));
 	O_METHOD (String, fprint);					\
 	O_METHOD (String, snprint);					\
 	O_METHOD (String, ctor_from_file);				\
-	O_METHOD (String, split)
+	O_METHOD (String, split);					\
+	O_METHOD (String, compare)
 
 #define String_Attr							\
 	Object_Attr;							\
