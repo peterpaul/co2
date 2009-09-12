@@ -66,7 +66,7 @@ STRING_CONST	\"({CHAR_SYMBOL}|\')*\"
 {MACRO_IDENT}	yylval.token = O_CALL_CLASS(Token(), new, yytext, MACRO_IDENTIFIER, filename, linenumber); return yylval.token->type;
 {CHAR_CONST}	yylval.token = O_CALL_CLASS(Token(), new, yytext, CHAR_CONSTANT, filename, linenumber); return yylval.token->type;
 {CHAR_CONST_ERR}  yylval.token = O_CALL_CLASS(Token(), new, yytext, CHAR_CONSTANT, filename, linenumber); error(yylval.token, "invalid character constant %s", yytext); return yylval.token->type;
-{STRING_CONST}	yylval.token = O_CALL_CLASS(Token(), new, yytext, CHAR_CONSTANT, filename, linenumber); return yylval.token->type;
+{STRING_CONST}	yylval.token = O_CALL_CLASS(Token(), new, yytext, STRING_CONSTANT, filename, linenumber); return yylval.token->type;
 
 \n		linenumber++; /* count lines */
 [ \t]		/* eat whitespace */

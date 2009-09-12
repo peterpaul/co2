@@ -1,5 +1,6 @@
 #include "Type.h"
 #include "ArrayType.h"
+#include "PrimitiveType.h"
 #include "Token.h"
 
 #define O_SUPER CompileObject()
@@ -26,13 +27,13 @@ O_IMPLEMENT(Type, bool, is_compatible, (void *_self, void *_other), (_self,_othe
     {
       if (o_is_a(other, ArrayType()))
 	{
-	  struct ArrayType * array_self = self;
-	  struct ArrayType * array_other = other;
+	  struct ArrayType * array_self = (struct ArrayType *)self;
+	  struct ArrayType * array_other = (struct ArrayType *)other;
 	  return O_CALL(array_self->base_type, is_compatible, array_other->base_type);
 	}
       else
 	{
-	  assertTrue(o_is_a, PrimitiveType());
+	  assertTrue(o_is_a(self, PrimitiveType()), "Not a primitive type!");
 	  struct Token * name_self = O_CALL(self, get_token);
 	  struct Token * name_other = O_CALL(other, get_token);
 	  return O_CALL(name_self->name, compare, name_other->name) == 0;
@@ -49,8 +50,11 @@ O_IMPLEMENT(Type, void, assert_compatible, (void *_self, void *_other), (_self, 
   if (!O_CALL(self, is_compatible, other))
     {
       struct Token * token = O_CALL(self, get_token);
-      struct Token * expr_token = O_CALL(other, get_token);
-      error(token, "incompatible types: %s and %s\n", token->name->data, expr_token->name->data);
+      struct String * self_string = O_CALL(self, to_string);
+      struct String * other_string = O_CALL(other, to_string);
+      error(token, "incompatible types: %s and %s\n", self_string->data, other_string->data);
+      O_CALL(self_string, delete);
+      O_CALL(other_string, delete);
     }
 }
 

@@ -42,9 +42,16 @@ O_IMPLEMENT(PrimitiveType, struct Token *, get_token, (void *_self), (_self))
   return self->token;
 }
 
+O_IMPLEMENT(PrimitiveType, struct String *, to_string, (void *_self), (_self))
+{
+  struct PrimitiveType *self = O_CAST(_self, PrimitiveType());
+  return O_CALL_CLASS(String(), new, "%s", self->token->name->data);;
+}
+
 O_OBJECT(PrimitiveType, Type);
 O_OBJECT_METHOD(PrimitiveType, ctor);
 O_OBJECT_METHOD(PrimitiveType, dtor);
 O_OBJECT_METHOD(PrimitiveType, generate);
 O_OBJECT_METHOD(PrimitiveType, get_token);
+O_OBJECT_METHOD(PrimitiveType, to_string);
 O_END_OBJECT

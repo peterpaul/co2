@@ -39,28 +39,43 @@ O_IMPLEMENT(TokenExpression, void, type_check, (void *_self), (_self))
       if (o_is_a(self->decl, VarDeclaration()))
 	{
 	  struct VarDeclaration * var_decl = self->decl;
-	  self->type = var_decl->type;
+	  self->type = O_CALL(var_decl->type, retain);
 	}
       else if (o_is_a(self->decl, FunDeclaration()))
 	{
 	  struct FunDeclaration * fun_decl = self->decl;
-	  self->type = fun_decl->type;
+	  self->type = O_CALL(fun_decl->type, retain);
 	}
       break;
     case INT_CONSTANT:
       {
 	struct Token * token = O_CALL_CLASS(Token(), new, "int", INT, self->token->file, self->token->line);
 	self->type = O_CALL_CLASS(PrimitiveType(), new, token);
+	O_CALL(self->type, retain);
       }
       break;
-    case CHAR_CONSTANT:
-    case FLOAT_CONSTANT:
     case STRING_CONSTANT:
       {
 	struct Token * token = O_CALL_CLASS(Token(), new, "char", CHAR, self->token->file, self->token->line);
 	struct Type * base_type = O_CALL_CLASS(PrimitiveType(), new, token);
 	self->type = O_CALL_CLASS(ArrayType(), new, base_type);
+	O_CALL(self->type, retain);
       }
+      break;
+    case CHAR_CONSTANT:
+      {
+	struct Token * token = O_CALL_CLASS(Token(), new, "char", CHAR, self->token->file, self->token->line);
+	self->type = O_CALL_CLASS(PrimitiveType(), new, token);
+	O_CALL(self->type, retain);
+      }
+      break;
+    case FLOAT_CONSTANT:
+      {
+	struct Token * token = O_CALL_CLASS(Token(), new, "float", FLOAT, self->token->file, self->token->line);
+	self->type = O_CALL_CLASS(PrimitiveType(), new, token);
+	O_CALL(self->type, retain);
+      }
+      break;
     default:
       break;
     }

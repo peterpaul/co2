@@ -177,7 +177,7 @@ O_IMPLEMENT_VA(Object, void *, init_ctor,
 	return object;
 }
 
-O_IMPLEMENT(Object, struct String *, toString, (void *_self), (_self))
+O_IMPLEMENT(Object, struct String *, to_string, (void *_self), (_self))
 {
 	struct Object *self = O_CAST(_self, Object());
 	return O_CALL_CLASS(String(), new, "%s at %p", self->class->name,
@@ -254,7 +254,7 @@ struct Class *Object()
 		O_OBJECT_METHOD(Object, init);
 		O_OBJECT_METHOD(Object, init_ctor);
 		O_OBJECT_METHOD(Object, delete);
-		O_OBJECT_METHOD(Object, toString);
+		O_OBJECT_METHOD(Object, to_string);
 		O_OBJECT_METHOD(Object, clone);
 	}
 	return self;
@@ -280,7 +280,7 @@ struct Class *Class()
 		O_OBJECT_METHOD(Object, init);
 		O_OBJECT_METHOD(Object, init_ctor);
 		O_OBJECT_METHOD(Class, delete);
-		O_OBJECT_METHOD(Object, toString);
+		O_OBJECT_METHOD(Object, to_string);
 		/* O_OBJECT_METHOD(Object,clone); */
 	}
 	return self;

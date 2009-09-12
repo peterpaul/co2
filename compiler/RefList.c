@@ -179,10 +179,10 @@ O_IMPLEMENT(RefList, void *, filter_args,
 	return result;
 }
 
-O_IMPLEMENT(RefList, struct String *, toString, (void *_self), (_self))
+O_IMPLEMENT(RefList, struct String *, to_string, (void *_self), (_self))
 {
 	struct RefList *self = O_CAST(_self, RefList());
-	struct String *str = O_SUPER->toString(self);
+	struct String *str = O_SUPER->to_string(self);
 
 	struct String *enter = O_CALL_CLASS(String(), new, "\n");
 	struct String *item_enter = O_CALL_CLASS(String(), new, "\n\t");
@@ -192,7 +192,7 @@ O_IMPLEMENT(RefList, struct String *, toString, (void *_self), (_self))
 	O_CALL(str, append_str, " [\n");
 	for (i = 0; i < length; i++) {
 		struct RefObject *item = O_CALL(self, get, i);
-		struct String *item_str = O_CALL(item, toString);
+		struct String *item_str = O_CALL(item, to_string);
 		O_CALL(item_str, replace, enter, item_enter);
 		O_CALL(str, append_str, "\t");
 		O_CALL(str, append, item_str);
@@ -227,6 +227,6 @@ O_OBJECT_METHOD(RefList, map);
 O_OBJECT_METHOD(RefList, map_args);
 O_OBJECT_METHOD(RefList, filter);
 O_OBJECT_METHOD(RefList, filter_args);
-O_OBJECT_METHOD(RefList, toString);
+O_OBJECT_METHOD(RefList, to_string);
 O_OBJECT_METHOD(RefList, getIterator);
 O_END_OBJECT

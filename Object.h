@@ -178,7 +178,7 @@ O_METHOD_DEF(Object, void *, init_ctor,
 	     (const void *_class, void *_self, Object_ctor_t ctor, ...));
 O_METHOD_DEF(Object, void *, dtor, (void *_self));
 O_METHOD_DEF(Object, void *, delete, (void *_self));
-O_METHOD_DEF(Object, struct String *, toString, (void *_self));
+O_METHOD_DEF(Object, struct String *, to_string, (void *_self));
 O_METHOD_DEF(Object, void *, clone, (void *_self));
 
 /* Object definition */
@@ -197,7 +197,7 @@ O_METHOD_DEF(Object, void *, clone, (void *_self));
 	O_METHOD(Object, ctor);			\
 	O_METHOD(Object, dtor);			\
 	O_METHOD(Object, delete);		\
-	O_METHOD(Object, toString);		\
+	O_METHOD(Object, to_string);		\
 	O_METHOD(Object, clone)
 
 #define ObjectClass Class

@@ -1,4 +1,5 @@
 #include "ArrayType.h"
+#include "String.h"
 #include "io.h"
 
 #define O_SUPER Type()
@@ -25,6 +26,14 @@ O_IMPLEMENT(ArrayType, void, generate, (void *_self), (_self))
   fprintf(out, "*");
 }
 
+O_IMPLEMENT(ArrayType, struct String *, to_string, (void *_self), (_self))
+{
+  struct ArrayType *self = O_CAST(_self, ArrayType());
+  struct String * string = O_CALL(self->base_type, to_string);
+  O_CALL(string, append_str, "*");
+  return string;
+}
+
 O_IMPLEMENT(ArrayType, struct Token *, get_token, (void *_self), (_self))
 {
   struct ArrayType *self = O_CAST(_self, ArrayType());
@@ -35,5 +44,6 @@ O_OBJECT(ArrayType, Type);
 O_OBJECT_METHOD(ArrayType, ctor);
 O_OBJECT_METHOD(ArrayType, dtor);
 O_OBJECT_METHOD(ArrayType, generate);
+O_OBJECT_METHOD(ArrayType, to_string);
 O_OBJECT_METHOD(ArrayType, get_token);
 O_END_OBJECT
