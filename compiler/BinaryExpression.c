@@ -1,5 +1,7 @@
 #include "BinaryExpression.h"
 #include "Token.h"
+#include "Type.h"
+#include "ArrayType.h"
 #include "io.h"
 
 #define O_SUPER Expression()
@@ -54,8 +56,30 @@ O_IMPLEMENT(BinaryExpression, void, generate, (void *_self), (self))
     }
 }
 
+O_IMPLEMENT(BinaryExpression, void, type_check, (void *_self), (self))
+{
+  struct BinaryExpression *self = O_CAST(_self, BinaryExpression());
+  switch (self->operator->type) 
+    {
+    case '.':
+      break;
+    case '[':
+      O_CALL(self->operand[0], type_check);
+      struct ArrayType * array_type = o_cast(self->operand[0]->type, ArrayType());
+      self->type = O_CALL(array_type->base_type, retain);
+      break;
+    default:
+      O_CALL(self->operand[0], type_check);
+      O_CALL(self->operand[1], type_check);
+      O_CALL(self->operand[0]->type, assert_compatible, self->operand[1]->type);
+      self->type = O_CALL(self->operand[0], retain);
+      break;
+    }
+}
+
 O_OBJECT(BinaryExpression, Expression);
 O_OBJECT_METHOD(BinaryExpression, ctor);
 O_OBJECT_METHOD(BinaryExpression, dtor);
 O_OBJECT_METHOD(BinaryExpression, generate);
+O_OBJECT_METHOD(BinaryExpression, type_check);
 O_END_OBJECT

@@ -33,8 +33,21 @@ O_IMPLEMENT(CompoundStatement, void, generate, (void *_self), (_self))
   fprintf(out, "}\n");
 }
 
+void CompoundStatement_type_check_body(void *_item)
+{
+  struct CompileObject *item = O_CAST(_item, CompileObject());
+  O_CALL(item, type_check);
+}
+
+O_IMPLEMENT(CompoundStatement, void, type_check, (void *_self), (_self))
+{
+  struct CompoundStatement *self = O_CAST(_self, CompoundStatement());
+  O_CALL(self->body, map, CompoundStatement_type_check_body);
+}
+
 O_OBJECT(CompoundStatement, Statement);
 O_OBJECT_METHOD(CompoundStatement, ctor);
 O_OBJECT_METHOD(CompoundStatement, dtor);
 O_OBJECT_METHOD(CompoundStatement, generate);
+O_OBJECT_METHOD(CompoundStatement, type_check);
 O_END_OBJECT

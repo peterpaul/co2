@@ -3,6 +3,7 @@
 #include "Expression.h"
 #include "RefList.h"
 #include "PrimitiveType.h"
+#include "ArrayType.h"
 #include "io.h"
 #include "Token.h"
 
@@ -72,8 +73,34 @@ O_IMPLEMENT(NewExpression, void, generate, (void *_self), (_self))
     }
 }
 
+void NewExpression_type_check_object(void *_item)
+{
+  struct CompileObject *item = O_CAST(_item, CompileObject());
+  O_CALL(item, type_check);
+}
+
+O_IMPLEMENT(NewExpression, void, type_check, (void *_self), (_self))
+{
+  struct NewExpression *self = O_CAST(_self, NewExpression());
+  if (self->ctor_arguments)
+    {
+      O_CALL(self->ctor_arguments, map, NewExpression_type_check_object);
+      self->type = self->new_type;
+    }
+  else if (self->array_size)
+    {
+      O_CALL(self->array_size, type_check);
+      self->type = O_CALL_CLASS(ArrayType(), new, self->new_type);
+    }
+  else
+    {
+      /* TODO error message */
+    }
+}
+
 O_OBJECT(NewExpression, Expression);
 O_OBJECT_METHOD(NewExpression, ctor);
 O_OBJECT_METHOD(NewExpression, dtor);
 O_OBJECT_METHOD(NewExpression, generate);
+O_OBJECT_METHOD(NewExpression, type_check);
 O_END_OBJECT

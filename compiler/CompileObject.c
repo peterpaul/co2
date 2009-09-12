@@ -6,14 +6,12 @@ O_IMPLEMENT(CompileObject, void *, ctor, (void *_self, va_list *app), (_self, ap
 {
   struct CompileObject * self = O_CAST(_self, CompileObject());
   self = O_SUPER->ctor(self, app);
-  /* TODO initialize */
   return self;
 }
 
 O_IMPLEMENT(CompileObject, void *, dtor, (void *_self), (_self))
 {
   struct CompileObject *self = O_CAST(_self, CompileObject());
-  /* TODO cleanup */
   return O_SUPER->dtor(self);
 }
 

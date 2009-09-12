@@ -29,8 +29,15 @@ O_IMPLEMENT(DeleteStatement, void, generate, (void *_self), (_self))
   fprintf(out, ");\n");
 }
 
+O_IMPLEMENT(DeleteStatement, void, type_check, (void *_self), (_self))
+{
+  struct DeleteStatement *self = O_CAST(_self, DeleteStatement());
+  O_CALL(self->expr, type_check);
+}
+
 O_OBJECT(DeleteStatement, Statement);
 O_OBJECT_METHOD(DeleteStatement, ctor);
 O_OBJECT_METHOD(DeleteStatement, dtor);
 O_OBJECT_METHOD(DeleteStatement, generate);
+O_OBJECT_METHOD(DeleteStatement, type_check);
 O_END_OBJECT

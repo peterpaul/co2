@@ -82,6 +82,7 @@ O_OBJECT_METHOD(Scope, dtor);
 O_OBJECT_METHOD(Scope, declare);
 O_OBJECT_METHOD(Scope, leave);
 O_OBJECT_METHOD(Scope, error_already_declared);
+O_OBJECT_METHOD(Scope, error_not_found);
 O_OBJECT_METHOD(Scope, lookup_in_this_scope);
 O_OBJECT_METHOD(Scope, lookup);
 O_END_OBJECT

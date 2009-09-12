@@ -23,6 +23,13 @@ O_IMPLEMENT(UnaryExpression, void *, dtor, (void *_self), (_self))
   return O_SUPER->dtor(self);
 }
 
+O_IMPLEMENT(UnaryExpression, void, type_check, (void *_self), (_self))
+{
+  struct UnaryExpression *self = O_CAST(_self, UnaryExpression());
+  O_CALL(self->operand, type_check);
+  self->type = self->operand->type;
+}
+
 O_IMPLEMENT(UnaryExpression, void, generate, (void *_self), (self))
 {
   struct UnaryExpression *self = O_CAST(_self, UnaryExpression());
@@ -34,4 +41,5 @@ O_OBJECT(UnaryExpression, Expression);
 O_OBJECT_METHOD(UnaryExpression, ctor);
 O_OBJECT_METHOD(UnaryExpression, dtor);
 O_OBJECT_METHOD(UnaryExpression, generate);
+O_OBJECT_METHOD(UnaryExpression, type_check);
 O_END_OBJECT

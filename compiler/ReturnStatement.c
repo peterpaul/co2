@@ -27,8 +27,15 @@ O_IMPLEMENT(ReturnStatement, void, generate, (void *_self), (_self))
   fprintf(out, ";\n");
 }
 
+O_IMPLEMENT(ReturnStatement, void, type_check, (void *_self), (_self))
+{
+  struct ReturnStatement *self = O_CAST(_self, ReturnStatement());
+  O_CALL(self->expr, type_check);
+}
+
 O_OBJECT(ReturnStatement, Statement);
 O_OBJECT_METHOD(ReturnStatement, ctor);
 O_OBJECT_METHOD(ReturnStatement, dtor);
 O_OBJECT_METHOD(ReturnStatement, generate);
+O_OBJECT_METHOD(ReturnStatement, type_check);
 O_END_OBJECT

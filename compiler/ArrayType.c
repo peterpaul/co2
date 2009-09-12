@@ -25,8 +25,15 @@ O_IMPLEMENT(ArrayType, void, generate, (void *_self), (_self))
   fprintf(out, "*");
 }
 
+O_IMPLEMENT(ArrayType, struct Token *, get_token, (void *_self), (_self))
+{
+  struct ArrayType *self = O_CAST(_self, ArrayType());
+  return O_CALL(self->base_type, get_token);
+}
+
 O_OBJECT(ArrayType, Type);
 O_OBJECT_METHOD(ArrayType, ctor);
 O_OBJECT_METHOD(ArrayType, dtor);
 O_OBJECT_METHOD(ArrayType, generate);
+O_OBJECT_METHOD(ArrayType, get_token);
 O_END_OBJECT

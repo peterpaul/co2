@@ -26,8 +26,15 @@ O_IMPLEMENT(ExpressionStatement, void, generate, (void *_self), (_self))
   fprintf(out, ";\n");
 }
 
+O_IMPLEMENT(ExpressionStatement, void, type_check, (void *_self), (_self))
+{
+  struct ExpressionStatement *self = O_CAST(_self, ExpressionStatement());
+  O_CALL(self->expr, type_check);
+}
+
 O_OBJECT(ExpressionStatement, Statement);
 O_OBJECT_METHOD(ExpressionStatement, ctor);
 O_OBJECT_METHOD(ExpressionStatement, dtor);
 O_OBJECT_METHOD(ExpressionStatement, generate);
+O_OBJECT_METHOD(ExpressionStatement, type_check);
 O_END_OBJECT

@@ -9,7 +9,8 @@
 
 #define TokenExpression_Attr				\
   Expression_Attr;					\
-  struct Token * token
+  struct Token * token;					\
+  struct Declaration * decl
 
 O_CLASS(TokenExpression, Expression);
 

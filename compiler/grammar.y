@@ -559,7 +559,13 @@ type
 
 expression
 :	constant
-|	IDENTIFIER { $$ = O_CALL_CLASS(TokenExpression(), new, $1); }
+|	IDENTIFIER 
+{
+  struct TokenExpression * result = O_CALL_CLASS(TokenExpression(), new, $1);
+  struct Declaration * decl = O_CALL(current_scope, lookup, $1);
+  result->decl = decl;
+  $$ = result;
+}
 |	expression '(' opt_actual_arg_list ')' 
 {
   $$ = O_CALL_CLASS(FunctionCallExpression(), new, $1, $3);

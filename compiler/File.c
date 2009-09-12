@@ -7,6 +7,8 @@
 
 static void type_check(void *_declaration)
 {
+  struct Declaration * declaration = O_CAST(_declaration, Declaration());
+  O_CALL(declaration, type_check);
 }
 
 static void optimize(void *_declaration)

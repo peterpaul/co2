@@ -55,8 +55,15 @@ O_IMPLEMENT(FunDeclaration, void, generate, (void *_self), (_self))
   fprintf(out, "}\n");
 }
 
+O_IMPLEMENT(FunDeclaration, void, type_check, (void *_self), (_self))
+{
+  struct FunDeclaration * self = O_CAST(_self, FunDeclaration());
+  O_CALL(self->body, type_check);
+}
+
 O_OBJECT(FunDeclaration, Declaration);
 O_OBJECT_METHOD(FunDeclaration, ctor);
 O_OBJECT_METHOD(FunDeclaration, dtor);
 O_OBJECT_METHOD(FunDeclaration, generate);
+O_OBJECT_METHOD(FunDeclaration, type_check);
 O_END_OBJECT
