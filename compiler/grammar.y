@@ -315,7 +315,7 @@ formal_arg_list_var
 |
 	/* empty */
 {
-  $$ = O_CALL_CLASS(RefList(), new, 8, ArgDeclaration());
+  $$ = O_CALL_CLASS(RefList(), new, 0, ArgDeclaration());
 }
 ;
 

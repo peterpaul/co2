@@ -2,6 +2,7 @@
 #include "grammar.tab.h"
 #include "VarDeclaration.h"
 #include "FunDeclaration.h"
+#include "ArgDeclaration.h"
 #include "PrimitiveType.h"
 #include "ArrayType.h"
 #include "Token.h"
@@ -46,6 +47,15 @@ O_IMPLEMENT(TokenExpression, void, type_check, (void *_self), (_self))
 	  struct FunDeclaration * fun_decl = self->decl;
 	  self->type = O_CALL(fun_decl->type, retain);
 	}
+      else if (o_is_a(self->decl, ArgDeclaration()))
+	{
+	  struct ArgDeclaration * arg_decl = self->decl;
+	  self->type = O_CALL(arg_decl->type, retain);
+	}
+      else
+	{
+	  error(self->token, "Unhandled TokenExpression: %s\n", self->token->name->data);
+	}
       break;
     case INT_CONSTANT:
       {
@@ -77,6 +87,7 @@ O_IMPLEMENT(TokenExpression, void, type_check, (void *_self), (_self))
       }
       break;
     default:
+      error(self->token, "Unhandled TokenExpression: %s\n", self->token->name->data);
       break;
     }
   // check whether token type is an identifier or a constant.
