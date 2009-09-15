@@ -75,7 +75,6 @@ O_IMPLEMENT(Scope, void, error_not_found, (void *_self, struct Token * token), (
   error(token, "'%s' not declared.\n", token->name->data);
 }
 
-
 O_OBJECT(Scope, Hash);
 O_OBJECT_METHOD(Scope, ctor);
 O_OBJECT_METHOD(Scope, dtor);

@@ -1,7 +1,6 @@
 #include "PrimitiveType.h"
 #include "Token.h"
 #include "io.h"
-#include "grammar.tab.h"
 
 #define O_SUPER Type()
 
@@ -24,16 +23,7 @@ O_IMPLEMENT(PrimitiveType, void *, dtor, (void *_self), (_self))
 O_IMPLEMENT(PrimitiveType, void, generate, (void *_self), (_self))
 {
   struct PrimitiveType *self = O_CAST(_self, PrimitiveType());
-  if (self->token->type == TYPE_IDENTIFIER) 
-    {
-      fprintf(out, "struct ");
-      O_CALL(self->token, generate);
-      fprintf(out, "*");
-    }
-  else
-    {
-      O_CALL(self->token, generate);
-    }
+  O_CALL(self->token, generate);
 }
 
 O_IMPLEMENT(PrimitiveType, struct Token *, get_token, (void *_self), (_self))
@@ -48,10 +38,24 @@ O_IMPLEMENT(PrimitiveType, struct String *, to_string, (void *_self), (_self))
   return O_CALL_CLASS(String(), new, "%s", self->token->name->data);;
 }
 
+O_IMPLEMENT(PrimitiveType, bool, is_compatible, (void *_self, void *_other), (_self,_other))
+{
+  struct PrimitiveType *self = O_CAST(_self, PrimitiveType());
+  if (O_SUPER->is_compatible(self, _other))
+    {
+      struct PrimitiveType * other = O_CAST(_other, PrimitiveType());
+      struct Token * name_self = O_CALL(self, get_token);
+      struct Token * name_other = O_CALL(other, get_token);
+      return O_CALL(name_self->name, compare, name_other->name) == 0;
+    }
+  return false;
+}
+
 O_OBJECT(PrimitiveType, Type);
 O_OBJECT_METHOD(PrimitiveType, ctor);
 O_OBJECT_METHOD(PrimitiveType, dtor);
 O_OBJECT_METHOD(PrimitiveType, generate);
 O_OBJECT_METHOD(PrimitiveType, get_token);
 O_OBJECT_METHOD(PrimitiveType, to_string);
+O_OBJECT_METHOD(PrimitiveType, is_compatible);
 O_END_OBJECT

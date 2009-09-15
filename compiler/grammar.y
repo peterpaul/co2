@@ -20,6 +20,7 @@
 #include "ReturnStatement.h"
 #include "Expression.h"
 #include "NewExpression.h"
+#include "ObjectType.h"
 #include "BinaryExpression.h"
 #include "UnaryExpression.h"
 #include "Token.h"
@@ -531,7 +532,8 @@ interface_method_declaration_list
 type
 :	TYPE_IDENTIFIER
 {
-  $$ = O_CALL_CLASS(PrimitiveType(), new, $1);
+  struct Declaration * decl = O_CALL(current_scope, lookup, $1);
+  $$ = O_CALL_CLASS(ObjectType(), new, $1, decl);
 }
 |	INT
 {
@@ -563,10 +565,7 @@ expression
 :	constant
 |	IDENTIFIER 
 {
-  struct TokenExpression * result = O_CALL_CLASS(TokenExpression(), new, $1);
-  struct Declaration * decl = O_CALL(current_scope, lookup, $1);
-  result->decl = decl;
-  $$ = result;
+  $$ = O_CALL_CLASS(TokenExpression(), new, $1);
 }
 |	expression '(' opt_actual_arg_list ')' 
 {

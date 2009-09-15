@@ -6,6 +6,7 @@
 #include "PrimitiveType.h"
 #include "ArrayType.h"
 #include "Token.h"
+#include "grammar.tab.h"
 
 #define O_SUPER Expression()
 
@@ -15,6 +16,10 @@ O_IMPLEMENT(TokenExpression, void *, ctor, (void *_self, va_list *app), (_self, 
   self = O_SUPER->ctor(self, app);
   self->token = O_CAST(va_arg(*app, struct Token *), Token());
   O_CALL(self->token, retain);
+  if (self->token->type == IDENTIFIER)
+    {
+      self->scope = current_scope;
+    }
   return self;
 }
 
@@ -22,6 +27,7 @@ O_IMPLEMENT(TokenExpression, void *, dtor, (void *_self), (_self))
 {
   struct TokenExpression *self = O_CAST(_self, TokenExpression());
   O_CALL(self->token, release);
+  O_BRANCH_CALL(self->decl, release);
   return O_SUPER->dtor(self);
 }
 
@@ -31,12 +37,21 @@ O_IMPLEMENT(TokenExpression, void, generate, (void *_self), (_self))
   O_CALL(self->token, generate);
 }
 
+O_IMPLEMENT(TokenExpression, void, set_scope, (void *_self, void *_scope), (_self, _scope))
+{
+  struct TokenExpression *self = O_CAST(_self, TokenExpression());
+  self->scope = O_CAST(_scope, Scope());
+}
+
 O_IMPLEMENT(TokenExpression, void, type_check, (void *_self), (_self))
 {
   struct TokenExpression *self = O_CAST(_self, TokenExpression());
   switch (self->token->type)
     {
     case IDENTIFIER:
+      self->decl = O_CALL(self->scope, lookup, self->token);
+      if (!self->decl) return;
+      O_CALL(self->decl, retain);
       if (o_is_a(self->decl, VarDeclaration()))
 	{
 	  struct VarDeclaration * var_decl = self->decl;
@@ -104,4 +119,5 @@ O_OBJECT_METHOD(TokenExpression, ctor);
 O_OBJECT_METHOD(TokenExpression, dtor);
 O_OBJECT_METHOD(TokenExpression, generate);
 O_OBJECT_METHOD(TokenExpression, type_check);
+O_OBJECT_METHOD(TokenExpression, set_scope);
 O_END_OBJECT

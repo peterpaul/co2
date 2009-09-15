@@ -3,8 +3,11 @@
 
 #include "CompileObject.h"
 
+O_METHOD_DEF(Expression, void, set_scope, (void *_self, void *_scope));
+
 #define ExpressionClass_Attr			\
-  CompileObjectClass_Attr
+  CompileObjectClass_Attr;			\
+  O_METHOD(Expression, set_scope)
 
 #define Expression_Attr				\
   CompileObject_Attr;				\

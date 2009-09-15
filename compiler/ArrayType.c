@@ -40,10 +40,22 @@ O_IMPLEMENT(ArrayType, struct Token *, get_token, (void *_self), (_self))
   return O_CALL(self->base_type, get_token);
 }
 
+O_IMPLEMENT(ArrayType, bool, is_compatible, (void *_self, void *_other), (_self,_other))
+{
+  struct ArrayType *self = O_CAST(_self, ArrayType());
+  if (O_SUPER->is_compatible(self, _other))
+    {
+      struct ArrayType * other = O_CAST(_other, ArrayType());
+      return O_CALL(self->base_type, is_compatible, other->base_type);
+    }
+  return false;
+}
+
 O_OBJECT(ArrayType, Type);
 O_OBJECT_METHOD(ArrayType, ctor);
 O_OBJECT_METHOD(ArrayType, dtor);
 O_OBJECT_METHOD(ArrayType, generate);
 O_OBJECT_METHOD(ArrayType, to_string);
 O_OBJECT_METHOD(ArrayType, get_token);
+O_OBJECT_METHOD(ArrayType, is_compatible);
 O_END_OBJECT

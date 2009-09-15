@@ -121,7 +121,7 @@ static void ClassDeclaration_generate_method_implementation(void *_method_decl, 
 
 static void ClassDeclaration_generate_attribute_registration(void *_method_decl, va_list *app)
 {
-  struct FunDeclaration * method_decl = O_CAST(_method_decl, VarDeclaration());
+  struct VarDeclaration * method_decl = O_CAST(_method_decl, VarDeclaration());
   struct ClassDeclaration * class_decl = o_cast(va_arg(*app, struct ClassDeclaration *), ClassDeclaration());
   fprintf(out, "; \\\n ");
   O_CALL(method_decl->type, generate);
@@ -187,8 +187,21 @@ O_IMPLEMENT(ClassDeclaration, void, generate, (void *_self), (_self))
   O_CALL(methods, release);
 }
 
+static void ClassDeclaration_type_check_members(void *_member)
+{
+  struct Declaration * member = O_CAST(_member, Declaration());
+  O_CALL(member, type_check);
+}
+
+O_IMPLEMENT(ClassDeclaration, void, type_check, (void *_self), (_self))
+{
+  struct ClassDeclaration * self = O_CAST(_self, ClassDeclaration());
+  O_CALL(self->members, map, ClassDeclaration_type_check_members);
+}
+
 O_OBJECT(ClassDeclaration, Declaration);
 O_OBJECT_METHOD(ClassDeclaration, ctor);
 O_OBJECT_METHOD(ClassDeclaration, dtor);
 O_OBJECT_METHOD(ClassDeclaration, generate);
+O_OBJECT_METHOD(ClassDeclaration, type_check);
 O_END_OBJECT

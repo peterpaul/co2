@@ -1,6 +1,8 @@
 #include "BinaryExpression.h"
 #include "Token.h"
 #include "Type.h"
+#include "ObjectType.h"
+#include "Declaration.h"
 #include "ArrayType.h"
 #include "io.h"
 
@@ -62,6 +64,11 @@ O_IMPLEMENT(BinaryExpression, void, type_check, (void *_self), (self))
   switch (self->operator->type) 
     {
     case '.':
+      O_CALL(self->operand[0], type_check);
+      struct ObjectType * object_type = o_cast(self->operand[0]->type, ObjectType());
+      O_CALL(self->operand[1], set_scope, object_type->decl->scope);
+      O_CALL(self->operand[1], type_check);
+      self->type = O_BRANCH_CALL(self->operand[1]->type, retain);
       break;
     case '[':
       O_CALL(self->operand[0], type_check);
@@ -77,9 +84,16 @@ O_IMPLEMENT(BinaryExpression, void, type_check, (void *_self), (self))
     }
 }
 
+O_IMPLEMENT(BinaryExpression, void, set_scope, (void *_self, void *_scope), (_self, _scope))
+{
+  struct BinaryExpression *self = O_CAST(_self, BinaryExpression());
+  O_CALL(self->operand[0], set_scope, _scope);
+}
+
 O_OBJECT(BinaryExpression, Expression);
 O_OBJECT_METHOD(BinaryExpression, ctor);
 O_OBJECT_METHOD(BinaryExpression, dtor);
 O_OBJECT_METHOD(BinaryExpression, generate);
 O_OBJECT_METHOD(BinaryExpression, type_check);
+O_OBJECT_METHOD(BinaryExpression, set_scope);
 O_END_OBJECT

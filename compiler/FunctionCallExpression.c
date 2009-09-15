@@ -66,10 +66,11 @@ O_IMPLEMENT(FunctionCallExpression, void, generate, (void *_self), (_self))
 O_IMPLEMENT(FunctionCallExpression, void, type_check, (void *_self), (_self))
 {
   struct FunctionCallExpression *self = O_CAST(_self, FunctionCallExpression());
+  O_CALL(self->function, type_check);
+  self->type = O_BRANCH_CALL(self->function->type, retain);
   if (o_is_a(self->function, TokenExpression()))
     {
       struct TokenExpression * function = (struct TokenExpression *) self->function;
-      O_CALL(self->function, type_check);
       self->type = O_CALL(self->function->type, retain);
       if (!o_is_of(function->decl, FunDeclaration()))
 	{
