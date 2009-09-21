@@ -29,7 +29,7 @@ O_IMPLEMENT(FunctionType, void *, ctor_from_decl, (void *_self, va_list *app), (
   struct FunctionType * self = O_CAST(_self, FunctionType());
   self = O_SUPER->ctor(self, app);
   struct FunDeclaration * decl = o_cast(va_arg(*app, struct FunDeclaration *), FunDeclaration());
-  self->return_type = O_CALL(decl->type, retain);
+  self->return_type = O_CALL(decl->return_type, retain);
   self->parameters = O_CALL_CLASS(RefList(), new, decl->formal_arguments->length, Type());
   O_CALL(decl->formal_arguments, map_args, FunctionType_ctor_get_parameter_type_from_decl, self->parameters);
   return self;

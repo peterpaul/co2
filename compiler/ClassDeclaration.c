@@ -64,7 +64,7 @@ static void ClassDeclaration_generate_method_definition(void *_method_decl, va_l
   fprintf(out, "O_METHOD_DEF (");
   O_CALL(class_decl->name, generate);
   fprintf(out, ", ");
-  O_CALL(method_decl->type, generate);
+  O_CALL(method_decl->return_type, generate);
   fprintf(out, ", ");
   O_CALL(method_decl->name, generate);
   fprintf(out, ", (void *_self");
@@ -101,7 +101,7 @@ static void ClassDeclaration_generate_method_implementation(void *_method_decl, 
   fprintf(out, "O_IMPLEMENT(");
   O_CALL(class_decl->name, generate);
   fprintf(out, ", ");
-  O_CALL(method_decl->type, generate);
+  O_CALL(method_decl->return_type, generate);
   fprintf(out, ", ");
   O_CALL(method_decl->name, generate);
   fprintf(out, ", (void *_self");

@@ -60,7 +60,7 @@ O_IMPLEMENT(TokenExpression, void, type_check, (void *_self), (_self))
       else if (o_is_a(self->decl, FunDeclaration()))
 	{
 	  struct FunDeclaration * fun_decl = self->decl;
-	  self->type = O_CALL(fun_decl->type, retain);
+	  self->type = O_CALL(fun_decl->return_type, retain);
 	}
       else if (o_is_a(self->decl, ArgDeclaration()))
 	{

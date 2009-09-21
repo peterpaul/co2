@@ -1,3 +1,6 @@
+Refactoring:
+* add type member to declaration
+
 Code quality:
 * retain/release all members properly
 * run valgrind on testsuite

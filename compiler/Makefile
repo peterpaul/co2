@@ -18,7 +18,7 @@ GEN		= ${YACC_GEN_C} ${YACC_GEN_H} ${LEX_GEN_C} ${LEX_GEN_H}
 
 CC_SRCS		=ArgDeclaration.c ArrayType.c BinaryExpression.c ClassDeclaration.c CompileObject.c Compiler.c \
 		CompoundStatement.c Declaration.c DeleteStatement.c DoStatement.c error.c Expression.c \
-		ExpressionStatement.c File.c ForEachStatement.c ForStatement.c FunDeclaration.c \
+		ExpressionStatement.c File.c ForEachStatement.c ForStatement.c FunctionType.c FunDeclaration.c \
 		FunctionCallExpression.c IfStatement.c IncludeStack.c InterfaceDeclaration.c io.c \
 		MacroDeclaration.c NewExpression.c NestedExpression.c ObjectType.c Path.c PrimitiveType.c RefList.c \
 		ReturnStatement.c Scope.c Statement.c Token.c TokenExpression.c Type.c UnaryExpression.c \

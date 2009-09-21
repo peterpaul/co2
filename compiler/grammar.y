@@ -26,6 +26,7 @@
 #include "Token.h"
 #include "TokenExpression.h"
 #include "Type.h"
+#include "FunctionType.h"
 #include "ArrayType.h"
 #include "PrimitiveType.h"
 #include "Scope.h"
@@ -117,6 +118,8 @@
 %type	<list>		compound_content_list
 %type	<list>		opt_compound_content_list
 %type	<type>		type
+%type	<list>		opt_type_list
+%type	<list>		type_list
 %type	<list>		interface_method_declaration_list
 %type	<expression>	expression
 %type	<expression>	constant
@@ -555,9 +558,38 @@ type
 {
   $$ = O_CALL_CLASS(ArrayType(), new, $1);
 }
+|	type '*'
+{
+  $$ = O_CALL_CLASS(ArrayType(), new, $1);
+}
 |	VOID
 {
   $$ = O_CALL_CLASS(PrimitiveType(), new, $1);
+}
+|	type '(' '*' ')' '(' opt_type_list ')'
+{
+	$$ = O_CALL_CLASS(FunctionType(), new, $1, $6);
+}
+;
+
+opt_type_list
+:	type_list
+|	/* empty */
+{
+	$$ = O_CALL_CLASS(RefList(), new, 0, Type());
+}
+;
+
+type_list
+:	type_list ',' type
+{
+	O_CALL($1, append, $3);
+}
+|	type
+{
+	struct RefList * result = O_CALL_CLASS(RefList(), new, 8, Type());
+	O_CALL(result, append, $1);
+	$$ = result;
 }
 ;
 
