@@ -55,17 +55,17 @@ O_IMPLEMENT(TokenExpression, void, type_check, (void *_self), (_self))
       O_CALL(self->decl, retain);
       if (o_is_a(self->decl, VarDeclaration()))
 	{
-	  struct VarDeclaration * var_decl = self->decl;
+	  struct VarDeclaration * var_decl = (struct VarDeclaration *) self->decl;
 	  self->type = O_CALL(var_decl->type, retain);
 	}
       else if (o_is_a(self->decl, FunDeclaration()))
 	{
-	  struct FunDeclaration * fun_decl = self->decl;
+	  struct FunDeclaration * fun_decl = (struct FunDeclaration *) self->decl;
 	  self->type = O_CALL(fun_decl->type, retain);
 	}
       else if (o_is_a(self->decl, ArgDeclaration()))
 	{
-	  struct ArgDeclaration * arg_decl = self->decl;
+	  struct ArgDeclaration * arg_decl = (struct ArgDeclaration *) self->decl;
 	  self->type = O_CALL(arg_decl->type, retain);
 	}
       else
