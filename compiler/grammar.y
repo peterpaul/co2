@@ -298,7 +298,9 @@ function_header
 }
 formal_arg_list_var ')'
 {
-  struct Declaration * result = O_CALL_CLASS(FunDeclaration(), new, $2, $1, $5, NULL);
+  struct FunDeclaration * result = O_CALL_CLASS(FunDeclaration(), new, $2, $1, $5, NULL);
+  struct FunctionType * type = O_CALL_CLASS(FunctionType(), new_ctor, FunctionType_ctor_from_decl, result);
+  result->type = O_CALL(type, retain);
   $$ = result;
 }
 ;

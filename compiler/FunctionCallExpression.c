@@ -1,6 +1,8 @@
 #include "FunctionCallExpression.h"
 #include "BinaryExpression.h"
+#include "VarDeclaration.h"
 #include "FunDeclaration.h"
+#include "FunctionType.h"
 #include "ArgDeclaration.h"
 #include "Token.h"
 #include "TokenExpression.h"
@@ -71,12 +73,9 @@ O_IMPLEMENT(FunctionCallExpression, void, type_check, (void *_self), (_self))
   if (o_is_a(self->function, TokenExpression()))
     {
       struct TokenExpression * function = (struct TokenExpression *) self->function;
-      self->type = O_CALL(self->function->type, retain);
-      if (!o_is_of(function->decl, FunDeclaration()))
-	{
-	  error(function->token, "%s is not a function.\n", function->token->name->data);
-	}
-      else
+      struct FunctionType * function_type = o_cast(self->function->type, FunctionType());
+      self->type = O_CALL(function_type->return_type, retain);
+      if (o_is_of(function->decl, FunDeclaration()))
 	{
 	  struct FunDeclaration * fun_decl = (struct FunDeclaration *) function->decl;
 	  if (self->actual_arguments->length < fun_decl->formal_arguments->length)
@@ -92,6 +91,15 @@ O_IMPLEMENT(FunctionCallExpression, void, type_check, (void *_self), (_self))
 	      O_CALL(arg_expr, type_check);
 	      O_CALL(arg_decl->type, assert_compatible, arg_expr->type);
 	    }
+	}
+      else if (o_is_of(function->decl, VarDeclaration()))
+	{
+	  struct VarDeclaration * var_decl = (struct VarDeclaration *) function->decl;
+	  assertTrue(o_is_of(var_decl->type, FunctionType()), "Expected FunctionType.\n");
+	}
+      else
+	{
+	  error(function->token, "%s is not a function.\n", function->token->name->data);
 	}
     }
 }

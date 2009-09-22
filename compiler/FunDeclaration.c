@@ -3,6 +3,7 @@
 #include "RefList.h"
 #include "Statement.h"
 #include "io.h"
+#include "FunctionType.h"
 
 #define O_SUPER Declaration()
 
@@ -25,6 +26,7 @@ O_IMPLEMENT(FunDeclaration, void *, dtor, (void *_self), (_self))
   O_CALL(self->return_type, release);
   O_CALL(self->formal_arguments, release);
   O_BRANCH_CALL(self->body, release);
+  O_BRANCH_CALL(self->type, release);
   return O_SUPER->dtor(self);
 }
 

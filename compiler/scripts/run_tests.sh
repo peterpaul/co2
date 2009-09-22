@@ -88,7 +88,7 @@ do
 	test_separator
     else
 	echo "OK"
-	rm -f ${TARGETNAME}.err
+	# rm -f ${TARGETNAME}.err
     fi
 done
 

@@ -24,7 +24,8 @@ O_IMPLEMENT(VarDeclaration, void, generate, (void *_self), (_self))
 {
   struct VarDeclaration * self = O_CAST(_self, VarDeclaration());
   O_CALL(self->type, generate);
-  fprintf(out, " %s", self->name->name->data);
+  fprintf(out, " ");
+  O_CALL(self->name, generate);
   if (self->expr)
     {
       fprintf(out, " = ");

@@ -21,8 +21,8 @@ CC_SRCS		=ArgDeclaration.c ArrayType.c BinaryExpression.c ClassDeclaration.c Com
 		ExpressionStatement.c File.c ForEachStatement.c ForStatement.c FunctionType.c FunDeclaration.c \
 		FunctionCallExpression.c IfStatement.c IncludeStack.c InterfaceDeclaration.c io.c \
 		MacroDeclaration.c NewExpression.c NestedExpression.c ObjectType.c Path.c PrimitiveType.c RefList.c \
-		ReturnStatement.c Scope.c Statement.c Token.c TokenExpression.c Type.c UnaryExpression.c \
-		VarDeclaration.c WhileStatement.c
+		ReturnStatement.c Scope.c Statement.c Token.c TokenExpression.c TokenGenerator.c Type.c \
+		UnaryExpression.c VarDeclaration.c WhileStatement.c
 LIBSRCS		=$(CC_SRCS) $(YACC_GEN_C) ${LEX_GEN_C}
 LIBHDRS		=${LIBSRCS:%.c=%.h}
 LIBOBJS		=${LIBSRCS:%.c=%.o}

@@ -33,7 +33,8 @@ O_IMPLEMENT(UnaryExpression, void, type_check, (void *_self), (_self))
 O_IMPLEMENT(UnaryExpression, void, generate, (void *_self), (self))
 {
   struct UnaryExpression *self = O_CAST(_self, UnaryExpression());
-  fprintf(out, "%s ", self->operator->name->data);
+  O_CALL(self->operator, generate);
+  fprintf(out, " ");
   O_CALL(self->operand, generate);
 }
 

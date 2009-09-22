@@ -1,0 +1,14 @@
+package compiler.test;
+
+int sum(int a, int b)
+{
+	return a + b;
+}
+
+int (*)(int, int) sum_p;
+
+int main()
+{
+	sum_p = sum;
+	return sum_p(4, 5);
+}
