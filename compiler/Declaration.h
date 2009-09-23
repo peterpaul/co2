@@ -14,7 +14,8 @@ O_METHOD_DEF(Declaration, void, set_scope, (void *_self, void * scope));
 #define Declaration_Attr			\
   CompileObject_Attr;				\
   struct Token * name;				\
-  struct Scope * scope
+  struct Scope * scope;				\
+  struct Type * type
 
 O_CLASS(Declaration, CompileObject);
 

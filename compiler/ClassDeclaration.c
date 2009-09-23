@@ -5,6 +5,7 @@
 #include "Type.h"
 #include "Token.h"
 #include "RefList.h"
+#include "FunctionType.h"
 #include "io.h"
 #include "Statement.h"
 #include "Scope.h"
@@ -61,10 +62,11 @@ static void ClassDeclaration_generate_method_definition(void *_method_decl, va_l
 {
   struct FunDeclaration * method_decl = O_CAST(_method_decl, FunDeclaration());
   struct ClassDeclaration * class_decl = o_cast(va_arg(*app, struct ClassDeclaration *), ClassDeclaration());
+  struct FunctionType * method_type = o_cast(method_decl->type, FunctionType());
   fprintf(out, "O_METHOD_DEF (");
   O_CALL(class_decl->name, generate);
   fprintf(out, ", ");
-  O_CALL(method_decl->return_type, generate);
+  O_CALL(method_type->return_type, generate);
   fprintf(out, ", ");
   O_CALL(method_decl->name, generate);
   fprintf(out, ", (void *_self");
@@ -98,10 +100,11 @@ static void ClassDeclaration_generate_method_implementation(void *_method_decl, 
 {
   struct FunDeclaration * method_decl = O_CAST(_method_decl, FunDeclaration());
   struct ClassDeclaration * class_decl = o_cast(va_arg(*app, struct ClassDeclaration *), ClassDeclaration());
+  struct FunctionType * method_type = o_cast(method_decl->type, FunctionType());
   fprintf(out, "O_IMPLEMENT(");
   O_CALL(class_decl->name, generate);
   fprintf(out, ", ");
-  O_CALL(method_decl->return_type, generate);
+  O_CALL(method_type->return_type, generate);
   fprintf(out, ", ");
   O_CALL(method_decl->name, generate);
   fprintf(out, ", (void *_self");

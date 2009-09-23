@@ -1,5 +1,6 @@
 #include "Declaration.h"
 #include "Token.h"
+#include "Type.h"
 
 #define O_SUPER CompileObject()
 
@@ -16,6 +17,7 @@ O_IMPLEMENT(Declaration, void *, dtor, (void *_self), (_self))
 {
   struct Declaration *self = O_CAST(_self, Declaration());
   O_CALL(self->name, release);
+  O_BRANCH_CALL(self->type, release);
   return O_SUPER->dtor(self);
 }
 

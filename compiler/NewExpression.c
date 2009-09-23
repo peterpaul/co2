@@ -53,8 +53,8 @@ O_IMPLEMENT(NewExpression, void, generate, (void *_self), (_self))
   if (self->ctor_arguments)
     {
       fprintf(out, "O_CALL_CLASS(");
-      struct PrimitiveType * type = o_cast(self->new_type, PrimitiveType());
-      O_CALL(type->token, generate);
+      struct Token * token = O_CALL(self->new_type, get_token);
+      O_CALL(token, generate);
       fprintf(out, "(), new");
       O_CALL(self->ctor_arguments, map, NewExpression_generate_ctor_argument);
       fprintf(out, ")");

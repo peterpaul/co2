@@ -298,10 +298,8 @@ function_header
 }
 formal_arg_list_var ')'
 {
-  struct FunDeclaration * result = O_CALL_CLASS(FunDeclaration(), new, $2, $1, $5, NULL);
-  struct FunctionType * type = O_CALL_CLASS(FunctionType(), new_ctor, FunctionType_ctor_from_decl, result);
-  result->type = O_CALL(type, retain);
-  $$ = (struct Declaration *) result;
+  struct FunctionType * type = O_CALL_CLASS(FunctionType(), new_ctor, FunctionType_ctor_from_decl, $1, $5);
+  $$ = O_CALL_CLASS(FunDeclaration(), new, $2, type, $5, NULL);
 }
 ;
 
@@ -355,8 +353,11 @@ class_declaration
 }
 opt_declaration_list '}'
 {
+  struct Scope * member_scope = current_scope;
   O_CALL(current_scope, leave);
-  $$ = O_CALL_CLASS(ClassDeclaration(), new, $2, $4, $6, $10);
+  struct ClassDeclaration * decl = O_CALL_CLASS(ClassDeclaration(), new, $2, $4, $6, $10);
+  decl->member_scope = member_scope;;
+  $$ = (struct Declaration *) decl;
 }
 |	CLASS TYPE_IDENTIFIER ':' TYPE_IDENTIFIER '{' 
 {
@@ -364,8 +365,11 @@ opt_declaration_list '}'
 }
 opt_declaration_list '}'
 {
+  struct Scope * member_scope = current_scope;
   O_CALL(current_scope, leave);
-  $$ = O_CALL_CLASS(ClassDeclaration(), new, $2, $4, NULL, $7);
+  struct ClassDeclaration * decl = O_CALL_CLASS(ClassDeclaration(), new, $2, $4, NULL, $7);
+  decl->member_scope = member_scope;;
+  $$ = (struct Declaration *) decl;
 }
 ;
 

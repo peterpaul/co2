@@ -7,12 +7,17 @@
 
 #define O_SUPER Declaration()
 
+static struct FunctionType * get_type(struct FunDeclaration * self)
+{
+  return o_cast(self->type, FunctionType());
+}
+
 O_IMPLEMENT(FunDeclaration, void *, ctor, (void *_self, va_list *app), (_self, app))
 {
   struct FunDeclaration * self = O_CAST(_self, FunDeclaration());
   self = O_SUPER->ctor(self, app);
-  self->return_type = o_cast(va_arg(*app, struct Type *), Type());
-  O_CALL(self->return_type, retain);
+  self->type = o_cast(va_arg(*app, struct FunctionType *), FunctionType());
+  O_CALL(self->type, retain);
   self->formal_arguments = o_cast(va_arg(*app, struct RefList *), RefList());
   O_CALL(self->formal_arguments, retain);
   self->body = O_BRANCH_CAST(va_arg(*app, struct Statement *), Statement());
@@ -23,10 +28,8 @@ O_IMPLEMENT(FunDeclaration, void *, ctor, (void *_self, va_list *app), (_self, a
 O_IMPLEMENT(FunDeclaration, void *, dtor, (void *_self), (_self))
 {
   struct FunDeclaration * self = O_CAST(_self, FunDeclaration());
-  O_CALL(self->return_type, release);
   O_CALL(self->formal_arguments, release);
   O_BRANCH_CALL(self->body, release);
-  O_BRANCH_CALL(self->type, release);
   return O_SUPER->dtor(self);
 }
 
@@ -46,7 +49,7 @@ O_IMPLEMENT(FunDeclaration, void, generate, (void *_self), (_self))
 {
   struct FunDeclaration * self = O_CAST(_self, FunDeclaration());
   bool first_formal_arg = true;
-  O_CALL(self->return_type, generate);
+  O_CALL(get_type(self)->return_type, generate);
   fprintf(out, " ");
   O_CALL(self->name, generate);
   fprintf(out, "(");

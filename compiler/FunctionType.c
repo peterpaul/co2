@@ -29,11 +29,12 @@ O_IMPLEMENT(FunctionType, void *, ctor_from_decl, (void *_self, va_list *app), (
 {
   struct FunctionType * self = O_CAST(_self, FunctionType());
   self = O_SUPER->ctor(self, app);
-  struct FunDeclaration * decl = o_cast(va_arg(*app, struct FunDeclaration *), FunDeclaration());
-  self->return_type = O_CALL(decl->return_type, retain);
-  self->parameters = O_CALL_CLASS(RefList(), new, decl->formal_arguments->length, Type());
+  self->return_type = o_cast(va_arg(*app, struct Type *), Type());
+  O_CALL(self->return_type, retain);
+  struct RefList * formal_arguments = o_cast(va_arg(*app, struct RefList *), RefList());
+  self->parameters = O_CALL_CLASS(RefList(), new, formal_arguments->length, Type());
   O_CALL(self->parameters, retain);
-  O_CALL(decl->formal_arguments, map_args, FunctionType_ctor_get_parameter_type_from_decl, self->parameters);
+  O_CALL(formal_arguments, map_args, FunctionType_ctor_get_parameter_type_from_decl, self->parameters);
   return self;
 }
 
@@ -77,6 +78,22 @@ static void FunctionType_generate_parameter(void *_parameter, va_list *app)
       *first_arg = false;
     }
   O_CALL(parameter, generate);
+}
+
+static void FunctionType_parameter_to_string(void *_parameter, va_list *app)
+{
+  struct Type * parameter = O_CAST(_parameter, Type());
+}
+
+O_IMPLEMENT(FunctionType, struct String *, to_string, (void *_self), (_self))
+{
+  struct FunctionType *self = O_CAST(_self, FunctionType());
+  struct String * string = O_CALL(self->return_type, to_string);
+  bool first_arg = true;
+  O_CALL(string, append_str, "(*)(");
+  O_CALL(self->parameters, map_args, FunctionType_parameter_to_string, string, &first_arg);
+  O_CALL(string, append_str, ")");
+  return string;
 }
 
 O_IMPLEMENT(FunctionType, void, generate, (void *_self), (_self))
@@ -145,4 +162,5 @@ O_OBJECT_METHOD(FunctionType, dtor);
 O_OBJECT_METHOD(FunctionType, is_compatible);
 O_OBJECT_METHOD(FunctionType, get_token);
 O_OBJECT_METHOD(FunctionType, generate);
+O_OBJECT_METHOD(FunctionType, to_string);
 O_END_OBJECT

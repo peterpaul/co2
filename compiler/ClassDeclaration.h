@@ -10,7 +10,8 @@
   Declaration_Attr;				\
   struct Token * superclass;			\
   struct RefList * interfaces;			\
-  struct RefList * members
+  struct RefList * members;			\
+  struct Scope * member_scope
 
 O_CLASS(ClassDeclaration, Declaration);
 

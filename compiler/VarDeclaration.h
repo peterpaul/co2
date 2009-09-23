@@ -12,7 +12,6 @@ O_METHOD_DEF(VarDeclaration, void, set_type, (void *_self, struct Type * type));
 
 #define VarDeclaration_Attr			\
   Declaration_Attr;				\
-  struct Type * type;				\
   struct Expression * expr
 
 O_CLASS(VarDeclaration, Declaration);

@@ -73,7 +73,7 @@ O_IMPLEMENT(FunctionCallExpression, void, type_check, (void *_self), (_self))
   if (o_is_a(self->function, TokenExpression()))
     {
       struct TokenExpression * function = (struct TokenExpression *) self->function;
-      struct FunctionType * function_type = o_cast(self->function->type, FunctionType());
+      struct FunctionType * function_type = o_cast(function->type, FunctionType());
       self->type = O_CALL(function_type->return_type, retain);
       if (o_is_of(function->decl, FunDeclaration()))
 	{
@@ -101,6 +101,11 @@ O_IMPLEMENT(FunctionCallExpression, void, type_check, (void *_self), (_self))
 	{
 	  error(function->token, "%s is not a function.\n", function->token->name->data);
 	}
+    }
+  else
+    {
+      struct FunctionType * function_type = o_cast(self->function->type, FunctionType());
+      self->type = O_CALL(function_type->return_type, retain);
     }
 }
 

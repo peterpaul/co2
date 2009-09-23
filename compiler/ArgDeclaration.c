@@ -16,7 +16,6 @@ O_IMPLEMENT(ArgDeclaration, void *, ctor, (void *_self, va_list *app), (_self, a
 O_IMPLEMENT(ArgDeclaration, void *, dtor, (void *_self), (_self))
 {
   struct ArgDeclaration *self = O_CAST(_self, ArgDeclaration());
-  O_CALL(self->type, release);
   return O_SUPER->dtor(self);
 }
 
