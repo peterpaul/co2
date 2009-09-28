@@ -1,0 +1,8 @@
+package compiler.test;
+
+int main(int argv, char [][] args)
+{
+	int [] a = new int[1];
+	a[0] = 5.0;	
+	return 0;
+}

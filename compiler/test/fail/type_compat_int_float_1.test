@@ -1,0 +1,6 @@
+package compiler.test;
+
+int a = -5.0;
+
+int main(int argv, char [][] args)
+	return 0;

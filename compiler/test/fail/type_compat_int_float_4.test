@@ -1,0 +1,11 @@
+package compiler.test;
+
+int fun(int a, int b)
+	return a + b;
+
+int main(int argv, char [][] args)
+{
+	int (*)(int, float) fun_p;
+	fun_p = fun;
+	return 0;
+}

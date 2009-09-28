@@ -1,0 +1,16 @@
+package compiler.test;
+
+import Object;
+
+int a;
+
+class A:Object
+{
+}
+
+int main()
+{
+	A b = new A();
+	b.a = 4;
+	return 0;
+}

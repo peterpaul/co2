@@ -1,0 +1,31 @@
+package compiler.test;
+
+import Object;
+
+int a;
+
+class A:Object
+{
+	int a;
+	int fa(int a, int b)
+	{
+	}
+}
+
+class B:A
+{
+	int b;
+	int fb()
+	{
+		return fa(a, b);
+	}
+}
+
+int main()
+{
+	B b = new B();
+	b.a = 4;
+	b.b = 5;
+	int c = b.fb();
+	return 0;
+}
