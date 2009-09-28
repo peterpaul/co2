@@ -16,21 +16,19 @@ O_IMPLEMENT(ClassDeclaration, void *, ctor, (void *_self, va_list *app), (_self,
 {
   struct ClassDeclaration * self = O_CAST(_self, ClassDeclaration());
   self = O_SUPER->ctor(self, app);
-  self->superclass = o_cast(va_arg(*app, struct Type *), Token());
-  O_CALL(self->superclass, retain);
+  self->superclass = O_BRANCH_CAST(va_arg(*app, struct Type *), Token());
+  O_BRANCH_CALL(self->superclass, retain);
   self->interfaces = O_BRANCH_CAST(va_arg(*app, struct RefList *), RefList());
   O_BRANCH_CALL(self->interfaces, retain);
-  self->members = o_cast(va_arg(*app, struct RefList *), RefList());
-  O_CALL(self->members, retain);
   return self;
 }
 
 O_IMPLEMENT(ClassDeclaration, void *, dtor, (void *_self), (_self))
 {
   struct ClassDeclaration * self = O_CAST(_self, ClassDeclaration());
-  O_CALL(self->superclass, release);
+  O_BRANCH_CALL(self->superclass, release);
   O_BRANCH_CALL(self->interfaces, release);
-  O_CALL(self->members, release);
+  O_BRANCH_CALL(self->members, release);
 }
 
 static int member_filter(void *_member, va_list * app)
@@ -41,7 +39,7 @@ static int member_filter(void *_member, va_list * app)
 static int new_method_filter(void *_method)
 {
   struct FunDeclaration * method = O_CAST(_method, FunDeclaration());
-  return O_CALL(method->scope->parent, lookup_in_this_scope, method->name) == NULL;
+  return O_BRANCH_CALL(method->scope->parent, lookup_in_this_scope, method->name) == NULL;
 }
 
 static void ClassDeclaration_generate_method_arguments(void *_arg)

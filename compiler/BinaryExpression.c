@@ -80,8 +80,8 @@ O_IMPLEMENT(BinaryExpression, void, type_check, (void *_self), (self))
     default:
       O_CALL(self->operand[0], type_check);
       O_CALL(self->operand[1], type_check);
-      O_CALL(self->operand[0]->type, assert_compatible, self->operand[1]->type);
-      self->type = O_CALL(self->operand[0]->type, retain);
+      O_BRANCH_CALL(self->operand[0]->type, assert_compatible, self->operand[1]->type);
+      self->type = O_BRANCH_CALL(self->operand[0]->type, retain);
       break;
     }
 }

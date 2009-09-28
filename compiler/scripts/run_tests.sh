@@ -26,7 +26,7 @@ echo "Success test-cases"
 test_separator
 ERRORS=0
 # Testcases that should work
-TESTS=`find ${TESTDIR}/success -name "*.test"`
+TESTS=`find ${TESTDIR}/success -name "*.test" | sort`
 for TEST in ${TESTS}
 do
     # Compile the testcase
@@ -74,7 +74,7 @@ test_separator
 echo "Fail test-cases"
 test_separator
 # Testcases that should not work
-TESTS=`find ${TESTDIR}/fail -name "*.test"`
+TESTS=`find ${TESTDIR}/fail -name "*.test" | sort`
 for TEST in ${TESTS}
 do
     BASENAME=`basename ${TEST} .test`

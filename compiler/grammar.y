@@ -91,6 +91,7 @@
 %type	<declaration>	declaration
 %type	<declaration>	function_declaration
 %type	<declaration>	class_declaration
+%type	<declaration>	class_header
 %type	<declaration>	interface_declaration
 %type	<declaration>	macro_declaration
 %type	<declaration>	var_id_decl
@@ -347,29 +348,33 @@ formal_arg
 ;
 
 class_declaration
-:	CLASS TYPE_IDENTIFIER ':' TYPE_IDENTIFIER '<' interface_list '>' '{' 
+:	class_header '{' opt_declaration_list '}'
 {
-  O_CALL_CLASS(Scope(), new, CLASS_SCOPE, $2);
-}
-opt_declaration_list '}'
-{
-  struct Scope * member_scope = current_scope;
   O_CALL(current_scope, leave);
-  struct ClassDeclaration * decl = O_CALL_CLASS(ClassDeclaration(), new, $2, $4, $6, $10);
-  decl->member_scope = member_scope;;
-  $$ = (struct Declaration *) decl;
+  struct ClassDeclaration * result = O_CAST($1, ClassDeclaration());
+  result->members = O_CALL($3, retain);
+  result->member_scope->parent = NULL;
+  $$ = result;
 }
-|	CLASS TYPE_IDENTIFIER ':' TYPE_IDENTIFIER '{' 
+
+class_header
+:	CLASS TYPE_IDENTIFIER ':' TYPE_IDENTIFIER '<' interface_list '>'
 {
-  O_CALL_CLASS(Scope(), new, CLASS_SCOPE, $2);
+  struct ClassDeclaration * decl = O_CALL_CLASS(ClassDeclaration(), new, $2, $4, $6);
+  decl->member_scope = O_CALL_CLASS(Scope(), new, CLASS_SCOPE, $2);
+  $$ = decl;
 }
-opt_declaration_list '}'
+|	CLASS TYPE_IDENTIFIER ':' TYPE_IDENTIFIER
 {
-  struct Scope * member_scope = current_scope;
-  O_CALL(current_scope, leave);
-  struct ClassDeclaration * decl = O_CALL_CLASS(ClassDeclaration(), new, $2, $4, NULL, $7);
-  decl->member_scope = member_scope;;
-  $$ = (struct Declaration *) decl;
+  struct ClassDeclaration * decl = O_CALL_CLASS(ClassDeclaration(), new, $2, $4, NULL);
+  decl->member_scope = O_CALL_CLASS(Scope(), new, CLASS_SCOPE, $2);
+  $$ = decl;
+}
+|	CLASS TYPE_IDENTIFIER
+{
+  struct ClassDeclaration * decl = O_CALL_CLASS(ClassDeclaration(), new, $2, NULL, NULL);
+  decl->member_scope = O_CALL_CLASS(Scope(), new, CLASS_SCOPE, $2);
+  $$ = decl;
 }
 ;
 

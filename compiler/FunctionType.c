@@ -83,6 +83,19 @@ static void FunctionType_generate_parameter(void *_parameter, va_list *app)
 static void FunctionType_parameter_to_string(void *_parameter, va_list *app)
 {
   struct Type * parameter = O_CAST(_parameter, Type());
+  struct String * string = O_CAST(va_arg(*app, struct String *), String());
+  bool *first_arg = va_arg(*app, bool *);
+  if (!*first_arg)
+    {
+      O_CALL(string, append_str, ", ");
+    }
+  else
+    {
+      *first_arg = false;
+    }
+  struct String * parameter_string = O_CALL(parameter, to_string);
+  O_CALL(string, append, parameter_string);
+  O_CALL(parameter_string, delete);
 }
 
 O_IMPLEMENT(FunctionType, struct String *, to_string, (void *_self), (_self))
