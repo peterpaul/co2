@@ -130,6 +130,18 @@ static void ClassDeclaration_generate_attribute_registration(void *_method_decl,
   O_CALL(method_decl->name, generate);
 }
 
+static void generate_superclass(struct ClassDeclaration * self)
+{
+  if (self->superclass)
+    {
+      O_CALL(self->superclass, generate);
+    }
+  else
+    {
+      fprintf(out, "Object");
+    }
+}
+
 O_IMPLEMENT(ClassDeclaration, void, generate, (void *_self), (_self))
 {
   struct ClassDeclaration * self = O_CAST(_self, ClassDeclaration());
@@ -149,7 +161,7 @@ O_IMPLEMENT(ClassDeclaration, void, generate, (void *_self), (_self))
   fprintf(out, "#define ");
   O_CALL(self->name, generate);
   fprintf(out, "Class_Attr\\\n ");
-  O_CALL(self->superclass, generate);
+  generate_superclass(self);
   fprintf(out, "Class_Attr");
   O_CALL(new_methods, map_args, ClassDeclaration_generate_method_registration, self);
   fprintf(out, "\n\n");
@@ -157,7 +169,7 @@ O_IMPLEMENT(ClassDeclaration, void, generate, (void *_self), (_self))
   fprintf(out, "#define ");
   O_CALL(self->name, generate);
   fprintf(out, "_Attr\\\n ");
-  O_CALL(self->superclass, generate);
+  generate_superclass(self);
   fprintf(out, "_Attr");
   O_CALL(attributes, map_args, ClassDeclaration_generate_attribute_registration, self);
   fprintf(out, "\n\n");
@@ -165,11 +177,11 @@ O_IMPLEMENT(ClassDeclaration, void, generate, (void *_self), (_self))
   fprintf(out, "O_CLASS(");
   O_CALL(self->name, generate);
   fprintf(out, ", ");
-  O_CALL(self->superclass, generate);
+  generate_superclass(self);
   fprintf(out, ");\n\n");
 
   fprintf(out, "#define O_SUPER ");
-  O_CALL(self->superclass, generate);
+  generate_superclass(self);
   fprintf(out, "()\n\n");
 
   O_CALL(methods, map_args, ClassDeclaration_generate_method_implementation, self);
@@ -177,12 +189,14 @@ O_IMPLEMENT(ClassDeclaration, void, generate, (void *_self), (_self))
   fprintf(out, "O_OBJECT(");
   O_CALL(self->name, generate);
   fprintf(out, ", ");
-  O_CALL(self->superclass, generate);
+  generate_superclass(self);
   fprintf(out, ");\n");
 
   O_CALL(methods, map_args, ClassDeclaration_generate_method_registration_2, self);
 
   fprintf(out, "O_END_OBJECT\n\n");
+
+  fprintf(out, "#undef O_SUPER\n\n");
 
   O_CALL(attributes, release);
   O_CALL(methods, release);
@@ -197,6 +211,15 @@ static void ClassDeclaration_type_check_members(void *_member)
 O_IMPLEMENT(ClassDeclaration, void, type_check, (void *_self), (_self))
 {
   struct ClassDeclaration * self = O_CAST(_self, ClassDeclaration());
+  if (self->superclass)
+    {
+      struct ClassDeclaration * super = O_CALL(self->scope, lookup, self->superclass);
+      if (super)
+	{
+	  O_CAST(super, ClassDeclaration());
+	  self->member_scope->parent = super->member_scope;
+	}
+    }
   O_CALL(self->members, map, ClassDeclaration_type_check_members);
 }
 

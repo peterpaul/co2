@@ -1,10 +1,8 @@
 package compiler.test;
 
-import Object;
-
 int a;
 
-class A:Object
+class A
 {
 }
 

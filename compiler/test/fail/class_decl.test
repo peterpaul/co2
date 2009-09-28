@@ -1,6 +1,6 @@
 package compiler.test;
 
-class MyObject:Object 
+class MyObject
 {
 	int var;
 	int fun(int a, int b)

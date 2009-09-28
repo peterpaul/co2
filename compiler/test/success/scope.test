@@ -1,10 +1,8 @@
 package compiler.test;
 
-import Object;
-
 int a;
 
-class A:Object
+class A
 {
 	int a;
 	int fa(int a, int b)
