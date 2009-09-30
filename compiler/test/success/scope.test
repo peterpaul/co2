@@ -1,12 +1,11 @@
 package compiler.test;
 
-int a;
-
 class A
 {
 	int a;
 	int fa(int a, int b)
 	{
+		return a + b;
 	}
 }
 

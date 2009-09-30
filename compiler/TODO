@@ -4,8 +4,10 @@ Refactoring:
 Code quality:
 * retain/release all members properly
 * run valgrind on testsuite
+* generate error messages for incompatible types with the right line number
 
 Functionality:
 * add way to include c-code in syntax. (C-declaration)
 * implement package keyword for bundling related classes
 * implement file inclusion (import)
+* know whether a tokenexpression is part of the current class

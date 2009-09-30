@@ -4,6 +4,7 @@
 #define O_SUPER Hash()
 
 struct Scope * current_scope = NULL;
+struct Scope * global_scope = NULL;
 
 O_IMPLEMENT(Scope, void *, ctor, (void *_self, va_list *app), (_self, app))
 {
@@ -69,6 +70,23 @@ O_IMPLEMENT(Scope, struct Declaration *, lookup, (void *_self, struct Token * to
   return result;
 }
 
+O_IMPLEMENT(Scope, bool, exists_in_this_scope, (void *_self, struct Token * token), (_self, token))
+{
+  struct Scope *self = O_CAST(_self, Scope());
+  return O_CALL(self, get, token->name->data) != NULL;
+}
+
+O_IMPLEMENT(Scope, bool, exists, (void *_self, struct Token * token), (_self, token))
+{
+  struct Scope *self = O_CAST(_self, Scope());
+  bool result = O_CALL(self, lookup_in_this_scope, token);
+  if (result == false && self->parent != NULL)
+    {
+      return O_CALL(self->parent, exists, token);
+    }
+  return result;
+}
+
 O_IMPLEMENT(Scope, void, error_not_found, (void *_self, struct Token * token), (_self, token))
 {
   struct Scope *self = O_CAST(_self, Scope());
@@ -84,4 +102,6 @@ O_OBJECT_METHOD(Scope, error_already_declared);
 O_OBJECT_METHOD(Scope, error_not_found);
 O_OBJECT_METHOD(Scope, lookup_in_this_scope);
 O_OBJECT_METHOD(Scope, lookup);
+O_OBJECT_METHOD(Scope, exists_in_this_scope);
+O_OBJECT_METHOD(Scope, exists);
 O_END_OBJECT

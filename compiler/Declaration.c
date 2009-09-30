@@ -1,6 +1,7 @@
 #include "Declaration.h"
 #include "Token.h"
 #include "Type.h"
+#include "ClassDeclaration.h"
 
 #define O_SUPER CompileObject()
 
@@ -27,8 +28,15 @@ O_IMPLEMENT(Declaration, void, set_scope, (void *_self, void *_scope), (_self, _
   self->scope = o_cast(_scope, Scope());
 }
 
+O_IMPLEMENT(Declaration, void, set_class_decl, (void *_self, void *_class_decl), (_self, _class_decl))
+{
+  struct Declaration *self = O_CAST(_self, Declaration());
+  self->class_decl = o_cast(_class_decl, ClassDeclaration());
+}
+
 O_OBJECT(Declaration, CompileObject);
 O_OBJECT_METHOD(Declaration, ctor);
 O_OBJECT_METHOD(Declaration, dtor);
 O_OBJECT_METHOD(Declaration, set_scope);
+O_OBJECT_METHOD(Declaration, set_class_decl);
 O_END_OBJECT

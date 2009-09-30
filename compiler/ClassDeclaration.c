@@ -213,14 +213,25 @@ O_IMPLEMENT(ClassDeclaration, void, type_check, (void *_self), (_self))
   struct ClassDeclaration * self = O_CAST(_self, ClassDeclaration());
   if (self->superclass)
     {
-      struct ClassDeclaration * super = O_CALL(self->scope, lookup, self->superclass);
-      if (super)
+      struct Declaration * _super_class = O_CALL(self->scope, lookup, self->superclass);
+      if (_super_class)
 	{
-	  O_CAST(super, ClassDeclaration());
-	  self->member_scope->parent = super->member_scope;
+	  struct ClassDeclaration * super_class = O_CAST(_super_class, ClassDeclaration());
+	  self->member_scope->parent = super_class->member_scope;
 	}
     }
   O_CALL(self->members, map, ClassDeclaration_type_check_members);
+}
+
+O_IMPLEMENT(ClassDeclaration, bool, is_compatible, (void *_self, void *_other), (_self, _other))
+{
+  struct ClassDeclaration * self = O_CAST(_self, ClassDeclaration());
+  struct ClassDeclaration * other = o_cast(_other, ClassDeclaration());
+  while (self && self != other)
+    {
+      self = (struct ClassDeclaration *) O_CALL(self->scope, lookup, self->superclass);
+    }
+  return self == other;
 }
 
 O_OBJECT(ClassDeclaration, Declaration);

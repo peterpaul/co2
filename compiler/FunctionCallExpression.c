@@ -49,9 +49,39 @@ void FunctionCallExpression_generate_actual_arguments(void *_arg, va_list *app)
 O_IMPLEMENT(FunctionCallExpression, void, generate, (void *_self), (_self))
 {
   struct FunctionCallExpression *self = O_CAST(_self, FunctionCallExpression());
-  bool is_first_arg = true;
-  O_CALL(self->function, generate);
+  if (o_is_of(self->function, TokenExpression()))
+    {
+      struct TokenExpression *function = O_CAST(self->function, TokenExpression());
+      if (function->decl && o_is_a(function->decl, FunDeclaration()))
+	{
+	  struct FunDeclaration * fun_decl = (struct FunDeclaration *) function->decl;
+	  if (fun_decl->scope->type == CLASS_SCOPE)
+	    {
+	      fprintf(out, "O_CALL");
+	      fprintf(out, "(");
+	      bool is_first_arg = false;
+	      fprintf(out, "self, ");
+	      O_CALL(function->token, generate);
+	      O_CALL(self->actual_arguments, map_args, FunctionCallExpression_generate_actual_arguments, &is_first_arg);
+	      fprintf(out, ")");
+	      return;
+	    }
+	  else
+	    {
+	      O_CALL(function->token, generate);
+	    }
+	}
+      else
+	{
+	  O_CALL(function->token, generate);
+	}
+    }
+  else
+    {
+      O_CALL(self->function, generate);
+    }
   fprintf(out, "(");
+  bool is_first_arg = true;
   if (o_is_of(self->function, BinaryExpression()))
     {
       struct BinaryExpression * function = (struct BinaryExpression *)self->function;

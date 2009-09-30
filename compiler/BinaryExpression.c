@@ -43,7 +43,7 @@ O_IMPLEMENT(BinaryExpression, void, generate, (void *_self), (self))
 	  fprintf(out, "->class");
 	}
       fprintf(out, "->");
-      O_CALL(self->operand[1], generate);
+      O_CALL(self->operand[1], generate_left, false);
       break;
     case '[':
       O_CALL(self->operand[0], generate);

@@ -1,0 +1,25 @@
+package compiler.test;
+
+int global = 5;
+
+int calc(int a)
+{
+	return a + global;
+}
+
+class A
+{
+	int a;
+	int fa(int a)
+	{
+		return calc(a + global);
+	}
+}
+
+int main()
+{
+	A a = new A();
+	a.a = 4;
+	int c = a.fa(a.a);
+	return 0;
+}

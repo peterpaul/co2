@@ -8,6 +8,7 @@
 #include "FunctionType.h"
 #include "Token.h"
 #include "grammar.tab.h"
+#include "io.h"
 
 #define O_SUPER Expression()
 
@@ -32,9 +33,13 @@ O_IMPLEMENT(TokenExpression, void *, dtor, (void *_self), (_self))
   return O_SUPER->dtor(self);
 }
 
-O_IMPLEMENT(TokenExpression, void, generate, (void *_self), (_self))
+O_IMPLEMENT(TokenExpression, void, generate_left, (void *_self, bool left), (_self, left))
 {
   struct TokenExpression *self = O_CAST(_self, TokenExpression());
+  if (left && self->decl && self->decl->class_decl)
+    {
+      fprintf(out, "self->");
+    }
   O_CALL(self->token, generate);
 }
 
@@ -50,8 +55,18 @@ O_IMPLEMENT(TokenExpression, void, type_check, (void *_self), (_self))
   switch (self->token->type)
     {
     case IDENTIFIER:
-      self->decl = O_CALL(self->scope, lookup, self->token);
-      if (!self->decl) return;
+      if (O_CALL(self->scope, exists, self->token))
+	{
+	  self->decl = O_CALL(self->scope, lookup, self->token);
+	}
+      else
+	{
+	  self->decl = O_CALL(global_scope, lookup, self->token);
+	}
+      if (!self->decl) 
+	{
+	  return;
+	}
       O_CALL(self->decl, retain);
       self->type = O_CALL(self->decl->type, retain);
       break;
@@ -100,7 +115,7 @@ O_IMPLEMENT(TokenExpression, void, type_check, (void *_self), (_self))
 O_OBJECT(TokenExpression, Expression);
 O_OBJECT_METHOD(TokenExpression, ctor);
 O_OBJECT_METHOD(TokenExpression, dtor);
-O_OBJECT_METHOD(TokenExpression, generate);
+O_OBJECT_METHOD(TokenExpression, generate_left);
 O_OBJECT_METHOD(TokenExpression, type_check);
 O_OBJECT_METHOD(TokenExpression, set_scope);
 O_END_OBJECT

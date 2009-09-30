@@ -3,8 +3,11 @@
 
 #include "Declaration.h"
 
+O_METHOD_DEF(ClassDeclaration, bool, is_compatible, (void *_self, void *_other));
+
 #define ClassDeclarationClass_Attr		\
-  DeclarationClass_Attr
+  DeclarationClass_Attr;			\
+  O_METHOD(ClassDeclaration, is_compatible)
 
 #define ClassDeclaration_Attr			\
   Declaration_Attr;				\

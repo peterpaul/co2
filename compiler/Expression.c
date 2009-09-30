@@ -21,6 +21,7 @@ O_IMPLEMENT(Expression, void *, dtor, (void *_self), (_self))
 O_IMPLEMENT(Expression, void, generate, (void *_self), (_self))
 {
   struct Expression *self = O_CAST(_self, Expression());
+  O_CALL(self, generate_left, true);
 }
 
 O_OBJECT(Expression, CompileObject);

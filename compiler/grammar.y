@@ -35,11 +35,12 @@
 #include "io.h"
 #include "DeleteStatement.h"
 
-  extern void yyerror (const char *);
-  extern int yywrap (void);
   extern char *yytext;
   extern struct File * parsed_file;
+  extern void yyerror (const char *);
+  extern int yywrap (void);
   extern void var_id_decl_set_type(void *_var, va_list *app);
+  extern void set_class_decl(void *_decl, va_list *app);
 
   %}
 
@@ -353,6 +354,7 @@ class_declaration
   O_CALL(current_scope, leave);
   struct ClassDeclaration * result = O_CAST($1, ClassDeclaration());
   result->members = O_CALL($3, retain);
+  O_CALL(result->members, map_args, set_class_decl, result);
   result->member_scope->parent = NULL;
   $$ = result;
 }
@@ -709,7 +711,7 @@ void yyerror (const char * msg)
 }
 int parse ()
 {
-  O_CALL_CLASS(Scope(), new, GLOBAL_SCOPE, NULL);
+  global_scope = O_CALL_CLASS(Scope(), new, GLOBAL_SCOPE, NULL);
   int result = yyparse ();
   O_CALL(current_scope, leave);
   if (result == 0)
@@ -722,4 +724,9 @@ void var_id_decl_set_type(void *_var, va_list *app)
 {
   struct VarDeclaration * var = O_CAST(_var, VarDeclaration());
   O_CALL(var, set_type, va_arg(*app, struct Type *));
+}
+void set_class_decl(void *_decl, va_list *app)
+{
+  struct Declaration * decl = O_CAST(_decl, Declaration());
+  O_CALL(decl, set_class_decl, va_arg(*app, void *));
 }
