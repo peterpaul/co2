@@ -22,6 +22,7 @@ O_IMPLEMENT(TokenExpression, void *, ctor, (void *_self, va_list *app), (_self, 
     {
       self->scope = current_scope;
     }
+  self->check_global_scope = true;
   return self;
 }
 
@@ -47,6 +48,7 @@ O_IMPLEMENT(TokenExpression, void, set_scope, (void *_self, void *_scope), (_sel
 {
   struct TokenExpression *self = O_CAST(_self, TokenExpression());
   self->scope = O_CAST(_scope, Scope());
+  self->check_global_scope = false;
 }
 
 O_IMPLEMENT(TokenExpression, void, type_check, (void *_self), (_self))
@@ -55,14 +57,7 @@ O_IMPLEMENT(TokenExpression, void, type_check, (void *_self), (_self))
   switch (self->token->type)
     {
     case IDENTIFIER:
-      if (O_CALL(self->scope, exists, self->token))
-	{
-	  self->decl = O_CALL(self->scope, lookup, self->token);
-	}
-      else
-	{
-	  self->decl = O_CALL(global_scope, lookup, self->token);
-	}
+      O_CALL(self, lookup);
       if (!self->decl) 
 	{
 	  return;
@@ -112,10 +107,31 @@ O_IMPLEMENT(TokenExpression, void, type_check, (void *_self), (_self))
   // when it ia a macro declaration, ...?
 }
 
+O_IMPLEMENT(TokenExpression, void, lookup, (void *_self), (_self))
+{
+ struct TokenExpression *self = O_CAST(_self, TokenExpression());
+ if (self->check_global_scope) 
+   {
+     if (O_CALL(self->scope, exists, self->token))
+       {
+	 self->decl = O_CALL(self->scope, lookup, self->token);
+       }
+     else
+       {
+	 self->decl = O_CALL(global_scope, lookup, self->token);
+       }
+   }
+ else
+   {
+     self->decl = O_CALL(self->scope, lookup, self->token);
+   }
+}
+
 O_OBJECT(TokenExpression, Expression);
 O_OBJECT_METHOD(TokenExpression, ctor);
 O_OBJECT_METHOD(TokenExpression, dtor);
 O_OBJECT_METHOD(TokenExpression, generate_left);
 O_OBJECT_METHOD(TokenExpression, type_check);
 O_OBJECT_METHOD(TokenExpression, set_scope);
+O_OBJECT_METHOD(TokenExpression, lookup);
 O_END_OBJECT
