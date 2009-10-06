@@ -3,8 +3,11 @@
 
 #include "CompileObject.h"
 
+O_METHOD_DEF(File, void, parse_imports, (void *_self));
+
 #define FileClass_Attr				\
-  CompileObjectClass_Attr
+  CompileObjectClass_Attr;			\
+  O_METHOD(File, parse_imports)
 
 #define File_Attr				\
   CompileObject_Attr;				\

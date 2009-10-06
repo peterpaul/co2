@@ -11,8 +11,8 @@ O_IMPLEMENT(ObjectType, void *, ctor, (void *_self, va_list *app), (_self, app))
   self = O_SUPER->ctor(self, app);
   self->token = O_CAST(va_arg(*app, struct Token *), Token());
   O_CALL(self->token, retain);
-  self->decl = O_CAST(va_arg(*app, struct Declaration *), Declaration());
-  O_CALL(self->decl, retain);
+  self->decl = O_BRANCH_CAST(va_arg(*app, struct Declaration *), Declaration());
+  O_BRANCH_CALL(self->decl, retain);
   return self;
 }
 

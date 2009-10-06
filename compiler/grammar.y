@@ -717,6 +717,7 @@ int parse ()
   if (result == 0)
     {
       assertTrue(current_scope == NULL, "current_scope is not NULL");
+      O_CALL(parsed_file, parse_imports);
     }
   return result;
 }

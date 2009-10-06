@@ -12,7 +12,6 @@ O_METHOD_DEF(String, void *, append_str_n,
 O_METHOD_DEF(String, void *, replace,
 	     (void *_self, struct String * that, struct String * this));
 O_METHOD_DEF(String, void *, ctor_from_file, (void *_self, va_list * app));
-
 /**
  * @brief Prints this String to a file.
  *

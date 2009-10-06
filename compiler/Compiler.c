@@ -22,12 +22,17 @@ void delete_release_pool()
 int main(int argc, char ** argv)
 {
   create_release_pool();
+  const char * filename;
 
   /* io */
   if (argc >= 2)
-    yyin = open_input (argv[1]);
+    filename = argv[1];
   else
-    yyin = open_input (NULL);
+    filename = NULL;
+
+  yyin = open_input(filename);
+  file_path = analyze_file_name(filename);
+  base_dir = determine_base_dir(file_path);
 
   /* syntax analysis */
   parse ();

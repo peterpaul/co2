@@ -1,8 +1,8 @@
 Refactoring:
-* add type member to declaration
+* add type member to declaration [DONE]
 
 Code quality:
-* retain/release all members properly
+* retain/release all members properly [IN PROGRESS/DONE]
 * run valgrind on testsuite
 * generate error messages for incompatible types with the right line number
 
@@ -11,3 +11,8 @@ Functionality:
 * implement package keyword for bundling related classes
 * implement file inclusion (import)
 * know whether a tokenexpression is part of the current class
+
+Language Features:
+* enum
+* constructor/destructor
+* automatic reference counting
