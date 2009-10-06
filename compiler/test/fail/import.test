@@ -1,0 +1,11 @@
+package compiler.test;
+
+import non.existent.MyObject;
+
+int main(int argc, char[][] argv)
+{
+	MyObject test = new MyObject();
+	int val = test.var;
+	int result = test.fun(val,5);
+	return 0;
+}
