@@ -62,7 +62,6 @@ O_IMPLEMENT(TokenExpression, void, type_check, (void *_self), (_self))
 	{
 	  return;
 	}
-      O_CALL(self->decl, retain);
       self->type = O_CALL(self->decl->type, retain);
       break;
     case INT_CONSTANT:
@@ -125,6 +124,7 @@ O_IMPLEMENT(TokenExpression, void, lookup, (void *_self), (_self))
    {
      self->decl = O_CALL(self->scope, lookup, self->token);
    }
+ O_BRANCH_CALL(self->decl, retain);
 }
 
 O_OBJECT(TokenExpression, Expression);
