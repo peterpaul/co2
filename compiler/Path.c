@@ -16,11 +16,6 @@ O_IMPLEMENT(Path, void *, ctor, (void *_self, va_list *app), (_self, app))
 O_IMPLEMENT(Path, void *, dtor, (void *_self), (_self))
 {
   struct Path *self = O_CAST(_self, Path());
-  /*
-  struct String *path = O_CALL(self, to_system_path);
-  printf("%s\n", path->data);
-  O_CALL(path, delete);
-  */
   O_CALL(self->path_name, release);
   return O_SUPER->dtor(self);
 }
