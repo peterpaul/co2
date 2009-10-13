@@ -97,13 +97,6 @@ O_IMPLEMENT(TokenExpression, void, type_check, (void *_self), (_self))
       error(self->token, "Unhandled TokenExpression: %s\n", self->token->name->data);
       break;
     }
-  // check whether token type is an identifier or a constant.
-  // lookup in the scope where this expression is located
-  // when it is a var declaration, set self->type = decl->type
-  // when it is a fun declaration, set self->type = decl->return_type
-  // when it is a class declaration, set self->type = new PrimitiveType(self->token)
-  // when it is an interface declaration, see class declaration
-  // when it ia a macro declaration, ...?
 }
 
 O_IMPLEMENT(TokenExpression, void, lookup, (void *_self), (_self))
