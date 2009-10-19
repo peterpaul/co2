@@ -7,7 +7,7 @@ O_IMPLEMENT(RefArray, void *, ctor, (void *_self, va_list *app), (_self, app))
   struct RefArray * self = O_CAST(_self, RefArray());
   self = O_SUPER->ctor(self, app);
   self->capacity = va_arg(*app, unsigned);
-  self->type = o_cast(va_arg(*app, void *), Class());
+  self->type = o_branch_cast(va_arg(*app, void *), Class());
   if (self->capacity > 0)
     {
       self->data = calloc(self->capacity, sizeof (void *));
@@ -98,7 +98,7 @@ O_IMPLEMENT(RefArray, void *, get, (void *_self, unsigned index), (_self, index)
 O_IMPLEMENT(RefArray, void *, set, (void *_self, unsigned index, void *_item), (_self, index, _item))
 {
   struct RefArray *self = O_CAST(_self, RefArray());
-  struct RefObject *item = O_CAST(_item, self->type);
+  struct RefObject *item = self->type ? o_branch_cast(_item, self->type) : _item;
   assertTrue(index < self->capacity, "array index out of bounds");
   if (index >= self->capacity)
     {

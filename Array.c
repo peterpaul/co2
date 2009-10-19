@@ -7,7 +7,7 @@ O_IMPLEMENT(Array, void *, ctor, (void *_self, va_list *app), (_self, app))
   struct Array * self = O_CAST(_self, Array());
   self = O_SUPER->ctor(self, app);
   self->capacity = va_arg(*app, unsigned);
-  self->type = o_cast(va_arg(*app, void *), Class());
+  self->type = o_branch_cast(va_arg(*app, void *), Class());
   if (self->capacity > 0)
     {
       self->data = calloc(self->capacity, sizeof (void *));
@@ -88,7 +88,7 @@ O_IMPLEMENT(Array, void *, set, (void *_self, unsigned index, void *_item), (_se
     {
       return NULL;
     }
-  self->data[index] = o_cast(_item, self->type);
+  self->data[index] = self->type ? o_branch_cast(_item, self->type) : _item;
   return _item;
 }
 
