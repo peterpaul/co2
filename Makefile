@@ -1,6 +1,6 @@
-LIBSRCS		= Object.c List.c String.c Hash.c utils.c LinkedList.c ListList.c Interface.c Singleton.c Iterator.c ListIterator.c Thread.c RefObject.c ReleasePool.c ReleasePoolItem.c Array.c
+LIBSRCS		= Object.c List.c String.c Hash.c utils.c LinkedList.c ListList.c Interface.c Singleton.c Iterator.c ListIterator.c Thread.c RefArray.c RefObject.c ReleasePool.c ReleasePoolItem.c Array.c
 
-LIBHDRS		= Object.h List.h String.h Hash.h utils.h LinkedList.h ListList.h Interface.h Singleton.h Iterator.h ListIterator.h Thread.h RefObject.h ReleasePool.h ReleasePoolItem.h Array.h
+LIBHDRS		= Object.h List.h String.h Hash.h utils.h LinkedList.h ListList.h Interface.h Singleton.h Iterator.h ListIterator.h Thread.h RefArray.h RefObject.h ReleasePool.h ReleasePoolItem.h Array.h
 
 LIBOBJS		= $(LIBSRCS:%.c=%.o)
 

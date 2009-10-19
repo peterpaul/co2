@@ -180,6 +180,7 @@ O_METHOD_DEF(Object, void *, dtor, (void *_self));
 O_METHOD_DEF(Object, void *, delete, (void *_self));
 O_METHOD_DEF(Object, struct String *, to_string, (void *_self));
 O_METHOD_DEF(Object, void *, clone, (void *_self));
+O_METHOD_DEF(Object, int, compare, (void *_self, void *_other));
 
 /* Object definition */
 #define Object_Attr
@@ -198,7 +199,8 @@ O_METHOD_DEF(Object, void *, clone, (void *_self));
 	O_METHOD(Object, dtor);			\
 	O_METHOD(Object, delete);		\
 	O_METHOD(Object, to_string);		\
-	O_METHOD(Object, clone)
+	O_METHOD(Object, clone);		\
+	O_METHOD(Object, compare)
 
 #define ObjectClass Class
 

@@ -192,6 +192,13 @@ O_IMPLEMENT(Object, void *, clone, (void *_self), (_self))
 	return clone;
 }
 
+O_IMPLEMENT(Object, int, compare, (void *_self, void *_other), (_self, _other))
+{
+	struct Object *self = O_CAST(_self, Object());
+	struct Object *other = o_cast(_other, Object());
+	return self - other;
+}
+
 /* Class methods */
 #define O_SUPER Object()
 
@@ -256,6 +263,7 @@ struct Class *Object()
 		O_OBJECT_METHOD(Object, delete);
 		O_OBJECT_METHOD(Object, to_string);
 		O_OBJECT_METHOD(Object, clone);
+		O_OBJECT_METHOD(Object, compare);
 	}
 	return self;
 }
@@ -282,6 +290,7 @@ struct Class *Class()
 		O_OBJECT_METHOD(Class, delete);
 		O_OBJECT_METHOD(Object, to_string);
 		/* O_OBJECT_METHOD(Object,clone); */
+		O_OBJECT_METHOD(Object, compare);
 	}
 	return self;
 }

@@ -27,15 +27,12 @@ O_METHOD_DEF(LinkedList, void *, sort, (void *_self));
 O_METHOD_DEF(LinkedList, void *, merge_sorted,
 	     (void *_self, void *_other));
 O_METHOD_DEF(LinkedList, void *, map, (void *_self, void (*fun) (void *)));
-O_METHOD_DEF(LinkedList, int, compare,
-	     (const void *_self, const void *_other));
 
 #define LinkedListClass_Attr					\
 	ObjectClass_Attr;							\
 	O_METHOD(LinkedList, sort);				\
 	O_METHOD(LinkedList, merge_sorted);		\
-	O_METHOD(LinkedList, map);					\
-	O_METHOD(LinkedList, compare)
+	O_METHOD(LinkedList, map)
 
 #define LinkedList_Attr						\
 	Object_Attr;								\

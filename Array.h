@@ -1,23 +1,24 @@
 #ifndef Array_H
 #define Array_H
 
-#include "Object.h"
+#include "RefObject.h"
 
-O_METHOD_DEF(Array, void *, resize, (void *_self, int size));
-O_METHOD_DEF(Array, void *, set, (void *_self, int index, void *_item));
-O_METHOD_DEF(Array, void *, get, (void *_self, int index));
+O_METHOD_DEF(Array, void *, resize, (void *_self, unsigned capacity));
+O_METHOD_DEF(Array, void *, set, (void *_self, unsigned index, void *_item));
+O_METHOD_DEF(Array, void *, get, (void *_self, unsigned index));
 
 #define ArrayClass_Attr				\
-  ObjectClass_Attr;				\
+  RefObjectClass_Attr;				\
   O_METHOD(Array, resize);			\
   O_METHOD(Array, set);				\
   O_METHOD(Array, get)
 
 #define Array_Attr				\
-  Object_Attr;					\
-  int size;					\
-  void ** data
+  RefObject_Attr;				\
+  unsigned capacity;				\
+  void ** data;					\
+  struct Class * type
 
-O_CLASS(Array, Object);
+O_CLASS(Array, RefObject);
 
 #endif /* Array_H */
