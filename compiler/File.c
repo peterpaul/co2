@@ -66,10 +66,13 @@ void parse_import(void *_import, va_list *app)
 {
   struct Path * import = o_cast(_import, Path());
   struct String * import_path = O_CALL(import, to_system_path);
+  /*
   struct String * path = O_CALL(base_dir, clone);
   O_CALL(path, append, import_path);
   O_CALL(import_path, delete);
   O_CALL(path, delete);
+  */
+  new_input(import_path->data);
 }
 
 O_IMPLEMENT(File, void, parse_imports, (void *_self), (_self))

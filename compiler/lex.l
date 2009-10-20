@@ -8,7 +8,7 @@ int linenumber = 1;
 const char * filename;
 
 static const char * input_file_name = NULL;
-static struct RefList * path = NULL;
+struct RefList * path = NULL;
 
 void new_input(const char *);
 %}
