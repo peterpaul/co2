@@ -3,6 +3,7 @@
 
 #include "Array.h"
 
+O_METHOD_DEF(ArrayList, void *, prepend, (void *_self, void *item));
 O_METHOD_DEF(ArrayList, void *, append, (void *_self, void *item));
 O_METHOD_DEF(ArrayList, void *, append_list, (void *_self, void *_list));
 O_METHOD_DEF(ArrayList, void *, merge, (void *_self, void *_other));
@@ -16,6 +17,7 @@ O_METHOD_DEF(ArrayList, void *, getIterator, (void *_self));
 
 #define ArrayListClass_Attr			\
   ArrayClass_Attr;				\
+  O_METHOD(ArrayList, prepend);			\
   O_METHOD(ArrayList, append);			\
   O_METHOD(ArrayList, append_list);		\
   O_METHOD(ArrayList, merge);			\

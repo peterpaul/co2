@@ -16,6 +16,18 @@ O_IMPLEMENT(ArrayList, void *, dtor, (void *_self), (_self))
   return O_SUPER->dtor(self);
 }
 
+O_IMPLEMENT(ArrayList, void *, prepend, (void *_self, void *item), (_self, item))
+{
+  struct ArrayList *self = O_CAST(_self, ArrayList());
+  if (self->length == self->capacity)
+    {
+      O_CALL(self, resize, self->capacity * 2);
+    }
+  memmove(&self->data[1], &self->data[0], sizeof(void *[self->length]));
+  O_CALL(self, set, 0, item);
+  self->length ++;
+}
+
 O_IMPLEMENT(ArrayList, void *, append, (void *_self, void *item), (_self, item))
 {
   struct ArrayList *self = O_CAST(_self, ArrayList());
@@ -27,8 +39,32 @@ O_IMPLEMENT(ArrayList, void *, append, (void *_self, void *item), (_self, item))
   self->length ++;
 }
 
-O_IMPLEMENT(ArrayList, void *, append_list, (void *_self, void *_list), (_self, _list));
-O_IMPLEMENT(ArrayList, void *, merge, (void *_self, void *_other), (_self, _other));
+static void ArrayList_append_item(void *_item, va_list * ap)
+{
+  struct ArrayList *list = o_cast(va_arg(*ap, struct ArrayList *), ArrayList());
+  O_CALL(list, append, _item);
+}
+
+O_IMPLEMENT(ArrayList, void *, append_list, (void *_self, void *_list), (_self, _list))
+{
+  struct ArrayList *self = O_CAST(_self, ArrayList());
+  struct ArrayList *list = o_cast(_list, ArrayList());
+  O_CALL(list, map_args, ArrayList_append_item, self);
+  return self;
+}
+
+O_IMPLEMENT(ArrayList, void *, merge, (void *_self, void *_other), (_self, _other))
+{
+  struct ArrayList *self = O_CAST(_self, ArrayList());
+  struct ArrayList *other = O_CAST(_other, ArrayList());
+  O_CALL(self, append_list, other);
+  /* delete other list */
+  other->length = 0;
+  O_CALL(other, delete);
+  /* return result */
+  return self;
+}
+
 O_IMPLEMENT(ArrayList, void *, map, (void *_self, void (*fun) (void *)), (_self, fun))
 {
   struct ArrayList *self = O_CAST(_self, ArrayList());

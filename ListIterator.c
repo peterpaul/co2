@@ -44,4 +44,5 @@ O_OBJECT_METHOD(ListIterator, hasNext);
 O_OBJECT_IF(Iterator);
 O_OBJECT_IF_METHOD(ListIterator, getNext);
 O_OBJECT_IF_METHOD(ListIterator, hasNext);
-O_OBJECT_IF_END O_END_OBJECT
+O_OBJECT_IF_END
+O_END_OBJECT
