@@ -2,7 +2,7 @@
 
 #define O_SUPER Object()
 
-O_IMPLEMENT(Thread, int, run, (void *_self), (_self))
+O_IMPLEMENT(Thread, int, run, (void *_self))
 {
 	struct Thread *self = O_CAST(_self, Thread());
 	assertTrue(self->class->main,
@@ -11,7 +11,7 @@ O_IMPLEMENT(Thread, int, run, (void *_self), (_self))
 	return pthread_create(&self->thread, NULL, self->class->main, self);
 }
 
-O_IMPLEMENT(Thread, int, join, (void *_self), (_self))
+O_IMPLEMENT(Thread, int, join, (void *_self))
 {
 	struct Thread *self = O_CAST(_self, Thread());
 	return pthread_join(self->thread, NULL);

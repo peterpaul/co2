@@ -7,7 +7,7 @@
 struct ReleasePool * current_release_pool;
 #define RELEASEPOOL_HASH_SIZE 1223
 
-O_IMPLEMENT(ReleasePool, void *, ctor, (void *_self, va_list * app), (_self, app))
+O_IMPLEMENT(ReleasePool, void *, ctor, (void *_self, va_list * app))
 {
   struct ReleasePool *self = O_CAST(_self, ReleasePool());
   self = O_SUPER->ctor(self, app);
@@ -17,7 +17,7 @@ O_IMPLEMENT(ReleasePool, void *, ctor, (void *_self, va_list * app), (_self, app
   return self;
 }
 
-O_IMPLEMENT(ReleasePool, void *, dtor, (void *_self), (_self))
+O_IMPLEMENT(ReleasePool, void *, dtor, (void *_self))
 {
   struct ReleasePool *self = O_CAST(_self, ReleasePool());
   int i;
@@ -35,7 +35,7 @@ O_IMPLEMENT(ReleasePool, void *, dtor, (void *_self), (_self))
   return O_SUPER->dtor(self);
 }
 
-O_IMPLEMENT(ReleasePool, void *, add, (void *_self, void *_item), (_self, _item))
+O_IMPLEMENT(ReleasePool, void *, add, (void *_self, void *_item))
 {
   struct ReleasePool *self = O_CAST(_self, ReleasePool());
   size_t index = ((size_t)_item) % RELEASEPOOL_HASH_SIZE;
@@ -47,7 +47,7 @@ O_IMPLEMENT(ReleasePool, void *, add, (void *_self, void *_item), (_self, _item)
   return _item;
 }
 
-O_IMPLEMENT(ReleasePool, void *, remove, (void *_self, void *_item), (_self, _item))
+O_IMPLEMENT(ReleasePool, void *, remove, (void *_self, void *_item))
 {
   struct ReleasePool *self = O_CAST(_self, ReleasePool());
   size_t index = ((size_t)_item) % RELEASEPOOL_HASH_SIZE;

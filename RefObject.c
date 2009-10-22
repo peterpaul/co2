@@ -2,7 +2,7 @@
 
 #define O_SUPER Object()
 
-O_IMPLEMENT(RefObject, void *, ctor, (void *_self, va_list * app), (_self, app))
+O_IMPLEMENT(RefObject, void *, ctor, (void *_self, va_list * app))
 {
   struct RefObject *self = O_CAST(_self, RefObject());
   self = O_SUPER->ctor(self, app);
@@ -12,7 +12,7 @@ O_IMPLEMENT(RefObject, void *, ctor, (void *_self, va_list * app), (_self, app))
   return self;
 }
 
-O_IMPLEMENT(RefObject, void *, dtor, (void *_self), (_self))
+O_IMPLEMENT(RefObject, void *, dtor, (void *_self))
 {
   struct RefObject *self = O_CAST(_self, RefObject());
   if (self->ref_count <= 0)
@@ -23,7 +23,7 @@ O_IMPLEMENT(RefObject, void *, dtor, (void *_self), (_self))
   return O_SUPER->dtor(self);
 }
 
-O_IMPLEMENT(RefObject, void *, retain, (void *_self), (_self))
+O_IMPLEMENT(RefObject, void *, retain, (void *_self))
 {
   struct RefObject *self = O_CAST(_self, RefObject());
   if (self->ref_count <= 0)
@@ -36,7 +36,7 @@ O_IMPLEMENT(RefObject, void *, retain, (void *_self), (_self))
   return self;
 }
 
-O_IMPLEMENT(RefObject, void *, release, (void *_self), (_self))
+O_IMPLEMENT(RefObject, void *, release, (void *_self))
 {
   struct RefObject *self = O_CAST(_self, RefObject());
   self->ref_count--;
@@ -48,7 +48,7 @@ O_IMPLEMENT(RefObject, void *, release, (void *_self), (_self))
   return self;
 }
 
-O_IMPLEMENT(RefObject, void *, auto_release, (void *_self), (_self))
+O_IMPLEMENT(RefObject, void *, auto_release, (void *_self))
 {
   struct RefObject *self = O_CAST(_self, RefObject());
   self->ref_count--;

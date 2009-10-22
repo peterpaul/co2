@@ -4,7 +4,7 @@
 
 #define O_SUPER Type()
 
-O_IMPLEMENT(PrimitiveType, void *, ctor, (void *_self, va_list *app), (_self, app))
+O_IMPLEMENT(PrimitiveType, void *, ctor, (void *_self, va_list *app))
 {
   struct PrimitiveType * self = O_CAST(_self, PrimitiveType());
   self = O_SUPER->ctor(self, app);
@@ -13,32 +13,32 @@ O_IMPLEMENT(PrimitiveType, void *, ctor, (void *_self, va_list *app), (_self, ap
   return self;
 }
 
-O_IMPLEMENT(PrimitiveType, void *, dtor, (void *_self), (_self))
+O_IMPLEMENT(PrimitiveType, void *, dtor, (void *_self))
 {
   struct PrimitiveType *self = O_CAST(_self, PrimitiveType());
   O_CALL(self->token, release);
   return O_SUPER->dtor(self);
 }
 
-O_IMPLEMENT(PrimitiveType, void, generate, (void *_self), (_self))
+O_IMPLEMENT(PrimitiveType, void, generate, (void *_self))
 {
   struct PrimitiveType *self = O_CAST(_self, PrimitiveType());
   O_CALL(self->token, generate);
 }
 
-O_IMPLEMENT(PrimitiveType, struct Token *, get_token, (void *_self), (_self))
+O_IMPLEMENT(PrimitiveType, struct Token *, get_token, (void *_self))
 {
   struct PrimitiveType *self = O_CAST(_self, PrimitiveType());
   return self->token;
 }
 
-O_IMPLEMENT(PrimitiveType, struct String *, to_string, (void *_self), (_self))
+O_IMPLEMENT(PrimitiveType, struct String *, to_string, (void *_self))
 {
   struct PrimitiveType *self = O_CAST(_self, PrimitiveType());
   return O_CALL_CLASS(String(), new, "%s", self->token->name->data);;
 }
 
-O_IMPLEMENT(PrimitiveType, bool, is_compatible, (void *_self, void *_other), (_self,_other))
+O_IMPLEMENT(PrimitiveType, bool, is_compatible, (void *_self, void *_other))
 {
   struct PrimitiveType *self = O_CAST(_self, PrimitiveType());
   if (O_SUPER->is_compatible(self, _other))

@@ -300,7 +300,7 @@ function_header
 }
 formal_arg_list_var ')'
 {
-  struct FunctionType * type = O_CALL_CLASS(FunctionType(), new_ctor, FunctionType_ctor_from_decl, $1, $5);
+  struct FunctionType * type = O_CALL_CLASS(FunctionType(), new_ctor, _FunctionType_ctor_from_decl, $1, $5);
   $$ = O_CALL_CLASS(FunDeclaration(), new, $2, type, $5, NULL);
 }
 ;

@@ -3,7 +3,7 @@
 
 #define O_SUPER Expression()
 
-O_IMPLEMENT(NestedExpression, void *, ctor, (void *_self, va_list *app), (_self, app))
+O_IMPLEMENT(NestedExpression, void *, ctor, (void *_self, va_list *app))
 {
   struct NestedExpression * self = O_CAST(_self, NestedExpression());
   self = O_SUPER->ctor(self, app);
@@ -12,14 +12,14 @@ O_IMPLEMENT(NestedExpression, void *, ctor, (void *_self, va_list *app), (_self,
   return self;
 }
 
-O_IMPLEMENT(NestedExpression, void *, dtor, (void *_self), (_self))
+O_IMPLEMENT(NestedExpression, void *, dtor, (void *_self))
 {
   struct NestedExpression *self = O_CAST(_self, NestedExpression());
   O_CALL(self->expr, release);
   return O_SUPER->dtor(self);
 }
 
-O_IMPLEMENT(NestedExpression, void, generate, (void *_self), (_self))
+O_IMPLEMENT(NestedExpression, void, generate, (void *_self))
 {
   struct NestedExpression *self = O_CAST(_self, NestedExpression());
   fprintf(out, "(");

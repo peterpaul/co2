@@ -5,7 +5,7 @@
 
 #define O_SUPER Type()
 
-O_IMPLEMENT(ObjectType, void *, ctor, (void *_self, va_list *app), (_self, app))
+O_IMPLEMENT(ObjectType, void *, ctor, (void *_self, va_list *app))
 {
   struct ObjectType * self = O_CAST(_self, ObjectType());
   self = O_SUPER->ctor(self, app);
@@ -16,7 +16,7 @@ O_IMPLEMENT(ObjectType, void *, ctor, (void *_self, va_list *app), (_self, app))
   return self;
 }
 
-O_IMPLEMENT(ObjectType, void *, dtor, (void *_self), (_self))
+O_IMPLEMENT(ObjectType, void *, dtor, (void *_self))
 {
   struct ObjectType *self = O_CAST(_self, ObjectType());
   O_CALL(self->token, release);
@@ -24,7 +24,7 @@ O_IMPLEMENT(ObjectType, void *, dtor, (void *_self), (_self))
   return O_SUPER->dtor(self);
 }
 
-O_IMPLEMENT(ObjectType, void, generate, (void *_self), (_self))
+O_IMPLEMENT(ObjectType, void, generate, (void *_self))
 {
   struct ObjectType *self = O_CAST(_self, ObjectType());
   fprintf(out, "struct ");
@@ -32,19 +32,19 @@ O_IMPLEMENT(ObjectType, void, generate, (void *_self), (_self))
   fprintf(out, "*");
 }
 
-O_IMPLEMENT(ObjectType, struct Token *, get_token, (void *_self), (_self))
+O_IMPLEMENT(ObjectType, struct Token *, get_token, (void *_self))
 {
   struct ObjectType *self = O_CAST(_self, ObjectType());
   return self->token;
 }
 
-O_IMPLEMENT(ObjectType, struct String *, to_string, (void *_self), (_self))
+O_IMPLEMENT(ObjectType, struct String *, to_string, (void *_self))
 {
   struct ObjectType *self = O_CAST(_self, ObjectType());
   return O_CALL_CLASS(String(), new, "%s", self->token->name->data);;
 }
 
-O_IMPLEMENT(ObjectType, bool, is_compatible, (void *_self, void *_other), (_self,_other))
+O_IMPLEMENT(ObjectType, bool, is_compatible, (void *_self, void *_other))
 {
   struct ObjectType *self = O_CAST(_self, ObjectType());
   if (O_SUPER->is_compatible(self, _other))

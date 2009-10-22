@@ -2,7 +2,7 @@
 
 #define O_SUPER Declaration()
 
-O_IMPLEMENT(InterfaceDeclaration, void *, ctor, (void *_self, va_list *app), (_self, app))
+O_IMPLEMENT(InterfaceDeclaration, void *, ctor, (void *_self, va_list *app))
 {
   struct InterfaceDeclaration * self = O_CAST(_self, InterfaceDeclaration());
   self = O_SUPER->ctor(self, app);
@@ -10,7 +10,7 @@ O_IMPLEMENT(InterfaceDeclaration, void *, ctor, (void *_self, va_list *app), (_s
   return self;
 }
 
-O_IMPLEMENT(InterfaceDeclaration, void *, dtor, (void *_self), (_self))
+O_IMPLEMENT(InterfaceDeclaration, void *, dtor, (void *_self))
 {
   struct InterfaceDeclaration *self = O_CAST(_self, InterfaceDeclaration());
   /* TODO cleanup */

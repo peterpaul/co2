@@ -2,7 +2,7 @@
 
 #define O_SUPER Statement()
 
-O_IMPLEMENT(WhileStatement, void *, ctor, (void *_self, va_list *app), (_self, app))
+O_IMPLEMENT(WhileStatement, void *, ctor, (void *_self, va_list *app))
 {
   struct WhileStatement * self = O_CAST(_self, WhileStatement());
   self = O_SUPER->ctor(self, app);
@@ -10,7 +10,7 @@ O_IMPLEMENT(WhileStatement, void *, ctor, (void *_self, va_list *app), (_self, a
   return self;
 }
 
-O_IMPLEMENT(WhileStatement, void *, dtor, (void *_self), (_self))
+O_IMPLEMENT(WhileStatement, void *, dtor, (void *_self))
 {
   struct WhileStatement *self = O_CAST(_self, WhileStatement());
   /* TODO cleanup */

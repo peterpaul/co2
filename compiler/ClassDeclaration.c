@@ -12,7 +12,7 @@
 
 #define O_SUPER Declaration()
 
-O_IMPLEMENT(ClassDeclaration, void *, ctor, (void *_self, va_list *app), (_self, app))
+O_IMPLEMENT(ClassDeclaration, void *, ctor, (void *_self, va_list *app))
 {
   struct ClassDeclaration * self = O_CAST(_self, ClassDeclaration());
   self = O_SUPER->ctor(self, app);
@@ -23,7 +23,7 @@ O_IMPLEMENT(ClassDeclaration, void *, ctor, (void *_self, va_list *app), (_self,
   return self;
 }
 
-O_IMPLEMENT(ClassDeclaration, void *, dtor, (void *_self), (_self))
+O_IMPLEMENT(ClassDeclaration, void *, dtor, (void *_self))
 {
   struct ClassDeclaration * self = O_CAST(_self, ClassDeclaration());
   O_BRANCH_CALL(self->superclass, release);
@@ -107,8 +107,6 @@ static void ClassDeclaration_generate_method_implementation(void *_method_decl, 
   O_CALL(method_decl->name, generate);
   fprintf(out, ", (void *_self");
   O_CALL(method_decl->formal_arguments, map, ClassDeclaration_generate_method_arguments);
-  fprintf(out, "), (_self");
-  O_CALL(method_decl->formal_arguments, map, ClassDeclaration_generate_method_argument_list);
   fprintf(out, "))\n");
   fprintf(out, "{\n");
   fprintf(out, "struct ");
@@ -142,7 +140,7 @@ static void generate_superclass(struct ClassDeclaration * self)
     }
 }
 
-O_IMPLEMENT(ClassDeclaration, void, generate, (void *_self), (_self))
+O_IMPLEMENT(ClassDeclaration, void, generate, (void *_self))
 {
   struct ClassDeclaration * self = O_CAST(_self, ClassDeclaration());
   /* filter the members */
@@ -208,7 +206,7 @@ static void ClassDeclaration_type_check_members(void *_member)
   O_CALL(member, type_check);
 }
 
-O_IMPLEMENT(ClassDeclaration, void, type_check, (void *_self), (_self))
+O_IMPLEMENT(ClassDeclaration, void, type_check, (void *_self))
 {
   struct ClassDeclaration * self = O_CAST(_self, ClassDeclaration());
   if (self->superclass)
@@ -223,7 +221,7 @@ O_IMPLEMENT(ClassDeclaration, void, type_check, (void *_self), (_self))
   O_CALL(self->members, map, ClassDeclaration_type_check_members);
 }
 
-O_IMPLEMENT(ClassDeclaration, bool, is_compatible, (void *_self, void *_other), (_self, _other))
+O_IMPLEMENT(ClassDeclaration, bool, is_compatible, (void *_self, void *_other))
 {
   struct ClassDeclaration * self = O_CAST(_self, ClassDeclaration());
   struct ClassDeclaration * other = o_cast(_other, ClassDeclaration());

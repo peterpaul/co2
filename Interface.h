@@ -28,6 +28,13 @@
 #define O_OBJECT_IF_END				\
 	}
 
+#define O_CALL_IF(interface,o,msg,...)					\
+  ({typeof(o) _tmp = o;							\
+    struct interface * _if = o_get_interface(_tmp, interface());	\
+    assertTrue(_if->msg,"runtime error: %s at %p doesn't respond to %s.", \
+	       _tmp->class->name, (void *)_tmp, __STRING(msg));		\
+    _if->msg(_tmp,##__VA_ARGS__);})
+
 /* Interface */
 #define InterfaceClass_Attr			\
 	ObjectClass_Attr

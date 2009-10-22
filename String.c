@@ -14,8 +14,7 @@ static size_t __strnlen(const char *str, size_t n)
 	return i;
 }
 
-O_IMPLEMENT(String, void *, ctor_from_file, (void *_self, va_list * app),
-	    (_self, app))
+O_IMPLEMENT(String, void *, ctor_from_file, (void *_self, va_list * app))
 {
 	struct String *self = O_CAST(_self, String());
 	self = O_SUPER->ctor(self, app);
@@ -46,7 +45,7 @@ O_IMPLEMENT(String, void *, ctor_from_file, (void *_self, va_list * app),
 	return self;
 }
 
-O_IMPLEMENT(String, void *, ctor, (void *_self, va_list * app), (_self, app))
+O_IMPLEMENT(String, void *, ctor, (void *_self, va_list * app))
 {
 	struct String *self = O_CAST(_self, String());
 	self = O_SUPER->ctor(self, app);
@@ -82,7 +81,7 @@ O_IMPLEMENT(String, void *, ctor, (void *_self, va_list * app), (_self, app))
 	return self;
 }
 
-O_IMPLEMENT(String, void *, resize, (void *_self, int size), (_self, size))
+O_IMPLEMENT(String, void *, resize, (void *_self, int size))
 {
 	struct String *self = O_CAST(_self, String());
 	self->data = realloc(self->data, size);
@@ -90,7 +89,7 @@ O_IMPLEMENT(String, void *, resize, (void *_self, int size), (_self, size))
 	return self;
 }
 
-O_IMPLEMENT(String, void *, ensure, (void *_self, int size), (_self, size))
+O_IMPLEMENT(String, void *, ensure, (void *_self, int size))
 {
 	struct String *self = O_CAST(_self, String());
 	if (size > self->max)
@@ -98,8 +97,7 @@ O_IMPLEMENT(String, void *, ensure, (void *_self, int size), (_self, size))
 	return self;
 }
 
-O_IMPLEMENT(String, void *, append, (void *_self, struct String * str),
-	    (_self, str))
+O_IMPLEMENT(String, void *, append, (void *_self, struct String * str))
 {
 	struct String *self = O_CAST(_self, String());
 	O_CALL(self, ensure, self->length + str->length + 1);
@@ -108,8 +106,7 @@ O_IMPLEMENT(String, void *, append, (void *_self, struct String * str),
 	return self;
 }
 
-O_IMPLEMENT(String, void *, append_str, (void *_self, char *str,...),
-	    (_self, str))
+O_IMPLEMENT(String, void *, append_str, (void *_self, char *str,...))
 {
 	struct String *self = O_CAST(_self, String());
 	int n, nn = strlen(str);
@@ -140,8 +137,7 @@ O_IMPLEMENT(String, void *, append_str, (void *_self, char *str,...),
 	return self;
 }
 
-O_IMPLEMENT(String, void *, append_str_n, (void *_self, char *str, int n),
-	    (_self, str, n))
+O_IMPLEMENT(String, void *, append_str_n, (void *_self, char *str, int n))
 {
 	struct String *self = O_CAST(_self, String());
 	if (n == 0)
@@ -159,9 +155,7 @@ O_IMPLEMENT(String, void *, append_str_n, (void *_self, char *str, int n),
  * This method replaces all occurrences of that with this.
  */
 O_IMPLEMENT(String, void *, replace,
-	    (void *_self, struct String * that, struct String * this), (_self,
-									that,
-									this))
+	    (void *_self, struct String * that, struct String * this))
 {
 	struct String *self = O_CAST(_self, String());
 	/* backup original string data, and truncate self */
@@ -182,20 +176,19 @@ O_IMPLEMENT(String, void *, replace,
 	return self;
 }
 
-O_IMPLEMENT(String, int, fprint, (void *_self, FILE * fp), (_self, fp))
+O_IMPLEMENT(String, int, fprint, (void *_self, FILE * fp))
 {
 	struct String *self = O_CAST(_self, String());
 	return fprintf(fp, "%s", self->data);
 }
 
-O_IMPLEMENT(String, int, snprint, (void *_self, char *str, int size),
-	    (_self, str, size))
+O_IMPLEMENT(String, int, snprint, (void *_self, char *str, int size))
 {
 	struct String *self = O_CAST(_self, String());
 	return snprintf(str, size, "%s", self->data);
 }
 
-O_IMPLEMENT(String, void *, clone, (void *_self), (_self))
+O_IMPLEMENT(String, void *, clone, (void *_self))
 {
 	struct String *self = O_CAST(_self, String());
 	struct String *clone = O_SUPER->clone(self);
@@ -205,7 +198,7 @@ O_IMPLEMENT(String, void *, clone, (void *_self), (_self))
 	return clone;
 }
 
-O_IMPLEMENT(String, void *, dtor, (void *_self), (_self))
+O_IMPLEMENT(String, void *, dtor, (void *_self))
 {
 	struct String *self = O_CAST(_self, String());
 	free(self->data);
@@ -213,8 +206,7 @@ O_IMPLEMENT(String, void *, dtor, (void *_self), (_self))
 	return O_SUPER->dtor(self);
 }
 
-O_IMPLEMENT(String, struct List *, split, (void *_self, const char *delim),
-	    (_self, delim))
+O_IMPLEMENT(String, struct List *, split, (void *_self, const char *delim))
 {
 	struct String *self = O_CAST(_self, String());
 	struct List *list = O_CALL_CLASS(List(), new, 8, String());
@@ -232,7 +224,7 @@ O_IMPLEMENT(String, struct List *, split, (void *_self, const char *delim),
 	return list;
 }
 
-O_IMPLEMENT(String, int, compare, (void *_self, void *_other), (_self, _other))
+O_IMPLEMENT(String, int, compare, (void *_self, void *_other))
 {
 	struct String *self = O_CAST(_self, String());
 	struct String *other = O_CAST(_other, String());

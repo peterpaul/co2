@@ -10,7 +10,7 @@
  * entered into the list can be cast to this type.
  */
 
-O_IMPLEMENT(RefList, void *, ctor, (void *_self, va_list * app), (_self, app))
+O_IMPLEMENT(RefList, void *, ctor, (void *_self, va_list * app))
 {
 	struct RefList *self = O_CAST(_self, RefList());
 	self = O_SUPER->ctor(self, app);
@@ -30,7 +30,7 @@ static void List_delete_items(void *_item)
 	O_CALL(item, release);
 }
 
-O_IMPLEMENT(RefList, void *, dtor, (void *_self), (_self))
+O_IMPLEMENT(RefList, void *, dtor, (void *_self))
 {
 	struct RefList *self = O_CAST(_self, RefList());
 	O_CALL(self, map, List_delete_items);
@@ -39,7 +39,7 @@ O_IMPLEMENT(RefList, void *, dtor, (void *_self), (_self))
 	return O_SUPER->dtor(self);
 }
 
-O_IMPLEMENT(RefList, void *, resize, (void *_self, unsigned size), (_self, size))
+O_IMPLEMENT(RefList, void *, resize, (void *_self, unsigned size))
 {
 	struct RefList *self = O_CAST(_self, RefList());
 	assert(size >= self->length);
@@ -49,7 +49,7 @@ O_IMPLEMENT(RefList, void *, resize, (void *_self, unsigned size), (_self, size)
 	return self;
 }
 
-O_IMPLEMENT(RefList, void *, append, (void *_self, void *_item), (_self, _item))
+O_IMPLEMENT(RefList, void *, append, (void *_self, void *_item))
 {
 	struct RefList *self = O_CAST(_self, RefList());
 	struct RefObject *item = O_CAST(_item, RefObject());
@@ -71,8 +71,7 @@ static void RefList_append_item(void *_item, va_list * ap)
 	O_CALL(list, append, _item);
 }
 
-O_IMPLEMENT(RefList, void *, append_list, (void *_self, void *_list),
-	    (_self, _list))
+O_IMPLEMENT(RefList, void *, append_list, (void *_self, void *_list))
 {
 	struct RefList *self = O_CAST(_self, RefList());
 	struct RefList *list = o_cast(_list, RefList());
@@ -80,7 +79,7 @@ O_IMPLEMENT(RefList, void *, append_list, (void *_self, void *_list),
 	return self;
 }
 
-O_IMPLEMENT(RefList, void *, merge, (void *_self, void *_other), (_self, _other))
+O_IMPLEMENT(RefList, void *, merge, (void *_self, void *_other))
 {
 	struct RefList *self = O_CAST(_self, RefList());
 	struct RefList *other = O_CAST(_other, RefList());
@@ -92,30 +91,28 @@ O_IMPLEMENT(RefList, void *, merge, (void *_self, void *_other), (_self, _other)
 	return self;
 }
 
-O_IMPLEMENT(RefList, void *, remove, (void *_self), (_self))
+O_IMPLEMENT(RefList, void *, remove, (void *_self))
 {
 	struct RefList *self = O_CAST(_self, RefList());
 	self->length--;
 	return O_CALL(self->data[self->length], auto_release);
 }
 
-O_IMPLEMENT(RefList, void *, get, (void *_self, unsigned index), (_self, index))
+O_IMPLEMENT(RefList, void *, get, (void *_self, unsigned index))
 {
 	struct RefList *self = O_CAST(_self, RefList());
 	assert(index < self->length);
 	return self->data[index];
 }
 
-O_IMPLEMENT(RefList, void *, set, (void *_self, unsigned index, void *item),
-	    (_self, index, item))
+O_IMPLEMENT(RefList, void *, set, (void *_self, unsigned index, void *item))
 {
 	struct RefList *self = O_CAST(_self, RefList());
 	assert(index < self->length && item);
 	return self->data[index] = self->type ? o_cast(item, self->type) : item;
 }
 
-O_IMPLEMENT(RefList, void *, map, (void *_self, void (*fun) (void *)),
-	    (_self, fun))
+O_IMPLEMENT(RefList, void *, map, (void *_self, void (*fun) (void *)))
 {
 	struct RefList *self = O_CAST(_self, RefList());
 	int i;
@@ -127,7 +124,7 @@ O_IMPLEMENT(RefList, void *, map, (void *_self, void (*fun) (void *)),
 }
 
 O_IMPLEMENT(RefList, void *, map_args,
-	    (void *_self, void (*fun) (void *, va_list *),...), (_self, fun))
+	    (void *_self, void (*fun) (void *, va_list *),...))
 {
 	struct RefList *self = O_CAST(_self, RefList());
 	int i;
@@ -144,8 +141,7 @@ O_IMPLEMENT(RefList, void *, map_args,
 	return self;
 }
 
-O_IMPLEMENT(RefList, void *, filter, (void *_self, int (*filter) (void *)),
-	    (_self, filter))
+O_IMPLEMENT(RefList, void *, filter, (void *_self, int (*filter) (void *)))
 {
 	struct RefList *self = O_CAST(_self, RefList());
 	int i;
@@ -159,8 +155,7 @@ O_IMPLEMENT(RefList, void *, filter, (void *_self, int (*filter) (void *)),
 }
 
 O_IMPLEMENT(RefList, void *, filter_args,
-	    (void *_self, int (*filter) (void *, va_list *),...), (_self,
-								   filter))
+	    (void *_self, int (*filter) (void *, va_list *),...))
 {
 	struct RefList *self = O_CAST(_self, RefList());
 	int i;
@@ -179,7 +174,7 @@ O_IMPLEMENT(RefList, void *, filter_args,
 	return result;
 }
 
-O_IMPLEMENT(RefList, struct String *, to_string, (void *_self), (_self))
+O_IMPLEMENT(RefList, struct String *, to_string, (void *_self))
 {
 	struct RefList *self = O_CAST(_self, RefList());
 	struct String *str = O_SUPER->to_string(self);
@@ -207,7 +202,7 @@ O_IMPLEMENT(RefList, struct String *, to_string, (void *_self), (_self))
 	return str;
 }
 
-O_IMPLEMENT(RefList, void *, getIterator, (void *_self), (_self))
+O_IMPLEMENT(RefList, void *, getIterator, (void *_self))
 {
 	struct RefList *self = O_CAST(_self, RefList());
 	return O_CALL_CLASS(ListIterator(), new, self);

@@ -4,7 +4,7 @@
 
 #define O_SUPER Statement()
 
-O_IMPLEMENT(DeleteStatement, void *, ctor, (void *_self, va_list *app), (_self, app))
+O_IMPLEMENT(DeleteStatement, void *, ctor, (void *_self, va_list *app))
 {
   struct DeleteStatement * self = O_CAST(_self, DeleteStatement());
   self = O_SUPER->ctor(self, app);
@@ -13,14 +13,14 @@ O_IMPLEMENT(DeleteStatement, void *, ctor, (void *_self, va_list *app), (_self, 
   return self;
 }
 
-O_IMPLEMENT(DeleteStatement, void *, dtor, (void *_self), (_self))
+O_IMPLEMENT(DeleteStatement, void *, dtor, (void *_self))
 {
   struct DeleteStatement *self = O_CAST(_self, DeleteStatement());
   O_CALL(self->expr, release);
   return O_SUPER->dtor(self);
 }
 
-O_IMPLEMENT(DeleteStatement, void, generate, (void *_self), (_self))
+O_IMPLEMENT(DeleteStatement, void, generate, (void *_self))
 {
   struct DeleteStatement *self = O_CAST(_self, DeleteStatement());
   /* TODO when self->expr->type == ArrayType, then free, else delete object */
@@ -29,7 +29,7 @@ O_IMPLEMENT(DeleteStatement, void, generate, (void *_self), (_self))
   fprintf(out, ");\n");
 }
 
-O_IMPLEMENT(DeleteStatement, void, type_check, (void *_self), (_self))
+O_IMPLEMENT(DeleteStatement, void, type_check, (void *_self))
 {
   struct DeleteStatement *self = O_CAST(_self, DeleteStatement());
   O_CALL(self->expr, type_check);

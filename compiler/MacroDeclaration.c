@@ -2,7 +2,7 @@
 
 #define O_SUPER Declaration()
 
-O_IMPLEMENT(MacroDeclaration, void *, ctor, (void *_self, va_list *app), (_self, app))
+O_IMPLEMENT(MacroDeclaration, void *, ctor, (void *_self, va_list *app))
 {
   struct MacroDeclaration * self = O_CAST(_self, MacroDeclaration());
   self = O_SUPER->ctor(self, app);
@@ -10,7 +10,7 @@ O_IMPLEMENT(MacroDeclaration, void *, ctor, (void *_self, va_list *app), (_self,
   return self;
 }
 
-O_IMPLEMENT(MacroDeclaration, void *, dtor, (void *_self), (_self))
+O_IMPLEMENT(MacroDeclaration, void *, dtor, (void *_self))
 {
   struct MacroDeclaration *self = O_CAST(_self, MacroDeclaration());
   /* TODO cleanup */

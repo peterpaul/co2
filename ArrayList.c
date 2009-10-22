@@ -2,7 +2,7 @@
 
 #define O_SUPER Array()
 
-O_IMPLEMENT(ArrayList, void *, ctor, (void *_self, va_list *app), (_self, app))
+O_IMPLEMENT(ArrayList, void *, ctor, (void *_self, va_list *app))
 {
   struct ArrayList * self = O_CAST(_self, ArrayList());
   self = O_SUPER->ctor(self, app);
@@ -10,13 +10,13 @@ O_IMPLEMENT(ArrayList, void *, ctor, (void *_self, va_list *app), (_self, app))
   return self;
 }
 
-O_IMPLEMENT(ArrayList, void *, dtor, (void *_self), (_self))
+O_IMPLEMENT(ArrayList, void *, dtor, (void *_self))
 {
   struct ArrayList *self = O_CAST(_self, ArrayList());
   return O_SUPER->dtor(self);
 }
 
-O_IMPLEMENT(ArrayList, void *, prepend, (void *_self, void *item), (_self, item))
+O_IMPLEMENT(ArrayList, void *, prepend, (void *_self, void *item))
 {
   struct ArrayList *self = O_CAST(_self, ArrayList());
   if (self->length == self->capacity)
@@ -28,7 +28,7 @@ O_IMPLEMENT(ArrayList, void *, prepend, (void *_self, void *item), (_self, item)
   self->length ++;
 }
 
-O_IMPLEMENT(ArrayList, void *, append, (void *_self, void *item), (_self, item))
+O_IMPLEMENT(ArrayList, void *, append, (void *_self, void *item))
 {
   struct ArrayList *self = O_CAST(_self, ArrayList());
   if (self->length == self->capacity)
@@ -45,7 +45,7 @@ static void ArrayList_append_item(void *_item, va_list * ap)
   O_CALL(list, append, _item);
 }
 
-O_IMPLEMENT(ArrayList, void *, append_list, (void *_self, void *_list), (_self, _list))
+O_IMPLEMENT(ArrayList, void *, append_list, (void *_self, void *_list))
 {
   struct ArrayList *self = O_CAST(_self, ArrayList());
   struct ArrayList *list = o_cast(_list, ArrayList());
@@ -53,7 +53,7 @@ O_IMPLEMENT(ArrayList, void *, append_list, (void *_self, void *_list), (_self, 
   return self;
 }
 
-O_IMPLEMENT(ArrayList, void *, merge, (void *_self, void *_other), (_self, _other))
+O_IMPLEMENT(ArrayList, void *, merge, (void *_self, void *_other))
 {
   struct ArrayList *self = O_CAST(_self, ArrayList());
   struct ArrayList *other = O_CAST(_other, ArrayList());
@@ -65,7 +65,7 @@ O_IMPLEMENT(ArrayList, void *, merge, (void *_self, void *_other), (_self, _othe
   return self;
 }
 
-O_IMPLEMENT(ArrayList, void *, map, (void *_self, void (*fun) (void *)), (_self, fun))
+O_IMPLEMENT(ArrayList, void *, map, (void *_self, void (*fun) (void *)))
 {
   struct ArrayList *self = O_CAST(_self, ArrayList());
   int i;
@@ -78,7 +78,7 @@ O_IMPLEMENT(ArrayList, void *, map, (void *_self, void (*fun) (void *)), (_self,
 }
 
 O_IMPLEMENT(ArrayList, void *, map_args,
-	    (void *_self, void (*fun) (void *, va_list *), ...), (_self, fun))
+	    (void *_self, void (*fun) (void *, va_list *), ...))
 {
   struct ArrayList *self = O_CAST(_self, ArrayList());
   int i;
@@ -96,7 +96,7 @@ O_IMPLEMENT(ArrayList, void *, map_args,
   return self;
 }
 
-O_IMPLEMENT(ArrayList, void *, filter, (void *_self, int (*filter) (void *)), (_self, filter))
+O_IMPLEMENT(ArrayList, void *, filter, (void *_self, int (*filter) (void *)))
 {
   struct ArrayList *self = O_CAST(_self, ArrayList());
   int i;
@@ -111,7 +111,7 @@ O_IMPLEMENT(ArrayList, void *, filter, (void *_self, int (*filter) (void *)), (_
 }
 
 O_IMPLEMENT(ArrayList, void *, filter_args,
-	    (void *_self, int (*filter) (void *, va_list *), ...), (_self, filter))
+	    (void *_self, int (*filter) (void *, va_list *), ...))
 {
   struct ArrayList *self = O_CAST(_self, ArrayList());
   int i;
@@ -131,7 +131,7 @@ O_IMPLEMENT(ArrayList, void *, filter_args,
   return result;
 }
 
-O_IMPLEMENT(ArrayList, void *, getIterator, (void *_self), (_self));
+O_IMPLEMENT(ArrayList, void *, getIterator, (void *_self));
 
 O_OBJECT(ArrayList, Array);
 O_OBJECT_METHOD(ArrayList, ctor);

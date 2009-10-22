@@ -2,8 +2,7 @@
 
 #define O_SUPER Object()
 
-O_IMPLEMENT(ListIterator, void *, ctor, (void *_self, va_list * argp),
-	    (_self, argp))
+O_IMPLEMENT(ListIterator, void *, ctor, (void *_self, va_list * argp))
 {
 	struct ListIterator *self = O_CAST(_self, ListIterator());
 	self = O_SUPER->ctor(self, argp);

@@ -4,7 +4,7 @@
 
 #define O_SUPER CompileObject()
 
-O_IMPLEMENT(Path, void *, ctor, (void *_self, va_list *app), (_self, app))
+O_IMPLEMENT(Path, void *, ctor, (void *_self, va_list *app))
 {
   struct Path * self = O_CAST(_self, Path());
   self = O_SUPER->ctor(self, app);
@@ -13,7 +13,7 @@ O_IMPLEMENT(Path, void *, ctor, (void *_self, va_list *app), (_self, app))
   return self;
 }
 
-O_IMPLEMENT(Path, void *, dtor, (void *_self), (_self))
+O_IMPLEMENT(Path, void *, dtor, (void *_self))
 {
   struct Path *self = O_CAST(_self, Path());
   O_CALL(self->path_name, release);
@@ -28,7 +28,7 @@ void Path_convert_to_system_path(void *_token, va_list *app)
   O_CALL(result, append, token->name);
 }
 
-O_IMPLEMENT(Path, struct String *, to_system_path, (void *_self), (_self))
+O_IMPLEMENT(Path, struct String *, to_system_path, (void *_self))
 {
   struct Path *self = O_CAST(_self, Path());
   struct String *result = O_CALL_CLASS(String (), new, "");

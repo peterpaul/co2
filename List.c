@@ -10,7 +10,7 @@
  * entered into the list can be cast to this type.
  */
 
-O_IMPLEMENT(List, void *, ctor, (void *_self, va_list * app), (_self, app))
+O_IMPLEMENT(List, void *, ctor, (void *_self, va_list * app))
 {
 	struct List *self = O_CAST(_self, List());
 	self = O_SUPER->ctor(self, app);
@@ -23,7 +23,7 @@ O_IMPLEMENT(List, void *, ctor, (void *_self, va_list * app), (_self, app))
 	return self;
 }
 
-O_IMPLEMENT(List, void *, resize, (void *_self, unsigned size), (_self, size))
+O_IMPLEMENT(List, void *, resize, (void *_self, unsigned size))
 {
 	struct List *self = O_CAST(_self, List());
 	assert(size >= self->length);
@@ -33,7 +33,7 @@ O_IMPLEMENT(List, void *, resize, (void *_self, unsigned size), (_self, size))
 	return self;
 }
 
-O_IMPLEMENT(List, void *, append, (void *_self, void *item), (_self, item))
+O_IMPLEMENT(List, void *, append, (void *_self, void *item))
 {
 	struct List *self = O_CAST(_self, List());
 	/* if item and type, cast item to type */
@@ -54,8 +54,7 @@ static void List_append_item(void *_item, va_list * ap)
 	O_CALL(list, append, _item);
 }
 
-O_IMPLEMENT(List, void *, append_list, (void *_self, void *_list),
-	    (_self, _list))
+O_IMPLEMENT(List, void *, append_list, (void *_self, void *_list))
 {
 	struct List *self = O_CAST(_self, List());
 	struct List *list = o_cast(_list, List());
@@ -63,7 +62,7 @@ O_IMPLEMENT(List, void *, append_list, (void *_self, void *_list),
 	return self;
 }
 
-O_IMPLEMENT(List, void *, merge, (void *_self, void *_other), (_self, _other))
+O_IMPLEMENT(List, void *, merge, (void *_self, void *_other))
 {
 	struct List *self = O_CAST(_self, List());
 	struct List *other = O_CAST(_other, List());
@@ -75,30 +74,28 @@ O_IMPLEMENT(List, void *, merge, (void *_self, void *_other), (_self, _other))
 	return self;
 }
 
-O_IMPLEMENT(List, void *, remove, (void *_self), (_self))
+O_IMPLEMENT(List, void *, remove, (void *_self))
 {
 	struct List *self = O_CAST(_self, List());
 	self->length--;
 	return self->data[self->length];
 }
 
-O_IMPLEMENT(List, void *, get, (void *_self, unsigned index), (_self, index))
+O_IMPLEMENT(List, void *, get, (void *_self, unsigned index))
 {
 	struct List *self = O_CAST(_self, List());
 	assert(index < self->length);
 	return self->data[index];
 }
 
-O_IMPLEMENT(List, void *, set, (void *_self, unsigned index, void *item),
-	    (_self, index, item))
+O_IMPLEMENT(List, void *, set, (void *_self, unsigned index, void *item))
 {
 	struct List *self = O_CAST(_self, List());
 	assert(index < self->length && item);
 	return self->data[index] = self->type ? o_cast(item, self->type) : item;
 }
 
-O_IMPLEMENT(List, void *, map, (void *_self, void (*fun) (void *)),
-	    (_self, fun))
+O_IMPLEMENT(List, void *, map, (void *_self, void (*fun) (void *)))
 {
 	struct List *self = O_CAST(_self, List());
 	int i;
@@ -110,7 +107,7 @@ O_IMPLEMENT(List, void *, map, (void *_self, void (*fun) (void *)),
 }
 
 O_IMPLEMENT(List, void *, map_args,
-	    (void *_self, void (*fun) (void *, va_list *),...), (_self, fun))
+	    (void *_self, void (*fun) (void *, va_list *),...))
 {
 	struct List *self = O_CAST(_self, List());
 	int i;
@@ -127,8 +124,7 @@ O_IMPLEMENT(List, void *, map_args,
 	return self;
 }
 
-O_IMPLEMENT(List, void *, filter, (void *_self, int (*filter) (void *)),
-	    (_self, filter))
+O_IMPLEMENT(List, void *, filter, (void *_self, int (*filter) (void *)))
 {
 	struct List *self = O_CAST(_self, List());
 	int i;
@@ -142,8 +138,7 @@ O_IMPLEMENT(List, void *, filter, (void *_self, int (*filter) (void *)),
 }
 
 O_IMPLEMENT(List, void *, filter_args,
-	    (void *_self, int (*filter) (void *, va_list *),...), (_self,
-								   filter))
+	    (void *_self, int (*filter) (void *, va_list *),...))
 {
 	struct List *self = O_CAST(_self, List());
 	int i;
@@ -169,7 +164,7 @@ static void List_delete_items(void *_item)
 	O_CALL(item, delete);
 }
 
-O_IMPLEMENT(List, void *, dtor, (void *_self), (_self))
+O_IMPLEMENT(List, void *, dtor, (void *_self))
 {
 	struct List *self = O_CAST(_self, List());
 	O_CALL(self, map, List_delete_items);
@@ -178,7 +173,7 @@ O_IMPLEMENT(List, void *, dtor, (void *_self), (_self))
 	return O_SUPER->dtor(self);
 }
 
-O_IMPLEMENT(List, struct String *, to_string, (void *_self), (_self))
+O_IMPLEMENT(List, struct String *, to_string, (void *_self))
 {
 	struct List *self = O_CAST(_self, List());
 	struct String *str = O_SUPER->to_string(self);
@@ -206,7 +201,7 @@ O_IMPLEMENT(List, struct String *, to_string, (void *_self), (_self))
 	return str;
 }
 
-O_IMPLEMENT(List, void *, getIterator, (void *_self), (_self))
+O_IMPLEMENT(List, void *, getIterator, (void *_self))
 {
 	struct List *self = O_CAST(_self, List());
 	return O_CALL_CLASS(ListIterator(), new, self);

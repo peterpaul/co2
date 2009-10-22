@@ -2,8 +2,7 @@
 
 #define O_SUPER Object()
 
-O_IMPLEMENT(TestInterface, void *, ctor, (void *_self, va_list * argp),
-	    (_self, argp))
+O_IMPLEMENT(TestInterface, void *, ctor, (void *_self, va_list * argp))
 {
 	struct TestInterface *self = o_cast(_self, TestInterface());
 	self = O_SUPER->ctor(self, argp);

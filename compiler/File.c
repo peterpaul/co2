@@ -22,7 +22,7 @@ static void generate(void *_declaration)
   O_CALL(declaration, generate);
 }
 
-O_IMPLEMENT(File, void *, ctor, (void *_self, va_list *app), (_self, app))
+O_IMPLEMENT(File, void *, ctor, (void *_self, va_list *app))
 {
   struct File * self = O_CAST(_self, File());
   self = O_SUPER->ctor(self, app);
@@ -35,7 +35,7 @@ O_IMPLEMENT(File, void *, ctor, (void *_self, va_list *app), (_self, app))
   return self;
 }
 
-O_IMPLEMENT(File, void *, dtor, (void *_self), (_self))
+O_IMPLEMENT(File, void *, dtor, (void *_self))
 {
   struct File *self = O_CAST(_self, File());
   O_CALL(self->package, release);
@@ -44,19 +44,19 @@ O_IMPLEMENT(File, void *, dtor, (void *_self), (_self))
   return O_SUPER->dtor(self);
 }
 
-O_IMPLEMENT(File, void, type_check, (void *_self), (_self))
+O_IMPLEMENT(File, void, type_check, (void *_self))
 {
   struct File *self = O_CAST(_self, File());
   O_CALL (self->declarations, map, type_check);
 }
 
-O_IMPLEMENT(File, void, optimize, (void *_self), (_self))
+O_IMPLEMENT(File, void, optimize, (void *_self))
 {
   struct File *self = O_CAST(_self, File());
   O_CALL (self->declarations, map, optimize);
 }
 
-O_IMPLEMENT(File, void, generate, (void *_self), (_self))
+O_IMPLEMENT(File, void, generate, (void *_self))
 {
   struct File *self = O_CAST(_self, File());
   O_CALL (self->declarations, map, generate);
@@ -75,7 +75,7 @@ void parse_import(void *_import, va_list *app)
   new_input(import_path->data);
 }
 
-O_IMPLEMENT(File, void, parse_imports, (void *_self), (_self))
+O_IMPLEMENT(File, void, parse_imports, (void *_self))
 {
   struct File *self = O_CAST(_self, File());
   if (!self->imported_files)

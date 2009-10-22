@@ -5,7 +5,7 @@
 
 #define O_SUPER CompileObject()
 
-O_IMPLEMENT(Declaration, void *, ctor, (void *_self, va_list *app), (_self, app))
+O_IMPLEMENT(Declaration, void *, ctor, (void *_self, va_list *app))
 {
   struct Declaration * self = O_CAST(_self, Declaration());
   self = O_SUPER->ctor(self, app);  
@@ -14,7 +14,7 @@ O_IMPLEMENT(Declaration, void *, ctor, (void *_self, va_list *app), (_self, app)
   return self;
 }
 
-O_IMPLEMENT(Declaration, void *, dtor, (void *_self), (_self))
+O_IMPLEMENT(Declaration, void *, dtor, (void *_self))
 {
   struct Declaration *self = O_CAST(_self, Declaration());
   O_CALL(self->name, release);
@@ -22,13 +22,13 @@ O_IMPLEMENT(Declaration, void *, dtor, (void *_self), (_self))
   return O_SUPER->dtor(self);
 }
 
-O_IMPLEMENT(Declaration, void, set_scope, (void *_self, void *_scope), (_self, _scope))
+O_IMPLEMENT(Declaration, void, set_scope, (void *_self, void *_scope))
 {
   struct Declaration *self = O_CAST(_self, Declaration());
   self->scope = o_cast(_scope, Scope());
 }
 
-O_IMPLEMENT(Declaration, void, set_class_decl, (void *_self, void *_class_decl), (_self, _class_decl))
+O_IMPLEMENT(Declaration, void, set_class_decl, (void *_self, void *_class_decl))
 {
   struct Declaration *self = O_CAST(_self, Declaration());
   self->class_decl = o_cast(_class_decl, ClassDeclaration());

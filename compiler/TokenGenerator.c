@@ -3,7 +3,7 @@
 
 #define O_SUPER Singleton()
 
-O_IMPLEMENT(TokenGenerator, void *, ctor, (void *_self, va_list *app), (_self, app))
+O_IMPLEMENT(TokenGenerator, void *, ctor, (void *_self, va_list *app))
 {
   struct TokenGenerator * self = O_CAST(_self, TokenGenerator());
   self = O_SUPER->ctor(self, app);
@@ -11,13 +11,13 @@ O_IMPLEMENT(TokenGenerator, void *, ctor, (void *_self, va_list *app), (_self, a
   return self;
 }
 
-O_IMPLEMENT(TokenGenerator, void *, dtor, (void *_self), (_self))
+O_IMPLEMENT(TokenGenerator, void *, dtor, (void *_self))
 {
   struct TokenGenerator *self = O_CAST(_self, TokenGenerator());
   return O_SUPER->dtor(self);
 }
 
-O_IMPLEMENT(TokenGenerator, struct Token *, create, (void *_self, struct Token * token), (_self, token))
+O_IMPLEMENT(TokenGenerator, struct Token *, create, (void *_self, struct Token * token))
 {
   struct TokenGenerator *self = O_CAST(_self, TokenGenerator());
   struct String * name = O_CALL_CLASS(String(), new, "_%s_%d", token->name->data, self->value);

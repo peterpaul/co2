@@ -3,7 +3,7 @@
 
 #define O_SUPER Object()
 
-O_IMPLEMENT(ReleasePoolItem, void *, ctor, (void *_self, va_list * app), (_self, app))
+O_IMPLEMENT(ReleasePoolItem, void *, ctor, (void *_self, va_list * app))
 {
   struct ReleasePoolItem *self = O_CAST(_self, ReleasePoolItem());
   self = O_SUPER->ctor(self, app);
@@ -12,7 +12,7 @@ O_IMPLEMENT(ReleasePoolItem, void *, ctor, (void *_self, va_list * app), (_self,
   return self;
 }
 
-O_IMPLEMENT(ReleasePoolItem, void *, add, (void *_self, void *_item), (_self, _item))
+O_IMPLEMENT(ReleasePoolItem, void *, add, (void *_self, void *_item))
 {
   struct ReleasePoolItem *self = O_CAST(_self, ReleasePoolItem());
   struct ReleasePoolItem *item = o_cast(_item, ReleasePoolItem());
@@ -20,7 +20,7 @@ O_IMPLEMENT(ReleasePoolItem, void *, add, (void *_self, void *_item), (_self, _i
   return item;
 }
 
-O_IMPLEMENT(ReleasePoolItem, void *, remove, (void *_self, void *_item), (_self, _item))
+O_IMPLEMENT(ReleasePoolItem, void *, remove, (void *_self, void *_item))
 {
   struct ReleasePoolItem *self = O_CAST(_self, ReleasePoolItem());
   struct RefObject *item = O_CAST(_item, RefObject());
@@ -40,7 +40,7 @@ O_IMPLEMENT(ReleasePoolItem, void *, remove, (void *_self, void *_item), (_self,
     }
 }
 
-O_IMPLEMENT(ReleasePoolItem, void, clear_list, (void *_self), (_self))
+O_IMPLEMENT(ReleasePoolItem, void, clear_list, (void *_self))
 {
   struct ReleasePoolItem *self = O_CAST(_self, ReleasePoolItem());
   O_BRANCH_CALL(self->next, clear_list);

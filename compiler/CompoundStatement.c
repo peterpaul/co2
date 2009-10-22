@@ -3,7 +3,7 @@
 
 #define O_SUPER Statement()
 
-O_IMPLEMENT(CompoundStatement, void *, ctor, (void *_self, va_list *app), (_self, app))
+O_IMPLEMENT(CompoundStatement, void *, ctor, (void *_self, va_list *app))
 {
   struct CompoundStatement * self = O_CAST(_self, CompoundStatement());
   self = O_SUPER->ctor(self, app);
@@ -12,7 +12,7 @@ O_IMPLEMENT(CompoundStatement, void *, ctor, (void *_self, va_list *app), (_self
   return self;
 }
 
-O_IMPLEMENT(CompoundStatement, void *, dtor, (void *_self), (_self))
+O_IMPLEMENT(CompoundStatement, void *, dtor, (void *_self))
 {
   struct CompoundStatement *self = O_CAST(_self, CompoundStatement());
   O_CALL(self->body, release);
@@ -25,7 +25,7 @@ void CompoundStatement_generate_body(void *_item)
   O_CALL(item, generate);
 }
 
-O_IMPLEMENT(CompoundStatement, void, generate, (void *_self), (_self))
+O_IMPLEMENT(CompoundStatement, void, generate, (void *_self))
 {
   struct CompoundStatement *self = O_CAST(_self, CompoundStatement());
   fprintf(out, "{\n");
@@ -39,7 +39,7 @@ void CompoundStatement_type_check_body(void *_item)
   O_CALL(item, type_check);
 }
 
-O_IMPLEMENT(CompoundStatement, void, type_check, (void *_self), (_self))
+O_IMPLEMENT(CompoundStatement, void, type_check, (void *_self))
 {
   struct CompoundStatement *self = O_CAST(_self, CompoundStatement());
   O_CALL(self->body, map, CompoundStatement_type_check_body);

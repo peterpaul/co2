@@ -7,7 +7,7 @@
 
 #define O_SUPER Type()
 
-O_IMPLEMENT(FunctionType, void *, ctor, (void *_self, va_list *app), (_self, app))
+O_IMPLEMENT(FunctionType, void *, ctor, (void *_self, va_list *app))
 {
   struct FunctionType * self = O_CAST(_self, FunctionType());
   self = O_SUPER->ctor(self, app);
@@ -25,7 +25,7 @@ static void FunctionType_ctor_get_parameter_type_from_decl(void *_decl, va_list 
   O_CALL(list, append, decl->type);
 }
 
-O_IMPLEMENT(FunctionType, void *, ctor_from_decl, (void *_self, va_list *app), (_self, app))
+O_IMPLEMENT(FunctionType, void *, ctor_from_decl, (void *_self, va_list *app))
 {
   struct FunctionType * self = O_CAST(_self, FunctionType());
   self = O_SUPER->ctor(self, app);
@@ -45,7 +45,7 @@ static void FunctionType_ctor_get_parameter_type_from_expr(void *_decl, va_list 
   O_CALL(list, append, expr->type);
 }
 
-O_IMPLEMENT(FunctionType, void *, ctor_from_expr, (void *_self, va_list *app), (_self, app))
+O_IMPLEMENT(FunctionType, void *, ctor_from_expr, (void *_self, va_list *app))
 {
   struct FunctionType * self = O_CAST(_self, FunctionType());
   self = O_SUPER->ctor(self, app);
@@ -57,7 +57,7 @@ O_IMPLEMENT(FunctionType, void *, ctor_from_expr, (void *_self, va_list *app), (
   return self;
 }
 
-O_IMPLEMENT(FunctionType, void *, dtor, (void *_self), (_self))
+O_IMPLEMENT(FunctionType, void *, dtor, (void *_self))
 {
   struct FunctionType *self = O_CAST(_self, FunctionType());
   O_CALL(self->return_type, release);
@@ -98,7 +98,7 @@ static void FunctionType_parameter_to_string(void *_parameter, va_list *app)
   O_CALL(parameter_string, delete);
 }
 
-O_IMPLEMENT(FunctionType, struct String *, to_string, (void *_self), (_self))
+O_IMPLEMENT(FunctionType, struct String *, to_string, (void *_self))
 {
   struct FunctionType *self = O_CAST(_self, FunctionType());
   struct String * string = O_CALL(self->return_type, to_string);
@@ -109,7 +109,7 @@ O_IMPLEMENT(FunctionType, struct String *, to_string, (void *_self), (_self))
   return string;
 }
 
-O_IMPLEMENT(FunctionType, void, generate, (void *_self), (_self))
+O_IMPLEMENT(FunctionType, void, generate, (void *_self))
 {
   struct FunctionType *self = O_CAST(_self, FunctionType());
   /* TODO This only works when the type should be generated for a declaration first.
@@ -135,7 +135,7 @@ O_IMPLEMENT(FunctionType, void, generate, (void *_self), (_self))
 
 #define SET_RESULT(x,p) (x = p ? x : p)
 
-O_IMPLEMENT(FunctionType, bool, is_compatible, (void *_self, void *_other), (_self,_other))
+O_IMPLEMENT(FunctionType, bool, is_compatible, (void *_self, void *_other))
 {
   struct FunctionType *self = O_CAST(_self, FunctionType());
   if (O_SUPER->is_compatible(self, _other))
@@ -161,7 +161,7 @@ O_IMPLEMENT(FunctionType, bool, is_compatible, (void *_self, void *_other), (_se
   return false;
 }
 
-O_IMPLEMENT(FunctionType, struct Token *, get_token, (void *_self), (_self))
+O_IMPLEMENT(FunctionType, struct Token *, get_token, (void *_self))
 {
   struct FunctionType *self = O_CAST(_self, FunctionType());
   return O_CALL(self->return_type, get_token);

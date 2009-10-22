@@ -29,35 +29,10 @@
 
 #define O_METHOD_DEF(klass,type,name,args)		\
 	typedef type (*klass##_##name##_##t) args;	\
-        O_FUNCTION_DEF(klass, type, name, args)
+        O_FUNCTION_DEF(_##klass, type, name, args)
 
-#define O_IMPLEMENT(klass,type,name,args,act_args)		\
-	O_FUNCTION_DEF(klass,type,name,args) {			\
-		struct klass * self = O_CAST(_self, klass());	\
-		return self->class->name act_args;		\
-	}							\
+#define O_IMPLEMENT(klass,type,name,args)	\
 	O_FUNCTION_DEF(_##klass,type,name,args)
-
-#define O_IMPLEMENT_VA(klass,type,name,args,act_args,last)      \
-	O_FUNCTION_DEF(klass,type,name,args) {			\
-                va_list ap;                                     \
-		struct klass * self = O_CAST(_self, klass());	\
-                va_start(ap, last);                             \
-                type retval = self->class->name act_args;       \
-                va_end(ap);                                     \
-		return retval;                                  \
-	}							\
-	O_FUNCTION_DEF(_##klass,type,name,args)
-
-#define O_IMPLEMENT_VA_PROC(klass,name,args,act_args,last)	\
-	O_FUNCTION_DEF(klass,void,name,args) {			\
-                va_list ap;                                     \
-		struct klass * self = O_CAST(_self, klass());	\
-                va_start(ap, last);                             \
-                self->class->name act_args;			\
-                va_end(ap);                                     \
-	}							\
-	O_FUNCTION_DEF(_##klass,void,name,args)
 
 #define O_OBJECT_DEF(name,klass)		\
 	struct klass * name();			\

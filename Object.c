@@ -96,20 +96,20 @@ void *o_super_ctor(void *_self, const void *_class, ...)
 }
 
 /* Object methods */
-O_IMPLEMENT(Object, void *, ctor, (void *_self, va_list * argp), (_self, argp))
+O_IMPLEMENT(Object, void *, ctor, (void *_self, va_list * argp))
 {
 	struct Object *self = o_cast(_self, Object());
 	return self;
 }
 
-O_IMPLEMENT(Object, void *, dtor, (void *_self), (_self))
+O_IMPLEMENT(Object, void *, dtor, (void *_self))
 {
 	struct Object *self = o_cast(_self, Object());
 	self->class = NULL;
 	return self;
 }
 
-O_IMPLEMENT_VA(Object, void *, new, (void *_self,...), (_self, &ap), _self)
+O_IMPLEMENT(Object, void *, new, (void *_self,...))
 {
 	struct Class *self = o_cast(_self, Class());
 	struct Object *object = o_alloc(self);
@@ -123,8 +123,7 @@ O_IMPLEMENT_VA(Object, void *, new, (void *_self,...), (_self, &ap), _self)
 	return object;
 }
 
-O_IMPLEMENT_VA(Object, void *, new_ctor, (void *_self, Object_ctor_t ctor,...),
-	       (_self, ctor, &ap), ctor)
+O_IMPLEMENT(Object, void *, new_ctor, (void *_self, Object_ctor_t ctor,...))
 {
 	struct Class *self = o_cast(_self, Class());
 	struct Object *object = o_alloc(self);
@@ -138,7 +137,7 @@ O_IMPLEMENT_VA(Object, void *, new_ctor, (void *_self, Object_ctor_t ctor,...),
 	return object;
 }
 
-O_IMPLEMENT(Object, void *, delete, (void *_self), (_self))
+O_IMPLEMENT(Object, void *, delete, (void *_self))
 {
 	struct Object *self = o_cast(_self, Object());
 	self = O_CALL(self, dtor);
@@ -146,8 +145,7 @@ O_IMPLEMENT(Object, void *, delete, (void *_self), (_self))
 	return NULL;
 }
 
-O_IMPLEMENT_VA(Object, void *, init, (const void *_self, void *_object,...),
-	       (_self, _object, &ap), _object)
+O_IMPLEMENT(Object, void *, init, (const void *_self, void *_object,...))
 {
 	va_list ap;
 	struct Object *object = _object;
@@ -161,9 +159,8 @@ O_IMPLEMENT_VA(Object, void *, init, (const void *_self, void *_object,...),
 	return object;
 }
 
-O_IMPLEMENT_VA(Object, void *, init_ctor,
-	       (const void *_self, void *_object, Object_ctor_t ctor,...),
-	       (_self, _object, ctor, &ap), ctor)
+O_IMPLEMENT(Object, void *, init_ctor,
+	       (const void *_self, void *_object, Object_ctor_t ctor,...))
 {
 	va_list ap;
 	struct Object *object = _object;
@@ -177,14 +174,14 @@ O_IMPLEMENT_VA(Object, void *, init_ctor,
 	return object;
 }
 
-O_IMPLEMENT(Object, struct String *, to_string, (void *_self), (_self))
+O_IMPLEMENT(Object, struct String *, to_string, (void *_self))
 {
 	struct Object *self = O_CAST(_self, Object());
 	return O_CALL_CLASS(String(), new, "%s at %p", self->class->name,
 			    _self);
 }
 
-O_IMPLEMENT(Object, void *, clone, (void *_self), (_self))
+O_IMPLEMENT(Object, void *, clone, (void *_self))
 {
 	struct Object *self = O_CAST(_self, Object());
 	struct Object *clone = o_alloc(self->class);
@@ -192,7 +189,7 @@ O_IMPLEMENT(Object, void *, clone, (void *_self), (_self))
 	return clone;
 }
 
-O_IMPLEMENT(Object, int, compare, (void *_self, void *_other), (_self, _other))
+O_IMPLEMENT(Object, int, compare, (void *_self, void *_other))
 {
 	struct Object *self = O_CAST(_self, Object());
 	struct Object *other = o_cast(_other, Object());
@@ -202,7 +199,7 @@ O_IMPLEMENT(Object, int, compare, (void *_self, void *_other), (_self, _other))
 /* Class methods */
 #define O_SUPER Object()
 
-O_IMPLEMENT(Class, void *, ctor, (void *_self, va_list * argp), (_self, argp))
+O_IMPLEMENT(Class, void *, ctor, (void *_self, va_list * argp))
 {
 	struct Class *self = o_cast(_self, Class());
 	self = O_SUPER->ctor(self, argp);
@@ -220,7 +217,7 @@ O_IMPLEMENT(Class, void *, ctor, (void *_self, va_list * argp), (_self, argp))
 	return self;
 }
 
-O_IMPLEMENT(Class, void *, dtor, (void *_self), (_self))
+O_IMPLEMENT(Class, void *, dtor, (void *_self))
 {
 	o_cast(_self, Class());
 	fprintf(stderr, "--- BAD PROGRAMMER ALERT ---\n");
@@ -229,7 +226,7 @@ O_IMPLEMENT(Class, void *, dtor, (void *_self), (_self))
 	return NULL;
 }
 
-O_IMPLEMENT(Class, void *, delete, (void *_self), (_self))
+O_IMPLEMENT(Class, void *, delete, (void *_self))
 {
 	o_cast(_self, Class());
 	fprintf(stderr, "--- BAD PROGRAMMER ALERT ---\n");

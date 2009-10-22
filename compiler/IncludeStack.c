@@ -3,7 +3,7 @@
 
 #define O_SUPER RefObject()
 
-O_IMPLEMENT(IncludeStack, void *, ctor, (void *_self, va_list * app), (_self, app))
+O_IMPLEMENT(IncludeStack, void *, ctor, (void *_self, va_list * app))
 {
   struct IncludeStack *self = O_CAST(_self, IncludeStack());
   self = O_SUPER->ctor(self, app);
@@ -13,7 +13,7 @@ O_IMPLEMENT(IncludeStack, void *, ctor, (void *_self, va_list * app), (_self, ap
   return self;
 }
 
-O_IMPLEMENT(IncludeStack, void *, dtor, (void *_self), (_self))
+O_IMPLEMENT(IncludeStack, void *, dtor, (void *_self))
 {
   struct IncludeStack *self = O_CAST(_self, IncludeStack());
   return O_SUPER->dtor(self);

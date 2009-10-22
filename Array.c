@@ -2,7 +2,7 @@
 
 #define O_SUPER RefObject()
 
-O_IMPLEMENT(Array, void *, ctor, (void *_self, va_list *app), (_self, app))
+O_IMPLEMENT(Array, void *, ctor, (void *_self, va_list *app))
 {
   struct Array * self = O_CAST(_self, Array());
   self = O_SUPER->ctor(self, app);
@@ -19,7 +19,7 @@ O_IMPLEMENT(Array, void *, ctor, (void *_self, va_list *app), (_self, app))
   return self;
 }
 
-O_IMPLEMENT(Array, void *, dtor, (void *_self), (_self))
+O_IMPLEMENT(Array, void *, dtor, (void *_self))
 {
   struct Array *self = O_CAST(_self, Array());
   self->capacity = 0;
@@ -39,7 +39,7 @@ O_IMPLEMENT(Array, void *, dtor, (void *_self), (_self))
  * - make smaller
  * - make larger
  */
-O_IMPLEMENT(Array, void *, resize, (void *_self, unsigned size), (_self, size))
+O_IMPLEMENT(Array, void *, resize, (void *_self, unsigned size))
 {
   struct Array *self = O_CAST(_self, Array());
   if (size == 0)
@@ -69,7 +69,7 @@ O_IMPLEMENT(Array, void *, resize, (void *_self, unsigned size), (_self, size))
   return self;
 }
 
-O_IMPLEMENT(Array, void *, get, (void *_self, unsigned index), (_self, index))
+O_IMPLEMENT(Array, void *, get, (void *_self, unsigned index))
 {
   struct Array *self = O_CAST(_self, Array());
   assertTrue(index < self->capacity, "array index out of bounds");
@@ -80,7 +80,7 @@ O_IMPLEMENT(Array, void *, get, (void *_self, unsigned index), (_self, index))
   return self->data[index];
 }
 
-O_IMPLEMENT(Array, void *, set, (void *_self, unsigned index, void *_item), (_self, index, _item))
+O_IMPLEMENT(Array, void *, set, (void *_self, unsigned index, void *_item))
 {
   struct Array *self = O_CAST(_self, Array());
   assertTrue(index < self->capacity, "array index out of bounds");

@@ -2,7 +2,7 @@
 
 #define O_SUPER Object()
 
-O_IMPLEMENT(Tuple, void *, ctor, (void *_self, va_list * app), (_self, app))
+O_IMPLEMENT(Tuple, void *, ctor, (void *_self, va_list * app))
 {
 	struct Tuple *self = O_CAST(_self, Tuple());
 	self = O_SUPER->ctor(self, app);
@@ -12,7 +12,7 @@ O_IMPLEMENT(Tuple, void *, ctor, (void *_self, va_list * app), (_self, app))
 	return self;
 }
 
-O_IMPLEMENT(Tuple, void *, dtor, (void *_self), (_self))
+O_IMPLEMENT(Tuple, void *, dtor, (void *_self))
 {
 	struct Tuple *self = O_CAST(_self, Tuple());
 	free(self->key);
@@ -54,8 +54,7 @@ static struct Tuple *remove_tuple(struct Tuple *head, const char *key)
 		return NULL;
 }
 
-O_IMPLEMENT(Hash, void *, add, (void *_self, const char *key, const void *_item),
-	    (_self, key, _item))
+O_IMPLEMENT(Hash, void *, add, (void *_self, const char *key, const void *_item))
 {
 	struct Hash *self = O_CAST(_self, Hash());
 	struct Object *item = o_cast(_item, Object());
@@ -76,8 +75,7 @@ O_IMPLEMENT(Hash, void *, add, (void *_self, const char *key, const void *_item)
  * Set the value of a Hash Tuple to a certain value or add it if it doesn't
  * exist in the Hash yet.
  */
-O_IMPLEMENT(Hash, void *, set, (void *_self, const char *key, const void *_item),
-	    (_self, key, _item))
+O_IMPLEMENT(Hash, void *, set, (void *_self, const char *key, const void *_item))
 {
 	struct Hash *self = O_CAST(_self, Hash());
 	struct Object *item = o_cast(_item, Object());
@@ -95,7 +93,7 @@ O_IMPLEMENT(Hash, void *, set, (void *_self, const char *key, const void *_item)
 	return item;
 }
 
-O_IMPLEMENT(Hash, void *, get, (void *_self, const char *key), (_self, key))
+O_IMPLEMENT(Hash, void *, get, (void *_self, const char *key))
 {
 	struct Hash *self = O_CAST(_self, Hash());
 	unsigned long index = hash_function((unsigned char *) key) % HASH_SIZE;
@@ -107,7 +105,7 @@ O_IMPLEMENT(Hash, void *, get, (void *_self, const char *key), (_self, key))
 	}
 }
 
-O_IMPLEMENT(Hash, void *, del, (void *_self, const char *key), (_self, key))
+O_IMPLEMENT(Hash, void *, del, (void *_self, const char *key))
 {
 	struct Hash *self = O_CAST(_self, Hash());
 	unsigned long index = hash_function((unsigned char *) key) % HASH_SIZE;
@@ -115,7 +113,7 @@ O_IMPLEMENT(Hash, void *, del, (void *_self, const char *key), (_self, key))
 	return self;
 }
 
-O_IMPLEMENT(Hash, void *, dtor, (void *_self), (_self))
+O_IMPLEMENT(Hash, void *, dtor, (void *_self))
 {
 	struct Hash *self = O_CAST(_self, Hash());
 	int i;
@@ -130,7 +128,7 @@ O_IMPLEMENT(Hash, void *, dtor, (void *_self), (_self))
 	return O_SUPER->dtor(self);
 }
 
-O_IMPLEMENT(Hash, void, error_already_declared, (void *_self, const char * key, const void *_item), (_self, key, _item))
+O_IMPLEMENT(Hash, void, error_already_declared, (void *_self, const char * key, const void *_item))
 {
 	struct Hash *self = O_CAST(_self, Hash());
 	fprintf(stderr, "Item with key '%s' already exists.\n", key);

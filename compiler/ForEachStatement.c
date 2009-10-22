@@ -2,7 +2,7 @@
 
 #define O_SUPER Statement()
 
-O_IMPLEMENT(ForEachStatement, void *, ctor, (void *_self, va_list *app), (_self, app))
+O_IMPLEMENT(ForEachStatement, void *, ctor, (void *_self, va_list *app))
 {
   struct ForEachStatement * self = O_CAST(_self, ForEachStatement());
   self = O_SUPER->ctor(self, app);
@@ -10,7 +10,7 @@ O_IMPLEMENT(ForEachStatement, void *, ctor, (void *_self, va_list *app), (_self,
   return self;
 }
 
-O_IMPLEMENT(ForEachStatement, void *, dtor, (void *_self), (_self))
+O_IMPLEMENT(ForEachStatement, void *, dtor, (void *_self))
 {
   struct ForEachStatement *self = O_CAST(_self, ForEachStatement());
   /* TODO cleanup */

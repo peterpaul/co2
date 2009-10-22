@@ -4,7 +4,7 @@
 
 #define O_SUPER CompileObject()
 
-O_IMPLEMENT(Token, void *, ctor, (void *_self, va_list *app), (_self, app))
+O_IMPLEMENT(Token, void *, ctor, (void *_self, va_list *app))
 {
   struct Token *self = O_CAST(_self, Token());
   self = O_SUPER->ctor(self, app);
@@ -15,7 +15,7 @@ O_IMPLEMENT(Token, void *, ctor, (void *_self, va_list *app), (_self, app))
   return self;
 }
 
-O_IMPLEMENT(Token, void, generate, (void *_self), (_self))
+O_IMPLEMENT(Token, void, generate, (void *_self))
 {
   struct Token *self = O_CAST(_self, Token());
   fprintf(out, "%s", self->name->data);

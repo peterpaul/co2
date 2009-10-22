@@ -4,7 +4,7 @@
 
 #define O_SUPER Declaration()
 
-O_IMPLEMENT(ArgDeclaration, void *, ctor, (void *_self, va_list *app), (_self, app))
+O_IMPLEMENT(ArgDeclaration, void *, ctor, (void *_self, va_list *app))
 {
   struct ArgDeclaration * self = O_CAST(_self, ArgDeclaration());
   self = O_SUPER->ctor(self, app);
@@ -13,13 +13,13 @@ O_IMPLEMENT(ArgDeclaration, void *, ctor, (void *_self, va_list *app), (_self, a
   return self;
 }
 
-O_IMPLEMENT(ArgDeclaration, void *, dtor, (void *_self), (_self))
+O_IMPLEMENT(ArgDeclaration, void *, dtor, (void *_self))
 {
   struct ArgDeclaration *self = O_CAST(_self, ArgDeclaration());
   return O_SUPER->dtor(self);
 }
 
-O_IMPLEMENT(ArgDeclaration, void, generate, (void *_self), (_self))
+O_IMPLEMENT(ArgDeclaration, void, generate, (void *_self))
 {
   struct ArgDeclaration *self = O_CAST(_self, ArgDeclaration());
   O_CALL(self->type, generate);

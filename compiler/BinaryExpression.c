@@ -9,7 +9,7 @@
 
 #define O_SUPER Expression()
 
-O_IMPLEMENT(BinaryExpression, void *, ctor, (void *_self, va_list *app), (_self, app))
+O_IMPLEMENT(BinaryExpression, void *, ctor, (void *_self, va_list *app))
 {
   struct BinaryExpression * self = O_CAST(_self, BinaryExpression());
   self = O_SUPER->ctor(self, app);
@@ -22,7 +22,7 @@ O_IMPLEMENT(BinaryExpression, void *, ctor, (void *_self, va_list *app), (_self,
   return self;
 }
 
-O_IMPLEMENT(BinaryExpression, void *, dtor, (void *_self), (_self))
+O_IMPLEMENT(BinaryExpression, void *, dtor, (void *_self))
 {
   struct BinaryExpression *self = O_CAST(_self, BinaryExpression());
   O_BRANCH_CALL(self->operand[0], release);
@@ -31,7 +31,7 @@ O_IMPLEMENT(BinaryExpression, void *, dtor, (void *_self), (_self))
   return O_SUPER->dtor(self);
 }
 
-O_IMPLEMENT(BinaryExpression, void, generate, (void *_self), (self))
+O_IMPLEMENT(BinaryExpression, void, generate, (void *_self))
 {
   struct BinaryExpression *self = O_CAST(_self, BinaryExpression());
   switch (self->operator->type) 
@@ -59,7 +59,7 @@ O_IMPLEMENT(BinaryExpression, void, generate, (void *_self), (self))
     }
 }
 
-O_IMPLEMENT(BinaryExpression, void, type_check, (void *_self), (self))
+O_IMPLEMENT(BinaryExpression, void, type_check, (void *_self))
 {
   struct BinaryExpression *self = O_CAST(_self, BinaryExpression());
   switch (self->operator->type) 
@@ -86,7 +86,7 @@ O_IMPLEMENT(BinaryExpression, void, type_check, (void *_self), (self))
     }
 }
 
-O_IMPLEMENT(BinaryExpression, void, set_scope, (void *_self, void *_scope), (_self, _scope))
+O_IMPLEMENT(BinaryExpression, void, set_scope, (void *_self, void *_scope))
 {
   struct BinaryExpression *self = O_CAST(_self, BinaryExpression());
   O_CALL(self->operand[0], set_scope, _scope);

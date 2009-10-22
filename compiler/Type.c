@@ -5,21 +5,21 @@
 
 #define O_SUPER CompileObject()
 
-O_IMPLEMENT(Type, void *, ctor, (void *_self, va_list *app), (_self, app))
+O_IMPLEMENT(Type, void *, ctor, (void *_self, va_list *app))
 {
   struct Type * self = O_CAST(_self, Type());
   self = O_SUPER->ctor(self, app);
   return self;
 }
 
-O_IMPLEMENT(Type, void *, dtor, (void *_self), (_self))
+O_IMPLEMENT(Type, void *, dtor, (void *_self))
 {
   struct Type *self = O_CAST(_self, Type());
   /* TODO cleanup */
   return O_SUPER->dtor(self);
 }
 
-O_IMPLEMENT(Type, bool, is_compatible, (void *_self, void *_other), (_self,_other))
+O_IMPLEMENT(Type, bool, is_compatible, (void *_self, void *_other))
 {
   struct Type *self = O_CAST(_self, Type());
   if (_other)
@@ -33,7 +33,7 @@ O_IMPLEMENT(Type, bool, is_compatible, (void *_self, void *_other), (_self,_othe
     }
 }
 
-O_IMPLEMENT(Type, void, assert_compatible, (void *_self, void *_other), (_self, _other))
+O_IMPLEMENT(Type, void, assert_compatible, (void *_self, void *_other))
 {
   struct Type *self = O_CAST(_self, Type());
   if (!O_CALL(self, is_compatible, _other))

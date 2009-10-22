@@ -12,7 +12,7 @@
 
 #define O_SUPER Expression()
 
-O_IMPLEMENT(FunctionCallExpression, void *, ctor, (void *_self, va_list *app), (_self, app))
+O_IMPLEMENT(FunctionCallExpression, void *, ctor, (void *_self, va_list *app))
 {
   struct FunctionCallExpression * self = O_CAST(_self, FunctionCallExpression());
   self = O_SUPER->ctor(self, app);
@@ -23,7 +23,7 @@ O_IMPLEMENT(FunctionCallExpression, void *, ctor, (void *_self, va_list *app), (
   return self;
 }
 
-O_IMPLEMENT(FunctionCallExpression, void *, dtor, (void *_self), (_self))
+O_IMPLEMENT(FunctionCallExpression, void *, dtor, (void *_self))
 {
   struct FunctionCallExpression *self = O_CAST(_self, FunctionCallExpression());
   O_CALL(self->function, release);
@@ -46,7 +46,7 @@ void FunctionCallExpression_generate_actual_arguments(void *_arg, va_list *app)
   O_CALL(arg, generate);
 }
 
-O_IMPLEMENT(FunctionCallExpression, void, generate, (void *_self), (_self))
+O_IMPLEMENT(FunctionCallExpression, void, generate, (void *_self))
 {
   struct FunctionCallExpression *self = O_CAST(_self, FunctionCallExpression());
   if (o_is_of(self->function, TokenExpression()))
@@ -95,7 +95,7 @@ O_IMPLEMENT(FunctionCallExpression, void, generate, (void *_self), (_self))
   fprintf(out, ")");
 }
 
-O_IMPLEMENT(FunctionCallExpression, void, type_check, (void *_self), (_self))
+O_IMPLEMENT(FunctionCallExpression, void, type_check, (void *_self))
 {
   struct FunctionCallExpression *self = O_CAST(_self, FunctionCallExpression());
   O_CALL(self->function, type_check);

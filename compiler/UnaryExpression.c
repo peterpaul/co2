@@ -4,7 +4,7 @@
 
 #define O_SUPER Expression()
 
-O_IMPLEMENT(UnaryExpression, void *, ctor, (void *_self, va_list *app), (_self, app))
+O_IMPLEMENT(UnaryExpression, void *, ctor, (void *_self, va_list *app))
 {
   struct UnaryExpression * self = O_CAST(_self, UnaryExpression());
   self = O_SUPER->ctor(self, app);
@@ -15,7 +15,7 @@ O_IMPLEMENT(UnaryExpression, void *, ctor, (void *_self, va_list *app), (_self, 
   return self;
 }
 
-O_IMPLEMENT(UnaryExpression, void *, dtor, (void *_self), (_self))
+O_IMPLEMENT(UnaryExpression, void *, dtor, (void *_self))
 {
   struct UnaryExpression *self = O_CAST(_self, UnaryExpression());
   O_BRANCH_CALL(self->operator, release);
@@ -23,14 +23,14 @@ O_IMPLEMENT(UnaryExpression, void *, dtor, (void *_self), (_self))
   return O_SUPER->dtor(self);
 }
 
-O_IMPLEMENT(UnaryExpression, void, type_check, (void *_self), (_self))
+O_IMPLEMENT(UnaryExpression, void, type_check, (void *_self))
 {
   struct UnaryExpression *self = O_CAST(_self, UnaryExpression());
   O_CALL(self->operand, type_check);
   self->type = self->operand->type;
 }
 
-O_IMPLEMENT(UnaryExpression, void, generate, (void *_self), (self))
+O_IMPLEMENT(UnaryExpression, void, generate, (void *_self))
 {
   struct UnaryExpression *self = O_CAST(_self, UnaryExpression());
   O_CALL(self->operator, generate);

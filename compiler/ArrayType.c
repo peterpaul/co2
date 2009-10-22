@@ -4,7 +4,7 @@
 
 #define O_SUPER Type()
 
-O_IMPLEMENT(ArrayType, void *, ctor, (void *_self, va_list *app), (_self, app))
+O_IMPLEMENT(ArrayType, void *, ctor, (void *_self, va_list *app))
 {
   struct ArrayType * self = O_CAST(_self, ArrayType());
   self = O_SUPER->ctor(self, app);
@@ -12,21 +12,21 @@ O_IMPLEMENT(ArrayType, void *, ctor, (void *_self, va_list *app), (_self, app))
   return self;
 }
 
-O_IMPLEMENT(ArrayType, void *, dtor, (void *_self), (_self))
+O_IMPLEMENT(ArrayType, void *, dtor, (void *_self))
 {
   struct ArrayType *self = O_CAST(_self, ArrayType());
   O_CALL(self->base_type, release);
   return O_SUPER->dtor(self);
 }
 
-O_IMPLEMENT(ArrayType, void, generate, (void *_self), (_self))
+O_IMPLEMENT(ArrayType, void, generate, (void *_self))
 {
   struct ArrayType *self = O_CAST(_self, ArrayType());
   O_CALL(self->base_type, generate);
   fprintf(out, "*");
 }
 
-O_IMPLEMENT(ArrayType, struct String *, to_string, (void *_self), (_self))
+O_IMPLEMENT(ArrayType, struct String *, to_string, (void *_self))
 {
   struct ArrayType *self = O_CAST(_self, ArrayType());
   struct String * string = O_CALL(self->base_type, to_string);
@@ -34,13 +34,13 @@ O_IMPLEMENT(ArrayType, struct String *, to_string, (void *_self), (_self))
   return string;
 }
 
-O_IMPLEMENT(ArrayType, struct Token *, get_token, (void *_self), (_self))
+O_IMPLEMENT(ArrayType, struct Token *, get_token, (void *_self))
 {
   struct ArrayType *self = O_CAST(_self, ArrayType());
   return O_CALL(self->base_type, get_token);
 }
 
-O_IMPLEMENT(ArrayType, bool, is_compatible, (void *_self, void *_other), (_self,_other))
+O_IMPLEMENT(ArrayType, bool, is_compatible, (void *_self, void *_other))
 {
   struct ArrayType *self = O_CAST(_self, ArrayType());
   if (O_SUPER->is_compatible(self, _other))

@@ -2,7 +2,7 @@
 
 #define O_SUPER RefObject()
 
-O_IMPLEMENT(RefArray, void *, ctor, (void *_self, va_list *app), (_self, app))
+O_IMPLEMENT(RefArray, void *, ctor, (void *_self, va_list *app))
 {
   struct RefArray * self = O_CAST(_self, RefArray());
   self = O_SUPER->ctor(self, app);
@@ -28,7 +28,7 @@ static void RefArray_release_range(struct RefArray * self, int start, int end)
     }
 }
 
-O_IMPLEMENT(RefArray, void *, dtor, (void *_self), (_self))
+O_IMPLEMENT(RefArray, void *, dtor, (void *_self))
 {
   struct RefArray *self = O_CAST(_self, RefArray());
   self->capacity = 0;
@@ -49,7 +49,7 @@ O_IMPLEMENT(RefArray, void *, dtor, (void *_self), (_self))
  * - make smaller
  * - make larger
  */
-O_IMPLEMENT(RefArray, void *, resize, (void *_self, unsigned size), (_self, size))
+O_IMPLEMENT(RefArray, void *, resize, (void *_self, unsigned size))
 {
   struct RefArray *self = O_CAST(_self, RefArray());
   if (size == 0)
@@ -84,7 +84,7 @@ O_IMPLEMENT(RefArray, void *, resize, (void *_self, unsigned size), (_self, size
   return self;
 }
 
-O_IMPLEMENT(RefArray, void *, get, (void *_self, unsigned index), (_self, index))
+O_IMPLEMENT(RefArray, void *, get, (void *_self, unsigned index))
 {
   struct RefArray *self = O_CAST(_self, RefArray());
   assertTrue(index < self->capacity, "array index out of bounds");
@@ -95,7 +95,7 @@ O_IMPLEMENT(RefArray, void *, get, (void *_self, unsigned index), (_self, index)
   return self->data[index];
 }
 
-O_IMPLEMENT(RefArray, void *, set, (void *_self, unsigned index, void *_item), (_self, index, _item))
+O_IMPLEMENT(RefArray, void *, set, (void *_self, unsigned index, void *_item))
 {
   struct RefArray *self = O_CAST(_self, RefArray());
   struct RefObject *item = self->type ? o_branch_cast(_item, self->type) : _item;

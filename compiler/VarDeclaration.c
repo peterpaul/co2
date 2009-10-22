@@ -6,7 +6,7 @@
 
 #define O_SUPER Declaration()
 
-O_IMPLEMENT(VarDeclaration, void *, ctor, (void *_self, va_list *app), (_self, app))
+O_IMPLEMENT(VarDeclaration, void *, ctor, (void *_self, va_list *app))
 {
   struct VarDeclaration * self = O_CAST(_self, VarDeclaration());
   self = O_SUPER->ctor(self, app);
@@ -14,13 +14,13 @@ O_IMPLEMENT(VarDeclaration, void *, ctor, (void *_self, va_list *app), (_self, a
   return self;
 }
 
-O_IMPLEMENT(VarDeclaration, void, set_type, (void *_self, struct Type * type), (_self, type))
+O_IMPLEMENT(VarDeclaration, void, set_type, (void *_self, struct Type * type))
 {
   struct VarDeclaration * self = O_CAST(_self, VarDeclaration());
   self->type = O_CALL(type, retain);
 }
 
-O_IMPLEMENT(VarDeclaration, void, generate, (void *_self), (_self))
+O_IMPLEMENT(VarDeclaration, void, generate, (void *_self))
 {
   struct VarDeclaration * self = O_CAST(_self, VarDeclaration());
   O_CALL(self->type, generate);
@@ -34,7 +34,7 @@ O_IMPLEMENT(VarDeclaration, void, generate, (void *_self), (_self))
   fprintf(out, ";\n");
 }
 
-O_IMPLEMENT(VarDeclaration, void, type_check, (void *_self), (_self))
+O_IMPLEMENT(VarDeclaration, void, type_check, (void *_self))
 {
   struct VarDeclaration * self = O_CAST(_self, VarDeclaration());
   if (self->expr)

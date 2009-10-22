@@ -9,7 +9,7 @@
 
 #define O_SUPER Expression()
 
-O_IMPLEMENT(NewExpression, void *, ctor, (void *_self, va_list *app), (_self, app))
+O_IMPLEMENT(NewExpression, void *, ctor, (void *_self, va_list *app))
 {
   struct NewExpression * self = O_CAST(_self, NewExpression());
   self = O_SUPER->ctor(self, app);
@@ -31,7 +31,7 @@ O_IMPLEMENT(NewExpression, void *, ctor, (void *_self, va_list *app), (_self, ap
   return self;
 }
 
-O_IMPLEMENT(NewExpression, void *, dtor, (void *_self), (_self))
+O_IMPLEMENT(NewExpression, void *, dtor, (void *_self))
 {
   struct NewExpression *self = O_CAST(_self, NewExpression());
   O_CALL(self->new_type, release);
@@ -47,7 +47,7 @@ void NewExpression_generate_ctor_argument(void *_arg)
   O_CALL(actual_arg, generate);
 }
 
-O_IMPLEMENT(NewExpression, void, generate, (void *_self), (_self))
+O_IMPLEMENT(NewExpression, void, generate, (void *_self))
 {
   struct NewExpression *self = O_CAST(_self, NewExpression());
   if (self->ctor_arguments)
@@ -79,7 +79,7 @@ void NewExpression_type_check_object(void *_item)
   O_CALL(item, type_check);
 }
 
-O_IMPLEMENT(NewExpression, void, type_check, (void *_self), (_self))
+O_IMPLEMENT(NewExpression, void, type_check, (void *_self))
 {
   struct NewExpression *self = O_CAST(_self, NewExpression());
   if (self->ctor_arguments)

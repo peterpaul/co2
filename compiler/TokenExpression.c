@@ -12,7 +12,7 @@
 
 #define O_SUPER Expression()
 
-O_IMPLEMENT(TokenExpression, void *, ctor, (void *_self, va_list *app), (_self, app))
+O_IMPLEMENT(TokenExpression, void *, ctor, (void *_self, va_list *app))
 {
   struct TokenExpression * self = O_CAST(_self, TokenExpression());
   self = O_SUPER->ctor(self, app);
@@ -26,7 +26,7 @@ O_IMPLEMENT(TokenExpression, void *, ctor, (void *_self, va_list *app), (_self, 
   return self;
 }
 
-O_IMPLEMENT(TokenExpression, void *, dtor, (void *_self), (_self))
+O_IMPLEMENT(TokenExpression, void *, dtor, (void *_self))
 {
   struct TokenExpression *self = O_CAST(_self, TokenExpression());
   O_CALL(self->token, release);
@@ -34,7 +34,7 @@ O_IMPLEMENT(TokenExpression, void *, dtor, (void *_self), (_self))
   return O_SUPER->dtor(self);
 }
 
-O_IMPLEMENT(TokenExpression, void, generate_left, (void *_self, bool left), (_self, left))
+O_IMPLEMENT(TokenExpression, void, generate_left, (void *_self, bool left))
 {
   struct TokenExpression *self = O_CAST(_self, TokenExpression());
   if (left && self->decl && self->decl->class_decl)
@@ -44,14 +44,14 @@ O_IMPLEMENT(TokenExpression, void, generate_left, (void *_self, bool left), (_se
   O_CALL(self->token, generate);
 }
 
-O_IMPLEMENT(TokenExpression, void, set_scope, (void *_self, void *_scope), (_self, _scope))
+O_IMPLEMENT(TokenExpression, void, set_scope, (void *_self, void *_scope))
 {
   struct TokenExpression *self = O_CAST(_self, TokenExpression());
   self->scope = O_CAST(_scope, Scope());
   self->check_global_scope = false;
 }
 
-O_IMPLEMENT(TokenExpression, void, type_check, (void *_self), (_self))
+O_IMPLEMENT(TokenExpression, void, type_check, (void *_self))
 {
   struct TokenExpression *self = O_CAST(_self, TokenExpression());
   switch (self->token->type)
@@ -99,7 +99,7 @@ O_IMPLEMENT(TokenExpression, void, type_check, (void *_self), (_self))
     }
 }
 
-O_IMPLEMENT(TokenExpression, void, lookup, (void *_self), (_self))
+O_IMPLEMENT(TokenExpression, void, lookup, (void *_self))
 {
  struct TokenExpression *self = O_CAST(_self, TokenExpression());
  if (self->check_global_scope) 

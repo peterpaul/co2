@@ -3,7 +3,7 @@
 
 #define O_SUPER Statement()
 
-O_IMPLEMENT(ReturnStatement, void *, ctor, (void *_self, va_list *app), (_self, app))
+O_IMPLEMENT(ReturnStatement, void *, ctor, (void *_self, va_list *app))
 {
   struct ReturnStatement * self = O_CAST(_self, ReturnStatement());
   self = O_SUPER->ctor(self, app);
@@ -12,14 +12,14 @@ O_IMPLEMENT(ReturnStatement, void *, ctor, (void *_self, va_list *app), (_self, 
   return self;
 }
 
-O_IMPLEMENT(ReturnStatement, void *, dtor, (void *_self), (_self))
+O_IMPLEMENT(ReturnStatement, void *, dtor, (void *_self))
 {
   struct ReturnStatement *self = O_CAST(_self, ReturnStatement());
   O_BRANCH_CALL(self->expr, release);
   return O_SUPER->dtor(self);
 }
 
-O_IMPLEMENT(ReturnStatement, void, generate, (void *_self), (_self))
+O_IMPLEMENT(ReturnStatement, void, generate, (void *_self))
 {
   struct ReturnStatement *self = O_CAST(_self, ReturnStatement());
   fprintf(out, "return ");
@@ -27,7 +27,7 @@ O_IMPLEMENT(ReturnStatement, void, generate, (void *_self), (_self))
   fprintf(out, ";\n");
 }
 
-O_IMPLEMENT(ReturnStatement, void, type_check, (void *_self), (_self))
+O_IMPLEMENT(ReturnStatement, void, type_check, (void *_self))
 {
   struct ReturnStatement *self = O_CAST(_self, ReturnStatement());
   O_CALL(self->expr, type_check);

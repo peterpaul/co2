@@ -6,7 +6,7 @@
 struct Scope * current_scope = NULL;
 struct Scope * global_scope = NULL;
 
-O_IMPLEMENT(Scope, void *, ctor, (void *_self, va_list *app), (_self, app))
+O_IMPLEMENT(Scope, void *, ctor, (void *_self, va_list *app))
 {
   struct Scope * self = O_CAST(_self, Scope());
   self = O_SUPER->ctor(self, app);
@@ -18,14 +18,14 @@ O_IMPLEMENT(Scope, void *, ctor, (void *_self, va_list *app), (_self, app))
   return self;
 }
 
-O_IMPLEMENT(Scope, void *, dtor, (void *_self), (_self))
+O_IMPLEMENT(Scope, void *, dtor, (void *_self))
 {
   struct Scope *self = O_CAST(_self, Scope());
   /* TODO cleanup */
   return O_SUPER->dtor(self);
 }
 
-O_IMPLEMENT(Scope, struct Declaration *, declare, (void *_self, struct Declaration * decl), (_self, decl))
+O_IMPLEMENT(Scope, struct Declaration *, declare, (void *_self, struct Declaration * decl))
 {
   struct Scope *self = O_CAST(_self, Scope());
   O_CALL(self, add, decl->name->name->data, decl);
@@ -33,26 +33,26 @@ O_IMPLEMENT(Scope, struct Declaration *, declare, (void *_self, struct Declarati
   return decl;
 }
 
-O_IMPLEMENT(Scope, void, leave, (void *_self), (_self))
+O_IMPLEMENT(Scope, void, leave, (void *_self))
 {
   struct Scope *self = O_CAST(_self, Scope());
   current_scope = self->parent;
 }
 
-O_IMPLEMENT(Scope, void, error_already_declared, (void *_self, const char * key, const void *_item), (_self, key, _item))
+O_IMPLEMENT(Scope, void, error_already_declared, (void *_self, const char * key, const void *_item))
 {
   struct Scope *self = O_CAST(_self, Scope());
   struct Declaration *decl = o_cast(_item, Declaration());
   error(decl->name, "'%s' already declared.\n", key);
 }
 
-O_IMPLEMENT(Scope, struct Declaration *, lookup_in_this_scope, (void *_self, struct Token * token), (_self, token))
+O_IMPLEMENT(Scope, struct Declaration *, lookup_in_this_scope, (void *_self, struct Token * token))
 {
   struct Scope *self = O_CAST(_self, Scope());
   return O_CALL(self, get, token->name->data);
 }
 
-O_IMPLEMENT(Scope, struct Declaration *, lookup, (void *_self, struct Token * token), (_self, token))
+O_IMPLEMENT(Scope, struct Declaration *, lookup, (void *_self, struct Token * token))
 {
   struct Scope *self = O_CAST(_self, Scope());
   struct Declaration * result = O_CALL(self, lookup_in_this_scope, token);
@@ -70,13 +70,13 @@ O_IMPLEMENT(Scope, struct Declaration *, lookup, (void *_self, struct Token * to
   return result;
 }
 
-O_IMPLEMENT(Scope, bool, exists_in_this_scope, (void *_self, struct Token * token), (_self, token))
+O_IMPLEMENT(Scope, bool, exists_in_this_scope, (void *_self, struct Token * token))
 {
   struct Scope *self = O_CAST(_self, Scope());
   return O_CALL(self, get, token->name->data) != NULL;
 }
 
-O_IMPLEMENT(Scope, bool, exists, (void *_self, struct Token * token), (_self, token))
+O_IMPLEMENT(Scope, bool, exists, (void *_self, struct Token * token))
 {
   struct Scope *self = O_CAST(_self, Scope());
   bool result = O_CALL(self, lookup_in_this_scope, token);
@@ -87,7 +87,7 @@ O_IMPLEMENT(Scope, bool, exists, (void *_self, struct Token * token), (_self, to
   return result;
 }
 
-O_IMPLEMENT(Scope, void, error_not_found, (void *_self, struct Token * token), (_self, token))
+O_IMPLEMENT(Scope, void, error_not_found, (void *_self, struct Token * token))
 {
   struct Scope *self = O_CAST(_self, Scope());
   error(token, "'%s' not declared.\n", token->name->data);
