@@ -124,7 +124,7 @@ static void try_search_path(const char * file_name)
 	exit(EXIT_FAILURE);
 }
 
-char * strdup(const char *);
+// char * strdup(const char *);
 void new_input(const char * file_name)
 {
 	if (!include_stack) {

@@ -1,0 +1,50 @@
+package compiler.test;
+
+class ObjectA
+{
+	ObjectA(int value) {
+		var = value;
+	}
+
+	ObjectA.copy(ObjectA other) {
+		var = other.var;
+	}
+
+	~ObjectA() {
+		var = 0;
+	}
+
+	int var;
+	int fun(int a, int b)
+	{
+		int c = a + b + var;
+		return c;
+	}
+}
+
+class ObjectB:ObjectA
+{
+	ObjectB(int value) {
+		foo = new ObjectA(value);
+	}
+
+	ObjectB.copy(ObjectB other) {
+		foo = other.foo;
+	}
+
+	ObjectA foo;
+	int fun(int a, int b)
+	{
+		int c = a + b + foo.var;
+		return c;
+	}
+}
+
+int main(int argc, char[][] argv)
+{
+	ObjectA test = new ObjectB(5);
+	int val = test.var;
+	int result = test.fun(val,5);
+	ObjectA testje = new ObjectB.copy(test);
+	return 0;
+}

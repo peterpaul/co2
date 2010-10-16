@@ -34,6 +34,11 @@ int main(int argc, char ** argv)
   file_path = analyze_file_name(filename);
   base_dir = determine_base_dir(file_path);
 
+  /*
+  O_CALL(file_path, fprint, stderr);
+  fprintf(stderr, "\n");
+  */
+
   /* syntax analysis */
   parse ();
   if (parsed_file == NULL || errors != 0)

@@ -2,6 +2,10 @@ package compiler.test;
 
 class MyObject
 {
+	~MyObject() {
+		var = 0;
+	}
+
 	int var;
 	int fun(int a, int b)
 	{
@@ -12,8 +16,9 @@ class MyObject
 
 int main(int argc, char[][] argv)
 {
-	MyObject test = new MyObject();
+	MyObject test = new MyObject(5);
 	int val = test.var;
 	int result = test.fun(val,5);
+	delete test;
 	return 0;
 }

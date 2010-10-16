@@ -6,6 +6,8 @@
 #include "ClassDeclaration.h"
 #include "ArgDeclaration.h"
 #include "InterfaceDeclaration.h"
+#include "ConstructorDeclaration.h"
+#include "DestructorDeclaration.h"
 #include "MacroDeclaration.h"
 #include "Statement.h"
 #include "IfStatement.h"
@@ -95,6 +97,8 @@
 %type	<declaration>	class_header
 %type	<declaration>	interface_declaration
 %type	<declaration>	macro_declaration
+%type	<declaration>	constructor_declaration
+%type	<declaration>	destructor_declaration
 %type	<declaration>	var_id_decl
 %type	<list>		var_id_decl_list
 %type	<declaration>	function_header
@@ -144,7 +148,9 @@
 %left		<token>	'(' '[' '.'
 
 %start input
-%expect 1
+%expect 2
+ // 1. if/else
+ // 2. constructor
 %%
 
 input
@@ -224,12 +230,10 @@ opt_declaration_list
 declaration_list
 :	declaration_list declaration
 {
-  O_CALL(current_scope, declare, $2);
   O_CALL($$, append, $2);
 }
 |	declaration 
 {
-  O_CALL(current_scope, declare, $1);
   struct RefList * result = O_CALL_CLASS(RefList(), new, 8, Declaration()); 
   O_CALL(result, append, $1); 
   $$ = result;
@@ -243,9 +247,31 @@ declaration_list
 
 declaration
 :	function_declaration
+{
+  O_CALL(current_scope, declare, $1);
+  $$ = $1;
+}
 |	class_declaration
 |	interface_declaration
+{
+  O_CALL(current_scope, declare, $1);
+  $$ = $1;
+}
 |	macro_declaration
+{
+  O_CALL(current_scope, declare, $1);
+  $$ = $1;
+}
+|	constructor_declaration
+{
+  O_CALL(current_scope, declare, $1);
+  $$ = $1;
+}
+|	destructor_declaration
+{
+  O_CALL(current_scope, declare, $1);
+  $$ = $1;
+}
 ;
 
 variable_declaration_list
@@ -363,18 +389,21 @@ class_header
 :	CLASS TYPE_IDENTIFIER ':' TYPE_IDENTIFIER '<' interface_list '>'
 {
   struct ClassDeclaration * decl = O_CALL_CLASS(ClassDeclaration(), new, $2, $4, $6);
+  O_CALL(current_scope, declare, decl);
   decl->member_scope = O_CALL_CLASS(Scope(), new, CLASS_SCOPE, $2);
   $$ = decl;
 }
 |	CLASS TYPE_IDENTIFIER ':' TYPE_IDENTIFIER
 {
   struct ClassDeclaration * decl = O_CALL_CLASS(ClassDeclaration(), new, $2, $4, NULL);
+  O_CALL(current_scope, declare, decl);
   decl->member_scope = O_CALL_CLASS(Scope(), new, CLASS_SCOPE, $2);
   $$ = decl;
 }
 |	CLASS TYPE_IDENTIFIER
 {
   struct ClassDeclaration * decl = O_CALL_CLASS(ClassDeclaration(), new, $2, NULL, NULL);
+  O_CALL(current_scope, declare, decl);
   decl->member_scope = O_CALL_CLASS(Scope(), new, CLASS_SCOPE, $2);
   $$ = decl;
 }
@@ -646,6 +675,12 @@ expression
 |	'(' expression ')' { $$ = O_CALL_CLASS(NestedExpression(), new, $2); }
 |	NEW type '[' expression ']' { $$ = O_CALL_CLASS(NewExpression(), new, $2, $4); }
 |	NEW type '(' opt_actual_arg_list ')' { $$ = O_CALL_CLASS(NewExpression(), new, $2, $4); }
+|	NEW type '.' IDENTIFIER '(' opt_actual_arg_list ')' 
+{
+  struct NewExpression * new_expr = O_CALL_CLASS(NewExpression(), new, $2, $6);
+  O_CALL(new_expr, set_ctor_name, $4);
+  $$ = new_expr;
+}
 ;
 
 constant
@@ -701,6 +736,39 @@ macro_identifier_list
 {
   $$ = O_CALL_CLASS(RefList(), new, 8, Token());
   O_CALL($$, append, $1);
+}
+;
+
+constructor_declaration
+:	TYPE_IDENTIFIER '(' 
+{ 
+  O_CALL_CLASS(Scope(), new, ARGUMENT_SCOPE, $1); 
+}
+formal_arg_list ')' statement
+{
+  struct Token * ctor_name = O_CALL_CLASS(Token(), new, "ctor", IDENTIFIER, filename, $1->line);
+  struct ConstructorDeclaration * decl = O_CALL_CLASS(ConstructorDeclaration(), new, ctor_name, $1, $4, $6);
+  O_CALL(current_scope, leave);
+  $$ = decl;
+}
+|	TYPE_IDENTIFIER '.' IDENTIFIER '(' 
+{ 
+  O_CALL_CLASS(Scope(), new, ARGUMENT_SCOPE, $1); 
+}
+formal_arg_list ')' statement
+{
+  struct ConstructorDeclaration * decl = O_CALL_CLASS(ConstructorDeclaration(), new, $3, $1, $6, $8);
+  O_CALL(current_scope, leave);
+  $$ = decl;
+}
+;
+
+destructor_declaration
+:	'~' TYPE_IDENTIFIER '(' ')' statement
+{
+  struct Token * dtor_name = O_CALL_CLASS(Token(), new, "dtor", IDENTIFIER, filename, $2->line);
+  struct DestructorDeclaration * decl = O_CALL_CLASS(DestructorDeclaration(), new, dtor_name, $2, $5);
+  $$ = decl;
 }
 ;
 

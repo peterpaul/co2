@@ -7,7 +7,7 @@ void testIterator(struct List *list)
   struct Iterator *iterator = O_CALL(list, getIterator);
   while (O_CALL_IF(Iterator,iterator,hasNext))
     {
-      struct String * str = Iterator_getNext(iterator);
+      struct String * str = O_CALL_IF(Iterator,iterator,getNext);
       O_CALL(str, fprint, stdout);
       O_CALL(iterator, delete);
     }

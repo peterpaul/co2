@@ -28,7 +28,7 @@ O_IMPLEMENT(VarDeclaration, void, generate, (void *_self))
   O_CALL(self->name, generate);
   if (self->expr)
     {
-      fprintf(out, " = ");
+      fprintf(out, "=");
       O_CALL(self->expr, generate);
     }
   fprintf(out, ";\n");

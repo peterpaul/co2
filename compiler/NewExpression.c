@@ -35,6 +35,7 @@ O_IMPLEMENT(NewExpression, void *, dtor, (void *_self))
 {
   struct NewExpression *self = O_CAST(_self, NewExpression());
   O_CALL(self->new_type, release);
+  O_BRANCH_CALL(self->ctor_name, release);
   O_BRANCH_CALL(self->array_size, release);
   O_BRANCH_CALL(self->ctor_arguments, release);
   return O_SUPER->dtor(self);
@@ -55,9 +56,19 @@ O_IMPLEMENT(NewExpression, void, generate, (void *_self))
       fprintf(out, "O_CALL_CLASS(");
       struct Token * token = O_CALL(self->new_type, get_token);
       O_CALL(token, generate);
-      fprintf(out, "(), new");
-      O_CALL(self->ctor_arguments, map, NewExpression_generate_ctor_argument);
-      fprintf(out, ")");
+      if (self->ctor_name != NULL) {
+	fprintf(out, "(), new_ctor, _");
+	// TODO: lookup ctor_name, and use correct classname
+	O_CALL(token, generate);
+	fprintf(out, "_ctor_");
+	O_CALL(self->ctor_name, generate);
+	O_CALL(self->ctor_arguments, map, NewExpression_generate_ctor_argument);
+	fprintf(out, ")");
+      } else {
+	fprintf(out, "(), new");
+	O_CALL(self->ctor_arguments, map, NewExpression_generate_ctor_argument);
+	fprintf(out, ")");
+      }
     }
   else if (self->array_size)
     {
@@ -98,9 +109,16 @@ O_IMPLEMENT(NewExpression, void, type_check, (void *_self))
     }
 }
 
+O_IMPLEMENT(NewExpression, void, set_ctor_name, (void *_self, struct Token * ctor_name))
+{
+  struct NewExpression *self = O_CAST(_self, NewExpression());
+  self->ctor_name = ctor_name;
+}
+
 O_OBJECT(NewExpression, Expression);
 O_OBJECT_METHOD(NewExpression, ctor);
 O_OBJECT_METHOD(NewExpression, dtor);
+O_OBJECT_METHOD(NewExpression, set_ctor_name);
 O_OBJECT_METHOD(NewExpression, generate);
 O_OBJECT_METHOD(NewExpression, type_check);
 O_END_OBJECT

@@ -2,6 +2,14 @@ package compiler.test;
 
 class MyObject
 {
+	MyObject(int value) {
+		var = value;
+	}
+
+	MyObject.copy(MyObject other) {
+		var = other.var;
+	}
+
 	int var;
 	int fun(int a, int b)
 	{
@@ -12,8 +20,9 @@ class MyObject
 
 int main(int argc, char[][] argv)
 {
-	MyObject test = new MyObject();
+	MyObject test = new MyObject(5);
 	int val = test.var;
 	int result = test.fun(val,5);
+	MyObject testje = new MyObject.copy(test);
 	return 0;
 }

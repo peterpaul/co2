@@ -1,0 +1,18 @@
+package compiler.test;
+
+class A
+{
+	int a;
+	int fa(int a, int b)
+	{
+		return a + b;
+	}
+}
+
+int main()
+{
+	A b = new A();
+	b.a = 5;
+	int c = b.fa(3,4);
+	return 0;
+}

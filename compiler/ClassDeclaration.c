@@ -2,7 +2,10 @@
 #include "FunDeclaration.h"
 #include "ArgDeclaration.h"
 #include "VarDeclaration.h"
+#include "ConstructorDeclaration.h"
+#include "DestructorDeclaration.h"
 #include "Type.h"
+#include "ObjectType.h"
 #include "Token.h"
 #include "RefList.h"
 #include "FunctionType.h"
@@ -36,10 +39,37 @@ static int member_filter(void *_member, va_list * app)
   return o_is_of(_member, va_arg(*app, void *));
 }
 
-static int new_method_filter(void *_method)
+static int new_member_filter(void *_member)
 {
-  struct FunDeclaration * method = O_CAST(_method, FunDeclaration());
-  return O_BRANCH_CALL(method->scope->parent, lookup_in_this_scope, method->name) == NULL;
+  struct Declaration * member = O_CAST(_member, Declaration());
+  return O_BRANCH_CALL(member->scope->parent, lookup_in_this_scope, member->name) == NULL;
+}
+
+static int new_constructor_filter(void *_constructor)
+{
+  struct ConstructorDeclaration * constructor = O_CAST(_constructor, ConstructorDeclaration());
+  if (strcmp(constructor->name->name->data, "ctor") != 0) {
+    return new_member_filter(constructor);
+  }
+  return false;
+}
+
+static void ClassDeclaration_generate_constructor_arguments(void *_arg)
+{
+  struct ArgDeclaration * arg = O_CAST(_arg, ArgDeclaration());
+  O_CALL(arg, generate);
+  if (o_is_a(arg->type, ObjectType())) {
+    struct ObjectType * type = (struct ObjectType *) arg->type;
+    fprintf(out, "=O_BRANCH_CAST(va_arg(*app, ");
+    O_CALL(type, generate);
+    fprintf(out, "), ");
+    O_CALL(type->token, generate);
+    fprintf(out, "());\n");
+  } else {
+    fprintf(out, "=va_arg(*app, ");
+    O_CALL(arg->type, generate);
+    fprintf(out, ");\n");
+  }
 }
 
 static void ClassDeclaration_generate_method_arguments(void *_arg)
@@ -49,11 +79,18 @@ static void ClassDeclaration_generate_method_arguments(void *_arg)
   O_CALL(arg, generate);
 }
 
-static void ClassDeclaration_generate_method_argument_list(void *_arg)
+static void ClassDeclaration_generate_constructor_definition(void *_constructor_decl, va_list * app)
 {
-  struct ArgDeclaration * arg = O_CAST(_arg, ArgDeclaration());
-  fprintf(out, ", ");
-  O_CALL(arg->name, generate);
+  struct ConstructorDeclaration * constructor_decl = O_CAST(_constructor_decl, ConstructorDeclaration());
+  struct ClassDeclaration * class_decl = o_cast(va_arg(*app, struct ClassDeclaration *), ClassDeclaration());
+  fprintf(out, "O_METHOD_DEF(");
+  O_CALL(class_decl->name, generate);
+  fprintf(out, ", void *, ");
+  if (strcmp(constructor_decl->name->name->data, "ctor") != 0) {
+    fprintf(out, "ctor_");
+  }
+  O_CALL(constructor_decl->name, generate);
+  fprintf(out, ", (void *_self, va_list *app));\n");
 }
 
 static void ClassDeclaration_generate_method_definition(void *_method_decl, va_list * app)
@@ -61,7 +98,7 @@ static void ClassDeclaration_generate_method_definition(void *_method_decl, va_l
   struct FunDeclaration * method_decl = O_CAST(_method_decl, FunDeclaration());
   struct ClassDeclaration * class_decl = o_cast(va_arg(*app, struct ClassDeclaration *), ClassDeclaration());
   struct FunctionType * method_type = o_cast(method_decl->type, FunctionType());
-  fprintf(out, "O_METHOD_DEF (");
+  fprintf(out, "O_METHOD_DEF(");
   O_CALL(class_decl->name, generate);
   fprintf(out, ", ");
   O_CALL(method_type->return_type, generate);
@@ -72,26 +109,108 @@ static void ClassDeclaration_generate_method_definition(void *_method_decl, va_l
   fprintf(out, "));\n");
 }
 
+static void ClassDeclaration_generate_constructor_registration(void *_constructor_decl, va_list *app)
+{
+  struct ConstructorDeclaration * constructor_decl = O_CAST(_constructor_decl, ConstructorDeclaration());
+  struct ClassDeclaration * class_decl = o_cast(va_arg(*app, struct ClassDeclaration *), ClassDeclaration());
+  fprintf(out, "; \\\n O_METHOD(");
+  O_CALL(class_decl->name, generate);
+  fprintf(out, ", ");
+  if (strcmp(constructor_decl->name->name->data, "ctor") != 0) {
+    fprintf(out, "ctor_");
+  }
+  O_CALL(constructor_decl->name, generate);
+  fprintf(out, ")");
+}
+
 static void ClassDeclaration_generate_method_registration(void *_method_decl, va_list *app)
 {
   struct FunDeclaration * method_decl = O_CAST(_method_decl, FunDeclaration());
   struct ClassDeclaration * class_decl = o_cast(va_arg(*app, struct ClassDeclaration *), ClassDeclaration());
-  fprintf(out, "; \\\n O_METHOD (");
+  fprintf(out, "; \\\n O_METHOD(");
   O_CALL(class_decl->name, generate);
   fprintf(out, ", ");
   O_CALL(method_decl->name, generate);
   fprintf(out, ")");
 }
 
+static void ClassDeclaration_generate_constructor_registration_2(void *_constructor_decl, va_list *app)
+{
+  struct ConstructorDeclaration * constructor_decl = O_CAST(_constructor_decl, ConstructorDeclaration());
+  struct ClassDeclaration * class_decl = o_cast(va_arg(*app, struct ClassDeclaration *), ClassDeclaration());
+  fprintf(out, "O_OBJECT_METHOD(");
+  O_CALL(class_decl->name, generate);
+  fprintf(out, ", ");
+  if (strcmp(constructor_decl->name->name->data, "ctor") != 0) {
+    fprintf(out, "ctor_");
+  }
+  O_CALL(constructor_decl->name, generate);
+  fprintf(out, ");\n");
+}
+
+static void ClassDeclaration_generate_destructor_registration_2(void *_destructor_decl, va_list *app)
+{
+  struct DestructorDeclaration * destructor_decl = O_CAST(_destructor_decl, DestructorDeclaration());
+  struct ClassDeclaration * class_decl = o_cast(va_arg(*app, struct ClassDeclaration *), ClassDeclaration());
+  fprintf(out, "O_OBJECT_METHOD(");
+  O_CALL(class_decl->name, generate);
+  fprintf(out, ", dtor);\n");
+}
+
 static void ClassDeclaration_generate_method_registration_2(void *_method_decl, va_list *app)
 {
   struct FunDeclaration * method_decl = O_CAST(_method_decl, FunDeclaration());
   struct ClassDeclaration * class_decl = o_cast(va_arg(*app, struct ClassDeclaration *), ClassDeclaration());
-  fprintf(out, "O_OBJECT_METHOD (");
+  fprintf(out, "O_OBJECT_METHOD(");
   O_CALL(class_decl->name, generate);
   fprintf(out, ", ");
   O_CALL(method_decl->name, generate);
   fprintf(out, ");\n");
+}
+
+static void ClassDeclaration_generate_constructor_implementation(void *_constructor_decl, va_list *app)
+{
+  struct ConstructorDeclaration * constructor_decl = O_CAST(_constructor_decl, ConstructorDeclaration());
+  struct ClassDeclaration * class_decl = o_cast(va_arg(*app, struct ClassDeclaration *), ClassDeclaration());
+  fprintf(out, "O_IMPLEMENT(");
+  O_CALL(class_decl->name, generate);
+  fprintf(out, ", void *");
+  fprintf(out, ", ");
+  if (strcmp(constructor_decl->name->name->data, "ctor") != 0) {
+    fprintf(out, "ctor_");
+  }
+  O_CALL(constructor_decl->name, generate);
+  fprintf(out, ", (void *_self, va_list *app))\n");
+  fprintf(out, "{\n");
+  fprintf(out, "struct ");
+  O_CALL(class_decl->name, generate);
+  fprintf(out, "* self=O_CAST(_self, ");
+  O_CALL(class_decl->name, generate);
+  fprintf(out, "());\n");
+  O_CALL(constructor_decl->formal_arguments, map, ClassDeclaration_generate_constructor_arguments);
+  
+  O_CALL(constructor_decl->body, generate);
+  fprintf(out, "return self;\n");
+  fprintf(out, "}\n\n");
+}
+
+static void ClassDeclaration_generate_destructor_implementation(void *_destructor_decl, va_list *app)
+{
+  struct DestructorDeclaration * destructor_decl = O_CAST(_destructor_decl, DestructorDeclaration());
+  struct ClassDeclaration * class_decl = o_cast(va_arg(*app, struct ClassDeclaration *), ClassDeclaration());
+  fprintf(out, "O_IMPLEMENT(");
+  O_CALL(class_decl->name, generate);
+  fprintf(out, ", void *");
+  fprintf(out, ", dtor, (void *_self))\n");
+  fprintf(out, "{\n");
+  fprintf(out, "struct ");
+  O_CALL(class_decl->name, generate);
+  fprintf(out, "* self=O_CAST(_self, ");
+  O_CALL(class_decl->name, generate);
+  fprintf(out, "());\n");
+  O_CALL(destructor_decl->body, generate);
+  fprintf(out, "return O_SUPER->dtor(self);\n");
+  fprintf(out, "}\n\n");
 }
 
 static void ClassDeclaration_generate_method_implementation(void *_method_decl, va_list *app)
@@ -111,7 +230,7 @@ static void ClassDeclaration_generate_method_implementation(void *_method_decl, 
   fprintf(out, "{\n");
   fprintf(out, "struct ");
   O_CALL(class_decl->name, generate);
-  fprintf(out, "* self = O_CAST(_self, ");
+  fprintf(out, "* self=O_CAST(_self, ");
   O_CALL(class_decl->name, generate);
   fprintf(out, "());\n");
   O_CALL(method_decl->body, generate);
@@ -148,11 +267,21 @@ O_IMPLEMENT(ClassDeclaration, void, generate, (void *_self))
   O_CALL(attributes, retain);
   struct RefList * methods = O_CALL(self->members, filter_args, member_filter, FunDeclaration());
   O_CALL(methods, retain);
-  struct RefList * new_methods = O_CALL(methods, filter, new_method_filter);
+  struct RefList * constructors = O_CALL(self->members, filter_args, member_filter, ConstructorDeclaration());
+  O_CALL(constructors, retain);
+  struct RefList * destructors = O_CALL(self->members, filter_args, member_filter, DestructorDeclaration());
+  O_CALL(destructors, retain);
+
+  struct RefList * new_methods = O_CALL(methods, filter, new_member_filter);
   O_CALL(new_methods, retain);
 
+  struct RefList * new_constructors = O_CALL(constructors, filter, new_constructor_filter);
+  O_CALL(new_constructors, retain);
+
   /* generate the class */
-  // TODO Only generate new methods, not those inherited from superclass.
+  O_CALL(new_constructors, map_args, ClassDeclaration_generate_constructor_definition, self);
+  fprintf(out, "\n");
+
   O_CALL(new_methods, map_args, ClassDeclaration_generate_method_definition, self);
   fprintf(out, "\n");
 
@@ -161,6 +290,7 @@ O_IMPLEMENT(ClassDeclaration, void, generate, (void *_self))
   fprintf(out, "Class_Attr\\\n ");
   generate_superclass(self);
   fprintf(out, "Class_Attr");
+  O_CALL(new_constructors, map_args, ClassDeclaration_generate_constructor_registration, self);
   O_CALL(new_methods, map_args, ClassDeclaration_generate_method_registration, self);
   fprintf(out, "\n\n");
 
@@ -182,6 +312,8 @@ O_IMPLEMENT(ClassDeclaration, void, generate, (void *_self))
   generate_superclass(self);
   fprintf(out, "()\n\n");
 
+  O_CALL(constructors, map_args, ClassDeclaration_generate_constructor_implementation, self);
+  O_CALL(destructors, map_args, ClassDeclaration_generate_destructor_implementation, self);
   O_CALL(methods, map_args, ClassDeclaration_generate_method_implementation, self);
 
   fprintf(out, "O_OBJECT(");
@@ -190,6 +322,8 @@ O_IMPLEMENT(ClassDeclaration, void, generate, (void *_self))
   generate_superclass(self);
   fprintf(out, ");\n");
 
+  O_CALL(constructors, map_args, ClassDeclaration_generate_constructor_registration_2, self);
+  O_CALL(destructors, map_args, ClassDeclaration_generate_destructor_registration_2, self);
   O_CALL(methods, map_args, ClassDeclaration_generate_method_registration_2, self);
 
   fprintf(out, "O_END_OBJECT\n\n");
@@ -198,6 +332,9 @@ O_IMPLEMENT(ClassDeclaration, void, generate, (void *_self))
 
   O_CALL(attributes, release);
   O_CALL(methods, release);
+  O_CALL(new_methods, release);
+  O_CALL(constructors, release);
+  O_CALL(destructors, release);
 }
 
 static void ClassDeclaration_type_check_members(void *_member)
