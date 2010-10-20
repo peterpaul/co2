@@ -52,6 +52,9 @@ O_IMPLEMENT(ObjectType, bool, is_compatible, (void *_self, void *_other))
       struct ObjectType * other = O_CAST(_other, ObjectType());
       struct Token * name_self = O_CALL(self, get_token);
       struct Token * name_other = O_CALL(other, get_token);
+      /* TODO test whether the types are compatible by checking the
+       * class declarations.
+       */
       return O_CALL(name_self->name, compare, name_other->name) == 0;
     }
   return false;

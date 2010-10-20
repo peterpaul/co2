@@ -1,11 +1,15 @@
 #include "NewExpression.h"
-#include "Type.h"
+#include "ObjectType.h"
 #include "Expression.h"
+#include "ArgDeclaration.h"
+#include "ClassDeclaration.h"
+#include "ConstructorDeclaration.h"
 #include "RefList.h"
 #include "PrimitiveType.h"
 #include "ArrayType.h"
 #include "io.h"
 #include "Token.h"
+#include "grammar.tab.h"
 
 #define O_SUPER Expression()
 
@@ -61,7 +65,7 @@ O_IMPLEMENT(NewExpression, void, generate, (void *_self))
 	// TODO: lookup ctor_name, and use correct classname
 	O_CALL(token, generate);
 	fprintf(out, "_ctor_");
-	O_CALL(self->ctor_name, generate);
+	O_CALL(self->ctor_name->token, generate);
 	O_CALL(self->ctor_arguments, map, NewExpression_generate_ctor_argument);
 	fprintf(out, ")");
       } else {
@@ -90,13 +94,54 @@ void NewExpression_type_check_object(void *_item)
   O_CALL(item, type_check);
 }
 
+void NewExpression_type_check_arguments(struct ConstructorDeclaration * ctor_decl, struct RefList * actual_arguments) {
+  if (actual_arguments->length < ctor_decl->formal_arguments->length)
+    {
+      error(ctor_decl->name, "%s needs %d arguments, but got %d.\n", ctor_decl->name->name->data, ctor_decl->formal_arguments->length, actual_arguments->length);
+      return;
+    }
+  int i;
+  for (i = 0; i < ctor_decl->formal_arguments->length; i++)
+    {
+      struct ArgDeclaration * arg_decl = O_CALL(ctor_decl->formal_arguments, get, i);
+      struct Expression * arg_expr = O_CALL(actual_arguments, get, i);
+      O_CALL(arg_expr, type_check);
+      O_CALL(arg_decl->type, assert_compatible, arg_expr->type);
+    }
+}
+
 O_IMPLEMENT(NewExpression, void, type_check, (void *_self))
 {
   struct NewExpression *self = O_CAST(_self, NewExpression());
   if (self->ctor_arguments)
     {
-      O_CALL(self->ctor_arguments, map, NewExpression_type_check_object);
-      self->type = self->new_type;
+      struct ObjectType * object_type = o_cast(self->new_type, ObjectType());
+      struct ClassDeclaration * class_decl = o_cast(object_type->decl, ClassDeclaration());
+      if (self->ctor_name) 
+	{
+	  O_CALL(self->ctor_name, set_scope, class_decl->member_scope);
+	  O_CALL(self->ctor_name, type_check);
+	  NewExpression_type_check_arguments(self->ctor_name->decl, self->ctor_arguments);
+	}
+      else 
+	{
+	  struct Token * ctor_token = O_CALL_CLASS(Token(), new, "ctor", IDENTIFIER, object_type->token->file->data, object_type->token->line);
+	  struct TokenExpression * token_expr = O_CALL_CLASS(TokenExpression(), new, ctor_token);
+	  
+	  O_CALL(token_expr, set_scope, class_decl->member_scope);
+	  /* check whether the token "ctor" is defined */
+	  if (O_CALL(token_expr->scope, exists, token_expr->token) ||
+	      O_CALL(global_scope, exists, token_expr->token)) 
+	    {
+	      O_CALL(token_expr, type_check);
+	      NewExpression_type_check_arguments(token_expr->decl, self->ctor_arguments);
+	    } 
+	  else
+	    {
+	      /* accept empty constructor */
+	    }
+	}
+      self->type = O_CALL(self->new_type, retain);
     }
   else if (self->array_size)
     {
@@ -109,7 +154,7 @@ O_IMPLEMENT(NewExpression, void, type_check, (void *_self))
     }
 }
 
-O_IMPLEMENT(NewExpression, void, set_ctor_name, (void *_self, struct Token * ctor_name))
+O_IMPLEMENT(NewExpression, void, set_ctor_name, (void *_self, struct TokenExpression * ctor_name))
 {
   struct NewExpression *self = O_CAST(_self, NewExpression());
   self->ctor_name = ctor_name;

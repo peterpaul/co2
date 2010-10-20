@@ -29,10 +29,9 @@ ERRORS=0
 TESTS=`find ${TESTDIR}/success -name "*.test" | sort`
 for TEST in ${TESTS}
 do
-    test_separator
     # Compile the testcase
     BASENAME=`basename ${TEST} .test`
-    echo -n "${BASENAME}... "
+    echo -n "--- ${BASENAME}... "
     TARGETNAME=${TARGET}/success/${BASENAME}
     ${COMPILER} ${TEST} ${TARGETNAME}.c > ${TARGETNAME}.err 2>&1
     if [[ "$?" != "0" ]]
@@ -81,7 +80,7 @@ TESTS=`find ${TESTDIR}/fail -name "*.test" | sort`
 for TEST in ${TESTS}
 do
     BASENAME=`basename ${TEST} .test`
-    echo -n "${BASENAME}... "
+    echo -n "--- ${BASENAME}... "
     TARGETNAME=${TARGET}/fail/${BASENAME}
     ${COMPILER} ${TEST} ${TARGETNAME}.c > ${TARGETNAME}.err 2>&1
     if [[ "$?" == "0" ]]

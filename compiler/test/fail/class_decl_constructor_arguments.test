@@ -1,0 +1,12 @@
+package compiler.test;
+
+class MyObject
+{
+	MyObject(int value) {
+	}
+}
+
+int main(int argc, char[][] argv)
+{
+	MyObject test = new MyObject(5.6);
+}

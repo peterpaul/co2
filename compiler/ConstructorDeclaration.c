@@ -4,6 +4,7 @@
 #include "Statement.h"
 #include "io.h"
 #include "FunctionType.h"
+#include "ObjectType.h"
 
 #define O_SUPER Declaration()
 
@@ -32,7 +33,11 @@ O_IMPLEMENT(ConstructorDeclaration, void *, dtor, (void *_self))
 O_IMPLEMENT(ConstructorDeclaration, void, type_check, (void *_self))
 {
   struct ConstructorDeclaration * self = O_CAST(_self, ConstructorDeclaration());
-  
+
+  struct Declaration * class_decl = O_CALL(global_scope, lookup, self->class_name);
+  self->type = O_CALL_CLASS(ObjectType(), new, self->class_name, class_decl);
+  O_CALL(self->type, retain);
+
   O_CALL(self->body, type_check);
 }
 

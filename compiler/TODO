@@ -14,5 +14,6 @@ Functionality:
 
 Language Features:
 * enum
-* constructor/destructor
+* constructor/destructor [DONE]
 * automatic reference counting
+* super keyword

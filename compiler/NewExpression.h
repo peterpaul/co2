@@ -1,9 +1,9 @@
 #ifndef NewExpression_H
 #define NewExpression_H
 
-#include "Expression.h"
+#include "TokenExpression.h"
 
-O_METHOD_DEF (NewExpression, void, set_ctor_name, (void *_self, struct Token * ctor_name));
+O_METHOD_DEF (NewExpression, void, set_ctor_name, (void *_self, struct TokenExpression * ctor_name));
 
 #define NewExpressionClass_Attr			\
   ExpressionClass_Attr;				\
@@ -12,7 +12,7 @@ O_METHOD_DEF (NewExpression, void, set_ctor_name, (void *_self, struct Token * c
 #define NewExpression_Attr			\
   Expression_Attr;				\
   struct Type * new_type;			\
-  struct Token * ctor_name;			\
+  struct TokenExpression * ctor_name;		\
   struct Expression * array_size;		\
   struct RefList * ctor_arguments
 

@@ -81,6 +81,7 @@
 %token <token> RETURN
 %token <token> SELF
 %token <token> STRING_CONSTANT
+%token <token> SUPER
 %token <token> TYPE_IDENTIFIER
 %token <token> UNSIGNED
 %token <token> VA_ARG /* '...' */
@@ -677,10 +678,15 @@ expression
 |	NEW type '(' opt_actual_arg_list ')' { $$ = O_CALL_CLASS(NewExpression(), new, $2, $4); }
 |	NEW type '.' IDENTIFIER '(' opt_actual_arg_list ')' 
 {
+  struct TokenExpression * token_expr = O_CALL_CLASS(TokenExpression(), new, $4);
   struct NewExpression * new_expr = O_CALL_CLASS(NewExpression(), new, $2, $6);
-  O_CALL(new_expr, set_ctor_name, $4);
+  O_CALL(new_expr, set_ctor_name, token_expr);
   $$ = new_expr;
 }
+/*
+|	SUPER '(' opt_actual_arg_list ')' { $$ = O_CALL_CLASS(SuperExpression(), new, $1, NULL, $3); }
+|	SUPER '.' IDENTIFIER '(' opt_actual_arg_list ')' { $$ = O_CALL_CLASS(SuperExpression(), new, $1, $3, $5); }
+*/
 ;
 
 constant
@@ -742,18 +748,18 @@ macro_identifier_list
 constructor_declaration
 :	TYPE_IDENTIFIER '(' 
 { 
-  O_CALL_CLASS(Scope(), new, ARGUMENT_SCOPE, $1); 
+  struct Token * ctor_name = O_CALL_CLASS(Token(), new, "ctor", IDENTIFIER, filename, $1->line);
+  O_CALL_CLASS(Scope(), new, ARGUMENT_SCOPE, ctor_name); 
 }
 formal_arg_list ')' statement
 {
-  struct Token * ctor_name = O_CALL_CLASS(Token(), new, "ctor", IDENTIFIER, filename, $1->line);
-  struct ConstructorDeclaration * decl = O_CALL_CLASS(ConstructorDeclaration(), new, ctor_name, $1, $4, $6);
+  struct ConstructorDeclaration * decl = O_CALL_CLASS(ConstructorDeclaration(), new, current_scope->name, $1, $4, $6);
   O_CALL(current_scope, leave);
   $$ = decl;
 }
 |	TYPE_IDENTIFIER '.' IDENTIFIER '(' 
 { 
-  O_CALL_CLASS(Scope(), new, ARGUMENT_SCOPE, $1); 
+  O_CALL_CLASS(Scope(), new, ARGUMENT_SCOPE, $3); 
 }
 formal_arg_list ')' statement
 {
