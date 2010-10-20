@@ -5,11 +5,11 @@
 
 #define UnaryExpressionClass_Attr			\
   ExpressionClass_Attr
+
 #define UnaryExpression_Attr				\
   Expression_Attr;					\
   struct Token * operator;				\
   struct Expression * operand
-
 
 O_CLASS(UnaryExpression, Expression);
 

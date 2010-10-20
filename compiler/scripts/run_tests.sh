@@ -40,7 +40,6 @@ do
 	fail_test "ERROR: ${TEST} failed: Compiler error"
 	cat ${TARGETNAME}.err
 	echo "Command: ${COMPILER} ${TEST} ${TARGETNAME}.c"
-	test_separator
     else
 	# Compile the generated code with gcc
 	pushd `dirname ${TARGETNAME}.bin` > /dev/null 2>&1
@@ -51,7 +50,6 @@ do
 	then
 	    fail_test "ERROR: ${TEST} failed: GCC error"
 	    cat ${TARGETNAME}.err
-	    test_separator
 	else
 	    # When no input and output exists, create empty in/output.
 	    TESTINPUT=${TESTDIR}/success/${BASENAME}.in
@@ -87,7 +85,6 @@ do
     then
 	fail_test "ERROR: ${TEST} failed."
 	cat ${TARGETNAME}.err
-	test_separator
     else
 	echo "OK"
 	# rm -f ${TARGETNAME}.err
