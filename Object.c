@@ -95,6 +95,16 @@ void *o_super_ctor(void *_self, const void *_class, ...)
 	return self;
 }
 
+void *o_super_ctor_named(void *_self, void *(*constructor)(void *, va_list *), ...) {
+	struct Object *self = O_IS_OBJECT(_self);
+	va_list ap;
+	va_start(ap, constructor);
+	self = constructor(self, &ap);
+	va_end(ap);
+	return self;
+}
+
+
 /* Object methods */
 O_IMPLEMENT(Object, void *, ctor, (void *_self, va_list * argp))
 {

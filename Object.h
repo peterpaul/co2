@@ -142,6 +142,7 @@ void o_add_class(void *_class);
 void o_print_classes(FILE * fp);
 
 void *o_super_ctor(void *_self, const void *_class, ...);
+void *o_super_ctor_named(void *_self, void *(*constructor)(void *, va_list *), ...);
 
 /* Object methods definition */
 O_METHOD_DEF(Object, void *, ctor, (void *_self, va_list * argp));
