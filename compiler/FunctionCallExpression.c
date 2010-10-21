@@ -1,9 +1,9 @@
 #include "FunctionCallExpression.h"
 #include "BinaryExpression.h"
-#include "VarDeclaration.h"
-#include "FunDeclaration.h"
+#include "VariableDeclaration.h"
+#include "FunctionDeclaration.h"
 #include "FunctionType.h"
-#include "ArgDeclaration.h"
+#include "ArgumentDeclaration.h"
 #include "Token.h"
 #include "TokenExpression.h"
 #include "Type.h"
@@ -52,9 +52,9 @@ O_IMPLEMENT(FunctionCallExpression, void, generate, (void *_self))
   if (o_is_of(self->function, TokenExpression()))
     {
       struct TokenExpression *function = O_CAST(self->function, TokenExpression());
-      if (function->decl && o_is_a(function->decl, FunDeclaration()))
+      if (function->decl && o_is_a(function->decl, FunctionDeclaration()))
 	{
-	  struct FunDeclaration * fun_decl = (struct FunDeclaration *) function->decl;
+	  struct FunctionDeclaration * fun_decl = (struct FunctionDeclaration *) function->decl;
 	  if (fun_decl->scope->type == CLASS_SCOPE)
 	    {
 	      fprintf(out, "O_CALL");
@@ -106,9 +106,9 @@ O_IMPLEMENT(FunctionCallExpression, void, type_check, (void *_self))
       struct TokenExpression * function = (struct TokenExpression *) self->function;
       struct FunctionType * function_type = o_cast(function->type, FunctionType());
       self->type = O_CALL(function_type->return_type, retain);
-      if (o_is_of(function->decl, FunDeclaration()))
+      if (o_is_of(function->decl, FunctionDeclaration()))
 	{
-	  struct FunDeclaration * fun_decl = (struct FunDeclaration *) function->decl;
+	  struct FunctionDeclaration * fun_decl = (struct FunctionDeclaration *) function->decl;
 	  if (self->actual_arguments->length < fun_decl->formal_arguments->length)
 	    {
 	      error(function->token, "%s needs %d arguments, but got %d.\n", function->token->name->data, fun_decl->formal_arguments->length, self->actual_arguments->length);
@@ -117,15 +117,15 @@ O_IMPLEMENT(FunctionCallExpression, void, type_check, (void *_self))
 	  int i;
 	  for (i = 0; i < fun_decl->formal_arguments->length; i++)
 	    {
-	      struct ArgDeclaration * arg_decl = O_CALL(fun_decl->formal_arguments, get, i);
+	      struct ArgumentDeclaration * arg_decl = O_CALL(fun_decl->formal_arguments, get, i);
 	      struct Expression * arg_expr = O_CALL(self->actual_arguments, get, i);
 	      O_CALL(arg_expr, type_check);
 	      O_CALL(arg_decl->type, assert_compatible, arg_expr->type);
 	    }
 	}
-      else if (o_is_of(function->decl, VarDeclaration()))
+      else if (o_is_of(function->decl, VariableDeclaration()))
 	{
-	  struct VarDeclaration * var_decl = (struct VarDeclaration *) function->decl;
+	  struct VariableDeclaration * var_decl = (struct VariableDeclaration *) function->decl;
 	  assertTrue(o_is_of(var_decl->type, FunctionType()), "Expected FunctionType.\n");
 	}
       else

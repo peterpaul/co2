@@ -85,6 +85,7 @@ do
     then
 	fail_test "ERROR: ${TEST} failed."
 	cat ${TARGETNAME}.err
+	echo "Command: ${COMPILER} ${TEST} ${TARGETNAME}.c"
     else
 	echo "OK"
 	# rm -f ${TARGETNAME}.err

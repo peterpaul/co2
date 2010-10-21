@@ -1,7 +1,7 @@
 #include "NewExpression.h"
 #include "ObjectType.h"
 #include "Expression.h"
-#include "ArgDeclaration.h"
+#include "ArgumentDeclaration.h"
 #include "ClassDeclaration.h"
 #include "ConstructorDeclaration.h"
 #include "RefList.h"
@@ -94,16 +94,21 @@ void NewExpression_type_check_object(void *_item)
   O_CALL(item, type_check);
 }
 
-void NewExpression_type_check_arguments(struct ConstructorDeclaration * ctor_decl, struct RefList * actual_arguments) {
+void NewExpression_type_check_arguments(struct TokenExpression * ctor_token, struct RefList * actual_arguments) {
+  if (!o_is_of(ctor_token->decl, ConstructorDeclaration())) {
+    error(ctor_token->token, "%s is not a constructor.\n", ctor_token->token->name->data);
+    return;
+  }
+  struct ConstructorDeclaration * ctor_decl = (struct ConstructorDeclaration *)ctor_token->decl;
   if (actual_arguments->length < ctor_decl->formal_arguments->length)
     {
-      error(ctor_decl->name, "%s needs %d arguments, but got %d.\n", ctor_decl->name->name->data, ctor_decl->formal_arguments->length, actual_arguments->length);
+      error(ctor_token->token, "%s needs %d arguments, but got %d.\n", ctor_token->token->name->data, ctor_decl->formal_arguments->length, actual_arguments->length);
       return;
     }
   int i;
   for (i = 0; i < ctor_decl->formal_arguments->length; i++)
     {
-      struct ArgDeclaration * arg_decl = O_CALL(ctor_decl->formal_arguments, get, i);
+      struct ArgumentDeclaration * arg_decl = O_CALL(ctor_decl->formal_arguments, get, i);
       struct Expression * arg_expr = O_CALL(actual_arguments, get, i);
       O_CALL(arg_expr, type_check);
       O_CALL(arg_decl->type, assert_compatible, arg_expr->type);
@@ -121,7 +126,7 @@ O_IMPLEMENT(NewExpression, void, type_check, (void *_self))
 	{
 	  O_CALL(self->ctor_name, set_scope, class_decl->member_scope);
 	  O_CALL(self->ctor_name, type_check);
-	  NewExpression_type_check_arguments(self->ctor_name->decl, self->ctor_arguments);
+	  NewExpression_type_check_arguments(self->ctor_name, self->ctor_arguments);
 	}
       else 
 	{
@@ -134,7 +139,7 @@ O_IMPLEMENT(NewExpression, void, type_check, (void *_self))
 	      O_CALL(global_scope, exists, token_expr->token)) 
 	    {
 	      O_CALL(token_expr, type_check);
-	      NewExpression_type_check_arguments(token_expr->decl, self->ctor_arguments);
+	      NewExpression_type_check_arguments(token_expr, self->ctor_arguments);
 	    } 
 	  else
 	    {

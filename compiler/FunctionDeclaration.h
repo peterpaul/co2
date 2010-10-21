@@ -3,14 +3,14 @@
 
 #include "Declaration.h"
 
-#define FunDeclarationClass_Attr		\
+#define FunctionDeclarationClass_Attr		\
   DeclarationClass_Attr
 
-#define FunDeclaration_Attr			\
+#define FunctionDeclaration_Attr			\
   Declaration_Attr;				\
   struct RefList * formal_arguments;		\
   struct Statement * body
 
-O_CLASS(FunDeclaration, Declaration);
+O_CLASS(FunctionDeclaration, Declaration);
 
 #endif /* FUNDECLARATION_H */

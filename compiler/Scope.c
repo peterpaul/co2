@@ -79,7 +79,7 @@ O_IMPLEMENT(Scope, bool, exists_in_this_scope, (void *_self, struct Token * toke
 O_IMPLEMENT(Scope, bool, exists, (void *_self, struct Token * token))
 {
   struct Scope *self = O_CAST(_self, Scope());
-  bool result = O_CALL(self, lookup_in_this_scope, token);
+  bool result = O_CALL(self, exists_in_this_scope, token);
   if (result == false && self->parent != NULL)
     {
       return O_CALL(self->parent, exists, token);

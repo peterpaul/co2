@@ -1,7 +1,7 @@
 #include "ClassDeclaration.h"
-#include "FunDeclaration.h"
-#include "ArgDeclaration.h"
-#include "VarDeclaration.h"
+#include "FunctionDeclaration.h"
+#include "ArgumentDeclaration.h"
+#include "VariableDeclaration.h"
 #include "ConstructorDeclaration.h"
 #include "DestructorDeclaration.h"
 #include "Type.h"
@@ -56,7 +56,7 @@ static int new_constructor_filter(void *_constructor)
 
 static void ClassDeclaration_generate_constructor_arguments(void *_arg)
 {
-  struct ArgDeclaration * arg = O_CAST(_arg, ArgDeclaration());
+  struct ArgumentDeclaration * arg = O_CAST(_arg, ArgumentDeclaration());
   O_CALL(arg, generate);
   if (o_is_a(arg->type, ObjectType())) {
     struct ObjectType * type = (struct ObjectType *) arg->type;
@@ -74,7 +74,7 @@ static void ClassDeclaration_generate_constructor_arguments(void *_arg)
 
 static void ClassDeclaration_generate_method_arguments(void *_arg)
 {
-  struct ArgDeclaration * arg = O_CAST(_arg, ArgDeclaration());
+  struct ArgumentDeclaration * arg = O_CAST(_arg, ArgumentDeclaration());
   fprintf(out, ", ");
   O_CALL(arg, generate);
 }
@@ -95,7 +95,7 @@ static void ClassDeclaration_generate_constructor_definition(void *_constructor_
 
 static void ClassDeclaration_generate_method_definition(void *_method_decl, va_list * app)
 {
-  struct FunDeclaration * method_decl = O_CAST(_method_decl, FunDeclaration());
+  struct FunctionDeclaration * method_decl = O_CAST(_method_decl, FunctionDeclaration());
   struct ClassDeclaration * class_decl = o_cast(va_arg(*app, struct ClassDeclaration *), ClassDeclaration());
   struct FunctionType * method_type = o_cast(method_decl->type, FunctionType());
   fprintf(out, "O_METHOD_DEF(");
@@ -125,7 +125,7 @@ static void ClassDeclaration_generate_constructor_registration(void *_constructo
 
 static void ClassDeclaration_generate_method_registration(void *_method_decl, va_list *app)
 {
-  struct FunDeclaration * method_decl = O_CAST(_method_decl, FunDeclaration());
+  struct FunctionDeclaration * method_decl = O_CAST(_method_decl, FunctionDeclaration());
   struct ClassDeclaration * class_decl = o_cast(va_arg(*app, struct ClassDeclaration *), ClassDeclaration());
   fprintf(out, "; \\\n O_METHOD(");
   O_CALL(class_decl->name, generate);
@@ -159,7 +159,7 @@ static void ClassDeclaration_generate_destructor_registration_2(void *_destructo
 
 static void ClassDeclaration_generate_method_registration_2(void *_method_decl, va_list *app)
 {
-  struct FunDeclaration * method_decl = O_CAST(_method_decl, FunDeclaration());
+  struct FunctionDeclaration * method_decl = O_CAST(_method_decl, FunctionDeclaration());
   struct ClassDeclaration * class_decl = o_cast(va_arg(*app, struct ClassDeclaration *), ClassDeclaration());
   fprintf(out, "O_OBJECT_METHOD(");
   O_CALL(class_decl->name, generate);
@@ -215,7 +215,7 @@ static void ClassDeclaration_generate_destructor_implementation(void *_destructo
 
 static void ClassDeclaration_generate_method_implementation(void *_method_decl, va_list *app)
 {
-  struct FunDeclaration * method_decl = O_CAST(_method_decl, FunDeclaration());
+  struct FunctionDeclaration * method_decl = O_CAST(_method_decl, FunctionDeclaration());
   struct ClassDeclaration * class_decl = o_cast(va_arg(*app, struct ClassDeclaration *), ClassDeclaration());
   struct FunctionType * method_type = o_cast(method_decl->type, FunctionType());
   fprintf(out, "O_IMPLEMENT(");
@@ -239,7 +239,7 @@ static void ClassDeclaration_generate_method_implementation(void *_method_decl, 
 
 static void ClassDeclaration_generate_attribute_registration(void *_method_decl, va_list *app)
 {
-  struct VarDeclaration * method_decl = O_CAST(_method_decl, VarDeclaration());
+  struct VariableDeclaration * method_decl = O_CAST(_method_decl, VariableDeclaration());
   struct ClassDeclaration * class_decl = o_cast(va_arg(*app, struct ClassDeclaration *), ClassDeclaration());
   fprintf(out, "; \\\n ");
   O_CALL(method_decl->type, generate);
@@ -263,9 +263,9 @@ O_IMPLEMENT(ClassDeclaration, void, generate, (void *_self))
 {
   struct ClassDeclaration * self = O_CAST(_self, ClassDeclaration());
   /* filter the members */
-  struct RefList * attributes = O_CALL(self->members, filter_args, member_filter, VarDeclaration());
+  struct RefList * attributes = O_CALL(self->members, filter_args, member_filter, VariableDeclaration());
   O_CALL(attributes, retain);
-  struct RefList * methods = O_CALL(self->members, filter_args, member_filter, FunDeclaration());
+  struct RefList * methods = O_CALL(self->members, filter_args, member_filter, FunctionDeclaration());
   O_CALL(methods, retain);
   struct RefList * constructors = O_CALL(self->members, filter_args, member_filter, ConstructorDeclaration());
   O_CALL(constructors, retain);

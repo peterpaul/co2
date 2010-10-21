@@ -1,6 +1,5 @@
 #include "FunctionType.h"
-#include "FunDeclaration.h"
-#include "ArgDeclaration.h"
+#include "ArgumentDeclaration.h"
 #include "FunctionCallExpression.h"
 #include "TokenGenerator.h"
 #include "io.h"
@@ -20,7 +19,7 @@ O_IMPLEMENT(FunctionType, void *, ctor, (void *_self, va_list *app))
 
 static void FunctionType_ctor_get_parameter_type_from_decl(void *_decl, va_list *app)
 {
-  struct ArgDeclaration * decl = O_CAST(_decl, ArgDeclaration());
+  struct ArgumentDeclaration * decl = O_CAST(_decl, ArgumentDeclaration());
   struct RefList * list = o_cast(va_arg(*app, struct RefList *), RefList());
   O_CALL(list, append, decl->type);
 }
