@@ -76,6 +76,20 @@ O_IMPLEMENT(FunctionCallExpression, void, generate, (void *_self))
 	  O_CALL(function->token, generate);
 	}
     }
+  else if (o_is_of(self->function, BinaryExpression()))
+    {
+      struct BinaryExpression *function = O_CAST(self->function, BinaryExpression());
+      fprintf(out, "O_CALL");
+      fprintf(out, "(");
+      bool is_first_arg = false;
+      O_CALL(function->operand[0], generate);
+      fprintf(out, ", ");
+      O_CALL(function->operand[1], generate_left, false);
+      O_CALL(self->actual_arguments, map_args, FunctionCallExpression_generate_actual_arguments, &is_first_arg);
+      fprintf(out, ")");
+      return;
+      
+    }
   else
     {
       O_CALL(self->function, generate);

@@ -13,8 +13,7 @@ O_METHOD_DEF(Expression, void, generate_left, (void *_self, bool left));
 
 #define Expression_Attr				\
   CompileObject_Attr;				\
-  struct Type * type;				\
-  bool is_method
+  struct Type * type
 
 O_CLASS(Expression, CompileObject);
 
