@@ -40,7 +40,7 @@ O_IMPLEMENT(Type, void, assert_compatible, (void *_self, void *_other))
     {
       if (_other)
 	{
-	  struct Type *other = O_CAST(_other, Type());
+	  struct Type * other = O_CAST(_other, Type());
 	  struct Token * token = O_CALL(self, get_token);
 	  struct String * self_string = O_CALL(self, to_string);
 	  struct String * other_string = O_CALL(other, to_string);
