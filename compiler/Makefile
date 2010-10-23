@@ -17,12 +17,12 @@ LEX_FLAGS	=--header-file=${LEX_GEN_H}
 GEN		= ${YACC_GEN_C} ${YACC_GEN_H} ${LEX_GEN_C} ${LEX_GEN_H}
 
 CC_SRCS		=ArgumentDeclaration.c ArrayType.c BinaryExpression.c ClassDeclaration.c CompileObject.c Compiler.c \
-		CompoundStatement.c ConstructorDeclaration.c Declaration.c DeleteStatement.c DestructorDeclaration.c \
+		CompoundStatement.c ConstructorDeclaration.c Context.c Declaration.c DeleteStatement.c DestructorDeclaration.c \
 		DoStatement.c error.c Expression.c \
 		ExpressionStatement.c File.c ForEachStatement.c ForStatement.c FunctionType.c FunctionDeclaration.c \
 		FunctionCallExpression.c IfStatement.c IncludeStack.c InterfaceDeclaration.c io.c \
 		MacroDeclaration.c NewExpression.c NestedExpression.c ObjectType.c Path.c PrimitiveType.c RefList.c \
-		ReturnStatement.c Scope.c Statement.c Token.c TokenExpression.c TokenGenerator.c Type.c \
+		ReturnStatement.c Scope.c Statement.c SuperExpression.c Token.c TokenExpression.c TokenGenerator.c Type.c \
 		UnaryExpression.c VariableDeclaration.c WhileStatement.c
 LIBSRCS		=$(CC_SRCS) $(YACC_GEN_C) ${LEX_GEN_C}
 LIBHDRS		=${LIBSRCS:%.c=%.h}

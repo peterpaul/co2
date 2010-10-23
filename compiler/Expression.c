@@ -1,5 +1,6 @@
 #include "Expression.h"
 #include "Type.h"
+#include "io.h"
 
 #define O_SUPER CompileObject()
 
@@ -28,3 +29,19 @@ O_OBJECT_METHOD(Expression, ctor);
 O_OBJECT_METHOD(Expression, dtor);
 O_OBJECT_METHOD(Expression, generate);
 O_END_OBJECT
+
+void Expression_generate_actual_argument(void *_arg, va_list *app)
+{
+  struct Expression *arg = O_CAST(_arg, Expression());
+  bool * is_first_arg = va_arg(*app, bool *);
+  if (!*is_first_arg) 
+    {
+      fprintf(out, ", ");
+    }
+  else
+    {
+      *is_first_arg = false;
+    }
+  O_CALL(arg, generate);
+}
+

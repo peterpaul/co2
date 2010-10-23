@@ -1,4 +1,5 @@
 #include "ConstructorDeclaration.h"
+#include "ClassDeclaration.h"
 #include "Type.h"
 #include "RefList.h"
 #include "Statement.h"
@@ -33,12 +34,22 @@ O_IMPLEMENT(ConstructorDeclaration, void *, dtor, (void *_self))
 O_IMPLEMENT(ConstructorDeclaration, void, type_check, (void *_self))
 {
   struct ConstructorDeclaration * self = O_CAST(_self, ConstructorDeclaration());
+  O_CALL(current_context, add, self);
+  struct Declaration * class_decl = O_CALL(current_context, find, ClassDeclaration());
+  if (class_decl == NULL) 
+    {
+      error(self->class_name, "Constructors (%s) are only allowed in class declarations\n", self->class_name->name->data);
+    }
+  if (strcmp(class_decl->name->name->data, self->class_name->name->data) != 0) 
+    {
+      error(self->class_name, "Constructor should be called %s", class_decl->name->name->data);
+    }
 
-  struct Declaration * class_decl = O_CALL(global_scope, lookup, self->class_name);
   self->type = O_CALL_CLASS(ObjectType(), new, self->class_name, class_decl);
   O_CALL(self->type, retain);
 
   O_CALL(self->body, type_check);
+  O_CALL(current_context, remove_last);
 }
 
 O_OBJECT(ConstructorDeclaration, Declaration);

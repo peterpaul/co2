@@ -46,6 +46,7 @@ STRING_CONST	\"({CHAR_SYMBOL}|\')*\"
 "package"	return PACKAGE;
 "return"	return RETURN;
 "self"		return SELF;
+"super"		yylval.token = O_CALL_CLASS(Token(), new, yytext, SUPER, filename, linenumber); return yylval.token->type;
 "unsigned"	return UNSIGNED;
 "void"		yylval.token = O_CALL_CLASS(Token(), new, yytext, VOID, filename, linenumber); return yylval.token->type;
 "while"		return WHILE;

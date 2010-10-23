@@ -346,6 +346,7 @@ static void ClassDeclaration_type_check_members(void *_member)
 O_IMPLEMENT(ClassDeclaration, void, type_check, (void *_self))
 {
   struct ClassDeclaration * self = O_CAST(_self, ClassDeclaration());
+  O_CALL(current_context, add, self);
   if (self->superclass)
     {
       struct Declaration * _super_class = O_CALL(self->scope, lookup, self->superclass);
@@ -356,6 +357,7 @@ O_IMPLEMENT(ClassDeclaration, void, type_check, (void *_self))
 	}
     }
   O_CALL(self->members, map, ClassDeclaration_type_check_members);
+  O_CALL(current_context, remove_last);
 }
 
 O_IMPLEMENT(ClassDeclaration, bool, is_compatible, (void *_self, void *_other))

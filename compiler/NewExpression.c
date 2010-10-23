@@ -45,18 +45,12 @@ O_IMPLEMENT(NewExpression, void *, dtor, (void *_self))
   return O_SUPER->dtor(self);
 }
 
-void NewExpression_generate_ctor_argument(void *_arg)
-{
-  struct Expression * actual_arg = O_CAST(_arg, Expression());
-  fprintf(out, ", ");
-  O_CALL(actual_arg, generate);
-}
-
 O_IMPLEMENT(NewExpression, void, generate, (void *_self))
 {
   struct NewExpression *self = O_CAST(_self, NewExpression());
   if (self->ctor_arguments)
     {
+      bool is_first_arg = false;
       fprintf(out, "O_CALL_CLASS(");
       struct Token * token = O_CALL(self->new_type, get_token);
       O_CALL(token, generate);
@@ -66,11 +60,11 @@ O_IMPLEMENT(NewExpression, void, generate, (void *_self))
 	O_CALL(token, generate);
 	fprintf(out, "_ctor_");
 	O_CALL(self->ctor_name->token, generate);
-	O_CALL(self->ctor_arguments, map, NewExpression_generate_ctor_argument);
+	O_CALL(self->ctor_arguments, map_args, Expression_generate_actual_argument, &is_first_arg);
 	fprintf(out, ")");
       } else {
 	fprintf(out, "(), new");
-	O_CALL(self->ctor_arguments, map, NewExpression_generate_ctor_argument);
+	O_CALL(self->ctor_arguments, map_args, Expression_generate_actual_argument, &is_first_arg);
 	fprintf(out, ")");
       }
     }

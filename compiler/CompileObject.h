@@ -2,6 +2,7 @@
 #define CompileObject_H
 
 #include "RefObject.h"
+#include "Context.h"
 
 O_METHOD_DEF(CompileObject, void, type_check, (void *_self));
 O_METHOD_DEF(CompileObject, void, optimize, (void *_self));

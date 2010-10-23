@@ -31,21 +31,6 @@ O_IMPLEMENT(FunctionCallExpression, void *, dtor, (void *_self))
   return O_SUPER->dtor(self);
 }
 
-void FunctionCallExpression_generate_actual_arguments(void *_arg, va_list *app)
-{
-  struct Expression *arg = O_CAST(_arg, Expression());
-  bool * is_first_arg = va_arg(*app, bool *);
-  if (!*is_first_arg) 
-    {
-      fprintf(out, ", ");
-    }
-  else
-    {
-      *is_first_arg = false;
-    }
-  O_CALL(arg, generate);
-}
-
 O_IMPLEMENT(FunctionCallExpression, void, generate, (void *_self))
 {
   struct FunctionCallExpression *self = O_CAST(_self, FunctionCallExpression());
@@ -62,7 +47,7 @@ O_IMPLEMENT(FunctionCallExpression, void, generate, (void *_self))
 	      bool is_first_arg = false;
 	      fprintf(out, "self, ");
 	      O_CALL(function->token, generate);
-	      O_CALL(self->actual_arguments, map_args, FunctionCallExpression_generate_actual_arguments, &is_first_arg);
+	      O_CALL(self->actual_arguments, map_args, Expression_generate_actual_argument, &is_first_arg);
 	      fprintf(out, ")");
 	      return;
 	    }
@@ -85,7 +70,7 @@ O_IMPLEMENT(FunctionCallExpression, void, generate, (void *_self))
       O_CALL(function->operand[0], generate);
       fprintf(out, ", ");
       O_CALL(function->operand[1], generate_left, false);
-      O_CALL(self->actual_arguments, map_args, FunctionCallExpression_generate_actual_arguments, &is_first_arg);
+      O_CALL(self->actual_arguments, map_args, Expression_generate_actual_argument, &is_first_arg);
       fprintf(out, ")");
       return;
       
@@ -105,7 +90,7 @@ O_IMPLEMENT(FunctionCallExpression, void, generate, (void *_self))
 	  is_first_arg = false;
 	}
     }
-  O_CALL(self->actual_arguments, map_args, FunctionCallExpression_generate_actual_arguments, &is_first_arg);
+  O_CALL(self->actual_arguments, map_args, Expression_generate_actual_argument, &is_first_arg);
   fprintf(out, ")");
 }
 

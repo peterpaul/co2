@@ -16,6 +16,7 @@
 #include "ForStatement.h"
 #include "ForEachStatement.h"
 #include "FunctionCallExpression.h"
+#include "SuperExpression.h"
 #include "NestedExpression.h"
 #include "ExpressionStatement.h"
 #include "CompoundStatement.h"
@@ -679,10 +680,11 @@ expression
   O_CALL(new_expr, set_ctor_name, token_expr);
   $$ = (struct Expression *) new_expr;
 }
-/*
-|	SUPER '(' opt_actual_arg_list ')' { $$ = O_CALL_CLASS(SuperExpression(), new, $1, NULL, $3); }
+|	SUPER '(' opt_actual_arg_list ')' 
+{ 
+  $$ = O_CALL_CLASS(SuperExpression(), new, $1, NULL, $3);
+}
 |	SUPER '.' IDENTIFIER '(' opt_actual_arg_list ')' { $$ = O_CALL_CLASS(SuperExpression(), new, $1, $3, $5); }
-*/
 ;
 
 constant

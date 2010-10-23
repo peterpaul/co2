@@ -1,0 +1,43 @@
+package compiler.test;
+
+class ObjectA
+{
+	ObjectA(int f) {
+		foo = f;
+	}
+
+	ObjectA.baz(int a, int b) {
+		foo = a + b;
+	}
+
+	int fun(int f) {
+		return f + foo;
+	}
+
+	int foo;
+}
+
+class ObjectB:ObjectA
+{
+	ObjectB(int f, int b) {
+		super(f);
+		bar = b;
+	}
+
+	ObjectB.goo(int f, int b) {
+		super.baz(f, b);
+		bar = b;
+	}
+
+	int fun(int f) {
+		return super(f + bar);
+	}
+
+	int bar;
+}
+
+int main(int argc, char[][] argv)
+{
+	ObjectA obj = new ObjectB(3, 4);
+	return 0;
+}

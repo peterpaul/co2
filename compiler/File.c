@@ -47,7 +47,10 @@ O_IMPLEMENT(File, void *, dtor, (void *_self))
 O_IMPLEMENT(File, void, type_check, (void *_self))
 {
   struct File *self = O_CAST(_self, File());
+  current_context = O_CALL_CLASS(Context(), new);
+  O_CALL (current_context, retain);
   O_CALL (self->declarations, map, type_check);
+  O_CALL (current_context, release);
 }
 
 O_IMPLEMENT(File, void, optimize, (void *_self))

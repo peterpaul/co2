@@ -17,4 +17,6 @@ O_METHOD_DEF(Expression, void, generate_left, (void *_self, bool left));
 
 O_CLASS(Expression, CompileObject);
 
+void Expression_generate_actual_argument(void *_arg, va_list *app);
+
 #endif /* Expression_H */

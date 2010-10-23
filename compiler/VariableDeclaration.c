@@ -37,11 +37,13 @@ O_IMPLEMENT(VariableDeclaration, void, generate, (void *_self))
 O_IMPLEMENT(VariableDeclaration, void, type_check, (void *_self))
 {
   struct VariableDeclaration * self = O_CAST(_self, VariableDeclaration());
+  O_CALL(current_context, add, self);
   if (self->expr)
     {
       O_CALL(self->expr, type_check);
       O_CALL(self->type, assert_compatible, self->expr->type);
     }
+  O_CALL(current_context, remove_last);
 }
 
 O_OBJECT(VariableDeclaration, Declaration);

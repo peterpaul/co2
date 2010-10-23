@@ -12,10 +12,10 @@ DEBUGFLG	= -g3 -DP_DEBUG
 ANSIFLGS	=
 #ANSIFLGS	= -ansi -pedantic
 
-#OPTFLAGS	= -O0
+OPTFLAGS	= -O0
 #OPTFLAGS	= -O9 -march=i686 -ffast-math -funroll-loops -fomit-frame-pointer
 #OPTFLAGS	= -O9 -mfpmath=sse -ffast-math -funroll-loops -fomit-frame-pointer
-OPTFLAGS	= -O2
+#OPTFLAGS	= -O2
 #OPTFLAGS	= -O9 -march=athlon-xp -mfpmath=sse -funroll-loops -ffast-math -malign-double -fomit-frame-pointer
 #OPTFLAGS	= -O9 -mfpmath=sse -funroll-loops -ffast-math -malign-double -fomit-frame-pointer
 #OPTFLAGS	= -mfpmath=sse -msse

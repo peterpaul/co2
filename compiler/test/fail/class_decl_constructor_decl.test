@@ -1,0 +1,17 @@
+package compiler.test;
+
+class AnObject
+{
+	int var;
+}
+
+class MyObject
+{
+	AnObject(int value) {
+	}
+}
+
+int main(int argc, char[][] argv)
+{
+	return 0;
+}
