@@ -5,6 +5,8 @@
 #include "PrimitiveType.h"
 #include "ArrayType.h"
 #include "FunctionType.h"
+#include "ObjectType.h"
+#include "ClassDeclaration.h"
 #include "Token.h"
 #include "grammar.tab.h"
 #include "io.h"
@@ -62,6 +64,13 @@ O_IMPLEMENT(TokenExpression, void, type_check, (void *_self))
 	  return;
 	}
       self->type = O_CALL(self->decl->type, retain);
+      break;
+    case SELF:
+      {
+	struct ClassDeclaration * class_decl = O_CALL(current_context, find, ClassDeclaration());
+	self->type = O_CALL_CLASS(ObjectType(), new, class_decl->name, class_decl);
+	O_CALL(self->type, retain);
+      }
       break;
     case INT_CONSTANT:
       {

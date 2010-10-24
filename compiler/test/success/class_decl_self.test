@@ -1,0 +1,18 @@
+package compiler.test;
+
+class MyObject
+{
+	int var;
+	int fun(int var)
+	{
+		self.var = var;
+		return self.var;
+	}
+}
+
+int main(int argc, char[][] argv)
+{
+	MyObject test = new MyObject();
+	int result = test.fun(5);
+	return result;
+}
