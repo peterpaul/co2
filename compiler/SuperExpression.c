@@ -57,7 +57,7 @@ O_IMPLEMENT(SuperExpression, void, type_check, (void *_self))
       
       if (self->actual_arguments->length < ctor_decl->formal_arguments->length)
 	{
-	  error(self->super, "%s needs %d arguments, but got %d.\n", ctor_decl->name->name->data, ctor_decl->formal_arguments->length, self->actual_arguments->length);
+	  error(self->super, "'%s' needs %d arguments, but got %d.\n", ctor_decl->name->name->data, ctor_decl->formal_arguments->length, self->actual_arguments->length);
 	  return;
 	}
       int i;
@@ -76,7 +76,7 @@ O_IMPLEMENT(SuperExpression, void, type_check, (void *_self))
       
       if (self->actual_arguments->length < function_decl->formal_arguments->length)
 	{
-	  error(self->super, "%s needs %d arguments, but got %d.\n", function_decl->name->name->data, function_decl->formal_arguments->length, self->actual_arguments->length);
+	  error(self->super, "'%s' needs %d arguments, but got %d.\n", function_decl->name->name->data, function_decl->formal_arguments->length, self->actual_arguments->length);
 	  struct Declaration * null_ptr_gen = NULL;
 	  null_ptr_gen->name=NULL;
 	}

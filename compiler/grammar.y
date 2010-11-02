@@ -776,7 +776,7 @@ destructor_declaration
 %%
 void yyerror (const char * msg)
 {
-  error (yylval.token, "%s near \"%s\"\n", msg, yytext);
+  error (yylval.token, "%s near '%s'\n", msg, yytext);
 }
 int parse ()
 {

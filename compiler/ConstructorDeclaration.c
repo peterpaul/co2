@@ -38,11 +38,11 @@ O_IMPLEMENT(ConstructorDeclaration, void, type_check, (void *_self))
   struct Declaration * class_decl = O_CALL(current_context, find, ClassDeclaration());
   if (class_decl == NULL) 
     {
-      error(self->class_name, "Constructors (%s) are only allowed in class declarations\n", self->class_name->name->data);
+      error(self->class_name, "Constructors ('%s') are only allowed in class declarations\n", self->class_name->name->data);
     }
   if (strcmp(class_decl->name->name->data, self->class_name->name->data) != 0) 
     {
-      error(self->class_name, "Constructor should be called %s", class_decl->name->name->data);
+      error(self->class_name, "Constructor should be called '%s'\n", class_decl->name->name->data);
     }
 
   self->type = O_CALL_CLASS(ObjectType(), new, self->class_name, class_decl);

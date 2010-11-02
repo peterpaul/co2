@@ -90,13 +90,13 @@ void NewExpression_type_check_object(void *_item)
 
 void NewExpression_type_check_arguments(struct TokenExpression * ctor_token, struct RefList * actual_arguments) {
   if (!o_is_of(ctor_token->decl, ConstructorDeclaration())) {
-    error(ctor_token->token, "%s is not a constructor.\n", ctor_token->token->name->data);
+    error(ctor_token->token, "'%s' is not a constructor.\n", ctor_token->token->name->data);
     return;
   }
   struct ConstructorDeclaration * ctor_decl = (struct ConstructorDeclaration *)ctor_token->decl;
   if (actual_arguments->length < ctor_decl->formal_arguments->length)
     {
-      error(ctor_token->token, "%s needs %d arguments, but got %d.\n", ctor_token->token->name->data, ctor_decl->formal_arguments->length, actual_arguments->length);
+      error(ctor_token->token, "'%s' needs %d arguments, but got %d.\n", ctor_token->token->name->data, ctor_decl->formal_arguments->length, actual_arguments->length);
       return;
     }
   int i;

@@ -102,7 +102,7 @@ O_IMPLEMENT(TokenExpression, void, type_check, (void *_self))
       }
       break;
     default:
-      error(self->token, "Unhandled TokenExpression: %s\n", self->token->name->data);
+      error(self->token, "Unhandled TokenExpression: '%s'\n", self->token->name->data);
       break;
     }
 }

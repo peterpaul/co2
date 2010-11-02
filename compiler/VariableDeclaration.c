@@ -43,6 +43,13 @@ O_IMPLEMENT(VariableDeclaration, void, type_check, (void *_self))
       O_CALL(self->expr, type_check);
       O_CALL(self->type, assert_compatible, self->expr->type);
     }
+
+  if (self->scope->parent != NULL && 
+      O_CALL(self->scope->parent, exists, self->name))
+    {
+      struct Declaration * first_decl = O_CALL(self->scope->parent, lookup, self->name);
+      error(self->name, "'%s' already declared at %s:%d\n", self->name->name->data, first_decl->name->file->data, first_decl->name->line);
+    }
   O_CALL(current_context, remove_last);
 }
 

@@ -110,7 +110,7 @@ O_IMPLEMENT(FunctionCallExpression, void, type_check, (void *_self))
 	  struct FunctionDeclaration * fun_decl = (struct FunctionDeclaration *) function->decl;
 	  if (self->actual_arguments->length < fun_decl->formal_arguments->length)
 	    {
-	      error(function->token, "%s needs %d arguments, but got %d.\n", function->token->name->data, fun_decl->formal_arguments->length, self->actual_arguments->length);
+	      error(function->token, "'%s' needs %d arguments, but got %d.\n", function->token->name->data, fun_decl->formal_arguments->length, self->actual_arguments->length);
 	      return;
 	    }
 	  int i;
@@ -129,7 +129,7 @@ O_IMPLEMENT(FunctionCallExpression, void, type_check, (void *_self))
 	}
       else
 	{
-	  error(function->token, "%s is not a function.\n", function->token->name->data);
+	  error(function->token, "'%s' is not a function.\n", function->token->name->data);
 	}
     }
   else

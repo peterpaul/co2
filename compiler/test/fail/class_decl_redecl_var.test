@@ -1,0 +1,16 @@
+package compiler.test;
+
+class ObjectA
+{
+	int var;
+}
+
+class ObjectB:ObjectA
+{
+	int var;
+}
+
+int main(int argc, char[][] argv)
+{
+	return 0;
+}
