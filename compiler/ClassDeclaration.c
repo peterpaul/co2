@@ -39,18 +39,21 @@ static int member_filter(void *_member, va_list * app)
   return o_is_of(_member, va_arg(*app, void *));
 }
 
-static int new_member_filter(void *_member)
+static int new_member_filter(void *_member, va_list * app)
 {
   struct Declaration * member = O_CAST(_member, Declaration());
-  return O_BRANCH_CALL(member->scope->parent, lookup_in_this_scope, member->name) == NULL;
+  struct Class * _type = va_arg(*app, struct Class *);
+  struct Class * type = O_IS_CLASS(_type);
+  return O_BRANCH_CALL(member->scope->parent, lookup_type_in_this_scope, member->name, type) == NULL;
 }
 
 static int new_constructor_filter(void *_constructor)
 {
   struct ConstructorDeclaration * constructor = O_CAST(_constructor, ConstructorDeclaration());
-  if (strcmp(constructor->name->name->data, "ctor") != 0) {
-    return new_member_filter(constructor);
-  }
+  if (strcmp(constructor->name->name->data, "ctor") != 0)
+    {
+      return O_BRANCH_CALL(constructor->scope->parent, lookup_type_in_this_scope, constructor->name, ConstructorDeclaration()) == NULL;
+    }
   return false;
 }
 
@@ -272,7 +275,7 @@ O_IMPLEMENT(ClassDeclaration, void, generate, (void *_self))
   struct RefList * destructors = O_CALL(self->members, filter_args, member_filter, DestructorDeclaration());
   O_CALL(destructors, retain);
 
-  struct RefList * new_methods = O_CALL(methods, filter, new_member_filter);
+  struct RefList * new_methods = O_CALL(methods, filter_args, new_member_filter, FunctionDeclaration());
   O_CALL(new_methods, retain);
 
   struct RefList * new_constructors = O_CALL(constructors, filter, new_constructor_filter);
