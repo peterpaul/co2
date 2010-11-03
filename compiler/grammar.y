@@ -105,6 +105,7 @@
 %type	<list>		var_id_decl_list
 %type	<declaration>	function_header
 %type	<list>		formal_arg_list_var
+%type	<list>		opt_formal_arg_list
 %type	<list>		formal_arg_list
 %type	<declaration>	formal_arg
 %type	<list>		interface_list
@@ -339,13 +340,17 @@ formal_arg_list_var
   struct ArgumentDeclaration * arg = O_CALL_CLASS(ArgumentDeclaration(), new, NULL, $3);
   O_CALL($$, append, arg);
 }
-|	formal_arg_list
+|	opt_formal_arg_list
 |	VA_ARG
 {
   $$ = O_CALL_CLASS(RefList(), new, 8, ArgumentDeclaration());
   struct ArgumentDeclaration * arg = O_CALL_CLASS(ArgumentDeclaration(), new, NULL, $1);
   O_CALL($$, append, arg);
 }
+;
+
+opt_formal_arg_list
+:	formal_arg_list
 |
 	/* empty */
 {
@@ -747,7 +752,7 @@ constructor_declaration
   struct Token * ctor_name = O_CALL_CLASS(Token(), new, "ctor", IDENTIFIER, filename, $1->line);
   O_CALL_CLASS(Scope(), new, ARGUMENT_SCOPE, ctor_name); 
 }
-formal_arg_list ')' statement
+opt_formal_arg_list ')' statement
 {
   struct ConstructorDeclaration * decl = O_CALL_CLASS(ConstructorDeclaration(), new, current_scope->name, $1, $4, $6);
   O_CALL(current_scope, leave);
@@ -757,7 +762,7 @@ formal_arg_list ')' statement
 { 
   O_CALL_CLASS(Scope(), new, ARGUMENT_SCOPE, $3); 
 }
-formal_arg_list ')' statement
+opt_formal_arg_list ')' statement
 {
   struct ConstructorDeclaration * decl = O_CALL_CLASS(ConstructorDeclaration(), new, $3, $1, $6, $8);
   O_CALL(current_scope, leave);

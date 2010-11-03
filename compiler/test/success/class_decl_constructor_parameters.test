@@ -1,0 +1,32 @@
+package compiler.test;
+
+class ObjectA
+{
+	ObjectA() {
+		foo = 3;
+	}
+
+	int foo;
+
+	int get_foo()
+	{
+		return foo;
+	}
+}
+
+class ObjectB : ObjectA
+{
+	ObjectB.bar() {
+		super();
+	}
+
+	int foo(int bar) {
+		return get_foo() + bar;
+	}
+}
+
+int main(int argc, char[][] argv)
+{
+	ObjectB b = new ObjectB();
+	return b.foo(6);
+}
