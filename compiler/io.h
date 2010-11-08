@@ -2,6 +2,7 @@
 #define _IO_H
 
 #include "String.h"
+#include "List.h"
 #include "lex.yy.h"
 
 extern FILE * out;
@@ -10,6 +11,8 @@ extern const char * filename;
 
 extern struct String * base_dir;
 extern struct String * file_path;
+
+extern struct List * path;
 
 FILE * open_input (const char * filename);
 FILE * open_output (const char * filename);

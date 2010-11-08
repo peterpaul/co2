@@ -27,8 +27,17 @@ O_IMPLEMENT(ArgumentDeclaration, void, generate, (void *_self))
   O_CALL(self->name, generate);
 }
 
+O_IMPLEMENT(ArgumentDeclaration, void, type_check, (void *_self))
+{
+  struct ArgumentDeclaration * self = O_CAST(_self, ArgumentDeclaration());
+  O_CALL(current_context, add, self);
+  O_CALL(self->type, type_check);
+  O_CALL(current_context, remove_last);
+}
+
 O_OBJECT(ArgumentDeclaration, Declaration);
 O_OBJECT_METHOD(ArgumentDeclaration, ctor);
 O_OBJECT_METHOD(ArgumentDeclaration, dtor);
 O_OBJECT_METHOD(ArgumentDeclaration, generate);
+O_OBJECT_METHOD(ArgumentDeclaration, type_check);
 O_END_OBJECT

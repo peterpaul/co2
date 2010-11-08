@@ -112,6 +112,7 @@ void NewExpression_type_check_arguments(struct TokenExpression * ctor_token, str
 O_IMPLEMENT(NewExpression, void, type_check, (void *_self))
 {
   struct NewExpression *self = O_CAST(_self, NewExpression());
+  O_CALL(self->new_type, type_check);
   if (self->ctor_arguments)
     {
       struct ObjectType * object_type = o_cast(self->new_type, ObjectType());

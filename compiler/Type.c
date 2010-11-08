@@ -58,9 +58,15 @@ O_IMPLEMENT(Type, void, assert_compatible, (void *_self, void *_other))
     }
 }
 
+O_IMPLEMENT(Type, void, type_check, (void *_self))
+{
+  struct Type * self = O_CAST(_self, Type());
+}
+
 O_OBJECT(Type, CompileObject);
 O_OBJECT_METHOD(Type, ctor);
 O_OBJECT_METHOD(Type, dtor);
 O_OBJECT_METHOD(Type, is_compatible);
 O_OBJECT_METHOD(Type, assert_compatible);
+O_OBJECT_METHOD(Type, type_check);
 O_END_OBJECT

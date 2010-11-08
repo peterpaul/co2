@@ -24,6 +24,15 @@ O_IMPLEMENT(ObjectType, void *, dtor, (void *_self))
   return O_SUPER->dtor(self);
 }
 
+O_IMPLEMENT(ObjectType, void, type_check, (void *_self))
+{
+  struct ObjectType *self = O_CAST(_self, ObjectType());
+  if (self->decl == NULL)
+    {
+      self->decl = O_CALL(global_scope, lookup, self->token);
+    }
+}
+
 O_IMPLEMENT(ObjectType, void, generate, (void *_self))
 {
   struct ObjectType *self = O_CAST(_self, ObjectType());
@@ -64,6 +73,7 @@ O_OBJECT(ObjectType, Type);
 O_OBJECT_METHOD(ObjectType, ctor);
 O_OBJECT_METHOD(ObjectType, dtor);
 O_OBJECT_METHOD(ObjectType, generate);
+O_OBJECT_METHOD(ObjectType, type_check);
 O_OBJECT_METHOD(ObjectType, get_token);
 O_OBJECT_METHOD(ObjectType, to_string);
 O_END_OBJECT

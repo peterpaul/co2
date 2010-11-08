@@ -15,6 +15,17 @@ O_IMPLEMENT(CompileObject, void *, dtor, (void *_self))
   return O_SUPER->dtor(self);
 }
 
+/* filter methods */
+int type_filter(void *_member, va_list * app)
+{
+  return o_is_of(_member, va_arg(*app, void *));
+}
+
+int not_type_filter(void *_member, va_list * app)
+{
+  return !type_filter(_member, app);;
+}
+
 O_OBJECT(CompileObject, RefObject);
 O_OBJECT_METHOD(CompileObject, ctor);
 O_OBJECT_METHOD(CompileObject, dtor);

@@ -42,7 +42,10 @@ void CompoundStatement_type_check_body(void *_item)
 O_IMPLEMENT(CompoundStatement, void, type_check, (void *_self))
 {
   struct CompoundStatement *self = O_CAST(_self, CompoundStatement());
-  O_CALL(self->body, map, CompoundStatement_type_check_body);
+  struct RefList * declarations = O_CALL(self->body, filter_args, type_filter, Declaration());
+  struct RefList * expressions = O_CALL(self->body, filter_args, not_type_filter, Declaration());
+  O_CALL(declarations, map, CompoundStatement_type_check_body);
+  O_CALL(expressions, map, CompoundStatement_type_check_body);
 }
 
 O_OBJECT(CompoundStatement, Statement);

@@ -3,12 +3,14 @@
 #include "Token.h"
 #include "RefList.h"
 #include "IncludeStack.h"
+#include "String.h"
+#include "List.h"
 
 int linenumber = 1;
 const char * filename;
 
 static const char * input_file_name = NULL;
-struct RefList * path = NULL;
+struct List * path;
 
 void new_input(const char *);
 %}
@@ -112,7 +114,7 @@ static void try_search_path(const char * file_name)
 	for (i = 0; i < path->length; i++) {
 		struct String * item = (struct String *)O_CALL(path, get, i);
 		struct String * full_path = O_CALL_CLASS(String(), new, "%s", item->data);
-		O_CALL(full_path, append_str, "%s", file_name);
+		O_CALL(full_path, append_str, "%s.%s", file_name, "inc");
 		if ((yyin = fopen(full_path->data, "r")) != 0) {
 			fprintf(stderr, "Found file: %s\n", full_path->data);
 			O_CALL(full_path, delete);
@@ -121,7 +123,7 @@ static void try_search_path(const char * file_name)
 		O_CALL(full_path, delete);
 	}
 
-	error(NULL, "cannot open %s", file_name);
+	error(NULL, "cannot open '%s'\n", file_name);
 	exit(EXIT_FAILURE);
 }
 

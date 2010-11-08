@@ -64,6 +64,7 @@ O_IMPLEMENT(FunctionDeclaration, void, type_check, (void *_self))
 {
   struct FunctionDeclaration * self = O_CAST(_self, FunctionDeclaration());
   O_CALL(current_context, add, self);
+  O_CALL(self->type, type_check);
   O_CALL(self->body, type_check);
   O_CALL(current_context, remove_last);
 }

@@ -34,11 +34,6 @@ O_IMPLEMENT(ClassDeclaration, void *, dtor, (void *_self))
   O_BRANCH_CALL(self->members, release);
 }
 
-static int member_filter(void *_member, va_list * app)
-{
-  return o_is_of(_member, va_arg(*app, void *));
-}
-
 static int new_member_filter(void *_member, va_list * app)
 {
   struct Declaration * member = O_CAST(_member, Declaration());
@@ -266,13 +261,13 @@ O_IMPLEMENT(ClassDeclaration, void, generate, (void *_self))
 {
   struct ClassDeclaration * self = O_CAST(_self, ClassDeclaration());
   /* filter the members */
-  struct RefList * attributes = O_CALL(self->members, filter_args, member_filter, VariableDeclaration());
+  struct RefList * attributes = O_CALL(self->members, filter_args, type_filter, VariableDeclaration());
   O_CALL(attributes, retain);
-  struct RefList * methods = O_CALL(self->members, filter_args, member_filter, FunctionDeclaration());
+  struct RefList * methods = O_CALL(self->members, filter_args, type_filter, FunctionDeclaration());
   O_CALL(methods, retain);
-  struct RefList * constructors = O_CALL(self->members, filter_args, member_filter, ConstructorDeclaration());
+  struct RefList * constructors = O_CALL(self->members, filter_args, type_filter, ConstructorDeclaration());
   O_CALL(constructors, retain);
-  struct RefList * destructors = O_CALL(self->members, filter_args, member_filter, DestructorDeclaration());
+  struct RefList * destructors = O_CALL(self->members, filter_args, type_filter, DestructorDeclaration());
   O_CALL(destructors, retain);
 
   struct RefList * new_methods = O_CALL(methods, filter_args, new_member_filter, FunctionDeclaration());

@@ -21,4 +21,7 @@ O_METHOD_DEF(CompileObject, struct Token *, get_token, (void *_self));
 
 O_CLASS(CompileObject, RefObject);
 
+int type_filter(void *_member, va_list * app);
+int not_type_filter(void *_member, va_list * app);
+
 #endif /* CompileObject_H */

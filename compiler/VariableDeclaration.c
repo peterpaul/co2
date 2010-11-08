@@ -38,6 +38,7 @@ O_IMPLEMENT(VariableDeclaration, void, type_check, (void *_self))
 {
   struct VariableDeclaration * self = O_CAST(_self, VariableDeclaration());
   O_CALL(current_context, add, self);
+  O_CALL(self->type, type_check);
   if (self->expr)
     {
       O_CALL(self->expr, type_check);

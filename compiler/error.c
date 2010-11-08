@@ -4,6 +4,7 @@
 #include <assert.h>
 
 #include "error.h"
+#include "io.h"
 
 int errors = 0;
 int warnings = 0;
@@ -14,6 +15,14 @@ static int write_error_message (const struct Token *token, const char *msg, va_l
   if (token) 
     {
       result += fprintf (stderr, "%s:%d: ", token->file->data, token->line);
+    }
+  else if (filename != NULL)
+    {
+      result += fprintf (stderr, "%s:0: ", filename);
+    }
+  else
+    {
+      result += fprintf (stderr, "<null>:0: ");
     }
   result += vfprintf (stderr, msg, *app);
   return result;

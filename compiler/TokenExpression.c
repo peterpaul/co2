@@ -105,6 +105,7 @@ O_IMPLEMENT(TokenExpression, void, type_check, (void *_self))
       error(self->token, "Unhandled TokenExpression: '%s'\n", self->token->name->data);
       break;
     }
+  O_CALL(self->type, type_check);
 }
 
 O_IMPLEMENT(TokenExpression, void, lookup, (void *_self))

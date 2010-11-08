@@ -69,6 +69,7 @@ void parse_import(void *_import, va_list *app)
 {
   struct Path * import = o_cast(_import, Path());
   struct String * import_path = O_CALL(import, to_system_path);
+  fprintf(stderr, "import: %s\n", import_path->data);
   /*
   struct String * path = O_CALL(base_dir, clone);
   O_CALL(path, append, import_path);
@@ -76,11 +77,13 @@ void parse_import(void *_import, va_list *app)
   O_CALL(path, delete);
   */
   new_input(import_path->data);
+  yyparse();
 }
 
 O_IMPLEMENT(File, void, parse_imports, (void *_self))
 {
   struct File *self = O_CAST(_self, File());
+  fprintf(stderr, "checking imports...\n");
   if (!self->imported_files)
     {
       self->imported_files = O_CALL_CLASS(RefList(), new, 0, File());

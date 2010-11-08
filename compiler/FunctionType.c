@@ -166,6 +166,12 @@ O_IMPLEMENT(FunctionType, struct Token *, get_token, (void *_self))
   return O_CALL(self->return_type, get_token);
 }
 
+O_IMPLEMENT(FunctionType, void, type_check, (void *_self))
+{
+  struct FunctionType *self = O_CAST(_self, FunctionType());
+  O_CALL(self->return_type, type_check);
+}
+
 O_OBJECT(FunctionType, Type);
 O_OBJECT_METHOD(FunctionType, ctor);
 O_OBJECT_METHOD(FunctionType, ctor_from_decl);
@@ -175,4 +181,5 @@ O_OBJECT_METHOD(FunctionType, is_compatible);
 O_OBJECT_METHOD(FunctionType, get_token);
 O_OBJECT_METHOD(FunctionType, generate);
 O_OBJECT_METHOD(FunctionType, to_string);
+O_OBJECT_METHOD(FunctionType, type_check);
 O_END_OBJECT
