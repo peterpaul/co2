@@ -1,6 +1,7 @@
 #include "ArgumentDeclaration.h"
 #include "Type.h"
 #include "io.h"
+#include "grammar.tab.h"
 
 #define O_SUPER Declaration()
 
@@ -16,15 +17,23 @@ O_IMPLEMENT(ArgumentDeclaration, void *, ctor, (void *_self, va_list *app))
 O_IMPLEMENT(ArgumentDeclaration, void *, dtor, (void *_self))
 {
   struct ArgumentDeclaration *self = O_CAST(_self, ArgumentDeclaration());
+  // O_CALL(self->type, release);
   return O_SUPER->dtor(self);
 }
 
 O_IMPLEMENT(ArgumentDeclaration, void, generate, (void *_self))
 {
   struct ArgumentDeclaration *self = O_CAST(_self, ArgumentDeclaration());
-  O_CALL(self->type, generate);
-  fprintf(out, " ");
-  O_CALL(self->name, generate);
+  if (self->name->type == VA_ARG)
+    {
+      O_CALL(self->name, generate);
+    }
+  else
+    {
+      O_CALL(self->type, generate);
+      fprintf(out, " ");
+      O_CALL(self->name, generate);
+    }
 }
 
 O_IMPLEMENT(ArgumentDeclaration, void, type_check, (void *_self))

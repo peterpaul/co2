@@ -1,0 +1,6 @@
+package compiler.test;
+
+int fun_no_param(...)
+{
+	return 4 + 5;
+}

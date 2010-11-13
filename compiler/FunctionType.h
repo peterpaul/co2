@@ -14,6 +14,7 @@ O_METHOD_DEF(FunctionType, void *, ctor_from_expr, (void *_self, va_list *app));
 
 #define FunctionType_Attr			\
   Type_Attr;					\
+  bool has_var_args;				\
   struct Type * return_type;			\
   struct RefList * parameters;			\
   struct Token * generated_name

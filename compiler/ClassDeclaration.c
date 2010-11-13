@@ -12,6 +12,8 @@
 #include "io.h"
 #include "Statement.h"
 #include "Scope.h"
+#include "PrimitiveType.h"
+#include "grammar.tab.h"
 
 #define O_SUPER Declaration()
 
@@ -231,7 +233,50 @@ static void ClassDeclaration_generate_method_implementation(void *_method_decl, 
   fprintf(out, "* self=O_CAST(_self, ");
   O_CALL(class_decl->name, generate);
   fprintf(out, "());\n");
+
+  if (!o_is_of(method_type->return_type, PrimitiveType()) ||
+      ((struct PrimitiveType *)(method_type->return_type))->token->type != VOID)
+    {
+      O_CALL(method_type->return_type, generate);
+      fprintf(out, " return_value;\n");
+    }
+
+  if (method_type->has_var_args)
+    {
+      fprintf(out, "va_list ap;\n");
+      fprintf(out, "va_start(ap, ");
+      struct ArgumentDeclaration * arg_decl;
+      if (method_decl->formal_arguments->length == 1)
+	{
+	  fprintf(out, "_self");
+	}
+      else
+	{
+	  struct ArgumentDeclaration * arg_decl = O_CALL(method_decl->formal_arguments, get, method_decl->formal_arguments->length - 2);
+	  O_CALL(arg_decl->name, generate);
+	}
+      fprintf(out, ");\n");
+    }
+
   O_CALL(method_decl->body, generate);
+
+  if (!o_is_of(method_type->return_type, PrimitiveType()) ||
+      ((struct PrimitiveType *)(method_type->return_type))->token->type != VOID)
+    {
+      fprintf(out, "function_end:\n");
+    }
+
+  if (method_type->has_var_args)
+    {
+      fprintf(out, "va_end(ap);\n");
+    }
+
+  if (!o_is_of(method_type->return_type, PrimitiveType()) ||
+      ((struct PrimitiveType *)(method_type->return_type))->token->type != VOID)
+    {
+      fprintf(out, "return return_value;\n");
+    }
+
   fprintf(out, "}\n\n");
 }
 

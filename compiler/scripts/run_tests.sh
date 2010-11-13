@@ -25,10 +25,12 @@ test_separator
 echo "Success test-cases"
 test_separator
 ERRORS=0
+TOTAL=0
 # Testcases that should work
 TESTS=`find ${TESTDIR}/success -name "*.test" | sort`
 for TEST in ${TESTS}
 do
+    TOTAL=$(( TOTAL + 1 ))
     # Compile the testcase
     BASENAME=`basename ${TEST} .test`
     echo -n "--- ${BASENAME}... "
@@ -38,8 +40,8 @@ do
     then
 	
 	fail_test "ERROR: ${TEST} failed: Compiler error"
-	cat ${TARGETNAME}.err
-	echo "Command: ${COMPILER} ${TEST} ${TARGETNAME}.c"
+	# cat ${TARGETNAME}.err
+	echo "Command: ${COMPILER} ${TEST} ${TARGETNAME}.c" > ${TARGETNAME}.err
     else
 	# Compile the generated code with gcc
 	pushd `dirname ${TARGETNAME}.bin` > /dev/null 2>&1
@@ -49,7 +51,7 @@ do
 	if [[ "${GCC_STATUS}" != "0" ]]
 	then
 	    fail_test "ERROR: ${TEST} failed: GCC error"
-	    cat ${TARGETNAME}.err
+	    # cat ${TARGETNAME}.err
 	else
 	    # When no input and output exists, create empty in/output.
 	    TESTINPUT=${TESTDIR}/success/${BASENAME}.in
@@ -77,6 +79,8 @@ test_separator
 TESTS=`find ${TESTDIR}/fail -name "*.test" | sort`
 for TEST in ${TESTS}
 do
+    TOTAL=$(( TOTAL + 1 ))
+
     BASENAME=`basename ${TEST} .test`
     echo -n "--- ${BASENAME}... "
     TARGETNAME=${TARGET}/fail/${BASENAME}
@@ -84,8 +88,8 @@ do
     if [[ "$?" == "0" ]]
     then
 	fail_test "ERROR: ${TEST} failed."
-	cat ${TARGETNAME}.err
-	echo "Command: ${COMPILER} ${TEST} ${TARGETNAME}.c"
+	# cat ${TARGETNAME}.err
+	echo "Command: ${COMPILER} ${TEST} ${TARGETNAME}.c" > ${TARGETNAME}.err
     else
 	echo "OK"
 	# rm -f ${TARGETNAME}.err
@@ -99,7 +103,10 @@ then
 #    rm -rf ${TARGET}/success
 #    rm -rf ${TARGET}/fail
     touch ${TARGET}/OK
-    echo "All tests passed."
+    echo "All $TOTAL tests passed."
+else
+    echo "$ERRORS test of the $TOTAL failed."    
 fi
+test_separator
 
 exit ${ERRORS}

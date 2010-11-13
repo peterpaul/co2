@@ -50,9 +50,10 @@ STRING_CONST	\"({CHAR_SYMBOL}|\')*\"
 "self"		yylval.token = O_CALL_CLASS(Token(), new, yytext, SELF, filename, linenumber); return yylval.token->type;
 "super"		yylval.token = O_CALL_CLASS(Token(), new, yytext, SUPER, filename, linenumber); return yylval.token->type;
 "unsigned"	return UNSIGNED;
+"va_arg"	return GET_VA_ARG;
 "void"		yylval.token = O_CALL_CLASS(Token(), new, yytext, VOID, filename, linenumber); return yylval.token->type;
 "while"		return WHILE;
-"..."		return VA_ARG;
+"..."		yylval.token = O_CALL_CLASS(Token(), new, yytext, VA_ARG, filename, linenumber); return yylval.token->type;
 "&&"		yylval.token = O_CALL_CLASS(Token(), new, yytext, AND, filename, linenumber); return yylval.token->type;
 "||"		yylval.token = O_CALL_CLASS(Token(), new, yytext, OR, filename, linenumber); return yylval.token->type;
 "=="		yylval.token = O_CALL_CLASS(Token(), new, yytext, EQ, filename, linenumber); return yylval.token->type;

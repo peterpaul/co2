@@ -28,6 +28,7 @@
 #include "UnaryExpression.h"
 #include "Token.h"
 #include "TokenExpression.h"
+#include "VarArgExpression.h"
 #include "Type.h"
 #include "FunctionType.h"
 #include "ArrayType.h"
@@ -69,6 +70,7 @@
 %token <token> FLOAT_CONSTANT
 %token <token> FOR
 %token <token> FOREACH
+%token <token> GET_VA_ARG
 %token <token> IDENTIFIER
 %token <token> IF
 %token <token> IMPORT
@@ -340,14 +342,16 @@ formal_arg_list_var ')'
 formal_arg_list_var
 :	formal_arg_list ',' VA_ARG
 {
-  struct ArgumentDeclaration * arg = O_CALL_CLASS(ArgumentDeclaration(), new, NULL, $3);
+  struct Type * va_arg_type = O_CALL_CLASS(PrimitiveType(), new, $3);
+  struct ArgumentDeclaration * arg = O_CALL_CLASS(ArgumentDeclaration(), new, $3, va_arg_type);
   O_CALL($$, append, arg);
 }
 |	opt_formal_arg_list
 |	VA_ARG
 {
   $$ = O_CALL_CLASS(RefList(), new, 8, ArgumentDeclaration());
-  struct ArgumentDeclaration * arg = O_CALL_CLASS(ArgumentDeclaration(), new, NULL, $1);
+  struct Type * va_arg_type = O_CALL_CLASS(PrimitiveType(), new, $1);
+  struct ArgumentDeclaration * arg = O_CALL_CLASS(ArgumentDeclaration(), new, $1, va_arg_type);
   O_CALL($$, append, arg);
 }
 ;
@@ -694,6 +698,7 @@ expression
   $$ = O_CALL_CLASS(SuperExpression(), new, $1, NULL, $3);
 }
 |	SUPER '.' IDENTIFIER '(' opt_actual_arg_list ')' { $$ = O_CALL_CLASS(SuperExpression(), new, $1, $3, $5); }
+|	GET_VA_ARG '(' type ')' { $$ = O_CALL_CLASS(VarArgExpression(), new, $3); }
 ;
 
 constant

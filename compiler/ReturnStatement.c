@@ -22,9 +22,10 @@ O_IMPLEMENT(ReturnStatement, void *, dtor, (void *_self))
 O_IMPLEMENT(ReturnStatement, void, generate, (void *_self))
 {
   struct ReturnStatement *self = O_CAST(_self, ReturnStatement());
-  fprintf(out, "return ");
+  fprintf(out, "return_value = ");
   O_BRANCH_CALL(self->expr, generate);
   fprintf(out, ";\n");
+  fprintf(out, "goto function_end;\n");
 }
 
 O_IMPLEMENT(ReturnStatement, void, type_check, (void *_self))

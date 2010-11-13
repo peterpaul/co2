@@ -2,7 +2,7 @@
 
 #define O_SUPER $2()
 
-O_IMPLEMENT($1, void *, ctor, (void *_self, va_list *app), (_self, app))
+O_IMPLEMENT($1, void *, ctor, (void *_self, va_list *app))
 {
   struct $1 * self = O_CAST(_self, $1());
   self = O_SUPER->ctor(self, app);
@@ -10,7 +10,7 @@ O_IMPLEMENT($1, void *, ctor, (void *_self, va_list *app), (_self, app))
   return self;
 }
 
-O_IMPLEMENT($1, void *, dtor, (void *_self), (_self))
+O_IMPLEMENT($1, void *, dtor, (void *_self))
 {
   struct $1 *self = O_CAST(_self, $1());
   /* TODO cleanup */

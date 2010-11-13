@@ -4,6 +4,10 @@
 #include "Statement.h"
 #include "io.h"
 #include "FunctionType.h"
+#include "ArgumentDeclaration.h"
+#include "ClassDeclaration.h"
+#include "grammar.tab.h"
+#include "PrimitiveType.h"
 
 #define O_SUPER Declaration()
 
@@ -49,15 +53,50 @@ O_IMPLEMENT(FunctionDeclaration, void, generate, (void *_self))
 {
   struct FunctionDeclaration * self = O_CAST(_self, FunctionDeclaration());
   bool first_formal_arg = true;
-  O_CALL(get_type(self)->return_type, generate);
+  struct FunctionType * function_type = get_type(self);
+  O_CALL(function_type->return_type, generate);
   fprintf(out, " ");
   O_CALL(self->name, generate);
   fprintf(out, "(");
   O_CALL(self->formal_arguments, map_args, FunctionDeclaration_generate_formal_arg, &first_formal_arg);
   fprintf(out, ")\n");
   fprintf(out, "{\n");
+
+  if (!o_is_of(function_type->return_type, PrimitiveType()) ||
+      ((struct PrimitiveType *)(function_type->return_type))->token->type != VOID)
+    {
+      O_CALL(function_type->return_type, generate);
+      fprintf(out, " return_value;\n");
+    }
+
+  if (function_type->has_var_args)
+    {
+      fprintf(out, "va_list ap;\n");
+      fprintf(out, "va_start(ap, ");
+      struct ArgumentDeclaration * arg_decl = O_CALL(self->formal_arguments, get, self->formal_arguments->length - 2);
+      O_CALL(arg_decl->name, generate);
+      fprintf(out, ");\n");
+    }
   O_CALL(self->body, generate);
-  fprintf(out, "}\n");
+
+  if (!o_is_of(function_type->return_type, PrimitiveType()) ||
+      ((struct PrimitiveType *)(function_type->return_type))->token->type != VOID)
+    {
+      fprintf(out, "function_end:\n");
+    }
+
+  if (function_type->has_var_args)
+    {
+      fprintf(out, "va_end(ap);\n");
+    }
+
+  if (!o_is_of(function_type->return_type, PrimitiveType()) ||
+      ((struct PrimitiveType *)(function_type->return_type))->token->type != VOID)
+    {
+      fprintf(out, "return return_value;\n");
+    }
+
+  fprintf(out, "}\n\n");
 }
 
 O_IMPLEMENT(FunctionDeclaration, void, type_check, (void *_self))
@@ -66,6 +105,17 @@ O_IMPLEMENT(FunctionDeclaration, void, type_check, (void *_self))
   O_CALL(current_context, add, self);
   O_CALL(self->type, type_check);
   O_CALL(self->body, type_check);
+
+  struct FunctionType * function_type = get_type(self);
+  if (function_type->has_var_args)
+    {
+      struct Declaration * class_decl = O_CALL(current_context, find, ClassDeclaration());
+      if (class_decl == NULL &&
+	  self->formal_arguments->length <= 1)
+	{
+	  error(self->name, "variable argument list only supported on functions with at least one fixed argument.\n");
+	}
+    }
   O_CALL(current_context, remove_last);
 }
 

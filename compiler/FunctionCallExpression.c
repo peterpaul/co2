@@ -108,13 +108,18 @@ O_IMPLEMENT(FunctionCallExpression, void, type_check, (void *_self))
       if (o_is_of(function->decl, FunctionDeclaration()))
 	{
 	  struct FunctionDeclaration * fun_decl = (struct FunctionDeclaration *) function->decl;
-	  if (self->actual_arguments->length < fun_decl->formal_arguments->length)
+	  int expected_length = function_type->parameters->length;
+	  if (function_type->has_var_args)
+	    {
+	      expected_length -= 1;
+	    }
+	  if (self->actual_arguments->length < expected_length)
 	    {
 	      error(function->token, "'%s' needs %d arguments, but got %d.\n", function->token->name->data, fun_decl->formal_arguments->length, self->actual_arguments->length);
 	      return;
 	    }
 	  int i;
-	  for (i = 0; i < fun_decl->formal_arguments->length; i++)
+	  for (i = 0; i < expected_length; i++)
 	    {
 	      struct ArgumentDeclaration * arg_decl = O_CALL(fun_decl->formal_arguments, get, i);
 	      struct Expression * arg_expr = O_CALL(self->actual_arguments, get, i);
