@@ -3,3 +3,5 @@
 *.bin
 *.a
 target
+grammar.tab.[ch]
+lex.yy.[ch]

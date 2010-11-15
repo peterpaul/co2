@@ -52,6 +52,14 @@ void FunctionDeclaration_generate_formal_arg(void *_decl, va_list * ap)
 O_IMPLEMENT(FunctionDeclaration, void, generate, (void *_self))
 {
   struct FunctionDeclaration * self = O_CAST(_self, FunctionDeclaration());
+  // don't generate if external definition
+  if (self->include_file) 
+    {
+      fprintf(out, "#include ");
+      O_CALL(self->include_file, generate);
+      fprintf(out, "\n");
+      return;
+    }
   bool first_formal_arg = true;
   struct FunctionType * function_type = get_type(self);
   O_CALL(function_type->return_type, generate);
@@ -77,7 +85,7 @@ O_IMPLEMENT(FunctionDeclaration, void, generate, (void *_self))
       O_CALL(arg_decl->name, generate);
       fprintf(out, ");\n");
     }
-  O_CALL(self->body, generate);
+  O_BRANCH_CALL(self->body, generate);
 
   if (!o_is_of(function_type->return_type, PrimitiveType()) ||
       ((struct PrimitiveType *)(function_type->return_type))->token->type != VOID)
@@ -104,7 +112,7 @@ O_IMPLEMENT(FunctionDeclaration, void, type_check, (void *_self))
   struct FunctionDeclaration * self = O_CAST(_self, FunctionDeclaration());
   O_CALL(current_context, add, self);
   O_CALL(self->type, type_check);
-  O_CALL(self->body, type_check);
+  O_BRANCH_CALL(self->body, type_check);
 
   struct FunctionType * function_type = get_type(self);
   if (function_type->has_var_args)

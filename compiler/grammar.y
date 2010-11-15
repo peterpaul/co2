@@ -106,6 +106,9 @@
 %type	<declaration>	var_id_decl
 %type	<list>		var_id_decl_list
 %type	<declaration>	function_header
+%type	<list>		definition_declaration
+%type	<list>		definition_list
+%type	<list>		definition
 %type	<list>		formal_arg_list_var
 %type	<list>		opt_formal_arg_list
 %type	<list>		formal_arg_list
@@ -137,6 +140,7 @@
 %type	<list>		actual_arg_list
 %type	<list>		opt_actual_arg_list
 %type	<token>		string_constant
+%type	<token>		header_file
 %type	<list>		macro_identifier_list
 
 %left		<token>	','
@@ -251,6 +255,11 @@ declaration_list
   $$ = O_CALL($1, merge, $2);
 }
 |	variable_declaration_list
+|	declaration_list definition_declaration
+{
+  $$ = O_CALL($1, merge, $2);
+}
+|	definition_declaration
 ;
 
 declaration
@@ -279,6 +288,45 @@ declaration
 {
   O_CALL(current_scope, declare, $1);
   $$ = $1;
+}
+;
+
+definition_declaration
+:	header_file definition
+{
+  $$ = $2;
+  O_CALL($$, map_args, Declaration_list_set_include_header, $1);
+}
+|	header_file '{' definition_list '}'
+{
+  $$ = $3;
+  O_CALL($$, map_args, Declaration_list_set_include_header, $3);
+}
+;
+
+definition_list
+:	definition_list definition
+{
+  O_CALL($1, merge, $2);
+}
+|	definition
+;
+
+definition
+:	variable_declaration_list
+|	function_header ';'
+{
+  O_CALL(current_scope, leave);
+  O_CALL(current_scope, declare, $1);
+  $$ = O_CALL_CLASS(RefList(), new, 8, Declaration());
+  O_CALL($$, append, $1);
+}
+;
+
+header_file
+:	'[' STRING_CONSTANT ']'
+{
+  $$ = $2;
 }
 ;
 

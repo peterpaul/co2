@@ -59,10 +59,31 @@ O_IMPLEMENT(File, void, optimize, (void *_self))
   O_CALL (self->declarations, map, optimize);
 }
 
+static int File_definition_filter(void *_member)
+{
+  struct Declaration * member = O_CAST(_member, Declaration());
+  return member->include_file != NULL;
+}
+
+static int File_declaration_filter(void *_member)
+{
+  struct Declaration * member = O_CAST(_member, Declaration());
+  return member->include_file == NULL;
+}
+
 O_IMPLEMENT(File, void, generate, (void *_self))
 {
   struct File *self = O_CAST(_self, File());
-  O_CALL (self->declarations, map, generate);
+  struct RefList * definitions = O_CALL(self->declarations, filter, File_definition_filter);
+  O_CALL(definitions, retain);
+  struct RefList * declarations = O_CALL(self->declarations, filter, File_declaration_filter);
+  O_CALL(declarations, retain);
+
+  O_CALL (definitions, map, generate);
+  O_CALL (declarations, map, generate);
+
+  O_CALL(definitions, release);
+  O_CALL(declarations, release);
 }
 
 void parse_import(void *_import, va_list *app)

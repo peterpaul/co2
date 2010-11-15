@@ -23,6 +23,14 @@ O_IMPLEMENT(VariableDeclaration, void, set_type, (void *_self, struct Type * typ
 O_IMPLEMENT(VariableDeclaration, void, generate, (void *_self))
 {
   struct VariableDeclaration * self = O_CAST(_self, VariableDeclaration());
+  // don't generate if external definition
+  if (self->include_file)
+    {
+      fprintf(out, "#include ");
+      O_CALL(self->include_file, generate);
+      fprintf(out, "\n");
+      return;
+    }
   O_CALL(self->type, generate);
   fprintf(out, " ");
   O_CALL(self->name, generate);
