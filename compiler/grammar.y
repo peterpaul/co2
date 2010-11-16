@@ -1,43 +1,48 @@
 %{
-#include "RefList.h"
-#include "Declaration.h"
-#include "VariableDeclaration.h"
-#include "FunctionDeclaration.h"
-#include "ClassDeclaration.h"
+  /* Declarations */
 #include "ArgumentDeclaration.h"
-#include "InterfaceDeclaration.h"
+#include "ClassDeclaration.h"
 #include "ConstructorDeclaration.h"
+#include "Declaration.h"
 #include "DestructorDeclaration.h"
+#include "FunctionDeclaration.h"
+#include "InterfaceDeclaration.h"
 #include "MacroDeclaration.h"
-#include "Statement.h"
-#include "IfStatement.h"
-#include "DoStatement.h"
-#include "WhileStatement.h"
-#include "ForStatement.h"
-#include "ForEachStatement.h"
-#include "FunctionCallExpression.h"
-#include "SuperExpression.h"
-#include "NestedExpression.h"
-#include "ExpressionStatement.h"
+#include "VariableDeclaration.h"
+  /* Statements */
 #include "CompoundStatement.h"
+#include "DeleteStatement.h"
+#include "DoStatement.h"
+#include "ExpressionStatement.h"
+#include "ForEachStatement.h"
+#include "ForStatement.h"
+#include "IfStatement.h"
 #include "ReturnStatement.h"
-#include "Expression.h"
-#include "NewExpression.h"
-#include "ObjectType.h"
+#include "Statement.h"
+#include "WhileStatement.h"
+  /* Expressions */
 #include "BinaryExpression.h"
-#include "UnaryExpression.h"
-#include "Token.h"
+#include "Expression.h"
+#include "FunctionCallExpression.h"
+#include "NestedExpression.h"
+#include "NewExpression.h"
+#include "SuperExpression.h"
 #include "TokenExpression.h"
+#include "UnaryExpression.h"
 #include "VarArgExpression.h"
-#include "Type.h"
-#include "FunctionType.h"
+  /* Types */
 #include "ArrayType.h"
+#include "FunctionType.h"
+#include "ObjectType.h"
 #include "PrimitiveType.h"
-#include "Scope.h"
-#include "Path.h"
+#include "Type.h"
+  /* Support */
 #include "File.h"
 #include "io.h"
-#include "DeleteStatement.h"
+#include "Path.h"
+#include "RefList.h"
+#include "Scope.h"
+#include "Token.h"
 
   extern char *yytext;
   extern struct File * parsed_file;
@@ -49,15 +54,15 @@
   %}
 
 %union {
-  struct RefList * list;
-  struct Declaration * declaration;
-  struct Statement * statement;
-  struct Expression * expression;
-  struct Token * token;
   struct CompileObject * object;
-  struct Type * type;
-  struct Path * path;
+  struct Declaration * declaration;
+  struct Expression * expression;
   struct File * file;
+  struct Path * path;
+  struct RefList * list;
+  struct Statement * statement;
+  struct Token * token;
+  struct Type * type;
 }
 
 %token <token> CHAR
@@ -92,56 +97,63 @@
 %token <token> WHILE
 
 %type	<file>		input
-%type	<list>		opt_declaration_list
-%type	<list>		declaration_list
-%type	<list>		variable_declaration_list
-%type	<declaration>	declaration
-%type	<declaration>	function_declaration
+ /* Declarations */
 %type	<declaration>	class_declaration
 %type	<declaration>	class_header
-%type	<declaration>	interface_declaration
-%type	<declaration>	macro_declaration
 %type	<declaration>	constructor_declaration
-%type	<declaration>	destructor_declaration
-%type	<declaration>	var_id_decl
-%type	<list>		var_id_decl_list
-%type	<declaration>	function_header
+%type	<declaration>	declaration
+%type	<list>		declaration_list
+%type	<list>		declaration_list_content
 %type	<list>		definition_declaration
 %type	<list>		definition_list
 %type	<list>		definition
-%type	<list>		formal_arg_list_var
-%type	<list>		opt_formal_arg_list
-%type	<list>		formal_arg_list
+%type	<declaration>	destructor_declaration
 %type	<declaration>	formal_arg
+%type	<list>		formal_arg_list
+%type	<list>		formal_arg_list_var
+%type	<declaration>	function_declaration
+%type	<declaration>	function_header
+%type	<token>		header_file
+%type	<declaration>	interface_declaration
 %type	<list>		interface_list
-%type	<statement>	statement
+%type	<list>		interface_method_declaration_list
+%type	<declaration>	macro_declaration
+%type	<list>		macro_identifier_list
+%type	<list>		opt_declaration_list
+%type	<list>		opt_formal_arg_list
+%type	<list>		variable_declaration_list
+%type	<declaration>	var_id_decl
+%type	<list>		var_id_decl_list
+ /* Statements */
+%type	<list>		compound_content_list
 %type	<statement>	compound_statement
-%type	<statement>	if_statement
 %type	<statement>	delete_statement
+%type	<statement>	do_statement
+%type	<statement>	expression_statement
+%type	<statement>	foreach_statement
+%type	<statement>	for_statement
+%type	<statement>	if_statement
+%type	<list>		opt_compound_content_list
+%type	<statement>	return_statement
+%type	<statement>	statement
+%type	<statement>	while_statement
+ /* Imports */
+%type	<token>		identifier
 %type	<path>		import
 %type	<list>		import_list
 %type	<list>		import_path
 %type	<list>		opt_import_list
 %type	<path>		package
-%type	<statement>	expression_statement
-%type	<statement>	do_statement
-%type	<statement>	while_statement
-%type	<statement>	for_statement
-%type	<statement>	foreach_statement
-%type	<statement>	return_statement
-%type	<list>		compound_content_list
-%type	<list>		opt_compound_content_list
-%type	<type>		type
+ /* Types */
 %type	<list>		opt_type_list
+%type	<type>		type
 %type	<list>		type_list
-%type	<list>		interface_method_declaration_list
-%type	<expression>	expression
-%type	<expression>	constant
+ /* Expressions */
 %type	<list>		actual_arg_list
+%type	<expression>	constant
+%type	<expression>	expression
 %type	<list>		opt_actual_arg_list
 %type	<token>		string_constant
-%type	<token>		header_file
-%type	<list>		macro_identifier_list
 
 %left		<token>	','
 %right		<token>	'='
@@ -208,21 +220,11 @@ import
 ;
 
 import_path
-: import_path '.' IDENTIFIER
+:	import_path '.' identifier
 {
   O_CALL($1, append, $3);
 }
-| import_path '.' TYPE_IDENTIFIER
-{
-  O_CALL($1, append, $3);
-}
-| IDENTIFIER
-{
-  struct RefList * result = O_CALL_CLASS(RefList(), new, 8, Token());
-  O_CALL(result, append, $1);
-  $$ = result;
-}
-| TYPE_IDENTIFIER
+|	identifier
 {
   struct RefList * result = O_CALL_CLASS(RefList(), new, 8, Token());
   O_CALL(result, append, $1);
@@ -230,35 +232,35 @@ import_path
 }
 ;
 
+identifier
+:	IDENTIFIER
+|	TYPE_IDENTIFIER
+;
+
 opt_declaration_list
 :	declaration_list
-|
-	/* empty */
+|	/* empty */
 {
   $$ = O_CALL_CLASS(RefList(), new, 0, Declaration());
 }
 ;
 
 declaration_list
-:	declaration_list declaration
+:	declaration_list declaration_list_content
 {
-  O_CALL($$, append, $2);
+  $$ = O_CALL($1, merge, $2);
 }
-|	declaration 
+|	declaration_list_content
+;
+
+declaration_list_content
+:	declaration 
 {
   struct RefList * result = O_CALL_CLASS(RefList(), new, 8, Declaration()); 
   O_CALL(result, append, $1); 
   $$ = result;
 }
-|	declaration_list variable_declaration_list
-{
-  $$ = O_CALL($1, merge, $2);
-}
 |	variable_declaration_list
-|	declaration_list definition_declaration
-{
-  $$ = O_CALL($1, merge, $2);
-}
 |	definition_declaration
 ;
 
@@ -406,8 +408,7 @@ formal_arg_list_var
 
 opt_formal_arg_list
 :	formal_arg_list
-|
-	/* empty */
+|	/* empty */
 {
   $$ = O_CALL_CLASS(RefList(), new, 0, ArgumentDeclaration());
 }
@@ -639,10 +640,6 @@ interface_method_declaration_list
 type
 :	TYPE_IDENTIFIER
 {
-  /*
-    struct Declaration * decl = O_CALL(current_scope, lookup, $1);
-    $$ = O_CALL_CLASS(ObjectType(), new, $1, decl);
-  */
   $$ = O_CALL_CLASS(ObjectType(), new, $1, NULL);
 }
 |	INT
