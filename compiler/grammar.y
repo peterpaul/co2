@@ -155,6 +155,13 @@
 %type	<list>		opt_actual_arg_list
 %type	<token>		string_constant
 
+ /* Solve shift-reduce conflict for if-else */
+%nonassoc	IFX
+%nonassoc	ELSE
+
+ /* Solve shift-reduce conflict for constructor, in combination with '(' */
+%nonassoc	CONSTRUCTX
+
 %left		<token>	','
 %right		<token>	'='
 %left		<token>	OR '|' 
@@ -169,9 +176,8 @@
 %left		<token>	'(' '[' '.'
 
 %start input
-%expect 2
- // 1. if/else
- // 2. constructor
+%expect 0
+
 %%
 
 input
@@ -553,7 +559,7 @@ compound_content_list
 ;
 
 if_statement
-:	IF '(' expression ')' statement
+:	IF '(' expression ')' statement %prec IFX
 {
   $$ = O_CALL_CLASS(IfStatement(), new, $3, $5, NULL);
 }
@@ -638,7 +644,7 @@ interface_method_declaration_list
 ;
 
 type
-:	TYPE_IDENTIFIER
+:	TYPE_IDENTIFIER %prec CONSTRUCTX
 {
   $$ = O_CALL_CLASS(ObjectType(), new, $1, NULL);
 }
