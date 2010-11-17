@@ -157,7 +157,7 @@ O_IMPLEMENT(NewExpression, void, type_check, (void *_self))
 O_IMPLEMENT(NewExpression, void, set_ctor_name, (void *_self, struct TokenExpression * ctor_name))
 {
   struct NewExpression *self = O_CAST(_self, NewExpression());
-  self->ctor_name = ctor_name;
+  self->ctor_name = O_CALL(ctor_name, retain);
 }
 
 O_OBJECT(NewExpression, Expression);

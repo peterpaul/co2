@@ -27,6 +27,7 @@ O_IMPLEMENT(Declaration, void *, dtor, (void *_self))
   O_CALL(self->name, release);
   O_BRANCH_CALL(self->type, release);
   O_BRANCH_CALL(self->include_file, release);
+  O_BRANCH_CALL(self->class_decl, release);
   return O_SUPER->dtor(self);
 }
 
@@ -40,6 +41,7 @@ O_IMPLEMENT(Declaration, void, set_class_decl, (void *_self, void *_class_decl))
 {
   struct Declaration *self = O_CAST(_self, Declaration());
   self->class_decl = o_cast(_class_decl, ClassDeclaration());
+  O_CALL(self->class_decl, retain);
 }
 
 O_IMPLEMENT(Declaration, void, set_include_file, (void *_self, void *_include_file))

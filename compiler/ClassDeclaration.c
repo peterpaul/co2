@@ -34,6 +34,7 @@ O_IMPLEMENT(ClassDeclaration, void *, dtor, (void *_self))
   O_BRANCH_CALL(self->superclass, release);
   O_BRANCH_CALL(self->interfaces, release);
   O_BRANCH_CALL(self->members, release);
+  O_CALL(self->member_scope, delete);
 }
 
 static int new_member_filter(void *_member, va_list * app)

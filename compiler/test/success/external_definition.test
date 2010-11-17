@@ -2,8 +2,11 @@ package compiler.test;
 
 ["stdio.h"] int printf(char * format, ...);
 
-["compiler/test/success/include.h"] int test_var;
-["compiler/test/success/include.h"] int test_fun(int a, int b);
+["compiler/test/success/include.h"] 
+{
+	int test_var;
+	int test_fun(int a, int b);
+}
 
 int main(int argc, char ** argv)
 {

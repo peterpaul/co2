@@ -3,11 +3,8 @@
 
 #include "Declaration.h"
 
-O_METHOD_DEF(ConstructorDeclaration, void, set_class_name, (void *_self, struct Token * name));
-
 #define ConstructorDeclarationClass_Attr		\
-  DeclarationClass_Attr;				\
-  O_METHOD(ConstructorDeclaration, set_class_name)
+  DeclarationClass_Attr
 
 #define ConstructorDeclaration_Attr		\
   Declaration_Attr;				\

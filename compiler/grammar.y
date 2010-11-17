@@ -183,9 +183,8 @@
 input
 :	package opt_import_list declaration_list
 {
-  struct File * result = O_CALL_CLASS(File(), new, $1, $2, $3);
-  $$ = result;
-  parsed_file = result;
+  $$ = O_CALL_CLASS(File(), new, $1, $2, $3);
+  parsed_file = $$;
 }
 ;
 
@@ -211,16 +210,14 @@ import_list
 }
 |	import
 {
-  struct RefList * imports = O_CALL_CLASS(RefList(), new, 1, Path());
-  O_CALL(imports, append, $1);
-  $$ = imports;
+  $$ = O_CALL_CLASS(RefList(), new, 1, Path());
+  O_CALL($$, append, $1);
 }
 ;
 
 import
 :	IMPORT import_path ';'
 {
-  // TODO open new lexer, to parse the declarations of the imports, not to generate code for them
   $$ = O_CALL_CLASS(Path(), new, $2);
 }
 ;
@@ -232,9 +229,8 @@ import_path
 }
 |	identifier
 {
-  struct RefList * result = O_CALL_CLASS(RefList(), new, 8, Token());
-  O_CALL(result, append, $1);
-  $$ = result;
+  $$ = O_CALL_CLASS(RefList(), new, 8, Token());
+  O_CALL($$, append, $1);
 }
 ;
 
@@ -262,9 +258,8 @@ declaration_list
 declaration_list_content
 :	declaration 
 {
-  struct RefList * result = O_CALL_CLASS(RefList(), new, 8, Declaration()); 
-  O_CALL(result, append, $1); 
-  $$ = result;
+  $$ = O_CALL_CLASS(RefList(), new, 8, Declaration()); 
+  O_CALL($$, append, $1); 
 }
 |	variable_declaration_list
 |	definition_declaration
@@ -274,28 +269,23 @@ declaration
 :	function_declaration
 {
   O_CALL(current_scope, declare, $1);
-  $$ = $1;
 }
 |	class_declaration
 |	interface_declaration
 {
   O_CALL(current_scope, declare, $1);
-  $$ = $1;
 }
 |	macro_declaration
 {
   O_CALL(current_scope, declare, $1);
-  $$ = $1;
 }
 |	constructor_declaration
 {
   O_CALL(current_scope, declare, $1);
-  $$ = $1;
 }
 |	destructor_declaration
 {
   O_CALL(current_scope, declare, $1);
-  $$ = $1;
 }
 ;
 
@@ -308,7 +298,7 @@ definition_declaration
 |	header_file '{' definition_list '}'
 {
   $$ = $3;
-  O_CALL($$, map_args, Declaration_list_set_include_header, $3);
+  O_CALL($$, map_args, Declaration_list_set_include_header, $1);
 }
 ;
 
@@ -353,31 +343,28 @@ var_id_decl_list
 }
 |	var_id_decl
 {
-  struct RefList * result = O_CALL_CLASS(RefList(), new, 8, Declaration());
-  O_CALL(result, append, $1);
-  $$ = result;
+  $$ = O_CALL_CLASS(RefList(), new, 8, Declaration());
+  O_CALL($$, append, $1);
 }
 ;
 
 var_id_decl
 :	IDENTIFIER
 {
-  struct Declaration * result = O_CALL_CLASS(VariableDeclaration(), new, $1, NULL);
-  O_CALL(current_scope, declare, result);
-  $$ = result;
+  $$ = O_CALL_CLASS(VariableDeclaration(), new, $1, NULL);
+  O_CALL(current_scope, declare, $$);
 }
 |	IDENTIFIER '=' expression
 {
-  struct Declaration * result = O_CALL_CLASS(VariableDeclaration(), new, $1, $3);
-  O_CALL(current_scope, declare, result);
-  $$ = result;
+  $$ = O_CALL_CLASS(VariableDeclaration(), new, $1, $3);
+  O_CALL(current_scope, declare, $$);
 }
 ;
 
 function_declaration
 :	function_header statement
 {
-  struct FunctionDeclaration * decl = o_cast($1, FunctionDeclaration());
+  struct FunctionDeclaration * decl = O_CAST($1, FunctionDeclaration());
   decl->body = O_CALL($2, retain);
   O_CALL(current_scope, leave);
 }
@@ -428,9 +415,8 @@ formal_arg_list
 }
 |	formal_arg
 {
-  struct RefList * result = O_CALL_CLASS(RefList(), new, 8, ArgumentDeclaration());
-  O_CALL(result, append, $1);
-  $$ = result;
+  $$ = O_CALL_CLASS(RefList(), new, 8, ArgumentDeclaration());
+  O_CALL($$, append, $1);
 }
 ;
 
@@ -444,11 +430,17 @@ formal_arg
 ;
 
 class_declaration
-:	class_header '{' opt_declaration_list '}'
+:	class_header 
+{
+  O_CALL(current_scope, declare, $1);
+  struct ClassDeclaration * result = O_CAST($1, ClassDeclaration());
+  result->member_scope = O_CALL_CLASS(Scope(), new, CLASS_SCOPE, result->name);
+}
+'{' opt_declaration_list '}'
 {
   O_CALL(current_scope, leave);
   struct ClassDeclaration * result = O_CAST($1, ClassDeclaration());
-  result->members = O_CALL($3, retain);
+  result->members = O_CALL($4, retain);
   O_CALL(result->members, map_args, set_class_decl, result);
   result->member_scope->parent = NULL;
   $$ = (struct Declaration *) result;
@@ -457,24 +449,15 @@ class_declaration
 class_header
 :	CLASS TYPE_IDENTIFIER ':' TYPE_IDENTIFIER '<' interface_list '>'
 {
-  struct ClassDeclaration * decl = O_CALL_CLASS(ClassDeclaration(), new, $2, $4, $6);
-  O_CALL(current_scope, declare, (struct Declaration *) decl);
-  decl->member_scope = O_CALL_CLASS(Scope(), new, CLASS_SCOPE, $2);
-  $$ = (struct Declaration *) decl;
+  $$ = O_CALL_CLASS(ClassDeclaration(), new, $2, $4, $6);
 }
 |	CLASS TYPE_IDENTIFIER ':' TYPE_IDENTIFIER
 {
-  struct ClassDeclaration * decl = O_CALL_CLASS(ClassDeclaration(), new, $2, $4, NULL);
-  O_CALL(current_scope, declare, (struct Declaration *) decl);
-  decl->member_scope = O_CALL_CLASS(Scope(), new, CLASS_SCOPE, $2);
-  $$ = (struct Declaration *) decl;
+  $$ = O_CALL_CLASS(ClassDeclaration(), new, $2, $4, NULL);
 }
 |	CLASS TYPE_IDENTIFIER
 {
-  struct ClassDeclaration * decl = O_CALL_CLASS(ClassDeclaration(), new, $2, NULL, NULL);
-  O_CALL(current_scope, declare, (struct Declaration *) decl);
-  decl->member_scope = O_CALL_CLASS(Scope(), new, CLASS_SCOPE, $2);
-  $$ = (struct Declaration *) decl;
+  $$ = O_CALL_CLASS(ClassDeclaration(), new, $2, NULL, NULL);
 }
 ;
 
@@ -540,21 +523,18 @@ compound_content_list
 }
 |	statement
 {
-  struct RefList * result = O_CALL_CLASS(RefList(), new, 8, CompileObject());
-  O_CALL(result, append, $1);
-  $$ = result;
+  $$ = O_CALL_CLASS(RefList(), new, 8, CompileObject());
+  O_CALL($$, append, $1);
 }
 |	declaration
 {
-  struct RefList * result = O_CALL_CLASS(RefList(), new, 8, CompileObject());
-  O_CALL(result, append, $1);
-  $$ = result;
+  $$ = O_CALL_CLASS(RefList(), new, 8, CompileObject());
+  O_CALL($$, append, $1);
 }
 |	variable_declaration_list
 {
-  struct RefList * result = O_CALL_CLASS(RefList(), new, 8, CompileObject());
-  O_CALL(result, merge, $1);
-  $$ = result;
+  $$ = O_CALL_CLASS(RefList(), new, 8, CompileObject());
+  O_CALL($$, merge, $1);
 }
 ;
 
@@ -637,9 +617,8 @@ interface_method_declaration_list
 :	interface_method_declaration_list function_header ';'
 |	function_header ';'
 {
-  struct RefList * result = O_CALL_CLASS(RefList(), new, 8, Declaration());
-  O_CALL(result, append, $1);
-  $$ = result;
+  $$ = O_CALL_CLASS(RefList(), new, 8, Declaration());
+  O_CALL($$, append, $1);
 }
 ;
 
@@ -697,9 +676,8 @@ type_list
 }
 |	type
 {
-	struct RefList * result = O_CALL_CLASS(RefList(), new, 8, Type());
-	O_CALL(result, append, $1);
-	$$ = result;
+	$$ = O_CALL_CLASS(RefList(), new, 8, Type());
+	O_CALL($$, append, $1);
 }
 ;
 
@@ -811,14 +789,13 @@ macro_identifier_list
 constructor_declaration
 :	TYPE_IDENTIFIER '(' 
 { 
-  struct Token * ctor_name = O_CALL_CLASS(Token(), new, "ctor", IDENTIFIER, filename, $1->line);
-  O_CALL_CLASS(Scope(), new, ARGUMENT_SCOPE, ctor_name); 
+  $<token>$ = O_CALL_CLASS(Token(), new, "ctor", IDENTIFIER, filename, $1->line);
+  O_CALL_CLASS(Scope(), new, ARGUMENT_SCOPE, $<token>$);
 }
 opt_formal_arg_list ')' statement
 {
-  struct ConstructorDeclaration * decl = O_CALL_CLASS(ConstructorDeclaration(), new, current_scope->name, $1, $4, $6);
+  $$ = O_CALL_CLASS(ConstructorDeclaration(), new, $<token>3, $1, $4, $6);
   O_CALL(current_scope, leave);
-  $$ = (struct Declaration *) decl;
 }
 |	TYPE_IDENTIFIER '.' IDENTIFIER '(' 
 { 
@@ -826,9 +803,8 @@ opt_formal_arg_list ')' statement
 }
 opt_formal_arg_list ')' statement
 {
-  struct ConstructorDeclaration * decl = O_CALL_CLASS(ConstructorDeclaration(), new, $3, $1, $6, $8);
+  $$ = O_CALL_CLASS(ConstructorDeclaration(), new, $3, $1, $6, $8);
   O_CALL(current_scope, leave);
-  $$ = (struct Declaration *) decl;
 }
 ;
 
