@@ -48,8 +48,8 @@
   extern struct File * parsed_file;
   extern void yyerror (const char *);
   extern int yywrap (void);
-  extern void var_id_decl_set_type(void *_var, va_list *app);
-  extern void set_class_decl(void *_decl, va_list *app);
+  extern void VariableDeclaration_set_type(void *_var, va_list *app);
+  extern void Declaration_set_class_decl(void *_decl, va_list *app);
 
   %}
 
@@ -108,9 +108,9 @@
 %type	<list>		definition_list
 %type	<list>		definition
 %type	<declaration>	destructor_declaration
-%type	<declaration>	formal_arg
-%type	<list>		formal_arg_list
-%type	<list>		formal_arg_list_var
+%type	<declaration>	formal_argument
+%type	<list>		formal_argument_list
+%type	<list>		formal_argument_list_var
 %type	<declaration>	function_declaration
 %type	<declaration>	function_header
 %type	<token>		header_file
@@ -119,10 +119,10 @@
 %type	<list>		interface_method_declaration_list
 %type	<declaration>	macro_declaration
 %type	<list>		macro_identifier_list
-%type	<list>		opt_formal_arg_list
+%type	<list>		opt_formal_argument_list
+%type	<declaration>	variable_declaration_id
+%type	<list>		variable_declaration_id_list
 %type	<list>		variable_declaration_list
-%type	<declaration>	var_id_decl
-%type	<list>		var_id_decl_list
  /* Statements */
 %type	<list>		compound_content
 %type	<list>		compound_content_list
@@ -147,10 +147,10 @@
 %type	<type>		type
 %type	<list>		type_list
  /* Expressions */
-%type	<list>		actual_arg_list
+%type	<list>		actual_argument_list
 %type	<expression>	constant
 %type	<expression>	expression
-%type	<list>		opt_actual_arg_list
+%type	<list>		opt_actual_argument_list
 %type	<token>		string_constant
 
  /* Solve shift-reduce conflict for if-else */
@@ -313,26 +313,26 @@ header_file
 ;
 
 variable_declaration_list
-:	type var_id_decl_list ';' 
+:	type variable_declaration_id_list ';' 
 {
-  O_CALL($2, map_args, var_id_decl_set_type, $1);
+  O_CALL($2, map_args, VariableDeclaration_set_type, $1);
   $$ = $2;
 }
 ;
 
-var_id_decl_list
-:	var_id_decl_list ',' var_id_decl
+variable_declaration_id_list
+:	variable_declaration_id_list ',' variable_declaration_id
 {
   O_CALL($$, append, $3);
 }
-|	var_id_decl
+|	variable_declaration_id
 {
   $$ = O_CALL_CLASS(RefList(), new, 8, Declaration());
   O_CALL($$, append, $1);
 }
 ;
 
-var_id_decl
+variable_declaration_id
 :	IDENTIFIER
 {
   $$ = O_CALL_CLASS(VariableDeclaration(), new, $1, NULL);
@@ -359,57 +359,56 @@ function_header
 { 
   O_CALL_CLASS(Scope(), new, ARGUMENT_SCOPE, $2); 
 }
-formal_arg_list_var ')'
+formal_argument_list_var ')'
 {
   struct FunctionType * type = O_CALL_CLASS(FunctionType(), new_ctor, _FunctionType_ctor_from_decl, $1, $5);
   $$ = O_CALL_CLASS(FunctionDeclaration(), new, $2, type, $5, NULL);
 }
 ;
 
-formal_arg_list_var
-:	formal_arg_list ',' VA_ARG
+formal_argument_list_var
+:	formal_argument_list ',' VA_ARG
 {
-  struct Type * va_arg_type = O_CALL_CLASS(PrimitiveType(), new, $3);
-  struct ArgumentDeclaration * arg = O_CALL_CLASS(ArgumentDeclaration(), new, $3, va_arg_type);
+  struct Type * type = O_CALL_CLASS(PrimitiveType(), new, $3);
+  struct ArgumentDeclaration * arg = O_CALL_CLASS(ArgumentDeclaration(), new, $3, type);
   O_CALL($$, append, arg);
 }
-|	opt_formal_arg_list
+|	opt_formal_argument_list
 |	VA_ARG
 {
   $$ = O_CALL_CLASS(RefList(), new, 8, ArgumentDeclaration());
-  struct Type * va_arg_type = O_CALL_CLASS(PrimitiveType(), new, $1);
-  struct ArgumentDeclaration * arg = O_CALL_CLASS(ArgumentDeclaration(), new, $1, va_arg_type);
+  struct Type * type = O_CALL_CLASS(PrimitiveType(), new, $1);
+  struct ArgumentDeclaration * arg = O_CALL_CLASS(ArgumentDeclaration(), new, $1, type);
   O_CALL($$, append, arg);
 }
 ;
 
-opt_formal_arg_list
-:	formal_arg_list
+opt_formal_argument_list
+:	formal_argument_list
 |	/* empty */
 {
   $$ = O_CALL_CLASS(RefList(), new, 8, ArgumentDeclaration());
 }
 ;
 
-formal_arg_list
-:	formal_arg_list ',' formal_arg
+formal_argument_list
+:	formal_argument_list ',' formal_argument
 {
   
   O_CALL($$, append, $3);
 }
-|	formal_arg
+|	formal_argument
 {
   $$ = O_CALL_CLASS(RefList(), new, 8, ArgumentDeclaration());
   O_CALL($$, append, $1);
 }
 ;
 
-formal_arg
+formal_argument
 :	type IDENTIFIER
 {
-  struct Declaration * result = O_CALL_CLASS(ArgumentDeclaration(), new, $2, $1);
-  O_CALL(current_scope, declare, result);
-  $$ = result;
+  $$ = O_CALL_CLASS(ArgumentDeclaration(), new, $2, $1);
+  O_CALL(current_scope, declare, $$);
 }
 ;
 
@@ -417,17 +416,17 @@ class_declaration
 :	class_header 
 {
   O_CALL(current_scope, declare, $1);
-  struct ClassDeclaration * result = O_CAST($1, ClassDeclaration());
-  result->member_scope = O_CALL_CLASS(Scope(), new, CLASS_SCOPE, result->name);
+  struct ClassDeclaration * decl = O_CAST($1, ClassDeclaration());
+  decl->member_scope = O_CALL_CLASS(Scope(), new, CLASS_SCOPE, decl->name);
 }
 '{' declaration_list '}'
 {
   O_CALL(current_scope, leave);
-  struct ClassDeclaration * result = O_CAST($1, ClassDeclaration());
-  result->members = O_CALL($4, retain);
-  O_CALL(result->members, map_args, set_class_decl, result);
-  result->member_scope->parent = NULL;
-  $$ = (struct Declaration *) result;
+  struct ClassDeclaration * decl = O_CAST($1, ClassDeclaration());
+  decl->members = O_CALL($4, retain);
+  O_CALL(decl->members, map_args, Declaration_set_class_decl, decl);
+  decl->member_scope->parent = NULL;
+  $$ = (struct Declaration *) decl;
 }
 
 class_header
@@ -657,7 +656,7 @@ expression
 :	constant
 |	IDENTIFIER { $$ = O_CALL_CLASS(TokenExpression(), new, $1); }
 |	SELF { $$ = O_CALL_CLASS(TokenExpression(), new, $1); }
-|	expression '(' opt_actual_arg_list ')' { $$ = O_CALL_CLASS(FunctionCallExpression(), new, $1, $3); }
+|	expression '(' opt_actual_argument_list ')' { $$ = O_CALL_CLASS(FunctionCallExpression(), new, $1, $3); }
 |	expression '[' expression ']' { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
 |	expression '.' expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
 |	expression '+' expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
@@ -686,19 +685,19 @@ expression
 |	'!' expression { $$ = O_CALL_CLASS(UnaryExpression(), new, $1, $2); }
 |	'(' expression ')' { $$ = O_CALL_CLASS(NestedExpression(), new, $2); }
 |	NEW type '[' expression ']' { $$ = O_CALL_CLASS(NewExpression(), new, $2, $4); }
-|	NEW type '(' opt_actual_arg_list ')' { $$ = O_CALL_CLASS(NewExpression(), new, $2, $4); }
-|	NEW type '.' IDENTIFIER '(' opt_actual_arg_list ')' 
+|	NEW type '(' opt_actual_argument_list ')' { $$ = O_CALL_CLASS(NewExpression(), new, $2, $4); }
+|	NEW type '.' IDENTIFIER '(' opt_actual_argument_list ')' 
 {
   struct TokenExpression * token_expr = O_CALL_CLASS(TokenExpression(), new, $4);
   struct NewExpression * new_expr = O_CALL_CLASS(NewExpression(), new, $2, $6);
   O_CALL(new_expr, set_ctor_name, token_expr);
   $$ = (struct Expression *) new_expr;
 }
-|	SUPER '(' opt_actual_arg_list ')' 
+|	SUPER '(' opt_actual_argument_list ')' 
 { 
   $$ = O_CALL_CLASS(SuperExpression(), new, $1, NULL, $3);
 }
-|	SUPER '.' IDENTIFIER '(' opt_actual_arg_list ')' { $$ = O_CALL_CLASS(SuperExpression(), new, $1, $3, $5); }
+|	SUPER '.' IDENTIFIER '(' opt_actual_argument_list ')' { $$ = O_CALL_CLASS(SuperExpression(), new, $1, $3, $5); }
 |	GET_VA_ARG '(' type ')' { $$ = O_CALL_CLASS(VarArgExpression(), new, $3); }
 ;
 
@@ -709,16 +708,16 @@ constant
 |	string_constant { $$ = O_CALL_CLASS(TokenExpression(), new, $1); }
 ;
 
-opt_actual_arg_list
-:	actual_arg_list
+opt_actual_argument_list
+:	actual_argument_list
 |	/* empty */
 {
   $$ = O_CALL_CLASS(RefList(), new, 8, Expression());
 }
 ;
 
-actual_arg_list
-:	actual_arg_list ',' expression
+actual_argument_list
+:	actual_argument_list ',' expression
 {
   O_CALL($$, append, $3);
 
@@ -764,7 +763,7 @@ constructor_declaration
   $<token>$ = O_CALL_CLASS(Token(), new, "ctor", IDENTIFIER, filename, $1->line);
   O_CALL_CLASS(Scope(), new, ARGUMENT_SCOPE, $<token>$);
 }
-opt_formal_arg_list ')' statement
+opt_formal_argument_list ')' statement
 {
   $$ = O_CALL_CLASS(ConstructorDeclaration(), new, $<token>3, $1, $4, $6);
   O_CALL(current_scope, leave);
@@ -773,7 +772,7 @@ opt_formal_arg_list ')' statement
 { 
   O_CALL_CLASS(Scope(), new, ARGUMENT_SCOPE, $3); 
 }
-opt_formal_arg_list ')' statement
+opt_formal_argument_list ')' statement
 {
   $$ = O_CALL_CLASS(ConstructorDeclaration(), new, $3, $1, $6, $8);
   O_CALL(current_scope, leave);
@@ -805,12 +804,12 @@ int parse ()
     }
   return result;
 }
-void var_id_decl_set_type(void *_var, va_list *app)
+void VariableDeclaration_set_type(void *_decl, va_list *app)
 {
-  struct VariableDeclaration * var = O_CAST(_var, VariableDeclaration());
-  O_CALL(var, set_type, va_arg(*app, struct Type *));
+  struct VariableDeclaration * decl = O_CAST(_decl, VariableDeclaration());
+  O_CALL(decl, set_type, va_arg(*app, struct Type *));
 }
-void set_class_decl(void *_decl, va_list *app)
+void Declaration_set_class_decl(void *_decl, va_list *app)
 {
   struct Declaration * decl = O_CAST(_decl, Declaration());
   O_CALL(decl, set_class_decl, va_arg(*app, void *));

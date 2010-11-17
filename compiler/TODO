@@ -7,7 +7,7 @@ Code quality:
 * generate error messages for incompatible types with the right line number
 
 Functionality:
-* add way to include c-code in syntax. (C-declaration)
+* add way to include c-code in syntax. (C-declaration) [IN PROGRESS/DONE]
 * implement package keyword for bundling related classes
 * implement file inclusion (import)
 * know whether a tokenexpression is part of the current class
@@ -16,4 +16,7 @@ Language Features:
 * enum
 * constructor/destructor [DONE]
 * automatic reference counting
-* super keyword
+* super keyword [DONE]
+* static keyword
+* private keyword
+* annotations
