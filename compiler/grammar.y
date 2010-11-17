@@ -119,12 +119,12 @@
 %type	<list>		interface_method_declaration_list
 %type	<declaration>	macro_declaration
 %type	<list>		macro_identifier_list
-%type	<list>		opt_declaration_list
 %type	<list>		opt_formal_arg_list
 %type	<list>		variable_declaration_list
 %type	<declaration>	var_id_decl
 %type	<list>		var_id_decl_list
  /* Statements */
+%type	<list>		compound_content
 %type	<list>		compound_content_list
 %type	<statement>	compound_statement
 %type	<statement>	delete_statement
@@ -133,7 +133,6 @@
 %type	<statement>	foreach_statement
 %type	<statement>	for_statement
 %type	<statement>	if_statement
-%type	<list>		opt_compound_content_list
 %type	<statement>	return_statement
 %type	<statement>	statement
 %type	<statement>	while_statement
@@ -142,7 +141,6 @@
 %type	<path>		import
 %type	<list>		import_list
 %type	<list>		import_path
-%type	<list>		opt_import_list
 %type	<path>		package
  /* Types */
 %type	<list>		opt_type_list
@@ -181,7 +179,7 @@
 %%
 
 input
-:	package opt_import_list declaration_list
+:	package import_list declaration_list
 {
   $$ = O_CALL_CLASS(File(), new, $1, $2, $3);
   parsed_file = $$;
@@ -195,23 +193,14 @@ package
 }
 ;
 
-opt_import_list
-:	import_list
-|	/* empty */
-{
-  $$ = O_CALL_CLASS(RefList(), new, 0, Path());
-}
-;
-
 import_list
 :	import_list import
 {
   O_CALL($1, append, $2);
 }
-|	import
+|	/* empty */
 {
   $$ = O_CALL_CLASS(RefList(), new, 1, Path());
-  O_CALL($$, append, $1);
 }
 ;
 
@@ -239,20 +228,15 @@ identifier
 |	TYPE_IDENTIFIER
 ;
 
-opt_declaration_list
-:	declaration_list
-|	/* empty */
-{
-  $$ = O_CALL_CLASS(RefList(), new, 0, Declaration());
-}
-;
-
 declaration_list
 :	declaration_list declaration_list_content
 {
   $$ = O_CALL($1, merge, $2);
 }
-|	declaration_list_content
+|	/* empty */
+{
+  $$ = O_CALL_CLASS(RefList(), new, 8, Declaration());
+}
 ;
 
 declaration_list_content
@@ -403,7 +387,7 @@ opt_formal_arg_list
 :	formal_arg_list
 |	/* empty */
 {
-  $$ = O_CALL_CLASS(RefList(), new, 0, ArgumentDeclaration());
+  $$ = O_CALL_CLASS(RefList(), new, 8, ArgumentDeclaration());
 }
 ;
 
@@ -436,7 +420,7 @@ class_declaration
   struct ClassDeclaration * result = O_CAST($1, ClassDeclaration());
   result->member_scope = O_CALL_CLASS(Scope(), new, CLASS_SCOPE, result->name);
 }
-'{' opt_declaration_list '}'
+'{' declaration_list '}'
 {
   O_CALL(current_scope, leave);
   struct ClassDeclaration * result = O_CAST($1, ClassDeclaration());
@@ -486,42 +470,30 @@ statement
 ;
 
 compound_statement
-:	'{' opt_compound_content_list '}'
-{
-  $$ = O_CALL_CLASS(CompoundStatement(), new, $2);
-}
-;
-
-opt_compound_content_list
-:
+:	'{' 
 {
   O_CALL_CLASS(Scope(), new, COMPOUND_SCOPE, NULL);
 }
-compound_content_list
+compound_content_list '}'
 {
-  $$ = $2;
   O_CALL(current_scope, leave);
-}
-|	/* empty */
-{
-  $$ = O_CALL_CLASS(RefList(), new, 0, CompileObject());
+  $$ = O_CALL_CLASS(CompoundStatement(), new, $3);
 }
 ;
 
 compound_content_list
-:	compound_content_list statement
-{
-  O_CALL($$, append, $2);
-}
-|	compound_content_list declaration
-{
-  O_CALL($$, append, $2);
-}
-|	compound_content_list variable_declaration_list
+:	compound_content_list compound_content
 {
   O_CALL($$, merge, $2);
 }
-|	statement
+|	/* empty */
+{
+  $$ = O_CALL_CLASS(RefList(), new, 8, CompileObject());
+}
+;
+
+compound_content
+:	statement
 {
   $$ = O_CALL_CLASS(RefList(), new, 8, CompileObject());
   O_CALL($$, append, $1);
@@ -665,7 +637,7 @@ opt_type_list
 :	type_list
 |	/* empty */
 {
-	$$ = O_CALL_CLASS(RefList(), new, 0, Type());
+	$$ = O_CALL_CLASS(RefList(), new, 8, Type());
 }
 ;
 
