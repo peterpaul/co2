@@ -10,9 +10,9 @@ O_IMPLEMENT(Scope, void *, ctor, (void *_self, va_list *app))
 {
   struct Scope * self = O_CAST(_self, Scope());
   self = O_SUPER->ctor(self, app);
-  /* TODO initialize */
   self->type = va_arg(*app, ScopeType);
   self->name = O_BRANCH_CAST(va_arg(*app, struct Token *), Token());
+  O_BRANCH_CALL(self->name, retain);
   self->parent = current_scope;
   current_scope = self;
   return self;
@@ -21,7 +21,7 @@ O_IMPLEMENT(Scope, void *, ctor, (void *_self, va_list *app))
 O_IMPLEMENT(Scope, void *, dtor, (void *_self))
 {
   struct Scope *self = O_CAST(_self, Scope());
-  /* TODO cleanup */
+  O_BRANCH_CALL(self->name, release);
   return O_SUPER->dtor(self);
 }
 

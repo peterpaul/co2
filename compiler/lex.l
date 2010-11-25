@@ -44,6 +44,7 @@ STRING_CONST	\"({CHAR_SYMBOL}|\')*\"
 "if"		return IF;
 "import"	return IMPORT;
 "int"		yylval.token = O_CALL_CLASS(Token(), new, yytext, INT, filename, linenumber); return yylval.token->type;
+"interface"	return INTERFACE;
 "new"		return NEW;
 "package"	return PACKAGE;
 "return"	return RETURN;

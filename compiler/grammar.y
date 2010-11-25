@@ -115,6 +115,7 @@
 %type	<declaration>	function_header
 %type	<token>		header_file
 %type	<declaration>	interface_declaration
+%type	<declaration>	interface_header
 %type	<list>		interface_list
 %type	<list>		interface_method_declaration_list
 %type	<declaration>	macro_declaration
@@ -394,7 +395,6 @@ opt_formal_argument_list
 formal_argument_list
 :	formal_argument_list ',' formal_argument
 {
-  
   O_CALL($$, append, $3);
 }
 |	formal_argument
@@ -574,21 +574,42 @@ delete_statement
 ;
 
 interface_declaration
-:	INTERFACE TYPE_IDENTIFIER '<' interface_list '>' '{' interface_method_declaration_list '}'
+:	interface_header 
 {
-  $$ = O_CALL_CLASS(InterfaceDeclaration(), new, $2, $4, $7);
+  struct InterfaceDeclaration * decl = O_CAST($1, InterfaceDeclaration());
+  decl->member_scope = O_CALL_CLASS(Scope(), new, INTERFACE_SCOPE, decl->name);
 }
-|	INTERFACE TYPE_IDENTIFIER '{' interface_method_declaration_list '}'
+'{' interface_method_declaration_list '}'
 {
-  $$ = O_CALL_CLASS(InterfaceDeclaration(), new, $2, NULL, $4);
+  O_CALL(current_scope, leave);
+  struct InterfaceDeclaration * decl = O_CAST($1, InterfaceDeclaration());
+  decl->members = O_CALL($4, retain);
+}
+;
+
+interface_header
+:	INTERFACE TYPE_IDENTIFIER '<' interface_list '>' 
+{
+  $$ = O_CALL_CLASS(InterfaceDeclaration(), new, $2, $4);
+}
+|	INTERFACE TYPE_IDENTIFIER 
+{
+  $$ = O_CALL_CLASS(InterfaceDeclaration(), new, $2, NULL);
 }
 ;
 
 interface_method_declaration_list
 :	interface_method_declaration_list function_header ';'
+{
+  O_CALL(current_scope, leave);
+  O_CALL(current_scope, declare, $2);
+  O_CALL($1, append, $2);
+}
 |	function_header ';'
 {
+  O_CALL(current_scope, leave);
   $$ = O_CALL_CLASS(RefList(), new, 8, Declaration());
+  O_CALL(current_scope, declare, $1);
   O_CALL($$, append, $1);
 }
 ;
@@ -799,7 +820,7 @@ int parse ()
   O_CALL(current_scope, leave);
   if (result == 0)
     {
-      assertTrue(current_scope == NULL, "current_scope is not NULL");
+      assertTrue(current_scope == NULL, "current_scope (%d) is not NULL", current_scope->type);
       O_CALL(parsed_file, parse_imports);
     }
   return result;

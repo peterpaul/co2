@@ -37,14 +37,6 @@ O_IMPLEMENT(ClassDeclaration, void *, dtor, (void *_self))
   O_CALL(self->member_scope, delete);
 }
 
-static int new_member_filter(void *_member, va_list * app)
-{
-  struct Declaration * member = O_CAST(_member, Declaration());
-  struct Class * _type = va_arg(*app, struct Class *);
-  struct Class * type = O_IS_CLASS(_type);
-  return O_BRANCH_CALL(member->scope->parent, lookup_type_in_this_scope, member->name, type) == NULL;
-}
-
 static int new_constructor_filter(void *_constructor)
 {
   struct ConstructorDeclaration * constructor = O_CAST(_constructor, ConstructorDeclaration());
@@ -316,7 +308,7 @@ O_IMPLEMENT(ClassDeclaration, void, generate, (void *_self))
   struct RefList * destructors = O_CALL(self->members, filter_args, type_filter, DestructorDeclaration());
   O_CALL(destructors, retain);
 
-  struct RefList * new_methods = O_CALL(methods, filter_args, new_member_filter, FunctionDeclaration());
+  struct RefList * new_methods = O_CALL(methods, filter_args, Declaration_new_member_filter, FunctionDeclaration());
   O_CALL(new_methods, retain);
 
   struct RefList * new_constructors = O_CALL(constructors, filter, new_constructor_filter);
@@ -381,12 +373,6 @@ O_IMPLEMENT(ClassDeclaration, void, generate, (void *_self))
   O_CALL(destructors, release);
 }
 
-static void ClassDeclaration_type_check_members(void *_member)
-{
-  struct Declaration * member = O_CAST(_member, Declaration());
-  O_CALL(member, type_check);
-}
-
 O_IMPLEMENT(ClassDeclaration, void, type_check, (void *_self))
 {
   struct ClassDeclaration * self = O_CAST(_self, ClassDeclaration());
@@ -400,7 +386,7 @@ O_IMPLEMENT(ClassDeclaration, void, type_check, (void *_self))
 	  self->member_scope->parent = super_class->member_scope;
 	}
     }
-  O_CALL(self->members, map, ClassDeclaration_type_check_members);
+  O_CALL(self->members, map, Declaration_list_type_check);
   O_CALL(current_context, remove_last);
 }
 

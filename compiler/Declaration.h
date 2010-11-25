@@ -25,5 +25,7 @@ O_METHOD_DEF(Declaration, void, set_include_file, (void *_self, void *_include_f
 O_CLASS(Declaration, CompileObject);
 
 void Declaration_list_set_include_header(void * _decl, va_list * app);
+void Declaration_list_type_check(void *_decl);
+int Declaration_new_member_filter(void *_member, va_list * app);
 
 #endif /* Declaration_H */

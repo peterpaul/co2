@@ -12,6 +12,20 @@ void Declaration_list_set_include_header(void * _decl, va_list * app)
   O_CALL(decl, set_include_file, header_file);
 }
 
+void Declaration_list_type_check(void *_decl)
+{
+  struct Declaration * decl = O_CAST(_decl, Declaration());
+  O_CALL(decl, type_check);
+}
+
+int Declaration_new_member_filter(void *_member, va_list * app)
+{
+  struct Declaration * member = O_CAST(_member, Declaration());
+  struct Class * _type = va_arg(*app, struct Class *);
+  struct Class * type = O_IS_CLASS(_type);
+  return O_BRANCH_CALL(member->scope->parent, lookup_type_in_this_scope, member->name, type) == NULL;
+}
+
 O_IMPLEMENT(Declaration, void *, ctor, (void *_self, va_list *app))
 {
   struct Declaration * self = O_CAST(_self, Declaration());
