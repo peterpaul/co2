@@ -8,7 +8,7 @@
 void Declaration_list_set_include_header(void * _decl, va_list * app)
 {
   struct Declaration * decl = o_cast(_decl, Declaration());
-  struct Token * header_file = o_cast(va_arg(*app, struct Token *), Token());
+  struct Token * header_file = O_CAST(va_arg(*app, struct Token *), Token());
   O_CALL(decl, set_include_file, header_file);
 }
 
@@ -30,7 +30,7 @@ O_IMPLEMENT(Declaration, void *, ctor, (void *_self, va_list *app))
 {
   struct Declaration * self = O_CAST(_self, Declaration());
   self = O_SUPER->ctor(self, app);  
-  self->name = o_cast(va_arg(*app, struct Token *), Token());
+  self->name = O_CAST(va_arg(*app, struct Token *), Token());
   O_CALL(self->name, retain);
   return self;
 }

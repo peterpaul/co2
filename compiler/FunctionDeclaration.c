@@ -6,6 +6,7 @@
 #include "FunctionType.h"
 #include "ArgumentDeclaration.h"
 #include "ClassDeclaration.h"
+#include "InterfaceDeclaration.h"
 #include "grammar.tab.h"
 #include "PrimitiveType.h"
 
@@ -20,9 +21,9 @@ O_IMPLEMENT(FunctionDeclaration, void *, ctor, (void *_self, va_list *app))
 {
   struct FunctionDeclaration * self = O_CAST(_self, FunctionDeclaration());
   self = O_SUPER->ctor(self, app);
-  self->type = o_cast(va_arg(*app, struct FunctionType *), FunctionType());
+  self->type = O_CAST(va_arg(*app, struct FunctionType *), FunctionType());
   O_CALL(self->type, retain);
-  self->formal_arguments = o_cast(va_arg(*app, struct RefList *), RefList());
+  self->formal_arguments = O_CAST(va_arg(*app, struct RefList *), RefList());
   O_CALL(self->formal_arguments, retain);
   self->body = O_BRANCH_CAST(va_arg(*app, struct Statement *), Statement());
   O_BRANCH_CALL(self->body, retain);
@@ -107,6 +108,24 @@ O_IMPLEMENT(FunctionDeclaration, void, generate, (void *_self))
   fprintf(out, "}\n\n");
 }
 
+static void FunctionDeclaration_find_in_interface(void *_self, va_list *app)
+{
+  struct Token * self = O_CAST(_self, Token());
+  struct FunctionDeclaration * function_decl = O_CAST(va_arg(*app, struct FunctionDeclaration *), FunctionDeclaration());
+  if (O_CALL(global_scope, exists_in_this_scope, self))
+    {
+      struct Declaration * _decl = O_CALL(global_scope, lookup_in_this_scope, self);
+      if (o_is_of(_decl, InterfaceDeclaration())) 
+	{
+	  function_decl->interface_decl = O_CAST(_decl, InterfaceDeclaration());
+	}
+      else
+	{
+	  error(function_decl->name, "%s is not an interface", _decl->name->name->data);
+	}
+    }
+}
+
 O_IMPLEMENT(FunctionDeclaration, void, type_check, (void *_self))
 {
   struct FunctionDeclaration * self = O_CAST(_self, FunctionDeclaration());
@@ -115,14 +134,18 @@ O_IMPLEMENT(FunctionDeclaration, void, type_check, (void *_self))
   O_BRANCH_CALL(self->body, type_check);
 
   struct FunctionType * function_type = get_type(self);
+  struct ClassDeclaration * class_decl = O_CALL(current_context, find, ClassDeclaration());
   if (function_type->has_var_args)
     {
-      struct Declaration * class_decl = O_CALL(current_context, find, ClassDeclaration());
       if (class_decl == NULL &&
 	  self->formal_arguments->length <= 1)
 	{
 	  error(self->name, "variable argument list only supported on functions with at least one fixed argument.\n");
 	}
+    }
+  if (class_decl && class_decl->interfaces)
+    {
+      O_CALL(class_decl->interfaces, map_args, FunctionDeclaration_find_in_interface, self);
     }
   O_CALL(current_context, remove_last);
 }

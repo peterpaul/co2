@@ -438,6 +438,10 @@ class_header
 {
   $$ = O_CALL_CLASS(ClassDeclaration(), new, $2, $4, NULL);
 }
+|	CLASS TYPE_IDENTIFIER '<' interface_list '>'
+{
+  $$ = O_CALL_CLASS(ClassDeclaration(), new, $2, NULL, $4);
+}
 |	CLASS TYPE_IDENTIFIER
 {
   $$ = O_CALL_CLASS(ClassDeclaration(), new, $2, NULL, NULL);

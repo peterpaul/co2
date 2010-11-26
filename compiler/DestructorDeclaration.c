@@ -18,10 +18,10 @@ O_IMPLEMENT(DestructorDeclaration, void *, ctor, (void *_self, va_list *app))
   self = O_SUPER->ctor(self, app);
   /*
   // TODO lookup current class
-  self->type = o_cast(va_arg(*app, struct FunctionType *), FunctionType());
+  self->type = O_CAST(va_arg(*app, struct FunctionType *), FunctionType());
   O_CALL(self->type, retain);
   */
-  self->class_name = o_cast(va_arg(*app, struct Token *), Token());
+  self->class_name = O_CAST(va_arg(*app, struct Token *), Token());
   O_CALL(self->class_name, retain);
   self->body = O_BRANCH_CAST(va_arg(*app, struct Statement *), Statement());
   O_BRANCH_CALL(self->body, retain);

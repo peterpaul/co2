@@ -1,21 +1,16 @@
 #ifndef CLASSDECLARATION_H
 #define CLASSDECLARATION_H
 
-#include "Declaration.h"
-
-O_METHOD_DEF(ClassDeclaration, bool, is_compatible, (void *_self, void *_other));
+#include "ObjectTypeDeclaration.h"
 
 #define ClassDeclarationClass_Attr		\
-  DeclarationClass_Attr;			\
-  O_METHOD(ClassDeclaration, is_compatible)
+  ObjectTypeDeclarationClass_Attr
 
 #define ClassDeclaration_Attr			\
-  Declaration_Attr;				\
+  ObjectTypeDeclaration_Attr;			\
   struct Token * superclass;			\
-  struct RefList * interfaces;			\
-  struct RefList * members;			\
-  struct Scope * member_scope
+  struct RefList * interfaces
 
-O_CLASS(ClassDeclaration, Declaration);
+O_CLASS(ClassDeclaration, ObjectTypeDeclaration);
 
 #endif /* CLASSDECLARATION_H */

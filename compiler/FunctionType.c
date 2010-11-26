@@ -11,7 +11,7 @@
 static void FunctionType_check_var_args(void *_type, va_list *app)
 {
   struct Type * type = O_CAST(_type, Type());
-  struct FunctionType * self = o_cast(va_arg(*app, struct FunctionType *), FunctionType());
+  struct FunctionType * self = O_CAST(va_arg(*app, struct FunctionType *), FunctionType());
   if (o_is_of(type, PrimitiveType()) &&
       ((struct PrimitiveType *)(type))->token->type == VA_ARG)
     {
@@ -23,9 +23,9 @@ O_IMPLEMENT(FunctionType, void *, ctor, (void *_self, va_list *app))
 {
   struct FunctionType * self = O_CAST(_self, FunctionType());
   self = O_SUPER->ctor(self, app);
-  self->return_type = o_cast(va_arg(*app, struct Type *), Type());
+  self->return_type = O_CAST(va_arg(*app, struct Type *), Type());
   O_CALL(self->return_type, retain);
-  self->parameters = o_cast(va_arg(*app, struct RefList *), RefList());
+  self->parameters = O_CAST(va_arg(*app, struct RefList *), RefList());
   O_CALL(self->parameters, retain);
   self->has_var_args = false;
   O_CALL(self->parameters, map_args, FunctionType_check_var_args, self);
@@ -35,7 +35,7 @@ O_IMPLEMENT(FunctionType, void *, ctor, (void *_self, va_list *app))
 static void FunctionType_ctor_get_parameter_type_from_decl(void *_decl, va_list *app)
 {
   struct ArgumentDeclaration * decl = O_CAST(_decl, ArgumentDeclaration());
-  struct RefList * list = o_cast(va_arg(*app, struct RefList *), RefList());
+  struct RefList * list = O_CAST(va_arg(*app, struct RefList *), RefList());
   O_CALL(list, append, decl->type);
 }
 
@@ -43,9 +43,9 @@ O_IMPLEMENT(FunctionType, void *, ctor_from_decl, (void *_self, va_list *app))
 {
   struct FunctionType * self = O_CAST(_self, FunctionType());
   self = O_SUPER->ctor(self, app);
-  self->return_type = o_cast(va_arg(*app, struct Type *), Type());
+  self->return_type = O_CAST(va_arg(*app, struct Type *), Type());
   O_CALL(self->return_type, retain);
-  struct RefList * formal_arguments = o_cast(va_arg(*app, struct RefList *), RefList());
+  struct RefList * formal_arguments = O_CAST(va_arg(*app, struct RefList *), RefList());
   self->parameters = O_CALL_CLASS(RefList(), new, formal_arguments->length, Type());
   O_CALL(self->parameters, retain);
   O_CALL(formal_arguments, map_args, FunctionType_ctor_get_parameter_type_from_decl, self->parameters);
@@ -57,7 +57,7 @@ O_IMPLEMENT(FunctionType, void *, ctor_from_decl, (void *_self, va_list *app))
 static void FunctionType_ctor_get_parameter_type_from_expr(void *_decl, va_list *app)
 {
   struct Expression * expr = O_CAST(_decl, Expression());
-  struct RefList * list = o_cast(va_arg(*app, struct RefList *), RefList());
+  struct RefList * list = O_CAST(va_arg(*app, struct RefList *), RefList());
   O_CALL(list, append, expr->type);
 }
 
@@ -65,7 +65,7 @@ O_IMPLEMENT(FunctionType, void *, ctor_from_expr, (void *_self, va_list *app))
 {
   struct FunctionType * self = O_CAST(_self, FunctionType());
   self = O_SUPER->ctor(self, app);
-  struct FunctionCallExpression * decl = o_cast(va_arg(*app, struct FunctionCallExpression *), FunctionCallExpression());
+  struct FunctionCallExpression * decl = O_CAST(va_arg(*app, struct FunctionCallExpression *), FunctionCallExpression());
   self->return_type = O_CALL(decl->type, retain);
   self->parameters = O_CALL_CLASS(RefList(), new, decl->actual_arguments->length, Type());
   O_CALL(self->parameters, retain);

@@ -13,9 +13,9 @@ O_IMPLEMENT(ConstructorDeclaration, void *, ctor, (void *_self, va_list *app))
 {
   struct ConstructorDeclaration * self = O_CAST(_self, ConstructorDeclaration());
   self = O_SUPER->ctor(self, app);
-  self->class_name = o_cast(va_arg(*app, struct Token *), Token());
+  self->class_name = O_CAST(va_arg(*app, struct Token *), Token());
   O_CALL(self->class_name, retain);
-  self->formal_arguments = o_cast(va_arg(*app, struct RefList *), RefList());
+  self->formal_arguments = O_CAST(va_arg(*app, struct RefList *), RefList());
   O_CALL(self->formal_arguments, retain);
   self->body = O_BRANCH_CAST(va_arg(*app, struct Statement *), Statement());
   O_BRANCH_CALL(self->body, retain);

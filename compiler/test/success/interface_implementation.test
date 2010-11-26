@@ -1,0 +1,26 @@
+package compiler.test;
+
+["stdio.h"] int printf(char * format, ...);
+
+interface Operation
+{
+	int fun(int a, int b);
+}
+
+class AddOperation <Operation>
+{
+	int last_result;
+	int fun(int a, int b)
+	{
+		last_result = a + b;
+		return last_result;
+	}
+}
+
+int main(int argc, char[][] argv)
+{
+	Operation op = new AddOperation();
+	int result = op.fun(4, 5);
+	printf("result = %d\n", result);
+	return 0;
+}

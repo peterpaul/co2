@@ -67,7 +67,7 @@ O_IMPLEMENT(RefList, void *, append, (void *_self, void *_item))
 
 static void RefList_append_item(void *_item, va_list * ap)
 {
-	struct RefList *list = o_cast(va_arg(*ap, struct RefList *), RefList());
+	struct RefList *list = O_CAST(va_arg(*ap, struct RefList *), RefList());
 	O_CALL(list, append, _item);
 }
 

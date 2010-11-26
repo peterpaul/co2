@@ -6,9 +6,10 @@
 #define FunctionDeclarationClass_Attr		\
   DeclarationClass_Attr
 
-#define FunctionDeclaration_Attr			\
+#define FunctionDeclaration_Attr		\
   Declaration_Attr;				\
   struct RefList * formal_arguments;		\
+  struct InterfaceDeclaration * interface_decl;	\
   struct Statement * body
 
 O_CLASS(FunctionDeclaration, Declaration);

@@ -4,7 +4,7 @@
 #include "ObjectType.h"
 #include "Declaration.h"
 #include "ArrayType.h"
-#include "ClassDeclaration.h"
+#include "ObjectTypeDeclaration.h"
 #include "io.h"
 
 #define O_SUPER Expression()
@@ -63,7 +63,7 @@ O_IMPLEMENT(BinaryExpression, void, type_check, (void *_self))
     case '.':
       O_CALL(self->operand[0], type_check);
       struct ObjectType * object_type = o_cast(self->operand[0]->type, ObjectType());
-      struct ClassDeclaration * class_decl = o_cast(object_type->decl, ClassDeclaration());
+      struct ObjectTypeDeclaration * class_decl = o_cast(object_type->decl, ObjectTypeDeclaration());
       O_CALL(self->operand[1], set_scope, class_decl->member_scope);
       O_CALL(self->operand[1], type_check);
       self->type = O_BRANCH_CALL(self->operand[1]->type, retain);
