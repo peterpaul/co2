@@ -12,6 +12,6 @@
   struct RefList * formal_arguments;		\
   struct Statement * body
 
-O_CLASS(ConstructorDeclaration, Declaration);
+O_CLASS (ConstructorDeclaration, Declaration);
 
 #endif /* CONSTRUCTORDECLARATION_H */

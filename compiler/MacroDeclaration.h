@@ -9,6 +9,6 @@
 #define MacroDeclaration_Attr				\
   Declaration_Attr
 
-O_CLASS(MacroDeclaration, Declaration);
+O_CLASS (MacroDeclaration, Declaration);
 
 #endif /* MacroDeclaration_H */

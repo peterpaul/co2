@@ -9,6 +9,6 @@
 #define IfStatement_Attr				\
   Statement_Attr
 
-O_CLASS(IfStatement, Statement);
+O_CLASS (IfStatement, Statement);
 
 #endif /* IfStatement_H */

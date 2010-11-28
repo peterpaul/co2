@@ -10,6 +10,6 @@
   Type_Attr;				\
   struct Token * token
 
-O_CLASS(PrimitiveType, Type);
+O_CLASS (PrimitiveType, Type);
 
 #endif /* PrimitiveType_H */

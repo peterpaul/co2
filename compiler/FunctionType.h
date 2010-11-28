@@ -4,8 +4,10 @@
 #include "Type.h"
 #include "RefList.h"
 
-O_METHOD_DEF(FunctionType, void *, ctor_from_decl, (void *_self, va_list *app));
-O_METHOD_DEF(FunctionType, void *, ctor_from_expr, (void *_self, va_list *app));
+O_METHOD_DEF (FunctionType, void *, ctor_from_decl,
+	      (void *_self, va_list * app));
+O_METHOD_DEF (FunctionType, void *, ctor_from_expr,
+	      (void *_self, va_list * app));
 
 #define FunctionTypeClass_Attr			\
   TypeClass_Attr;				\
@@ -19,6 +21,6 @@ O_METHOD_DEF(FunctionType, void *, ctor_from_expr, (void *_self, va_list *app));
   struct RefList * parameters;			\
   struct Token * generated_name
 
-O_CLASS(FunctionType, Type);
+O_CLASS (FunctionType, Type);
 
 #endif /* FunctionType_H */

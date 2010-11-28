@@ -11,6 +11,6 @@
   Statement_Attr;					\
   struct Expression *expr
 
-O_CLASS(ReturnStatement, Statement);
+O_CLASS (ReturnStatement, Statement);
 
 #endif /* ReturnStatement_H */

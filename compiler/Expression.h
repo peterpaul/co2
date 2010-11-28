@@ -3,8 +3,8 @@
 
 #include "CompileObject.h"
 
-O_METHOD_DEF(Expression, void, set_scope, (void *_self, void *_scope));
-O_METHOD_DEF(Expression, void, generate_left, (void *_self, bool left));
+O_METHOD_DEF (Expression, void, set_scope, (void *_self, void *_scope));
+O_METHOD_DEF (Expression, void, generate_left, (void *_self, bool left));
 
 #define ExpressionClass_Attr			\
   CompileObjectClass_Attr;			\
@@ -15,8 +15,8 @@ O_METHOD_DEF(Expression, void, generate_left, (void *_self, bool left));
   CompileObject_Attr;				\
   struct Type * type
 
-O_CLASS(Expression, CompileObject);
+O_CLASS (Expression, CompileObject);
 
-void Expression_generate_actual_argument(void *_arg, va_list *app);
+void Expression_generate_actual_argument (void *_arg, va_list * app);
 
 #endif /* Expression_H */

@@ -9,6 +9,6 @@
 #define WhileStatement_Attr				\
   Statement_Attr
 
-O_CLASS(WhileStatement, Statement);
+O_CLASS (WhileStatement, Statement);
 
 #endif /* WhileStatement_H */

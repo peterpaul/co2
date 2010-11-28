@@ -5,30 +5,30 @@
 #include "List.h"
 #include "lex.yy.h"
 
-extern FILE * out;
+extern FILE *out;
 
-extern const char * filename;
+extern const char *filename;
 
-extern struct String * base_dir;
-extern struct String * file_path;
+extern struct String *base_dir;
+extern struct String *file_path;
 
-extern struct List * path;
+extern struct List *path;
 
-FILE * open_input (const char * filename);
-FILE * open_output (const char * filename);
+FILE *open_input (const char *filename);
+FILE *open_output (const char *filename);
 
 /**
  * Analyzes the filename, and tries to get the full path of the filename
  * @param filename 
  * @return full path of the file
  */
-struct String * analyze_file_name(const char * filename);
+struct String *analyze_file_name (const char *filename);
 
 /**
  * Returns the basedir of the supplied path.
  * @param path
  * @return the basedir of the path
  */
-struct String * determine_base_dir(struct String * path);
+struct String *determine_base_dir (struct String *path);
 
 #endif /* _IO_H */

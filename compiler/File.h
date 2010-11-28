@@ -3,7 +3,7 @@
 
 #include "CompileObject.h"
 
-O_METHOD_DEF(File, void, parse_imports, (void *_self));
+O_METHOD_DEF (File, void, parse_imports, (void *_self));
 
 #define FileClass_Attr				\
   CompileObjectClass_Attr;			\
@@ -16,6 +16,6 @@ O_METHOD_DEF(File, void, parse_imports, (void *_self));
   struct RefList * imported_files;		\
   struct Path * package
 
-O_CLASS(File, CompileObject);
+O_CLASS (File, CompileObject);
 
 #endif /* File_H */

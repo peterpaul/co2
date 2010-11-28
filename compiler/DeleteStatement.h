@@ -10,6 +10,6 @@
   Statement_Attr;					\
   struct Expression * expr
 
-O_CLASS(DeleteStatement, Statement);
+O_CLASS (DeleteStatement, Statement);
 
 #endif /* DeleteStatement_H */

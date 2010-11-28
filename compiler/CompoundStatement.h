@@ -11,6 +11,6 @@
   Statement_Attr;					\
   struct RefList * body
 
-O_CLASS(CompoundStatement, Statement);
+O_CLASS (CompoundStatement, Statement);
 
 #endif /* CompoundStatement_H */

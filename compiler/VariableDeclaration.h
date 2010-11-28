@@ -4,7 +4,8 @@
 #include "Declaration.h"
 #include "Type.h"
 
-O_METHOD_DEF(VariableDeclaration, void, set_type, (void *_self, struct Type * type));
+O_METHOD_DEF (VariableDeclaration, void, set_type,
+	      (void *_self, struct Type * type));
 
 #define VariableDeclarationClass_Attr		\
   DeclarationClass_Attr;			\
@@ -14,6 +15,6 @@ O_METHOD_DEF(VariableDeclaration, void, set_type, (void *_self, struct Type * ty
   Declaration_Attr;				\
   struct Expression * expr
 
-O_CLASS(VariableDeclaration, Declaration);
+O_CLASS (VariableDeclaration, Declaration);
 
 #endif /* VARDECLARATION_H */

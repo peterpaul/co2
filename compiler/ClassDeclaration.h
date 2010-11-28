@@ -11,6 +11,6 @@
   struct Token * superclass;			\
   struct RefList * interfaces
 
-O_CLASS(ClassDeclaration, ObjectTypeDeclaration);
+O_CLASS (ClassDeclaration, ObjectTypeDeclaration);
 
 #endif /* CLASSDECLARATION_H */

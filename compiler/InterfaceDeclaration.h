@@ -10,6 +10,6 @@
   ObjectTypeDeclaration_Attr;			\
   struct RefList * interfaces
 
-O_CLASS(InterfaceDeclaration, ObjectTypeDeclaration);
+O_CLASS (InterfaceDeclaration, ObjectTypeDeclaration);
 
 #endif /* InterfaceDeclaration_H */

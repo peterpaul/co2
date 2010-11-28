@@ -12,6 +12,6 @@
   struct InterfaceDeclaration * interface_decl;	\
   struct Statement * body
 
-O_CLASS(FunctionDeclaration, Declaration);
+O_CLASS (FunctionDeclaration, Declaration);
 
 #endif /* FUNDECLARATION_H */

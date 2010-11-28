@@ -9,10 +9,12 @@
 int errors = 0;
 int warnings = 0;
 
-static int write_error_message (const struct Token *token, const char *msg, va_list *app)
+static int
+write_error_message (const struct Token *token, const char *msg,
+		     va_list * app)
 {
   int result = 0;
-  if (token) 
+  if (token)
     {
       result += fprintf (stderr, "%s:%d: ", token->file->data, token->line);
     }
@@ -28,22 +30,24 @@ static int write_error_message (const struct Token *token, const char *msg, va_l
   return result;
 }
 
-int error (const struct Token *token, const char *msg, ...)
+int
+error (const struct Token *token, const char *msg, ...)
 {
   int result;
   va_list ap;
-  errors ++;
+  errors++;
   va_start (ap, msg);
   result = write_error_message (token, msg, &ap);
   va_end (ap);
   return result;
 }
 
-int warning (const struct Token *token, const char *msg, ...)
+int
+warning (const struct Token *token, const char *msg, ...)
 {
   int result;
   va_list ap;
-  warnings ++;
+  warnings++;
   va_start (ap, msg);
   result = write_error_message (token, msg, &ap);
   va_end (ap);

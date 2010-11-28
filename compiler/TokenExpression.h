@@ -4,7 +4,7 @@
 #include "Expression.h"
 #include "Token.h"
 
-O_METHOD_DEF(TokenExpression, void, lookup, (void *_self));
+O_METHOD_DEF (TokenExpression, void, lookup, (void *_self));
 
 #define TokenExpressionClass_Attr			\
   ExpressionClass_Attr;					\
@@ -17,6 +17,6 @@ O_METHOD_DEF(TokenExpression, void, lookup, (void *_self));
   struct Declaration * decl;				\
   bool check_global_scope
 
-O_CLASS(TokenExpression, Expression);
+O_CLASS (TokenExpression, Expression);
 
 #endif /* TokenExpression_H */

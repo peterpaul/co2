@@ -10,6 +10,6 @@
 #define Statement_Attr				\
   CompileObject_Attr
 
-O_CLASS(Statement, CompileObject);
+O_CLASS (Statement, CompileObject);
 
 #endif /* STATEMENT_H */

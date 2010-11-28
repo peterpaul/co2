@@ -3,7 +3,8 @@
 
 #include "TokenExpression.h"
 
-O_METHOD_DEF (NewExpression, void, set_ctor_name, (void *_self, struct TokenExpression * ctor_name));
+O_METHOD_DEF (NewExpression, void, set_ctor_name,
+	      (void *_self, struct TokenExpression * ctor_name));
 
 #define NewExpressionClass_Attr			\
   ExpressionClass_Attr;				\
@@ -16,6 +17,6 @@ O_METHOD_DEF (NewExpression, void, set_ctor_name, (void *_self, struct TokenExpr
   struct Expression * array_size;		\
   struct RefList * ctor_arguments
 
-O_CLASS(NewExpression, Expression);
+O_CLASS (NewExpression, Expression);
 
 #endif /* NewExpression_H */

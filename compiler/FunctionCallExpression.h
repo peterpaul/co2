@@ -11,6 +11,6 @@
   struct Expression * function;					\
   struct RefList * actual_arguments
 
-O_CLASS(FunctionCallExpression, Expression);
+O_CLASS (FunctionCallExpression, Expression);
 
 #endif /* FunctionCallExpression_H */

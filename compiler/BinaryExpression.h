@@ -11,6 +11,6 @@
   struct Expression * operand[2];		\
   struct Token * operator
 
-O_CLASS(BinaryExpression, Expression);
+O_CLASS (BinaryExpression, Expression);
 
 #endif /* BinaryExpression_H */

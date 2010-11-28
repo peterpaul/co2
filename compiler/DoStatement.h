@@ -9,6 +9,6 @@
 #define DoStatement_Attr				\
   Statement_Attr
 
-O_CLASS(DoStatement, Statement);
+O_CLASS (DoStatement, Statement);
 
 #endif /* DoStatement_H */

@@ -9,6 +9,6 @@
 #define ForEachStatement_Attr				\
   Statement_Attr
 
-O_CLASS(ForEachStatement, Statement);
+O_CLASS (ForEachStatement, Statement);
 
 #endif /* ForEachStatement_H */

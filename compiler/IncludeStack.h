@@ -12,6 +12,6 @@
   const char * current_file;			\
   YY_BUFFER_STATE buffer_state
 
-O_CLASS(IncludeStack, RefObject);
+O_CLASS (IncludeStack, RefObject);
 
 #endif /* INCLUDESTACK_H */

@@ -10,6 +10,6 @@
   Expression_Attr;					\
   struct Expression * expr
 
-O_CLASS(NestedExpression, Expression);
+O_CLASS (NestedExpression, Expression);
 
 #endif /* NestedExpression_H */

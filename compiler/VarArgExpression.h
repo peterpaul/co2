@@ -11,6 +11,6 @@
   Expression_Attr;					\
   struct Type * va_arg_type
 
-O_CLASS(VarArgExpression, Expression);
+O_CLASS (VarArgExpression, Expression);
 
 #endif /* VarArgExpression_H */

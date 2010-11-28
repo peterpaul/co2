@@ -11,6 +11,6 @@
   struct Token * operator;				\
   struct Expression * operand
 
-O_CLASS(UnaryExpression, Expression);
+O_CLASS (UnaryExpression, Expression);
 
 #endif /* UnaryExpression_H */

@@ -4,10 +4,10 @@
 #include "RefObject.h"
 #include "Context.h"
 
-O_METHOD_DEF(CompileObject, void, type_check, (void *_self));
-O_METHOD_DEF(CompileObject, void, optimize, (void *_self));
-O_METHOD_DEF(CompileObject, void, generate, (void *_self));
-O_METHOD_DEF(CompileObject, struct Token *, get_token, (void *_self));
+O_METHOD_DEF (CompileObject, void, type_check, (void *_self));
+O_METHOD_DEF (CompileObject, void, optimize, (void *_self));
+O_METHOD_DEF (CompileObject, void, generate, (void *_self));
+O_METHOD_DEF (CompileObject, struct Token *, get_token, (void *_self));
 
 #define CompileObjectClass_Attr			\
   RefObjectClass_Attr;				\
@@ -19,9 +19,9 @@ O_METHOD_DEF(CompileObject, struct Token *, get_token, (void *_self));
 #define CompileObject_Attr			\
   RefObject_Attr
 
-O_CLASS(CompileObject, RefObject);
+O_CLASS (CompileObject, RefObject);
 
-int type_filter(void *_member, va_list * app);
-int not_type_filter(void *_member, va_list * app);
+int type_filter (void *_member, va_list * app);
+int not_type_filter (void *_member, va_list * app);
 
 #endif /* CompileObject_H */

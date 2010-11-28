@@ -3,9 +3,9 @@
 
 #include "RefList.h"
 
-O_METHOD_DEF(Context, void, add, (void *_self, void *_item));
-O_METHOD_DEF(Context, void *, find, (void *_self, void *_class));
-O_METHOD_DEF(Context, void, remove_last, (void *_self));
+O_METHOD_DEF (Context, void, add, (void *_self, void *_item));
+O_METHOD_DEF (Context, void *, find, (void *_self, void *_class));
+O_METHOD_DEF (Context, void, remove_last, (void *_self));
 
 #define ContextClass_Attr			\
   RefObjectClass_Attr;				\
@@ -17,8 +17,8 @@ O_METHOD_DEF(Context, void, remove_last, (void *_self));
   RefObject_Attr;				\
   struct RefList * stack
 
-O_CLASS(Context, RefObject);
+O_CLASS (Context, RefObject);
 
-extern struct Context * current_context;
+extern struct Context *current_context;
 
 #endif /* Context_H */

@@ -14,6 +14,6 @@
   struct Declaration * method_context;			\
   struct RefList * actual_arguments
 
-O_CLASS(SuperExpression, Expression);
+O_CLASS (SuperExpression, Expression);
 
 #endif /* SuperExpression_H */

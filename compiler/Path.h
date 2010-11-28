@@ -3,7 +3,7 @@
 
 #include "CompileObject.h"
 
-O_METHOD_DEF(Path, struct String *, to_system_path, (void *_self));
+O_METHOD_DEF (Path, struct String *, to_system_path, (void *_self));
 
 #define PathClass_Attr				\
   CompileObjectClass_Attr;			\
@@ -13,6 +13,6 @@ O_METHOD_DEF(Path, struct String *, to_system_path, (void *_self));
   CompileObject_Attr;				\
   struct RefList * path_name
 
-O_CLASS(Path, CompileObject);
+O_CLASS (Path, CompileObject);
 
 #endif /* Path_H */

@@ -10,6 +10,6 @@
   Type_Attr;					\
   struct Type * base_type
 
-O_CLASS(ArrayType, Type);
+O_CLASS (ArrayType, Type);
 
 #endif /* ArrayType_H */

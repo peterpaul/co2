@@ -9,6 +9,6 @@
 #define ArgumentDeclaration_Attr				\
   Declaration_Attr
 
-O_CLASS(ArgumentDeclaration, Declaration);
+O_CLASS (ArgumentDeclaration, Declaration);
 
 #endif /* ArgumentDeclaration_H */

@@ -14,6 +14,6 @@
   struct String * file;				\
   int line
 
-O_CLASS(Token, CompileObject);
+O_CLASS (Token, CompileObject);
 
 #endif /* TOKEN_H */

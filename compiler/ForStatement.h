@@ -9,6 +9,6 @@
 #define ForStatement_Attr				\
   Statement_Attr
 
-O_CLASS(ForStatement, Statement);
+O_CLASS (ForStatement, Statement);
 
 #endif /* ForStatement_H */

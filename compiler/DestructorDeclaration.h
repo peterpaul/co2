@@ -11,6 +11,6 @@
   struct Token * class_name;			\
   struct Statement * body
 
-O_CLASS(DestructorDeclaration, Declaration);
+O_CLASS (DestructorDeclaration, Declaration);
 
 #endif /* DESTRUCTORDECLARATION_H */

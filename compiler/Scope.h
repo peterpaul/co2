@@ -5,7 +5,8 @@
 #include "Declaration.h"
 #include "Token.h"
 
-typedef enum {
+typedef enum
+{
   GLOBAL_SCOPE,
   VARIABLE_SCOPE,
   CLASS_SCOPE,
@@ -14,15 +15,22 @@ typedef enum {
   INTERFACE_SCOPE
 } ScopeType;
 
-O_METHOD_DEF(Scope, struct Declaration *, declare, (void *_self, struct Declaration * decl));
-O_METHOD_DEF(Scope, void, leave, (void *_self));
-O_METHOD_DEF(Scope, struct Declaration *, lookup_in_this_scope, (void *_self, struct Token * token));
-O_METHOD_DEF(Scope, struct Declaration *, lookup, (void *_self, struct Token * token));
-O_METHOD_DEF(Scope, struct Declaration *, lookup_type_in_this_scope, (void *_self, struct Token * token, void *_type));
-O_METHOD_DEF(Scope, struct Declaration *, lookup_type, (void *_self, struct Token * token, void *_type));
-O_METHOD_DEF(Scope, bool, exists_in_this_scope, (void *_self, struct Token * token));
-O_METHOD_DEF(Scope, bool, exists, (void *_self, struct Token * token));
-O_METHOD_DEF(Scope, void, error_not_found, (void *_self, struct Token * token));
+O_METHOD_DEF (Scope, struct Declaration *, declare,
+	      (void *_self, struct Declaration * decl));
+O_METHOD_DEF (Scope, void, leave, (void *_self));
+O_METHOD_DEF (Scope, struct Declaration *, lookup_in_this_scope,
+	      (void *_self, struct Token * token));
+O_METHOD_DEF (Scope, struct Declaration *, lookup,
+	      (void *_self, struct Token * token));
+O_METHOD_DEF (Scope, struct Declaration *, lookup_type_in_this_scope,
+	      (void *_self, struct Token * token, void *_type));
+O_METHOD_DEF (Scope, struct Declaration *, lookup_type,
+	      (void *_self, struct Token * token, void *_type));
+O_METHOD_DEF (Scope, bool, exists_in_this_scope,
+	      (void *_self, struct Token * token));
+O_METHOD_DEF (Scope, bool, exists, (void *_self, struct Token * token));
+O_METHOD_DEF (Scope, void, error_not_found,
+	      (void *_self, struct Token * token));
 
 #define ScopeClass_Attr				\
   HashClass_Attr;				\
@@ -42,9 +50,9 @@ O_METHOD_DEF(Scope, void, error_not_found, (void *_self, struct Token * token));
   struct Token * name;				\
   struct Scope * parent
 
-O_CLASS(Scope, Hash);
+O_CLASS (Scope, Hash);
 
-extern struct Scope * current_scope;
-extern struct Scope * global_scope;
+extern struct Scope *current_scope;
+extern struct Scope *global_scope;
 
 #endif /* Scope_H */

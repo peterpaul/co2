@@ -11,6 +11,6 @@
   struct Declaration * decl;			\
   struct Token * token
 
-O_CLASS(ObjectType, Type);
+O_CLASS (ObjectType, Type);
 
 #endif /* ObjectType_H */

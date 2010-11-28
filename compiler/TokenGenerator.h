@@ -4,7 +4,8 @@
 #include "Singleton.h"
 #include "Token.h"
 
-O_METHOD_DEF(TokenGenerator, struct Token *, create, (void *_self, struct Token * token));
+O_METHOD_DEF (TokenGenerator, struct Token *, create,
+	      (void *_self, struct Token * token));
 
 #define TokenGeneratorClass_Attr			\
   SingletonClass_Attr;					\
@@ -14,6 +15,6 @@ O_METHOD_DEF(TokenGenerator, struct Token *, create, (void *_self, struct Token 
   Singleton_Attr;					\
   int value
 
-O_CLASS(TokenGenerator, Singleton);
+O_CLASS (TokenGenerator, Singleton);
 
 #endif /* TokenGenerator_H */
