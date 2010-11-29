@@ -52,7 +52,7 @@ O_IMPLEMENT (FunctionCallExpression, void, generate, (void *_self))
 	    (struct FunctionDeclaration *) function->decl;
 	  if (fun_decl->scope->type == CLASS_SCOPE)
 	    {
-	      fprintf (out, "O_CALL");
+	      fprintf (out, "O_CALL ");
 	      fprintf (out, "(");
 	      bool is_first_arg = false;
 	      fprintf (out, "self, ");
@@ -80,7 +80,7 @@ O_IMPLEMENT (FunctionCallExpression, void, generate, (void *_self))
 	o_cast (function->operand[0]->type, ObjectType ());
       if (o_is_of (function_type->decl, ClassDeclaration ()))
 	{
-	  fprintf (out, "O_CALL");
+	  fprintf (out, "O_CALL ");
 	  fprintf (out, "(");
 	  bool is_first_arg = false;
 	  O_CALL (function->operand[0], generate);
@@ -93,7 +93,7 @@ O_IMPLEMENT (FunctionCallExpression, void, generate, (void *_self))
 	}
       else if (o_is_of (function_type->decl, InterfaceDeclaration ()))
 	{
-	  fprintf (out, "O_CALL_IF");
+	  fprintf (out, "O_CALL_IF ");
 	  fprintf (out, "(");
 	  O_CALL (function_type->decl->name, generate);
 	  fprintf (out, ", ");
@@ -111,7 +111,7 @@ O_IMPLEMENT (FunctionCallExpression, void, generate, (void *_self))
     {
       O_CALL (self->function, generate);
     }
-  fprintf (out, "(");
+  fprintf (out, " (");
   bool is_first_arg = true;
   if (o_is_of (self->function, BinaryExpression ()))
     {

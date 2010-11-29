@@ -70,7 +70,7 @@ O_IMPLEMENT (FunctionDeclaration, void, generate, (void *_self))
   O_CALL (function_type->return_type, generate);
   fprintf (out, " ");
   O_CALL (self->name, generate);
-  fprintf (out, "(");
+  fprintf (out, " (");
   O_CALL (self->formal_arguments, map_args,
 	  FunctionDeclaration_generate_formal_arg, &first_formal_arg);
   fprintf (out, ")\n");
@@ -87,7 +87,7 @@ O_IMPLEMENT (FunctionDeclaration, void, generate, (void *_self))
   if (function_type->has_var_args)
     {
       fprintf (out, "va_list ap;\n");
-      fprintf (out, "va_start(ap, ");
+      fprintf (out, "va_start (ap, ");
       struct ArgumentDeclaration *arg_decl =
 	O_CALL (self->formal_arguments, get,
 		self->formal_arguments->length - 2);
@@ -105,7 +105,7 @@ O_IMPLEMENT (FunctionDeclaration, void, generate, (void *_self))
 
   if (function_type->has_var_args)
     {
-      fprintf (out, "va_end(ap);\n");
+      fprintf (out, "va_end (ap);\n");
     }
 
   if (!o_is_of (function_type->return_type, PrimitiveType ()) ||

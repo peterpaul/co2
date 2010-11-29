@@ -37,7 +37,7 @@ InterfaceDeclaration_generate_method_definition (void *_method_decl,
 	    InterfaceDeclaration ());
   struct FunctionType *method_type =
     o_cast (method_decl->type, FunctionType ());
-  fprintf (out, "O_METHOD_DEF(");
+  fprintf (out, "O_METHOD_DEF (");
   O_CALL (class_decl->name, generate);
   fprintf (out, ", ");
   O_CALL (method_type->return_type, generate);
@@ -58,7 +58,7 @@ InterfaceDeclaration_generate_method_registration (void *_method_decl,
   struct InterfaceDeclaration *class_decl =
     O_CAST (va_arg (*app, struct InterfaceDeclaration *),
 	    InterfaceDeclaration ());
-  fprintf (out, "; \\\n O_METHOD(");
+  fprintf (out, "; \\\n O_METHOD (");
   O_CALL (class_decl->name, generate);
   fprintf (out, ", ");
   O_CALL (method_decl->name, generate);
@@ -76,7 +76,7 @@ InterfaceDeclaration_generate_method_implementation (void *_method_decl,
 	    InterfaceDeclaration ());
   struct FunctionType *method_type =
     o_cast (method_decl->type, FunctionType ());
-  fprintf (out, "O_METHOD_IF(");
+  fprintf (out, "O_METHOD_IF (");
   O_CALL (class_decl->name, generate);
   fprintf (out, ", ");
   O_CALL (method_type->return_type, generate);
@@ -124,17 +124,17 @@ O_IMPLEMENT (InterfaceDeclaration, void, generate, (void *_self))
 	  InterfaceDeclaration_generate_method_registration, self);
   fprintf (out, "\n\n");
 
-  fprintf (out, "O_CLASS(");
+  fprintf (out, "O_CLASS (");
   O_CALL (self->name, generate);
   fprintf (out, ", Interface);\n\n");
 
-  fprintf (out, "#define O_SUPER Interface()\n\n");
+  fprintf (out, "#define O_SUPER Interface ()\n\n");
 
   O_CALL (methods, map_args,
 	  InterfaceDeclaration_generate_method_implementation, self);
   fprintf (out, "\n");
 
-  fprintf (out, "O_OBJECT(");
+  fprintf (out, "O_OBJECT (");
   O_CALL (self->name, generate);
   fprintf (out, ", Interface);\n");
   fprintf (out, "O_END_OBJECT\n\n");

@@ -51,12 +51,12 @@ O_IMPLEMENT (NewExpression, void, generate, (void *_self))
   if (self->ctor_arguments)
     {
       bool is_first_arg = false;
-      fprintf (out, "O_CALL_CLASS(");
+      fprintf (out, "O_CALL_CLASS (");
       struct Token *token = O_CALL (self->new_type, get_token);
       O_CALL (token, generate);
       if (self->ctor_name != NULL)
 	{
-	  fprintf (out, "(), new_ctor, _");
+	  fprintf (out, " (), new_ctor, _");
 	  // TODO: lookup ctor_name, and use correct classname
 	  O_CALL (token, generate);
 	  fprintf (out, "_ctor_");
@@ -67,7 +67,7 @@ O_IMPLEMENT (NewExpression, void, generate, (void *_self))
 	}
       else
 	{
-	  fprintf (out, "(), new");
+	  fprintf (out, " (), new");
 	  O_CALL (self->ctor_arguments, map_args,
 		  Expression_generate_actual_argument, &is_first_arg);
 	  fprintf (out, ")");
@@ -75,9 +75,9 @@ O_IMPLEMENT (NewExpression, void, generate, (void *_self))
     }
   else if (self->array_size)
     {
-      fprintf (out, "calloc(");
+      fprintf (out, "calloc (");
       O_CALL (self->array_size, generate);
-      fprintf (out, ", sizeof(");
+      fprintf (out, ", sizeof (");
       O_CALL (self->new_type, generate);
       fprintf (out, "))");
     }

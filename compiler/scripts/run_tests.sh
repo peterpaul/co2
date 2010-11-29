@@ -43,8 +43,6 @@ do
 	# cat ${TARGETNAME}.err
 	echo "Command: ${COMPILER} ${TEST} ${TARGETNAME}.c" > ${TARGETNAME}.err
     else
-	# indent generated code
-	indent ${TARGETNAME}.c
 	# Compile the generated code with gcc
 	pushd `dirname ${TARGETNAME}.bin` > /dev/null 2>&1
 	gcc -g3 -I${BASEDIR}/../ ${TARGETNAME}.c -o `basename ${TARGETNAME}.bin` -L${BASEDIR}/../ -lObject  > ${TARGETNAME}.err 2>&1
@@ -89,9 +87,6 @@ do
     ${COMPILER} ${TEST} ${TARGETNAME}.c > ${TARGETNAME}.err 2>&1
     if [[ "$?" == "0" ]]
     then
-	# indent generated code
-	indent ${TARGETNAME}.c
-
 	fail_test "ERROR: ${TEST} failed."
 	# cat ${TARGETNAME}.err
 	echo "Command: ${COMPILER} ${TEST} ${TARGETNAME}.c" > ${TARGETNAME}.err

@@ -51,7 +51,9 @@ O_IMPLEMENT (BinaryExpression, void, generate, (void *_self))
       break;
     default:
       O_CALL (self->operand[0], generate);
+      fprintf (out, " ");
       O_CALL (self->operator, generate);
+      fprintf (out, " ");
       O_CALL (self->operand[1], generate);
       break;
     }
