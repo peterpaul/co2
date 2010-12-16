@@ -133,9 +133,10 @@
 /* Functions */
 void *o_cast(const void *_object, const void *_class);
 void *o_branch_cast(const void *_object, const void *_class);
+void *o_cast_interface(const void *_object, const void *_interface);
 int o_is_a(const void *_self, const void *_class);
 int o_is_of(const void *_self, const void *_class);
-int o_implements(void *_self, void *_interface);
+int o_implements(const void *_self, const void *_interface);
 void *o_get_interface(void *_self, void *_interface);
 void *o_get_class(const char *class_name);
 void o_add_class(void *_class);

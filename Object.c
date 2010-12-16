@@ -31,6 +31,15 @@ void *o_cast(const void *_object, const void *_class)
 	return (void *) _object;
 }
 
+void *o_cast_interface(const void *_object, const void *_interface)
+{
+  const struct Object *object = O_IS_OBJECT(_object);
+  const struct Class *interface = O_IS_CLASS(_interface);
+  assertTrue(o_implements(object, interface), "Could not cast %s to %s.", 
+	     object->class->name, interface->name);
+  return (void *) _object;
+}
+
 void *o_alloc(const void *_class)
 {
 	const struct Class *class = O_IS_CLASS(_class);
@@ -60,14 +69,22 @@ int o_is_of(const void *_self, const void *_class)
 	return myClass == class;
 }
 
-int o_implements(void *_self, void *_interface)
+int o_implements(const void *_self, const void *_interface)
 {
-	struct Object *self = O_IS_OBJECT(_self);
-	struct Interface *interface = O_IS_OBJECT(_interface);
-	struct Interface *IF = self->class->interface_list;
-	while (IF && !o_is_of(IF, interface)) {
-		IF = IF->next;
+	const struct Object *self = O_IS_OBJECT(_self);
+	const struct Interface *interface = O_IS_OBJECT(_interface);
+
+	const struct ObjectClass *myClass = self->class;
+	const struct Class *o = Object();
+	struct Interface *IF;
+	do {
+		IF = myClass->interface_list;
+		while (IF && !o_is_of(IF, interface)) {
+			IF = IF->next;
+		}
+		myClass = myClass->super;
 	}
+	while (IF == NULL && myClass != o);
 	return IF != NULL;
 }
 
@@ -223,6 +240,7 @@ O_IMPLEMENT(Class, void *, ctor, (void *_self, va_list * argp))
 	self->size = size;
 	self->name = name;
 	self->super = (struct ObjectClass *) super;
+	self->interface_list = NULL;
 	o_add_class(self);
 	return self;
 }

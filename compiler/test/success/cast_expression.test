@@ -1,0 +1,30 @@
+package compiler.test;
+
+["stdio.h"] int printf(char * format, ...);
+
+interface Baz
+{
+}
+
+class ObjectA <Baz>
+{
+	int foo;
+}
+
+class ObjectB : ObjectA
+{
+	int bar;
+}
+
+int main(int argc, char ** argv)
+{
+	unsigned i = (unsigned) 5;
+
+	ObjectA objb = (ObjectA) new ObjectB();
+
+	ObjectA obja = new ObjectA();
+
+	Baz bar = (Baz) obja;
+
+	Baz baz = (Baz) objb;
+}

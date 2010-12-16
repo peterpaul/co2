@@ -22,6 +22,7 @@
 #include "WhileStatement.h"
   /* Expressions */
 #include "BinaryExpression.h"
+#include "CastExpression.h"
 #include "Expression.h"
 #include "FunctionCallExpression.h"
 #include "NestedExpression.h"
@@ -163,6 +164,9 @@
 
  /* Solve shift-reduce conflict for constructor, in combination with '(' */
 %nonassoc	CONSTRUCTX
+
+ /* Solve shift-reduce conflict for casts */
+%nonassoc	CASTX
 
 %left		<token>	','
 %right		<token>	'='
@@ -612,12 +616,9 @@ interface_method_declaration_list
   O_CALL(current_scope, declare, $2);
   O_CALL($1, append, $2);
 }
-|	function_header ';'
+|	/* empty */
 {
-  O_CALL(current_scope, leave);
   $$ = O_CALL_CLASS(RefList(), new, 8, Declaration());
-  O_CALL(current_scope, declare, $1);
-  O_CALL($$, append, $1);
 }
 ;
 
@@ -731,6 +732,7 @@ expression
 |	GET_VA_ARG '(' type ')' { $$ = O_CALL_CLASS(VarArgExpression(), new, $3, NULL); }
 |	GET_VA_ARG '(' expression ',' type ')' { $$ = O_CALL_CLASS(VarArgExpression(), new, $5, $3); }
 |	SIZEOF '(' type ')' { $$ = O_CALL_CLASS(SizeExpression(), new, $3); }
+|	'(' type ')' expression %prec CASTX { $$ = O_CALL_CLASS(CastExpression(), new, $2, $4); }
 ;
 
 constant
