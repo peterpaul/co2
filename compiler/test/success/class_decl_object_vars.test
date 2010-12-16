@@ -1,0 +1,39 @@
+package compiler.test;
+
+["stdarg.h"] {
+	int printf(char * fmt, ...);
+}
+
+class ObjectA
+{
+	ObjectA() {
+		foo = 3;
+	}
+
+	int foo;
+
+	int get_foo()
+	{
+		return foo;
+	}
+}
+
+class ObjectB
+{
+	ObjectA data;
+	ObjectB(ObjectA data) {
+		self.data = data;
+	}
+
+	int foo(int bar) {
+		return data.get_foo() + bar;
+	}
+}
+
+int main(int argc, char[][] argv)
+{
+	ObjectA a = new ObjectA();
+	ObjectB b = new ObjectB(a);
+	int result = b.foo(6);
+	printf("b.foo(9) = %d\n", result);
+}

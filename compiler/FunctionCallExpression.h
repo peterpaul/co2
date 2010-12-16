@@ -2,9 +2,13 @@
 #define FunctionCallExpression_H
 
 #include "Expression.h"
+#include "FunctionType.h"
+
+O_METHOD_DEF (FunctionCallExpression, void, type_check_arguments, (void *_self, struct FunctionType *function_type));
 
 #define FunctionCallExpressionClass_Attr			\
-  ExpressionClass_Attr
+  ExpressionClass_Attr;						\
+  O_METHOD(FunctionCallExpression, type_check_arguments)
 
 #define FunctionCallExpression_Attr				\
   Expression_Attr;						\

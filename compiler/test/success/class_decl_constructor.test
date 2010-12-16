@@ -1,5 +1,7 @@
 package compiler.test;
 
+["stdio.h"] int printf(char * format, ...);
+
 class MyObject
 {
 	MyObject(int value) {
@@ -23,6 +25,8 @@ int main(int argc, char[][] argv)
 	MyObject test = new MyObject(5);
 	int val = test.var;
 	int result = test.fun(val,5);
+	printf("result (15) = %d\n", result);
 	MyObject testje = new MyObject.copy(test);
+	printf("testje.var (5) = %d\n", testje.var);
 	return 0;
 }

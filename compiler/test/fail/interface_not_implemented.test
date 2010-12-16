@@ -1,0 +1,18 @@
+package compiler.test;
+
+["stdio.h"] int printf(char * format, ...);
+
+interface Operation
+{
+	int fun(int a, int b);
+}
+
+class AddOperation <Operation>
+{
+	int last_result;
+}
+
+int main(int argc, char[][] argv)
+{
+	return 0;
+}

@@ -1,0 +1,14 @@
+package compiler.test;
+
+class ObjectB
+{
+	int foo(int bar) {
+		return bar;
+	}
+}
+
+int main(int argc, char[][] argv)
+{
+	ObjectB b = new ObjectB();
+	return b.foo(6.5);
+}

@@ -41,7 +41,7 @@ do
 	
 	fail_test "ERROR: ${TEST} failed: Compiler error"
 	# cat ${TARGETNAME}.err
-	echo "Command: ${COMPILER} ${TEST} ${TARGETNAME}.c" > ${TARGETNAME}.err
+	echo "Command: ${COMPILER} ${TEST} ${TARGETNAME}.c" >> ${TARGETNAME}.err
     else
 	# Compile the generated code with gcc
 	pushd `dirname ${TARGETNAME}.bin` > /dev/null 2>&1
@@ -89,7 +89,7 @@ do
     then
 	fail_test "ERROR: ${TEST} failed."
 	# cat ${TARGETNAME}.err
-	echo "Command: ${COMPILER} ${TEST} ${TARGETNAME}.c" > ${TARGETNAME}.err
+	echo "Command: ${COMPILER} ${TEST} ${TARGETNAME}.c" >> ${TARGETNAME}.err
     else
 	echo "OK"
 	# rm -f ${TARGETNAME}.err

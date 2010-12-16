@@ -128,69 +128,72 @@ O_IMPLEMENT (FunctionCallExpression, void, generate, (void *_self))
   fprintf (out, ")");
 }
 
+O_IMPLEMENT(FunctionCallExpression, struct Token *, get_token, (void *_self))
+{
+  struct FunctionCallExpression *self =
+    O_CAST (_self, FunctionCallExpression ());
+  return O_CALL(self->function, get_token);
+}
+
+static void argument_error(struct FunctionCallExpression * self, struct FunctionType * function_type)
+{
+  struct Token * token = O_CALL(self, get_token);
+  // TODO determine the name of the function here
+  error (token,
+	 "'%s' needs %d arguments, but got %d.\n",
+	 "function",
+	 function_type->parameters->length,
+	 self->actual_arguments->length);
+}
+
+O_IMPLEMENT (FunctionCallExpression, void, type_check_arguments, (void *_self, struct FunctionType *function_type))
+{
+  struct FunctionCallExpression *self =
+    O_CAST (_self, FunctionCallExpression ());
+  int expected_length = function_type->parameters->length;
+  if (function_type->has_var_args)
+    {
+      expected_length -= 1;
+      if (self->actual_arguments->length < expected_length)
+	{
+	  argument_error(self, function_type);
+	  return;
+	}
+    }
+  else
+    {
+      if (self->actual_arguments->length != expected_length)
+	{
+	  argument_error(self, function_type);
+	  return;
+	}
+    }
+  int i;
+  for (i = 0; i < expected_length; i++)
+    {
+      struct Type *arg_type =
+	O_CALL (function_type->parameters, get, i);
+      struct Expression *arg_expr =
+	O_CALL (self->actual_arguments, get, i);
+      
+      O_CALL (arg_expr, type_check);
+      O_CALL (arg_type, assert_compatible, arg_expr->type);
+    }
+}
+
 O_IMPLEMENT (FunctionCallExpression, void, type_check, (void *_self))
 {
   struct FunctionCallExpression *self =
     O_CAST (_self, FunctionCallExpression ());
   O_CALL (self->function, type_check);
-  if (!self->function->type)
-    return;
-  self->type = O_CALL (self->function->type, retain);
-  if (o_is_a (self->function, TokenExpression ()))
-    {
-      struct TokenExpression *function =
-	(struct TokenExpression *) self->function;
-      struct FunctionType *function_type =
-	o_cast (function->type, FunctionType ());
-      self->type = O_CALL (function_type->return_type, retain);
-      if (o_is_of (function->decl, FunctionDeclaration ()))
-	{
-	  struct FunctionDeclaration *fun_decl =
-	    (struct FunctionDeclaration *) function->decl;
-	  int expected_length = function_type->parameters->length;
-	  if (function_type->has_var_args)
-	    {
-	      expected_length -= 1;
-	    }
-	  if (self->actual_arguments->length < expected_length)
-	    {
-	      error (function->token,
-		     "'%s' needs %d arguments, but got %d.\n",
-		     function->token->name->data,
-		     fun_decl->formal_arguments->length,
-		     self->actual_arguments->length);
-	      return;
-	    }
-	  int i;
-	  for (i = 0; i < expected_length; i++)
-	    {
-	      struct ArgumentDeclaration *arg_decl =
-		O_CALL (fun_decl->formal_arguments, get, i);
-	      struct Expression *arg_expr =
-		O_CALL (self->actual_arguments, get, i);
-	      O_CALL (arg_expr, type_check);
-	      O_CALL (arg_decl->type, assert_compatible, arg_expr->type);
-	    }
-	}
-      else if (o_is_of (function->decl, VariableDeclaration ()))
-	{
-	  struct VariableDeclaration *var_decl =
-	    (struct VariableDeclaration *) function->decl;
-	  assertTrue (o_is_of (var_decl->type, FunctionType ()),
-		      "Expected FunctionType.\n");
-	}
-      else
-	{
-	  error (function->token, "'%s' is not a function.\n",
-		 function->token->name->data);
-	}
-    }
-  else
-    {
-      struct FunctionType *function_type =
-	o_cast (self->function->type, FunctionType ());
-      self->type = O_CALL (function_type->return_type, retain);
-    }
+    if (!self->function->type)
+      {
+	return;
+      }
+  struct FunctionType *function_type =
+    o_cast (self->function->type, FunctionType ());
+  self->type = O_CALL (function_type->return_type, retain);
+  O_CALL(self, type_check_arguments, function_type);
 }
 
 O_OBJECT (FunctionCallExpression, Expression);
@@ -198,4 +201,6 @@ O_OBJECT_METHOD (FunctionCallExpression, ctor);
 O_OBJECT_METHOD (FunctionCallExpression, dtor);
 O_OBJECT_METHOD (FunctionCallExpression, generate);
 O_OBJECT_METHOD (FunctionCallExpression, type_check);
+O_OBJECT_METHOD (FunctionCallExpression, type_check_arguments);
+O_OBJECT_METHOD (FunctionCallExpression, get_token);
 O_END_OBJECT

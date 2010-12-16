@@ -93,6 +93,7 @@
 %token <token> TYPE_IDENTIFIER
 %token <token> UNSIGNED
 %token <token> VA_ARG /* '...' */
+%token <token> VA_LIST
 %token <token> VOID
 %token <token> WHILE
 
@@ -647,6 +648,10 @@ type
 {
   $$ = O_CALL_CLASS(ArrayType(), new, $1);
 }
+|	VA_LIST
+{
+  $$ = O_CALL_CLASS(PrimitiveType(), new, $1);
+}
 |	VOID
 {
   $$ = O_CALL_CLASS(PrimitiveType(), new, $1);
@@ -681,6 +686,7 @@ expression
 :	constant
 |	IDENTIFIER { $$ = O_CALL_CLASS(TokenExpression(), new, $1); }
 |	SELF { $$ = O_CALL_CLASS(TokenExpression(), new, $1); }
+|	VA_ARG { $$ = O_CALL_CLASS(TokenExpression(), new, $1); }
 |	expression '(' opt_actual_argument_list ')' { $$ = O_CALL_CLASS(FunctionCallExpression(), new, $1, $3); }
 |	expression '[' expression ']' { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
 |	expression '.' expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
@@ -718,12 +724,10 @@ expression
   O_CALL(new_expr, set_ctor_name, token_expr);
   $$ = (struct Expression *) new_expr;
 }
-|	SUPER '(' opt_actual_argument_list ')' 
-{ 
-  $$ = O_CALL_CLASS(SuperExpression(), new, $1, NULL, $3);
-}
+|	SUPER '(' opt_actual_argument_list ')' { $$ = O_CALL_CLASS(SuperExpression(), new, $1, NULL, $3); }
 |	SUPER '.' IDENTIFIER '(' opt_actual_argument_list ')' { $$ = O_CALL_CLASS(SuperExpression(), new, $1, $3, $5); }
-|	GET_VA_ARG '(' type ')' { $$ = O_CALL_CLASS(VarArgExpression(), new, $3); }
+|	GET_VA_ARG '(' type ')' { $$ = O_CALL_CLASS(VarArgExpression(), new, $3, NULL); }
+|	GET_VA_ARG '(' expression ',' type ')' { $$ = O_CALL_CLASS(VarArgExpression(), new, $5, $3); }
 ;
 
 constant

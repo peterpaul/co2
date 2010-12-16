@@ -7,7 +7,10 @@
   StatementClass_Attr
 
 #define IfStatement_Attr				\
-  Statement_Attr
+  Statement_Attr;					\
+  struct Expression * condition;			\
+  struct Statement * then_clause;			\
+  struct Statement * else_clause
 
 O_CLASS (IfStatement, Statement);
 

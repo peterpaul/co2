@@ -9,6 +9,7 @@
 
 #define VarArgExpression_Attr				\
   Expression_Attr;					\
+  struct Expression * va_arg_expr;			\
   struct Type * va_arg_type
 
 O_CLASS (VarArgExpression, Expression);

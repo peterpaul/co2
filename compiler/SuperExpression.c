@@ -47,6 +47,12 @@ O_IMPLEMENT (SuperExpression, void, type_check, (void *_self))
 	O_CALL (current_context, find, FunctionDeclaration ());
     }
 
+  if (self->class_context->superclass == NULL)
+    {
+      error(self->super, "%s has no superclass.\n", self->class_context->name->name->data);
+      return;
+    }
+
   struct ClassDeclaration *super =
     (struct ClassDeclaration *) O_CALL (global_scope, lookup,
 					self->class_context->superclass);

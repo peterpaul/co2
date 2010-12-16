@@ -23,12 +23,18 @@ void proc(int a, int b)
 	c = a + b;
 }
 
+int fun_va_param(int a, ...)
+{
+	return a + va_arg(int);
+}
+
 int main()
 {
 	fun_no_param();
 	fun_one_param(4);
 	fun_two_param(4,5);
-	fun_no_param(4,5);
+	fun_no_compound(4,5);
 	proc(4,5);
+	fun_va_param(4,5);
 	return 0;
 }

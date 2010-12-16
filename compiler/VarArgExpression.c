@@ -9,6 +9,8 @@ O_IMPLEMENT (VarArgExpression, void *, ctor, (void *_self, va_list * app))
   self = O_SUPER->ctor (self, app);
   self->va_arg_type = O_CAST (va_arg (*app, struct Type *), Type ());
   O_CALL (self->va_arg_type, retain);
+  self->va_arg_expr = O_BRANCH_CAST (va_arg(*app, struct Expression *), Expression());
+  O_BRANCH_CALL (self->va_arg_expr, retain);
   return self;
 }
 
@@ -16,6 +18,7 @@ O_IMPLEMENT (VarArgExpression, void *, dtor, (void *_self))
 {
   struct VarArgExpression *self = O_CAST (_self, VarArgExpression ());
   O_CALL (self->va_arg_type, release);
+  O_BRANCH_CALL (self->va_arg_type, release);
   return O_SUPER->dtor (self);
 }
 
@@ -23,15 +26,27 @@ O_IMPLEMENT (VarArgExpression, void, type_check, (void *_self))
 {
   struct VarArgExpression *self = O_CAST (_self, VarArgExpression ());
   O_CALL (self->va_arg_type, type_check);
+  O_BRANCH_CALL (self->va_arg_expr, type_check);
   self->type = O_CALL (self->va_arg_type, retain);
 }
 
 O_IMPLEMENT (VarArgExpression, void, generate, (void *_self))
 {
   struct VarArgExpression *self = O_CAST (_self, VarArgExpression ());
-  fprintf (out, "va_arg(ap, ");
-  O_CALL (self->type, generate);
-  fprintf (out, ")");
+  if (self->va_arg_expr)
+    {
+      fprintf (out, "va_arg(");
+      O_CALL (self->va_arg_expr, generate);
+      fprintf (out, ", ");
+      O_CALL (self->va_arg_type, generate);
+      fprintf (out, ")");
+    }
+  else
+    {
+      fprintf (out, "va_arg(ap, ");
+      O_CALL (self->va_arg_type, generate);
+      fprintf (out, ")");
+    }
 }
 
 O_OBJECT (VarArgExpression, Expression);

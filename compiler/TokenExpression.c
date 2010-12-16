@@ -38,6 +38,11 @@ O_IMPLEMENT (TokenExpression, void *, dtor, (void *_self))
 O_IMPLEMENT (TokenExpression, void, generate_left, (void *_self, bool left))
 {
   struct TokenExpression *self = O_CAST (_self, TokenExpression ());
+  if (self->token->type == VA_ARG)
+    {
+      fprintf (out, "ap");
+      return;
+    }
   if (left && self->decl && self->decl->class_decl)
     {
       fprintf (out, "self->");
@@ -111,6 +116,15 @@ O_IMPLEMENT (TokenExpression, void, type_check, (void *_self))
 	O_CALL (self->type, retain);
       }
       break;
+    case VA_ARG:
+      {
+	struct Token *token =
+	  O_CALL_CLASS (Token (), new, "va_list", VA_LIST, self->token->file,
+			self->token->line);
+	self->type = O_CALL_CLASS (PrimitiveType (), new, token);
+	O_CALL (self->type, retain);
+      }
+      break;
     default:
       error (self->token, "Unhandled TokenExpression: '%s'\n",
 	     self->token->name->data);
@@ -140,6 +154,12 @@ O_IMPLEMENT (TokenExpression, void, lookup, (void *_self))
   O_BRANCH_CALL (self->decl, retain);
 }
 
+O_IMPLEMENT(TokenExpression, struct Token *, get_token, (void *_self))
+{
+  struct TokenExpression *self = O_CAST (_self, TokenExpression ());
+  return self->token;
+}
+
 O_OBJECT (TokenExpression, Expression);
 O_OBJECT_METHOD (TokenExpression, ctor);
 O_OBJECT_METHOD (TokenExpression, dtor);
@@ -147,4 +167,5 @@ O_OBJECT_METHOD (TokenExpression, generate_left);
 O_OBJECT_METHOD (TokenExpression, type_check);
 O_OBJECT_METHOD (TokenExpression, set_scope);
 O_OBJECT_METHOD (TokenExpression, lookup);
+O_OBJECT_METHOD (TokenExpression, get_token);
 O_END_OBJECT

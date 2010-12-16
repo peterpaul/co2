@@ -3,6 +3,9 @@ package compiler.test;
 class A
 {
 	int a;
+	A(int a) {
+		self.a = a;
+	}
 	int fa(int a, int b)
 	{
 		return a + b;
@@ -20,7 +23,7 @@ class B:A
 
 int main()
 {
-	B b = new B();
+	B b = new B(3);
 	b.a = 4;
 	b.b = 5;
 	int c = b.fb();
