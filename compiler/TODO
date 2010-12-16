@@ -24,3 +24,6 @@ Language Features:
 * static keyword
 * private keyword
 * annotations
+* add missing c types (like double)
+* add structs
+* add typedefs

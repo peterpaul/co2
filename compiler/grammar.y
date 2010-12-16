@@ -26,6 +26,7 @@
 #include "FunctionCallExpression.h"
 #include "NestedExpression.h"
 #include "NewExpression.h"
+#include "SizeExpression.h"
 #include "SuperExpression.h"
 #include "TokenExpression.h"
 #include "UnaryExpression.h"
@@ -88,6 +89,7 @@
 %token <token> PACKAGE
 %token <token> RETURN
 %token <token> SELF
+%token <token> SIZEOF
 %token <token> STRING_CONSTANT
 %token <token> SUPER
 %token <token> TYPE_IDENTIFIER
@@ -728,6 +730,7 @@ expression
 |	SUPER '.' IDENTIFIER '(' opt_actual_argument_list ')' { $$ = O_CALL_CLASS(SuperExpression(), new, $1, $3, $5); }
 |	GET_VA_ARG '(' type ')' { $$ = O_CALL_CLASS(VarArgExpression(), new, $3, NULL); }
 |	GET_VA_ARG '(' expression ',' type ')' { $$ = O_CALL_CLASS(VarArgExpression(), new, $5, $3); }
+|	SIZEOF '(' type ')' { $$ = O_CALL_CLASS(SizeExpression(), new, $3); }
 ;
 
 constant
