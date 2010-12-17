@@ -116,11 +116,17 @@
 			   _tmp->name, (void *)_tmp, __STRING(msg));	\
 		_tmp->msg(_tmp,##__VA_ARGS__);})
 
+#ifdef O_DEBUG
 #define O_CAST(o,c)				\
-	o_cast(o,c)
-
+  o_cast(o,c)
 #define O_BRANCH_CAST(o,c)			\
   o_branch_cast(o,c)
+#else
+#define O_CAST(o,c)				\
+  (void *) o
+#define O_BRANCH_CAST(o,c)			\
+  (void *) o
+#endif
 
 #define O_BRANCH_CALL(o,msg,...)					\
   ({typeof(o) _tmp = o;							\

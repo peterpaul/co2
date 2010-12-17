@@ -6,8 +6,7 @@ GCC		= gcc
 DEP_FLAGS	= -MM -MG -MMD
 
 #DEBUGFLG	= -g3
-#DEBUGFLG	= -g3
-DEBUGFLG	= -g3 -DP_DEBUG
+DEBUGFLG	= -g3 -DO_DEBUG
 
 ANSIFLGS	=
 #ANSIFLGS	= -ansi -pedantic

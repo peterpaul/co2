@@ -28,7 +28,12 @@ O_OBJECT (Expression, CompileObject);
 O_OBJECT_METHOD (Expression, ctor);
 O_OBJECT_METHOD (Expression, dtor);
 O_OBJECT_METHOD (Expression, generate);
-O_END_OBJECT void
+O_END_OBJECT 
+
+/**
+ * Generates an argument expression.
+ */
+void
 Expression_generate_actual_argument (void *_arg, va_list * app)
 {
   struct Expression *arg = O_CAST (_arg, Expression ());
