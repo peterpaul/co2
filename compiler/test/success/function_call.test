@@ -1,0 +1,30 @@
+package compiler.test;
+
+["stdio.h"] int printf(char * format, ...);
+
+class Foo
+{
+	int bar;
+	Foo(int a)
+	{
+		bar = a;
+	}
+
+	int increase(int a)
+	{
+		bar = bar + a;
+		return bar;
+	}
+}
+
+int add(int a, int b)
+{
+	return a + b;
+}
+
+int main(int argc, char ** argv)
+{
+	Foo f = new Foo(1);
+	printf("1 + 2 + 3 = %d\n", add(f.increase(2), 3));
+	return 0;
+}
