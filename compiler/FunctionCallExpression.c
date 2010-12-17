@@ -169,15 +169,25 @@ O_IMPLEMENT (FunctionCallExpression, void, type_check_arguments, (void *_self, s
 	}
     }
   int i;
-  for (i = 0; i < expected_length; i++)
+  for (i = 0; i < self->actual_arguments->length; i++)
     {
-      struct Type *arg_type =
-	O_CALL (function_type->parameters, get, i);
-      struct Expression *arg_expr =
-	O_CALL (self->actual_arguments, get, i);
-      
-      O_CALL (arg_expr, type_check);
-      O_CALL (arg_type, assert_compatible, arg_expr->type);
+      if (i < expected_length)
+	{
+	  struct Type *arg_type =
+	    O_CALL (function_type->parameters, get, i);
+	  struct Expression *arg_expr =
+	    O_CALL (self->actual_arguments, get, i);
+	  
+	  O_CALL (arg_expr, type_check);
+	  O_CALL (arg_type, assert_compatible, arg_expr->type);
+	}
+      else
+	{
+	  struct Expression *arg_expr =
+	    O_CALL (self->actual_arguments, get, i);
+	  
+	  O_CALL (arg_expr, type_check);
+	}
     }
 }
 
