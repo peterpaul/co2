@@ -28,8 +28,8 @@ class ObjectB:ObjectA
 		foo = new ObjectA(value);
 	}
 
-	ObjectB.copy(ObjectB other) {
-		foo = other.foo;
+	ObjectB.copy(ObjectA other) {
+		foo = other;
 	}
 
 	ObjectA foo;

@@ -28,7 +28,12 @@ O_IMPLEMENT(CastExpression, void *, dtor, (void *_self))
 O_IMPLEMENT(CastExpression, void, type_check, (void *_self))
 {
   struct CastExpression *self = O_CAST(_self, CastExpression());
-  O_CALL(self->cast_type, type_check);
+  O_CALL (self->expression, type_check);
+  O_CALL (self->cast_type, type_check);
+  if (o_is_of (self->cast_type, ObjectType ()) && o_is_of (self->expression->type, ObjectType()))
+    {
+      O_CALL (self->cast_type, assert_compatible, self->expression->type);
+    }
   self->type = O_CALL(self->cast_type, retain);
 }
 

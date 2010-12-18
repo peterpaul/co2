@@ -535,11 +535,11 @@ O_IMPLEMENT (ClassDeclaration, bool, is_compatible,
 {
   struct ClassDeclaration *self = O_CAST (_self, ClassDeclaration ());
   struct ClassDeclaration *other = o_cast (_other, ClassDeclaration ());
-  while (self && self != other)
+  while (other && other->superclass && self != other)
     {
-      self =
-	(struct ClassDeclaration *) O_CALL (self->scope, lookup,
-					    self->superclass);
+      other =
+	(struct ClassDeclaration *) O_CALL (global_scope, lookup,
+					    other->superclass);
     }
   return self == other;
 }
@@ -549,4 +549,5 @@ O_OBJECT_METHOD (ClassDeclaration, ctor);
 O_OBJECT_METHOD (ClassDeclaration, dtor);
 O_OBJECT_METHOD (ClassDeclaration, generate);
 O_OBJECT_METHOD (ClassDeclaration, type_check);
+O_OBJECT_METHOD (ClassDeclaration, is_compatible);
 O_END_OBJECT

@@ -8,7 +8,7 @@
 
 #define ObjectType_Attr				\
   Type_Attr;					\
-  struct Declaration * decl;			\
+  struct ObjectTypeDeclaration * decl;		\
   struct Token * token
 
 O_CLASS (ObjectType, Type);
