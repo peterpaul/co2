@@ -52,7 +52,7 @@ O_IMPLEMENT (PrimitiveType, bool, is_compatible, (void *_self, void *_other))
 	{
 	  if (name_self->type != name_other->type)
 	    {
-	      warning (name_self, "possible data loss while converting %s to %s\n", name_self->name->data, name_other->name->data);
+	      warning (name_self, "possible data loss while converting %s to %s\n", name_other->name->data, name_self->name->data);
 	    }
 	  return true;
 	}

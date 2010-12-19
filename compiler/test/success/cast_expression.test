@@ -18,7 +18,11 @@ class ObjectB : ObjectA
 
 int main(int argc, char ** argv)
 {
-	unsigned i = (unsigned) 5;
+	unsigned i = 5;
+
+	int test_float = (int) 5.6;
+
+	printf("test_float = %d\n", test_float);
 
 	ObjectA objb = (ObjectA) new ObjectB();
 
