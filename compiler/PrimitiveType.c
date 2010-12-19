@@ -1,5 +1,6 @@
 #include "PrimitiveType.h"
 #include "Token.h"
+#include "grammar.tab.h"
 #include "io.h"
 
 #define O_SUPER Type()
@@ -46,7 +47,19 @@ O_IMPLEMENT (PrimitiveType, bool, is_compatible, (void *_self, void *_other))
       struct PrimitiveType *other = O_CAST (_other, PrimitiveType ());
       struct Token *name_self = O_CALL (self, get_token);
       struct Token *name_other = O_CALL (other, get_token);
-      return O_CALL (name_self->name, compare, name_other->name) == 0;
+      if ((name_self->type == INT || name_self->type == UNSIGNED) &&
+	  (name_other->type == INT || name_other->type == UNSIGNED))
+	{
+	  if (name_self->type != name_other->type)
+	    {
+	      warning (name_self, "possible data loss while converting %s to %s\n", name_self->name->data, name_other->name->data);
+	    }
+	  return true;
+	}
+      else
+	{
+	  return name_self->type == name_other->type;
+	}
     }
   return false;
 }
