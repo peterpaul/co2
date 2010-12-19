@@ -24,8 +24,7 @@ O_IMPLEMENT (TokenGenerator, struct Token *, create,
   struct String *name =
     O_CALL_CLASS (String (), new, "_%s_%d", token->name->data, self->value);
   struct Token *retval =
-    O_CALL_CLASS (Token (), new, name->data, IDENTIFIER, token->file->data,
-		  token->line);
+    O_CALL_CLASS (Token (), new_ctor, _Token_ctor_from_token, token, name->data, IDENTIFIER);
   self->value++;
   O_CALL (name, delete);
   return retval;

@@ -52,6 +52,10 @@ O_IMPLEMENT (ArrayType, bool, is_compatible, (void *_self, void *_other))
   if (O_SUPER->is_compatible (self, _other))
     {
       struct ArrayType *other = O_CAST (_other, ArrayType ());
+      if (O_CALL (self, is_void_ptr) || O_CALL (other, is_void_ptr))
+	{
+	  return true;
+	}
       return O_CALL (self->base_type, is_compatible, other->base_type);
     }
   return false;

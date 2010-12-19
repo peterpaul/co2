@@ -46,6 +46,7 @@ STRING_CONST	\"({CHAR_SYMBOL}|\')*\"
 "int"		yylval.token = O_CALL_CLASS(Token(), new, yytext, INT, filename, linenumber); return yylval.token->type;
 "interface"	return INTERFACE;
 "new"		return NEW;
+"null"		yylval.token = O_CALL_CLASS(Token(), new, yytext, _NULL, filename, linenumber); return yylval.token->type;
 "package"	return PACKAGE;
 "return"	return RETURN;
 "self"		yylval.token = O_CALL_CLASS(Token(), new, yytext, SELF, filename, linenumber); return yylval.token->type;

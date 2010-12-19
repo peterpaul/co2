@@ -27,6 +27,7 @@
 #include "FunctionCallExpression.h"
 #include "NestedExpression.h"
 #include "NewExpression.h"
+#include "NullExpression.h"
 #include "SizeExpression.h"
 #include "SuperExpression.h"
 #include "TokenExpression.h"
@@ -48,8 +49,8 @@
 
   extern char *yytext;
   extern struct File * parsed_file;
-  extern void yyerror (const char *);
-  extern int yywrap (void);
+  extern void yyerror(const char *);
+  extern int yywrap(void);
   extern void VariableDeclaration_set_type(void *_var, va_list *app);
   extern void Declaration_set_class_decl(void *_decl, va_list *app);
 
@@ -87,6 +88,7 @@
 %token <token> MACRO
 %token <token> MACRO_IDENTIFIER
 %token <token> NEW
+%token <token> _NULL
 %token <token> PACKAGE
 %token <token> RETURN
 %token <token> SELF
@@ -433,7 +435,7 @@ class_declaration
   decl->members = O_CALL($4, retain);
   O_CALL(decl->members, map_args, Declaration_set_class_decl, decl);
   decl->member_scope->parent = NULL;
-  $$ = (struct Declaration *) decl;
+  $$ =(struct Declaration *) decl;
 }
 
 class_header
@@ -734,7 +736,7 @@ expression
   struct TokenExpression * token_expr = O_CALL_CLASS(TokenExpression(), new, $4);
   struct NewExpression * new_expr = O_CALL_CLASS(NewExpression(), new, $2, $6);
   O_CALL(new_expr, set_ctor_name, token_expr);
-  $$ = (struct Expression *) new_expr;
+  $$ =(struct Expression *) new_expr;
 }
 |	SUPER '(' opt_actual_argument_list ')' { $$ = O_CALL_CLASS(SuperExpression(), new, $1, NULL, $3); }
 |	SUPER '.' IDENTIFIER '(' opt_actual_argument_list ')' { $$ = O_CALL_CLASS(SuperExpression(), new, $1, $3, $5); }
@@ -749,6 +751,7 @@ constant
 |	FLOAT_CONSTANT { $$ = O_CALL_CLASS(TokenExpression(), new, $1); }
 |	INT_CONSTANT { $$ = O_CALL_CLASS(TokenExpression(), new, $1); }
 |	string_constant { $$ = O_CALL_CLASS(TokenExpression(), new, $1); }
+|	_NULL { $$ = O_CALL_CLASS(NullExpression(), new, $1); }
 ;
 
 opt_actual_argument_list
@@ -803,7 +806,7 @@ macro_identifier_list
 constructor_declaration
 :	TYPE_IDENTIFIER '(' 
 { 
-  $<token>$ = O_CALL_CLASS(Token(), new, "ctor", IDENTIFIER, filename, $1->line);
+  $<token>$ = O_CALL_CLASS(Token(), new_ctor, _Token_ctor_from_token, $1, "ctor", IDENTIFIER);
   O_CALL_CLASS(Scope(), new, ARGUMENT_SCOPE, $<token>$);
 }
 opt_formal_argument_list ')' statement
@@ -825,24 +828,24 @@ opt_formal_argument_list ')' statement
 destructor_declaration
 :	'~' TYPE_IDENTIFIER '(' ')' statement
 {
-  struct Token * dtor_name = O_CALL_CLASS(Token(), new, "dtor", IDENTIFIER, filename, $2->line);
+  struct Token * dtor_name = O_CALL_CLASS(Token(), new_ctor, _Token_ctor_from_token, $2, "dtor", IDENTIFIER);
   $$ = O_CALL_CLASS(DestructorDeclaration(), new, dtor_name, $2, $5);
 }
 ;
 
 %%
-void yyerror (const char * msg)
+void yyerror(const char * msg)
 {
-  error (yylval.token, "%s near '%s'\n", msg, yytext);
+  error(yylval.token, "%s near '%s'\n", msg, yytext);
 }
-int parse ()
+int parse()
 {
   global_scope = O_CALL_CLASS(Scope(), new, GLOBAL_SCOPE, NULL);
-  int result = yyparse ();
+  int result = yyparse();
   O_CALL(current_scope, leave);
-  if (result == 0)
+  if(result == 0)
     {
-      assertTrue(current_scope == NULL, "current_scope (%d) is not NULL", current_scope->type);
+      assertTrue(current_scope == NULL, "current_scope(%d) is not NULL", current_scope->type);
       O_CALL(parsed_file, parse_imports);
     }
   return result;

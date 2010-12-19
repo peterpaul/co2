@@ -82,8 +82,7 @@ O_IMPLEMENT (TokenExpression, void, type_check, (void *_self))
     case INT_CONSTANT:
       {
 	struct Token *token =
-	  O_CALL_CLASS (Token (), new, "int", INT, self->token->file,
-			self->token->line);
+	  O_CALL_CLASS (Token (), new_ctor, _Token_ctor_from_token, self->token, "int", INT);
 	self->type = O_CALL_CLASS (PrimitiveType (), new, token);
 	O_CALL (self->type, retain);
       }
@@ -91,8 +90,7 @@ O_IMPLEMENT (TokenExpression, void, type_check, (void *_self))
     case STRING_CONSTANT:
       {
 	struct Token *token =
-	  O_CALL_CLASS (Token (), new, "char", CHAR, self->token->file,
-			self->token->line);
+	  O_CALL_CLASS (Token (), new_ctor, _Token_ctor_from_token, self->token, "char", CHAR);
 	struct Type *base_type = O_CALL_CLASS (PrimitiveType (), new, token);
 	self->type = O_CALL_CLASS (ArrayType (), new, base_type);
 	O_CALL (self->type, retain);
@@ -101,8 +99,7 @@ O_IMPLEMENT (TokenExpression, void, type_check, (void *_self))
     case CHAR_CONSTANT:
       {
 	struct Token *token =
-	  O_CALL_CLASS (Token (), new, "char", CHAR, self->token->file,
-			self->token->line);
+	  O_CALL_CLASS (Token (), new_ctor, _Token_ctor_from_token, self->token, "char", CHAR);
 	self->type = O_CALL_CLASS (PrimitiveType (), new, token);
 	O_CALL (self->type, retain);
       }
@@ -110,8 +107,7 @@ O_IMPLEMENT (TokenExpression, void, type_check, (void *_self))
     case FLOAT_CONSTANT:
       {
 	struct Token *token =
-	  O_CALL_CLASS (Token (), new, "float", FLOAT, self->token->file,
-			self->token->line);
+	  O_CALL_CLASS (Token (), new_ctor, _Token_ctor_from_token, self->token, "float", FLOAT);
 	self->type = O_CALL_CLASS (PrimitiveType (), new, token);
 	O_CALL (self->type, retain);
       }
@@ -119,8 +115,7 @@ O_IMPLEMENT (TokenExpression, void, type_check, (void *_self))
     case VA_ARG:
       {
 	struct Token *token =
-	  O_CALL_CLASS (Token (), new, "va_list", VA_LIST, self->token->file,
-			self->token->line);
+	  O_CALL_CLASS (Token (), new_ctor, _Token_ctor_from_token, self->token, "va_list", VA_LIST);
 	self->type = O_CALL_CLASS (PrimitiveType (), new, token);
 	O_CALL (self->type, retain);
       }

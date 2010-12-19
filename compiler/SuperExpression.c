@@ -63,8 +63,7 @@ O_IMPLEMENT (SuperExpression, void, type_check, (void *_self))
       if (ctor_name == NULL)
 	{
 	  ctor_name =
-	    O_CALL_CLASS (Token (), new, "ctor", IDENTIFIER, filename,
-			  self->super->line);
+	    O_CALL_CLASS (Token (), new_ctor, _Token_ctor_from_token, self->super, "ctor", IDENTIFIER);
 	}
       O_CALL (ctor_name, retain);
       struct ConstructorDeclaration *ctor_decl =

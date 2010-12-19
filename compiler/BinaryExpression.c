@@ -170,6 +170,7 @@ O_IMPLEMENT (BinaryExpression, void, type_check, (void *_self))
       O_CALL (self->operand[0], type_check);
       struct ArrayType *array_type =
 	o_cast (self->operand[0]->type, ArrayType ());
+      O_CALL (self->operand[1], type_check);
       self->type = O_CALL (array_type->base_type, retain);
       break;
     default:

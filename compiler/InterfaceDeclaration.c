@@ -156,7 +156,7 @@ O_IMPLEMENT (InterfaceDeclaration, void, type_check, (void *_self))
 
 static void InterfaceDeclaration_is_compatible_with_class(void *_self, va_list *app)
 {
-  struct Token *self = O_CAST(_self, Token());
+  struct Token *self = O_CAST(_self, Token ());
   struct InterfaceDeclaration *interface = O_CAST(va_arg(*app, struct InterfaceDeclaration*), InterfaceDeclaration ());
   bool *found = va_arg(*app, bool*);
   if (strcmp(self->name->data, interface->name->name->data) == 0) 

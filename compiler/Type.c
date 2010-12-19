@@ -2,6 +2,7 @@
 #include "ArrayType.h"
 #include "PrimitiveType.h"
 #include "Token.h"
+#include "grammar.tab.h"
 
 #define O_SUPER CompileObject()
 
@@ -65,10 +66,29 @@ O_IMPLEMENT (Type, void, type_check, (void *_self))
   struct Type *self = O_CAST (_self, Type ());
 }
 
+O_IMPLEMENT (Type, bool, is_void_ptr, (void *_self))
+{
+  struct Type *self = O_CAST (_self, Type ());
+  if (o_is_of (self, ArrayType ()))
+    {
+      struct ArrayType *array_type = O_CAST (self, ArrayType ());
+      if (o_is_of (array_type->base_type, PrimitiveType ()))
+	{
+	  struct PrimitiveType *primitive_type = O_CAST (array_type->base_type, PrimitiveType ());
+	  if (primitive_type->token->type == VOID)
+	    {
+	      return true;
+	    }
+	}
+    }
+  return false;
+}
+
 O_OBJECT (Type, CompileObject);
 O_OBJECT_METHOD (Type, ctor);
 O_OBJECT_METHOD (Type, dtor);
 O_OBJECT_METHOD (Type, is_compatible);
 O_OBJECT_METHOD (Type, assert_compatible);
 O_OBJECT_METHOD (Type, type_check);
+O_OBJECT_METHOD (Type, is_void_ptr);
 O_END_OBJECT

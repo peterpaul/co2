@@ -27,7 +27,7 @@ O_IMPLEMENT(SizeExpression, void, type_check, (void *_self))
   struct SizeExpression *self = O_CAST(_self, SizeExpression());
   O_CALL(self->param, type_check);
   struct Token * type_token = O_CALL(self->param, get_token);
-  struct Token * int_token = O_CALL_CLASS(Token(), new, "int", INT, type_token->file, type_token->line);
+  struct Token * int_token = O_CALL_CLASS(Token (), new_ctor, _Token_ctor_from_token, type_token, "int", INT);
   self->type = O_CALL_CLASS(PrimitiveType(), new, int_token);
   O_CALL(self->type, retain);
 }

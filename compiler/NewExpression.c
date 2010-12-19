@@ -143,9 +143,7 @@ O_IMPLEMENT (NewExpression, void, type_check, (void *_self))
       else
 	{
 	  struct Token *ctor_token =
-	    O_CALL_CLASS (Token (), new, "ctor", IDENTIFIER,
-			  object_type->token->file->data,
-			  object_type->token->line);
+	    O_CALL_CLASS (Token (), new_ctor, _Token_ctor_from_token, object_type->token, "ctor", IDENTIFIER);
 	  struct TokenExpression *token_expr =
 	    O_CALL_CLASS (TokenExpression (), new, ctor_token);
 
