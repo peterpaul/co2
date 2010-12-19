@@ -1,0 +1,52 @@
+package compiler.test;
+
+["stdio.h"] int printf(char * format, ...);
+
+int main(int argc, char ** argv)
+{
+	int i = 5;
+	printf("i (5) = %d\n", i);
+	printf("i+1 (6) = %d\n", i+1);
+	printf("i*2 (10) = %d\n", i*2);
+	printf("i-2 (3) = %d\n", i-2);
+	printf("i/5 (1) = %d\n", i/5);
+	printf("i^3 (125) = %d\n", i^3);
+	printf("i%3 (2) = %d\n", i%3);
+	printf("i+=1 (6) = %d\n", i+=1);
+	printf("i*=2 (12) = %d\n", i*=2);
+	printf("i-=2 (10) = %d\n", i-=2);
+	printf("i/=5 (2) = %d\n", i/=5);
+	printf("i^=3 (8) = %d\n", i^=3);
+	printf("i%=3 (2) = %d\n", i%=3);
+
+	unsigned u = (unsigned)5;
+	printf("u (5) = %u\n", u);
+	printf("u+1 (6) = %u\n", u+(unsigned)1);
+	printf("u*2 (10) = %u\n", u*(unsigned)2);
+	printf("u-2 (3) = %u\n", u-(unsigned)2);
+	printf("u/5 (1) = %u\n", u/(unsigned)5);
+	printf("u^3 (125) = %u\n", u^(unsigned)3);
+	printf("u%3 (2) = %u\n", u%(unsigned)3);
+	printf("u+=1 (6) = %u\n", u+=(unsigned)1);
+	printf("u*=2 (12) = %u\n", u*=(unsigned)2);
+	printf("u-=2 (10) = %u\n", u-=(unsigned)2);
+	printf("u/=5 (2) = %u\n", u/=(unsigned)5);
+	printf("u^=3 (8) = %u\n", u^=(unsigned)3);
+	printf("u%=3 (2) = %u\n", u%=(unsigned)3);
+
+	float f = 5.0;
+	printf("f (5) = %f\n", f);
+	printf("f+1 (6) = %f\n", f+1.0);
+	printf("f*2 (10) = %f\n", f*2.0);
+	printf("f-2 (3) = %f\n", f-2.0);
+	printf("f/5 (1) = %f\n", f/5.0);
+	printf("f^3 (125) = %f\n", f^3.0);
+	printf("f%3 (2) = %f\n", f%3.0);
+	printf("f+=1 (6) = %f\n", f+=1.0);
+	printf("f*=2 (12) = %f\n", f*=2.0);
+	printf("f-=2 (10) = %f\n", f-=2.0);
+	printf("f/=5 (2) = %f\n", f/=5.0);
+	printf("f^=3 (8) = %f\n", f^=3.0);
+	printf("f%=3 (2) = %f\n", f%=3.0);
+	return 0;
+}

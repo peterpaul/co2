@@ -169,7 +169,7 @@
 %nonassoc	CASTX
 
 %left		<token>	','
-%right		<token>	'='
+%right		<token>	'=' INCREASE DECREASE MULTIPLY DIVIDE POWER REMINDER AND_IS OR_IS XOR_IS
 %left		<token>	OR '|' 
 %left		<token>	AND '&'
 %left		<token>	EQ NEQ
@@ -714,6 +714,15 @@ expression
 |	expression GEQ expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
 |	expression SHIFTR expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
 |	expression SHIFTL expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
+|	expression INCREASE expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
+|	expression DECREASE expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
+|	expression MULTIPLY expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
+|	expression DIVIDE expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
+|	expression POWER expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
+|	expression REMINDER expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
+|	expression AND_IS expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
+|	expression OR_IS expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
+|	expression XOR_IS expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
 |	'-' expression %prec UNARY_MINUS { $$ = O_CALL_CLASS(UnaryExpression(), new, $1, $2); }
 |	'+' expression %prec UNARY_PLUS { $$ = O_CALL_CLASS(UnaryExpression(), new, $1, $2); }
 |	'!' expression { $$ = O_CALL_CLASS(UnaryExpression(), new, $1, $2); }

@@ -66,6 +66,15 @@ STRING_CONST	\"({CHAR_SYMBOL}|\')*\"
 ">="		yylval.token = O_CALL_CLASS(Token(), new, yytext, GEQ, filename, linenumber); return yylval.token->type;
 ">>"		yylval.token = O_CALL_CLASS(Token(), new, yytext, SHIFTR, filename, linenumber); return yylval.token->type;
 "<<"		yylval.token = O_CALL_CLASS(Token(), new, yytext, SHIFTL, filename, linenumber); return yylval.token->type;
+"+="		yylval.token = O_CALL_CLASS(Token(), new, yytext, INCREASE, filename, linenumber); return yylval.token->type;
+"-="		yylval.token = O_CALL_CLASS(Token(), new, yytext, DECREASE, filename, linenumber); return yylval.token->type;
+"*="		yylval.token = O_CALL_CLASS(Token(), new, yytext, MULTIPLY, filename, linenumber); return yylval.token->type;
+"/="		yylval.token = O_CALL_CLASS(Token(), new, yytext, DIVIDE, filename, linenumber); return yylval.token->type;
+"^="		yylval.token = O_CALL_CLASS(Token(), new, yytext, POWER, filename, linenumber); return yylval.token->type;
+"%="		yylval.token = O_CALL_CLASS(Token(), new, yytext, REMINDER, filename, linenumber); return yylval.token->type;
+"&="		yylval.token = O_CALL_CLASS(Token(), new, yytext, AND_IS, filename, linenumber); return yylval.token->type;
+"|="		yylval.token = O_CALL_CLASS(Token(), new, yytext, OR_IS, filename, linenumber); return yylval.token->type;
+"#="		yylval.token = O_CALL_CLASS(Token(), new, yytext, XOR_IS, filename, linenumber); return yylval.token->type;
 {INT_CONST}	yylval.token = O_CALL_CLASS(Token(), new, yytext, INT_CONSTANT, filename, linenumber); return yylval.token->type;
 {FLOAT_CONST}	yylval.token = O_CALL_CLASS(Token(), new, yytext, FLOAT_CONSTANT, filename, linenumber); return yylval.token->type;
 {IDENTIFIER}	yylval.token = O_CALL_CLASS(Token(), new, yytext, IDENTIFIER, filename, linenumber); return yylval.token->type;

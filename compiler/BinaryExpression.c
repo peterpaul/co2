@@ -6,6 +6,8 @@
 #include "ArrayType.h"
 #include "ObjectTypeDeclaration.h"
 #include "io.h"
+#include "PrimitiveType.h"
+#include "grammar.tab.h"
 
 #define O_SUPER Expression()
 
@@ -36,7 +38,7 @@ O_IMPLEMENT (BinaryExpression, void *, dtor, (void *_self))
 O_IMPLEMENT (BinaryExpression, void, generate, (void *_self))
 {
   struct BinaryExpression *self = O_CAST (_self, BinaryExpression ());
-  switch (self->operator-> type)
+  switch (self->operator->type)
     {
     case '.':
       O_CALL (self->operand[0], generate);
@@ -48,6 +50,96 @@ O_IMPLEMENT (BinaryExpression, void, generate, (void *_self))
       O_CALL (self->operator, generate);
       O_CALL (self->operand[1], generate);
       fprintf (out, "]");
+      break;
+    case '%':
+      {
+	struct PrimitiveType * type = O_CAST (self->type, PrimitiveType ());
+	switch (type->token->type)
+	  {
+	  case FLOAT:
+	    fprintf (out, "fmodf (");
+	    O_CALL (self->operand[0], generate);
+	    fprintf (out, ", ");
+	    O_CALL (self->operand[1], generate);
+	    fprintf (out, ")");
+	    break;
+	  default:
+	    O_CALL (self->operand[0], generate);
+	    fprintf (out, " ");
+	    O_CALL (self->operator, generate);
+	    fprintf (out, " ");
+	    O_CALL (self->operand[1], generate);
+	    break;
+	  }
+      }
+      break;
+    case REMINDER:
+      {
+	struct PrimitiveType * type = O_CAST (self->type, PrimitiveType ());
+	switch (type->token->type)
+	  {
+	  case FLOAT:
+	    O_CALL (self->operand[0], generate);
+	    fprintf (out, " = ");
+	    fprintf (out, "fmodf (");
+	    O_CALL (self->operand[0], generate);
+	    fprintf (out, ", ");
+	    O_CALL (self->operand[1], generate);
+	    fprintf (out, ")");
+	    break;
+	  default:
+	    O_CALL (self->operand[0], generate);
+	    fprintf (out, " ");
+	    O_CALL (self->operator, generate);
+	    fprintf (out, " ");
+	    O_CALL (self->operand[1], generate);
+	    break;
+	  }
+      }
+      break;
+    case '^':
+      {
+	struct PrimitiveType * type = O_CAST (self->type, PrimitiveType ());
+	switch (type->token->type)
+	  {
+	  case INT:
+	    fprintf (out, "ipow (");
+	  break;
+	  case UNSIGNED:
+	    fprintf (out, "upow (");
+	    break;
+	  case FLOAT:
+	    fprintf (out, "powf (");
+	    break;
+	  }
+	O_CALL (self->operand[0], generate);
+	fprintf (out, ", ");
+	O_CALL (self->operand[1], generate);
+	fprintf (out, ")");
+      }
+      break;
+    case POWER:
+      {
+	struct PrimitiveType * type = O_CAST (self->type, PrimitiveType ());
+	O_CALL (self->operand[0], generate);
+	fprintf (out, " = ");
+	switch (type->token->type)
+	  {
+	  case INT:
+	    fprintf (out, "ipow (");
+	  break;
+	  case UNSIGNED:
+	    fprintf (out, "upow (");
+	    break;
+	  case FLOAT:
+	    fprintf (out, "powf (");
+	    break;
+	  }
+	O_CALL (self->operand[0], generate);
+	fprintf (out, ", ");
+	O_CALL (self->operand[1], generate);
+	fprintf (out, ")");
+      }
       break;
     default:
       O_CALL (self->operand[0], generate);

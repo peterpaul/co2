@@ -23,6 +23,8 @@ void __write_message(const char *fmt,
     __attribute__ ((format(printf, 1, 5)));
 
 unsigned long hash_function(const unsigned char *str);
+int ipow(int base, int exp);
+unsigned upow(unsigned base, int exp);
 
 #ifndef false
 typedef int bool;
