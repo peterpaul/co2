@@ -3,19 +3,19 @@
 
 #define message(x,...)									\
 	__write_message(x, __FILE__, __LINE__,				\
-					__ASSERT_FUNCTION, ## __VA_ARGS__)
+					__PRETTY_FUNCTION__, ## __VA_ARGS__)
 #define assertFalse(p,msg,...)						\
 	((p)											\
 	 ? (message(msg, ## __VA_ARGS__),				\
 	    __assert_fail("!" __STRING(p), __FILE__,	\
-					  __LINE__, __ASSERT_FUNCTION))	\
+					  __LINE__, __PRETTY_FUNCTION__))	\
 	 : __ASSERT_VOID_CAST(0))
 #define assertTrue(p,msg,...)							\
 	((p)												\
 	 ? __ASSERT_VOID_CAST(0)							\
 	 : (message(msg, ## __VA_ARGS__),					\
 	    __assert_fail(__STRING(p), __FILE__,			\
-					  __LINE__, __ASSERT_FUNCTION)))
+					  __LINE__, __PRETTY_FUNCTION__)))
 
 void __write_message(const char *fmt,
 		     const char *file,
