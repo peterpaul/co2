@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include <stdio.h>
 #include "exception.h"
 
 struct ex_stack *ex_stack = NULL;
@@ -23,7 +22,6 @@ ex_pop ()
 void
 throw (int id, void *data)
 {
-  printf ("throw(%d, %s)\n", id, data ? "..." : "(null)");
   ex_stack->ex_val = id;
   ex_stack->ex_data = data;
   longjmp (ex_stack->ex_buf, id);

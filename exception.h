@@ -1,3 +1,6 @@
+#ifndef _EXCEPTION_H_
+#define _EXCEPTION_H_
+
 #include <setjmp.h>
 
 struct ex_stack
@@ -17,8 +20,8 @@ void throw (int id, void *data);
 #define try					\
   ex_push ();					\
   if (!setjmp (ex_stack->ex_buf))
-#define catch(x)				\
-  else if (ex_stack->ex_val == x)
+#define catch(x)					\
+  else if (ex_stack && o_is_of (ex_stack->ex_data, x))
 #define on(x)					\
   case x:
 #define finally					\
@@ -45,3 +48,5 @@ void throw (int id, void *data);
       do_finally;					\
       throw (ex_backup.ex_val, ex_backup.ex_data);	\
     }
+
+#endif /* _EXCEPTION_H_ */

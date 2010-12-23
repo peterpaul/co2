@@ -12,7 +12,8 @@ typedef enum
   CLASS_SCOPE,
   ARGUMENT_SCOPE,
   COMPOUND_SCOPE,
-  INTERFACE_SCOPE
+  INTERFACE_SCOPE,
+  CATCH_SCOPE
 } ScopeType;
 
 O_METHOD_DEF (Scope, struct Declaration *, declare,

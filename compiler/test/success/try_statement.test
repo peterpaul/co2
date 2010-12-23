@@ -1,0 +1,45 @@
+package compiler.test;
+
+["stdio.h"] int printf(char * format, ...);
+
+class Exception
+{
+	char * message;
+}
+
+class AnException : Exception
+{
+}
+
+int fun (Exception ex)
+{
+	if (ex != null)
+	{
+		throw ex;
+	}
+}
+
+void loop (Exception ex)
+{
+	printf ("--------------------------------------------------------------------------------\n");
+	try {
+		printf ("try\n");
+		fun (ex);
+	} catch (AnException ex) {
+		printf ("catch AnException\n");
+		delete ex;
+	} catch (Exception ex) {
+		printf ("catch Exception\n");
+		delete ex;
+	} finally {
+		printf ("finally\n");
+	}
+}
+
+int main(int argc, char ** argv)
+{
+	loop (null);
+	loop (new Exception());
+	loop (new AnException());
+	return 0;
+}

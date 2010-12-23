@@ -34,11 +34,13 @@ CHAR_CONST_ERR	\'({CHAR_SYMBOL}|\")*\'
 STRING_CONST	\"({CHAR_SYMBOL}|\')*\"
 
 %%
+"catch"		return CATCH;
 "char"		yylval.token = O_CALL_CLASS(Token(), new, yytext, CHAR, filename, linenumber); return yylval.token->type;
 "class"		return CLASS;
 "delete"	return DELETE;
 "do"		return DO;
 "else"		return ELSE;
+"finally"	return FINALLY;
 "float"		yylval.token = O_CALL_CLASS(Token(), new, yytext, FLOAT, filename, linenumber); return yylval.token->type;
 "for"		return FOR;
 "if"		return IF;
@@ -52,6 +54,8 @@ STRING_CONST	\"({CHAR_SYMBOL}|\')*\"
 "self"		yylval.token = O_CALL_CLASS(Token(), new, yytext, SELF, filename, linenumber); return yylval.token->type;
 "sizeof"	return SIZEOF;
 "super"		yylval.token = O_CALL_CLASS(Token(), new, yytext, SUPER, filename, linenumber); return yylval.token->type;
+"throw"		return THROW;
+"try"		return TRY;
 "unsigned"	yylval.token = O_CALL_CLASS(Token(), new, yytext, UNSIGNED, filename, linenumber); return yylval.token->type;
 "va_arg"	return GET_VA_ARG;
 "va_list"	yylval.token = O_CALL_CLASS(Token(), new, yytext, VA_LIST, filename, linenumber); return yylval.token->type;

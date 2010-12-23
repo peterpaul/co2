@@ -65,6 +65,14 @@ O_IMPLEMENT (ObjectType, bool, is_compatible, (void *_self, void *_other))
       struct Token *name_other = O_CALL (other, get_token);
       return O_CALL(self->decl, is_compatible, other->decl);
     }
+  else
+    {
+      struct Type *other = O_CAST (_other, Type ());
+      if (O_CALL (other, is_void_ptr))
+	{
+	  return true;
+	}
+    }
   return false;
 }
 

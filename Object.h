@@ -15,6 +15,7 @@
 #include <assert.h>
 
 #include "utils.h"
+#include "exception.h"
 
 /* Macros */
 #define O_STRING(x) #x

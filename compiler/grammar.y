@@ -10,6 +10,7 @@
 #include "MacroDeclaration.h"
 #include "VariableDeclaration.h"
   /* Statements */
+#include "CatchStatement.h"
 #include "CompoundStatement.h"
 #include "DeleteStatement.h"
 #include "DoStatement.h"
@@ -19,6 +20,8 @@
 #include "IfStatement.h"
 #include "ReturnStatement.h"
 #include "Statement.h"
+#include "TryStatement.h"
+#include "ThrowStatement.h"
 #include "WhileStatement.h"
   /* Expressions */
 #include "BinaryExpression.h"
@@ -66,14 +69,17 @@
   struct Statement * statement;
   struct Token * token;
   struct Type * type;
+  struct Scope * scope;
 }
 
+%token <token> CATCH
 %token <token> CHAR
 %token <token> CHAR_CONSTANT
 %token <token> CLASS
 %token <token> DO
 %token <token> DELETE
 %token <token> ELSE
+%token <token> FINALLY
 %token <token> FLOAT
 %token <token> FLOAT_CONSTANT
 %token <token> FOR
@@ -95,6 +101,8 @@
 %token <token> SIZEOF
 %token <token> STRING_CONSTANT
 %token <token> SUPER
+%token <token> THROW
+%token <token> TRY
 %token <token> TYPE_IDENTIFIER
 %token <token> UNSIGNED
 %token <token> VA_ARG /* '...' */
@@ -131,6 +139,8 @@
 %type	<list>		variable_declaration_id_list
 %type	<list>		variable_declaration_list
  /* Statements */
+%type	<statement>	catch_statement
+%type	<list>		catch_statement_list
 %type	<list>		compound_content
 %type	<list>		compound_content_list
 %type	<statement>	compound_statement
@@ -142,6 +152,8 @@
 %type	<statement>	if_statement
 %type	<statement>	return_statement
 %type	<statement>	statement
+%type	<statement>	throw_statement
+%type	<statement>	try_statement
 %type	<statement>	while_statement
  /* Imports */
 %type	<token>		identifier
@@ -169,6 +181,8 @@
 
  /* Solve shift-reduce conflict for casts */
 %nonassoc	CASTX
+
+%left	CATCH
 
 %left		<token>	','
 %right		<token>	'=' INCREASE DECREASE MULTIPLY DIVIDE POWER REMINDER AND_IS OR_IS XOR_IS
@@ -479,6 +493,8 @@ statement
 |	foreach_statement
 |	return_statement
 |	delete_statement
+|	try_statement
+|	throw_statement
 ;
 
 compound_statement
@@ -519,6 +535,52 @@ compound_content
 {
   $$ = O_CALL_CLASS(RefList(), new, 8, CompileObject());
   O_CALL($$, merge, $1);
+}
+;
+
+try_statement
+:
+/*
+	TRY statement catch_statement_list
+{
+  $$ = O_CALL_CLASS (TryStatement (), new, $2, $3, NULL);
+}
+|
+*/
+	TRY statement catch_statement_list FINALLY statement
+{
+  $$ = O_CALL_CLASS (TryStatement (), new, $2, $3, $5);
+}
+;
+
+catch_statement_list
+:	catch_statement_list catch_statement
+{
+  O_CALL ($1, append, $2);
+}
+|	catch_statement
+{
+  $$ = O_CALL_CLASS (RefList (), new, 8, CatchStatement ());
+  O_CALL ($$, append, $1);
+}
+;
+
+catch_statement
+:	CATCH 
+{
+  $<scope>$ = O_CALL_CLASS (Scope (), new, CATCH_SCOPE, NULL);
+}
+'(' formal_argument ')' statement
+{
+  O_CALL (current_scope, leave);
+  $$ = O_CALL_CLASS (CatchStatement (), new, $<scope>2, $4, $6);
+}
+;
+
+throw_statement
+:	THROW expression ';'
+{
+  $$ = O_CALL_CLASS (ThrowStatement (), new, $2);
 }
 ;
 

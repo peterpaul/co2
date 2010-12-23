@@ -24,9 +24,18 @@ O_IMPLEMENT (DeleteStatement, void, generate, (void *_self))
 {
   struct DeleteStatement *self = O_CAST (_self, DeleteStatement ());
   /* TODO when self->expr->type == ArrayType, then free, else delete object */
-  fprintf (out, "free(");
-  O_CALL (self->expr, generate);
-  fprintf (out, ");\n");
+  if (o_is_of (self->expr->type, ObjectType ()))
+    {
+      fprintf (out, "O_CALL (");
+      O_CALL (self->expr, generate);
+      fprintf (out, ", delete);\n");
+    }
+  else
+    {
+      fprintf (out, "free (");
+      O_CALL (self->expr, generate);
+      fprintf (out, ");\n");
+    }
 }
 
 O_IMPLEMENT (DeleteStatement, void, type_check, (void *_self))
