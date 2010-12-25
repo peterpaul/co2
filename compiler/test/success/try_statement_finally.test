@@ -31,6 +31,8 @@ void loop (Exception ex)
 	} catch (Exception ex) {
 		printf ("catch Exception\n");
 		delete ex;
+	} finally {
+		printf ("finally\n");
 	}
 }
 

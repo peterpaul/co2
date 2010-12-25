@@ -32,8 +32,6 @@ void loop (Exception ex)
 	} catch (Exception ex) {
 		printf ("loop.catch Exception\n");
 		delete ex;
-	} finally {
-		printf ("loop.finally\n");
 	}
 }
 
@@ -45,8 +43,6 @@ int main(int argc, char ** argv)
 		loop (new Exception());
 	} catch (Exception ex) {
 		printf ("main.catch Exception\n");
-	} finally {
-		printf ("main.finally\n");
 	}
 	return 0;
 }
