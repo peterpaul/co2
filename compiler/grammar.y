@@ -182,7 +182,9 @@
  /* Solve shift-reduce conflict for casts */
 %nonassoc	CASTX
 
-%left	CATCH
+%nonassoc	CATCHX
+%nonassoc	CATCH
+%nonassoc	FINALLY
 
 %left		<token>	','
 %right		<token>	'=' INCREASE DECREASE MULTIPLY DIVIDE POWER REMINDER AND_IS OR_IS XOR_IS
@@ -539,15 +541,11 @@ compound_content
 ;
 
 try_statement
-:
-/*
-	TRY statement catch_statement_list
+:	TRY statement catch_statement_list %prec CATCHX
 {
   $$ = O_CALL_CLASS (TryStatement (), new, $2, $3, NULL);
 }
-|
-*/
-	TRY statement catch_statement_list FINALLY statement
+|	TRY statement catch_statement_list FINALLY statement
 {
   $$ = O_CALL_CLASS (TryStatement (), new, $2, $3, $5);
 }

@@ -1,9 +1,6 @@
 --------------------------------------------------------------------------------
 loop.try
-loop.finally
 --------------------------------------------------------------------------------
 loop.try
 loop.catch AnException
-loop.finally
 main.catch Exception
-main.finally

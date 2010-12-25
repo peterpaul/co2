@@ -37,7 +37,7 @@ O_IMPLEMENT(TryStatement, void, type_check, (void *_self))
   O_CALL (current_context, add, self);
   O_CALL (self->try_clause, type_check);
   O_CALL (self->catch_clause, map, TryStatement_type_check_catch);
-  O_CALL (self->finally_clause, type_check);
+  O_BRANCH_CALL (self->finally_clause, type_check);
   O_CALL (current_context, remove_last);
 }
 
