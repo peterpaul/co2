@@ -33,7 +33,26 @@ CHAR_CONST	\'({CHAR_SYMBOL}|\")\'
 CHAR_CONST_ERR	\'({CHAR_SYMBOL}|\")*\'
 STRING_CONST	\"({CHAR_SYMBOL}|\')*\"
 
+
+
+%x MULTI_LINE_COMMENT
+%x ONE_LINE_COMMENT
 %%
+<INITIAL>{
+	"/*"		BEGIN(MULTI_LINE_COMMENT);
+	"//"		BEGIN(ONE_LINE_COMMENT);
+}
+<MULTI_LINE_COMMENT>{
+	"*/"		BEGIN(INITIAL);
+	[^*\n]+		// eat comment in chunks
+	"*"		// eat the lone star
+	\n		linenumber++;
+}
+<ONE_LINE_COMMENT>{
+	[^\n]+		// eat comment in chunks
+	\n		linenumber++; BEGIN(INITIAL);
+	<<EOF>>		BEGIN(INITIAL);
+}
 "catch"		return CATCH;
 "char"		yylval.token = O_CALL_CLASS(Token(), new, yytext, CHAR, filename, linenumber); return yylval.token->type;
 "class"		return CLASS;
@@ -88,7 +107,6 @@ STRING_CONST	\"({CHAR_SYMBOL}|\')*\"
 {CHAR_CONST}	yylval.token = O_CALL_CLASS(Token(), new, yytext, CHAR_CONSTANT, filename, linenumber); return yylval.token->type;
 {CHAR_CONST_ERR}  yylval.token = O_CALL_CLASS(Token(), new, yytext, CHAR_CONSTANT, filename, linenumber); error(yylval.token, "invalid character constant %s", yytext); return yylval.token->type;
 {STRING_CONST}	yylval.token = O_CALL_CLASS(Token(), new, yytext, STRING_CONSTANT, filename, linenumber); return yylval.token->type;
-
 \n		linenumber++; /* count lines */
 [ \t]		/* eat whitespace */
 [\(\)\]\{\}\;\:\,]	return yytext[0]; /* no Token for these characters */
