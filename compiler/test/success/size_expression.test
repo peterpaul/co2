@@ -18,9 +18,9 @@ int main(int argc, char[][] argv)
 	printf("sizeof unsigned: %d\n", sizeof(unsigned));
 	printf("sizeof float: %d\n", sizeof(float));
 	printf("sizeof char: %d\n", sizeof(char));
-	printf("sizeof va_list: %d\n", sizeof(va_list));
+	// printf("sizeof va_list: %d\n", sizeof(va_list));
 	printf("sizeof void: %d\n", sizeof(void));
-	printf("sizeof void*: %d\n", sizeof(void*));
-	printf("sizeof MyObject: %d\n", sizeof(MyObject));
+	// printf("sizeof void*: %d\n", sizeof(void*));
+	// printf("sizeof MyObject: %d\n", sizeof(MyObject));
 	return 0;
 }

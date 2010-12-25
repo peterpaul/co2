@@ -1,5 +1,6 @@
 #include "DeleteStatement.h"
 #include "Expression.h"
+#include "ObjectType.h"
 #include "io.h"
 
 #define O_SUPER Statement()
