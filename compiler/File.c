@@ -29,21 +29,13 @@ O_IMPLEMENT (File, void *, ctor, (void *_self, va_list * app))
 {
   struct File *self = O_CAST (_self, File ());
   self = O_SUPER->ctor (self, app);
-  self->package = O_CAST (va_arg (*app, struct Path *), Path ());
-  O_CALL (self->package, retain);
-  self->import_statements =
-    O_CAST (va_arg (*app, struct RefList *), RefList ());
-  O_CALL (self->import_statements, retain);
-  self->declarations = O_CAST (va_arg (*app, struct RefList *), RefList ());
-  O_CALL (self->declarations, retain);
+  self->declarations = O_RETAIN_ARG (RefList);
   return self;
 }
 
 O_IMPLEMENT (File, void *, dtor, (void *_self))
 {
   struct File *self = O_CAST (_self, File ());
-  O_CALL (self->package, release);
-  O_CALL (self->import_statements, release);
   O_CALL (self->declarations, release);
   return O_SUPER->dtor (self);
 }
@@ -94,38 +86,10 @@ O_IMPLEMENT (File, void, generate, (void *_self))
   O_CALL (declarations, release);
 }
 
-void
-parse_import (void *_import, va_list * app)
-{
-  struct Path *import = o_cast (_import, Path ());
-  struct String *import_path = O_CALL (import, to_system_path);
-  fprintf (stderr, "import: %s\n", import_path->data);
-  /*
-     struct String * path = O_CALL(base_dir, clone);
-     O_CALL(path, append, import_path);
-     O_CALL(import_path, delete);
-     O_CALL(path, delete);
-   */
-  new_input (import_path->data);
-  yyparse ();
-}
-
-O_IMPLEMENT (File, void, parse_imports, (void *_self))
-{
-  struct File *self = O_CAST (_self, File ());
-  fprintf (stderr, "checking imports...\n");
-  if (!self->imported_files)
-    {
-      self->imported_files = O_CALL_CLASS (RefList (), new, 0, File ());
-    }
-  O_CALL (self->import_statements, map_args, parse_import, self);
-}
-
 O_OBJECT (File, CompileObject);
 O_OBJECT_METHOD (File, ctor);
 O_OBJECT_METHOD (File, dtor);
 O_OBJECT_METHOD (File, type_check);
 O_OBJECT_METHOD (File, optimize);
 O_OBJECT_METHOD (File, generate);
-O_OBJECT_METHOD (File, parse_imports);
 O_END_OBJECT

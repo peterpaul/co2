@@ -1,6 +1,6 @@
-package compiler.test;
 
-import non.existent.MyObject;
+
+include non.existent.MyObject
 
 int main(int argc, char[][] argv)
 {

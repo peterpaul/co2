@@ -157,10 +157,6 @@
 %type	<statement>	while_statement
  /* Imports */
 %type	<token>		identifier
-%type	<path>		import
-%type	<list>		import_list
-%type	<list>		import_path
-%type	<path>		package
  /* Types */
 %type	<list>		opt_type_list
 %type	<type>		type
@@ -205,47 +201,10 @@
 %%
 
 input
-:	package import_list declaration_list
+:	declaration_list
 {
-  $$ = O_CALL_CLASS(File(), new, $1, $2, $3);
+  $$ = O_CALL_CLASS(File(), new, $1);
   parsed_file = $$;
-}
-;
-
-package
-:	PACKAGE import_path ';'
-{
-  $$ = O_CALL_CLASS(Path(), new, $2);
-}
-;
-
-import_list
-:	import_list import
-{
-  O_CALL($1, append, $2);
-}
-|	/* empty */
-{
-  $$ = O_CALL_CLASS(RefList(), new, 1, Path());
-}
-;
-
-import
-:	IMPORT import_path ';'
-{
-  $$ = O_CALL_CLASS(Path(), new, $2);
-}
-;
-
-import_path
-:	import_path '.' identifier
-{
-  O_CALL($1, append, $3);
-}
-|	identifier
-{
-  $$ = O_CALL_CLASS(RefList(), new, 8, Token());
-  O_CALL($$, append, $1);
 }
 ;
 
@@ -906,7 +865,7 @@ int parse()
   if(result == 0)
     {
       assertTrue(current_scope == NULL, "current_scope(%d) is not NULL", current_scope->type);
-      O_CALL(parsed_file, parse_imports);
+      // O_CALL(parsed_file, parse_imports);
     }
   return result;
 }

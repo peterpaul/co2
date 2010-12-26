@@ -1,4 +1,4 @@
-package compiler.test;
+
 
 interface Operation
 {

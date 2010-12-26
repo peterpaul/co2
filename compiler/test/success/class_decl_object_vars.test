@@ -1,4 +1,4 @@
-package compiler.test;
+
 
 ["stdarg.h"] {
 	int printf(char * fmt, ...);

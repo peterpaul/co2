@@ -37,10 +37,12 @@ STRING_CONST	\"({CHAR_SYMBOL}|\')*\"
 
 %x MULTI_LINE_COMMENT
 %x ONE_LINE_COMMENT
+%x INCLUDE
 %%
 <INITIAL>{
 	"/*"		BEGIN(MULTI_LINE_COMMENT);
 	"//"		BEGIN(ONE_LINE_COMMENT);
+	"include"	BEGIN(INCLUDE);
 }
 <MULTI_LINE_COMMENT>{
 	"*/"		BEGIN(INITIAL);
@@ -53,6 +55,8 @@ STRING_CONST	\"({CHAR_SYMBOL}|\')*\"
 	\n		linenumber++; BEGIN(INITIAL);
 	<<EOF>>		BEGIN(INITIAL);
 }
+<INCLUDE>[ \t]*            /* eat the whitespace */
+<INCLUDE>[^ \t\n]+ { new_input (yytext); }
 "catch"		return CATCH;
 "char"		yylval.token = O_CALL_CLASS(Token(), new, yytext, CHAR, filename, linenumber); return yylval.token->type;
 "class"		return CLASS;
@@ -150,7 +154,8 @@ static void try_search_path(const char * file_name)
 	for (i = 0; i < path->length; i++) {
 		struct String * item = (struct String *)O_CALL(path, get, i);
 		struct String * full_path = O_CALL_CLASS(String(), new, "%s", item->data);
-		O_CALL(full_path, append_str, "%s.%s", file_name, "inc");
+		O_CALL(full_path, append_str, "/%s.%s", file_name, "inc");
+fprintf(stderr, "trying: %s\n", full_path->data);
 		if ((yyin = fopen(full_path->data, "r")) != 0) {
 			fprintf(stderr, "Found file: %s\n", full_path->data);
 			O_CALL(full_path, delete);

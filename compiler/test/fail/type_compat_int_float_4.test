@@ -1,4 +1,4 @@
-package compiler.test;
+
 
 int fun(int a, int b)
 	return a + b;

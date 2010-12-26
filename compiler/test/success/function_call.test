@@ -1,4 +1,4 @@
-package compiler.test;
+
 
 ["stdio.h"] int printf(char * format, ...);
 

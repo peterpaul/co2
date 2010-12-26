@@ -1,11 +1,13 @@
-package compiler.test;
 
-import MyObject;
+["stdio.h"] int printf(char * format, ...);
+
+include MyObject
 
 int main(int argc, char[][] argv)
 {
 	MyObject test = new MyObject();
 	int val = test.var;
 	int result = test.fun(val,5);
+	printf("result = %d\n", result);
 	return 0;
 }

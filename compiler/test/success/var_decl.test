@@ -1,4 +1,4 @@
-package compiler.test;
+
 
 int a, b = 5, c;
 int d;

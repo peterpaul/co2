@@ -1,4 +1,3 @@
-package compiler.test;
 
 class MyObject
 {
