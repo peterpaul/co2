@@ -3,6 +3,7 @@
 
 #include "String.h"
 #include "List.h"
+#include "RefList.h"
 #include "lex.yy.h"
 
 extern FILE *out;
@@ -16,6 +17,8 @@ extern struct List *path;
 
 FILE *open_input (const char *filename);
 FILE *open_output (const char *filename);
+
+extern struct RefList *include_stack;
 
 /**
  * Analyzes the filename, and tries to get the full path of the filename

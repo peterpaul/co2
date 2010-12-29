@@ -6,11 +6,10 @@
 #include "String.h"
 #include "List.h"
 
-int linenumber = 1;
 const char * filename;
 
-static const char * input_file_name = NULL;
 struct List * path;
+struct RefList *include_stack = NULL;
 
 void new_input(const char *);
 %}
@@ -116,14 +115,6 @@ STRING_CONST	\"({CHAR_SYMBOL}|\')*\"
 [\(\)\]\{\}\;\:\,]	return yytext[0]; /* no Token for these characters */
 .		yylval.token = O_CALL_CLASS(Token(), new, yytext, yytext[0], filename, linenumber); return yylval.token->type;
 %%
-/*
-int yywrap ()
-{
-  return 1;
-}
-*/
-struct RefList *include_stack = NULL;
-
 int yywrap()
 {
 	yy_delete_buffer(YY_CURRENT_BUFFER);
@@ -135,15 +126,8 @@ int yywrap()
 		yytext = "";
 		return 1;
 	}
-	/* The input_file_name is only allocated for include files, and not for
-	   the original input file. Therefore this call to free is after the
-	   check on the include level. */
-	free((char *) input_file_name);
 	struct IncludeStack * item = O_CALL(include_stack, remove);
-	yy_switch_to_buffer(item->buffer_state);
-	linenumber = item->current_line;
-	input_file_name = item->current_file;
-	O_CALL(item, delete);
+	O_CALL(item, switch_back);
 	return 0;
 }
 

@@ -1,0 +1,55 @@
+
+
+["stdio.h"] int printf(char * format, ...);
+
+class Exception
+{
+	char * message;
+}
+
+class AnException : Exception
+{
+}
+
+int fun (Exception ex)
+{
+	if (ex != null)
+	{
+		throw ex;
+	}
+}
+
+int loop (Exception ex)
+{
+	printf ("--------------------------------------------------------------------------------\n");
+	try {
+		printf ("loop.try\n");
+		fun (ex);
+		return 0;
+	} catch (AnException ex) {
+		printf ("loop.catch AnException\n");
+		delete ex;
+		throw new Exception ();
+	} catch (Exception ex) {
+		printf ("loop.catch Exception\n");
+		delete ex;
+		return 2;
+	} finally {
+		printf ("loop.finally\n");
+	}
+	return 3;
+}
+
+int main(int argc, char ** argv)
+{
+	try {
+		printf ("main.%d\n", loop (null));
+		printf ("main.%d\n", loop (new Exception()));
+		printf ("main.%d\n", loop (new AnException()));
+	} catch (Exception ex) {
+		printf ("main.catch Exception\n");
+	} finally {
+		printf ("main.finally\n");
+	}
+	return 0;
+}

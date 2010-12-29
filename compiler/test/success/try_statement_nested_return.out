@@ -1,0 +1,15 @@
+--------------------------------------------------------------------------------
+loop.try
+loop.finally
+main.0
+--------------------------------------------------------------------------------
+loop.try
+loop.catch Exception
+loop.finally
+main.2
+--------------------------------------------------------------------------------
+loop.try
+loop.catch AnException
+loop.finally
+main.catch Exception
+main.finally

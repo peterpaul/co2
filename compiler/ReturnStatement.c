@@ -1,4 +1,7 @@
 #include "ReturnStatement.h"
+#include "FunctionType.h"
+#include "TryStatement.h"
+#include "CatchStatement.h"
 #include "io.h"
 
 #define O_SUPER Statement()
@@ -7,9 +10,7 @@ O_IMPLEMENT (ReturnStatement, void *, ctor, (void *_self, va_list * app))
 {
   struct ReturnStatement *self = O_CAST (_self, ReturnStatement ());
   self = O_SUPER->ctor (self, app);
-  self->expr =
-    O_BRANCH_CAST (va_arg (*app, struct Expression *), Expression ());
-  O_BRANCH_CALL (self->expr, retain);
+  self->expr = O_BRANCH_RETAIN_ARG (Expression);
   return self;
 }
 
@@ -23,16 +24,38 @@ O_IMPLEMENT (ReturnStatement, void *, dtor, (void *_self))
 O_IMPLEMENT (ReturnStatement, void, generate, (void *_self))
 {
   struct ReturnStatement *self = O_CAST (_self, ReturnStatement ());
-  fprintf (out, "return_value = ");
+
+  if (self->try_context)
+    {
+      fprintf (out, "ex_pop ();\n");
+      if (self->try_context->finally_clause)
+	{
+	  fprintf (out, "do_finally;\n");
+	}
+    }
+
+  struct FunctionType *function_type = o_cast (self->function_context->type, FunctionType ());
+  if (function_type->has_var_args)
+    {
+      fprintf (out, "va_end (ap);\n");
+    }
+
+  fprintf (out, "return ");
   O_BRANCH_CALL (self->expr, generate);
   fprintf (out, ";\n");
-  fprintf (out, "goto function_end;\n");
 }
 
 O_IMPLEMENT (ReturnStatement, void, type_check, (void *_self))
 {
   struct ReturnStatement *self = O_CAST (_self, ReturnStatement ());
-  O_CALL (self->expr, type_check);
+  O_BRANCH_CALL (self->expr, type_check);
+
+  self->function_context = O_CALL (current_context, find, FunctionDeclaration ());
+  struct FunctionType *function_type = o_cast (self->function_context->type, FunctionType ());
+  O_CALL (function_type->return_type, assert_compatible, self->expr->type);
+
+  self->try_context = O_CALL (current_context, find, TryStatement ());
+  self->catch_context = O_CALL (current_context, find, CatchStatement ());
 }
 
 O_OBJECT (ReturnStatement, Statement);

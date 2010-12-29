@@ -76,14 +76,6 @@ O_IMPLEMENT (FunctionDeclaration, void, generate, (void *_self))
   fprintf (out, ")\n");
   fprintf (out, "{\n");
 
-  if (!o_is_of (function_type->return_type, PrimitiveType ()) ||
-      ((struct PrimitiveType *) (function_type->return_type))->token->type !=
-      VOID)
-    {
-      O_CALL (function_type->return_type, generate);
-      fprintf (out, " return_value;\n");
-    }
-
   if (function_type->has_var_args)
     {
       fprintf (out, "va_list ap;\n");
@@ -95,25 +87,6 @@ O_IMPLEMENT (FunctionDeclaration, void, generate, (void *_self))
       fprintf (out, ");\n");
     }
   O_BRANCH_CALL (self->body, generate);
-
-  if (!o_is_of (function_type->return_type, PrimitiveType ()) ||
-      ((struct PrimitiveType *) (function_type->return_type))->token->type !=
-      VOID)
-    {
-      fprintf (out, "function_end:\n");
-    }
-
-  if (function_type->has_var_args)
-    {
-      fprintf (out, "va_end (ap);\n");
-    }
-
-  if (!o_is_of (function_type->return_type, PrimitiveType ()) ||
-      ((struct PrimitiveType *) (function_type->return_type))->token->type !=
-      VOID)
-    {
-      fprintf (out, "return return_value;\n");
-    }
 
   fprintf (out, "}\n\n");
 }

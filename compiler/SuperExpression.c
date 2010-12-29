@@ -1,6 +1,7 @@
 #include "SuperExpression.h"
 #include "Token.h"
 #include "FunctionDeclaration.h"
+#include "FunctionType.h"
 #include "ClassDeclaration.h"
 #include "ConstructorDeclaration.h"
 #include "ArgumentDeclaration.h"
@@ -104,8 +105,7 @@ O_IMPLEMENT (SuperExpression, void, type_check, (void *_self))
 		 function_decl->name->name->data,
 		 function_decl->formal_arguments->length,
 		 self->actual_arguments->length);
-	  struct Declaration *null_ptr_gen = NULL;
-	  null_ptr_gen->name = NULL;
+	  return;
 	}
       int i;
       for (i = 0; i < function_decl->formal_arguments->length; i++)
@@ -117,6 +117,8 @@ O_IMPLEMENT (SuperExpression, void, type_check, (void *_self))
 	  O_CALL (arg_expr, type_check);
 	  O_CALL (arg_decl->type, assert_compatible, arg_expr->type);
 	}
+      struct FunctionType * function_type = o_cast (function_decl->type, FunctionType ());
+      self->type = function_type->return_type;
     }
   else
     {
