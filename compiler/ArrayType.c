@@ -8,7 +8,7 @@ O_IMPLEMENT (ArrayType, void *, ctor, (void *_self, va_list * app))
 {
   struct ArrayType *self = O_CAST (_self, ArrayType ());
   self = O_SUPER->ctor (self, app);
-  self->base_type = O_CALL (va_arg (*app, struct Type *), retain);
+  self->base_type = O_RETAIN_ARG (Type);
   return self;
 }
 

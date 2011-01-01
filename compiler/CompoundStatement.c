@@ -7,8 +7,7 @@ O_IMPLEMENT (CompoundStatement, void *, ctor, (void *_self, va_list * app))
 {
   struct CompoundStatement *self = O_CAST (_self, CompoundStatement ());
   self = O_SUPER->ctor (self, app);
-  self->body = O_CAST (va_arg (*app, struct RefList *), RefList ());
-  O_CALL (self->body, retain);
+  self->body = O_RETAIN_ARG (RefList);
   return self;
 }
 

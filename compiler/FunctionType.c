@@ -25,10 +25,8 @@ O_IMPLEMENT (FunctionType, void *, ctor, (void *_self, va_list * app))
 {
   struct FunctionType *self = O_CAST (_self, FunctionType ());
   self = O_SUPER->ctor (self, app);
-  self->return_type = O_CAST (va_arg (*app, struct Type *), Type ());
-  O_CALL (self->return_type, retain);
-  self->parameters = O_CAST (va_arg (*app, struct RefList *), RefList ());
-  O_CALL (self->parameters, retain);
+  self->return_type = O_RETAIN_ARG (Type);
+  self->parameters = O_RETAIN_ARG (RefList);
   self->has_var_args = false;
   O_CALL (self->parameters, map_args, FunctionType_check_var_args, self);
   return self;
@@ -47,10 +45,8 @@ O_IMPLEMENT (FunctionType, void *, ctor_from_decl,
 {
   struct FunctionType *self = O_CAST (_self, FunctionType ());
   self = O_SUPER->ctor (self, app);
-  self->return_type = O_CAST (va_arg (*app, struct Type *), Type ());
-  O_CALL (self->return_type, retain);
-  struct RefList *formal_arguments =
-    O_CAST (va_arg (*app, struct RefList *), RefList ());
+  self->return_type = O_RETAIN_ARG (Type);
+  struct RefList *formal_arguments = O_GET_ARG (RefList);
   self->parameters =
     O_CALL_CLASS (RefList (), new, formal_arguments->length, Type ());
   O_CALL (self->parameters, retain);
@@ -65,7 +61,7 @@ static void
 FunctionType_ctor_get_parameter_type_from_expr (void *_decl, va_list * app)
 {
   struct Expression *expr = O_CAST (_decl, Expression ());
-  struct RefList *list = O_CAST (va_arg (*app, struct RefList *), RefList ());
+  struct RefList *list = O_GET_ARG (RefList);
   O_CALL (list, append, expr->type);
 }
 
@@ -74,9 +70,7 @@ O_IMPLEMENT (FunctionType, void *, ctor_from_expr,
 {
   struct FunctionType *self = O_CAST (_self, FunctionType ());
   self = O_SUPER->ctor (self, app);
-  struct FunctionCallExpression *decl =
-    O_CAST (va_arg (*app, struct FunctionCallExpression *),
-	    FunctionCallExpression ());
+  struct FunctionCallExpression *decl = O_GET_ARG (FunctionCallExpression);
   self->return_type = O_CALL (decl->type, retain);
   self->parameters =
     O_CALL_CLASS (RefList (), new, decl->actual_arguments->length, Type ());

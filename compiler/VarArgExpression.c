@@ -7,10 +7,8 @@ O_IMPLEMENT (VarArgExpression, void *, ctor, (void *_self, va_list * app))
 {
   struct VarArgExpression *self = O_CAST (_self, VarArgExpression ());
   self = O_SUPER->ctor (self, app);
-  self->va_arg_type = O_CAST (va_arg (*app, struct Type *), Type ());
-  O_CALL (self->va_arg_type, retain);
-  self->va_arg_expr = O_BRANCH_CAST (va_arg(*app, struct Expression *), Expression());
-  O_BRANCH_CALL (self->va_arg_expr, retain);
+  self->va_arg_type = O_RETAIN_ARG (Type);
+  self->va_arg_expr = O_BRANCH_RETAIN_ARG (Expression);
   return self;
 }
 

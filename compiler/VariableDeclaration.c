@@ -10,7 +10,7 @@ O_IMPLEMENT (VariableDeclaration, void *, ctor, (void *_self, va_list * app))
 {
   struct VariableDeclaration *self = O_CAST (_self, VariableDeclaration ());
   self = O_SUPER->ctor (self, app);
-  self->expr = O_BRANCH_CALL (va_arg (*app, struct Expression *), retain);
+  self->expr = O_BRANCH_RETAIN_ARG (Expression);
   return self;
 }
 

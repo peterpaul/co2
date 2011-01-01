@@ -21,11 +21,8 @@ O_IMPLEMENT (FunctionCallExpression, void *, ctor,
   struct FunctionCallExpression *self =
     O_CAST (_self, FunctionCallExpression ());
   self = O_SUPER->ctor (self, app);
-  self->function = O_CAST (va_arg (*app, struct Expression *), Expression ());
-  O_CALL (self->function, retain);
-  self->actual_arguments =
-    O_CAST (va_arg (*app, struct RefList *), RefList ());
-  O_CALL (self->actual_arguments, retain);
+  self->function = O_RETAIN_ARG (Expression);
+  self->actual_arguments = O_RETAIN_ARG (RefList);
   return self;
 }
 

@@ -9,8 +9,7 @@ O_IMPLEMENT (ArgumentDeclaration, void *, ctor, (void *_self, va_list * app))
 {
   struct ArgumentDeclaration *self = O_CAST (_self, ArgumentDeclaration ());
   self = O_SUPER->ctor (self, app);
-  self->type = O_CAST (va_arg (*app, struct Type *), Type ());
-  O_CALL (self->type, retain);
+  self->type = O_RETAIN_ARG (Type);
   return self;
 }
 

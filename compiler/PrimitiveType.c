@@ -9,8 +9,7 @@ O_IMPLEMENT (PrimitiveType, void *, ctor, (void *_self, va_list * app))
 {
   struct PrimitiveType *self = O_CAST (_self, PrimitiveType ());
   self = O_SUPER->ctor (self, app);
-  self->token = O_CAST (va_arg (*app, struct Token *), Token ());
-  O_CALL (self->token, retain);
+  self->token = O_RETAIN_ARG (Token);
   return self;
 }
 

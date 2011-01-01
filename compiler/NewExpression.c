@@ -17,9 +17,8 @@ O_IMPLEMENT (NewExpression, void *, ctor, (void *_self, va_list * app))
 {
   struct NewExpression *self = O_CAST (_self, NewExpression ());
   self = O_SUPER->ctor (self, app);
-  self->new_type = O_CAST (va_arg (*app, struct Type *), Type ());
-  O_CALL (self->new_type, retain);
-  struct Object *arg = O_CAST (va_arg (*app, struct Object *), Object ());
+  self->new_type = O_RETAIN_ARG (Type);
+  struct Object *arg = O_GET_ARG (Object);
   if (o_is_of (arg, Expression ()))
     {
       self->array_size = (struct Expression *) arg;

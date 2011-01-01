@@ -14,9 +14,7 @@ O_IMPLEMENT (InterfaceDeclaration, void *, ctor, (void *_self, va_list * app))
 {
   struct InterfaceDeclaration *self = O_CAST (_self, InterfaceDeclaration ());
   self = O_SUPER->ctor (self, app);
-  self->interfaces =
-    o_branch_cast (va_arg (*app, struct RefList *), RefList ());
-  O_BRANCH_CALL (self->interfaces, retain);
+  self->interfaces = O_BRANCH_RETAIN_ARG (RefList);
   return self;
 }
 

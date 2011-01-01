@@ -17,8 +17,7 @@ O_IMPLEMENT (TokenExpression, void *, ctor, (void *_self, va_list * app))
 {
   struct TokenExpression *self = O_CAST (_self, TokenExpression ());
   self = O_SUPER->ctor (self, app);
-  self->token = O_CAST (va_arg (*app, struct Token *), Token ());
-  O_CALL (self->token, retain);
+  self->token = O_RETAIN_ARG (Token);
   if (self->token->type == IDENTIFIER)
     {
       self->scope = current_scope;

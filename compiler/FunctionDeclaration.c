@@ -22,14 +22,9 @@ O_IMPLEMENT (FunctionDeclaration, void *, ctor, (void *_self, va_list * app))
 {
   struct FunctionDeclaration *self = O_CAST (_self, FunctionDeclaration ());
   self = O_SUPER->ctor (self, app);
-  self->type = O_CAST (va_arg (*app, struct FunctionType *), FunctionType ());
-  O_CALL (self->type, retain);
-  self->formal_arguments =
-    O_CAST (va_arg (*app, struct RefList *), RefList ());
-  O_CALL (self->formal_arguments, retain);
-  self->body =
-    O_BRANCH_CAST (va_arg (*app, struct Statement *), Statement ());
-  O_BRANCH_CALL (self->body, retain);
+  self->type = O_RETAIN_ARG (FunctionType);
+  self->formal_arguments = O_RETAIN_ARG (RefList);
+  self->body = O_BRANCH_RETAIN_ARG (Statement);
   return self;
 }
 

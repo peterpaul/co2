@@ -9,8 +9,7 @@ void
 Declaration_list_set_include_header (void *_decl, va_list * app)
 {
   struct Declaration *decl = o_cast (_decl, Declaration ());
-  struct Token *header_file =
-    O_CAST (va_arg (*app, struct Token *), Token ());
+  struct Token *header_file = O_GET_ARG (Token);
   O_CALL (decl, set_include_file, header_file);
 }
 

@@ -22,11 +22,8 @@ O_IMPLEMENT (ClassDeclaration, void *, ctor, (void *_self, va_list * app))
 {
   struct ClassDeclaration *self = O_CAST (_self, ClassDeclaration ());
   self = O_SUPER->ctor (self, app);
-  self->superclass = O_BRANCH_CAST (va_arg (*app, struct Type *), Token ());
-  O_BRANCH_CALL (self->superclass, retain);
-  self->interfaces =
-    O_BRANCH_CAST (va_arg (*app, struct RefList *), RefList ());
-  O_BRANCH_CALL (self->interfaces, retain);
+  self->superclass = O_BRANCH_RETAIN_ARG (Token);
+  self->interfaces = O_BRANCH_RETAIN_ARG (RefList);
   return self;
 }
 
@@ -81,8 +78,7 @@ ClassDeclaration_generate_constructor_definition (void *_constructor_decl,
 {
   struct ConstructorDeclaration *constructor_decl =
     O_CAST (_constructor_decl, ConstructorDeclaration ());
-  struct ClassDeclaration *class_decl =
-    O_CAST (va_arg (*app, struct ClassDeclaration *), ClassDeclaration ());
+  struct ClassDeclaration *class_decl = O_GET_ARG (ClassDeclaration);
   fprintf (out, "O_METHOD_DEF (");
   O_CALL (class_decl->name, generate);
   fprintf (out, ", void *, ");
@@ -105,8 +101,7 @@ ClassDeclaration_generate_method_definition (void *_method_decl,
       return;
     }
 
-  struct ClassDeclaration *class_decl =
-    O_CAST (va_arg (*app, struct ClassDeclaration *), ClassDeclaration ());
+  struct ClassDeclaration *class_decl = O_GET_ARG (ClassDeclaration);
   struct FunctionType *method_type =
     o_cast (method_decl->type, FunctionType ());
   fprintf (out, "O_METHOD_DEF (");
@@ -127,8 +122,7 @@ ClassDeclaration_generate_constructor_registration (void *_constructor_decl,
 {
   struct ConstructorDeclaration *constructor_decl =
     O_CAST (_constructor_decl, ConstructorDeclaration ());
-  struct ClassDeclaration *class_decl =
-    O_CAST (va_arg (*app, struct ClassDeclaration *), ClassDeclaration ());
+  struct ClassDeclaration *class_decl = O_GET_ARG (ClassDeclaration);
   fprintf (out, "; \\\n O_METHOD (");
   O_CALL (class_decl->name, generate);
   fprintf (out, ", ");
@@ -146,8 +140,7 @@ ClassDeclaration_generate_method_registration (void *_method_decl,
 {
   struct FunctionDeclaration *method_decl =
     O_CAST (_method_decl, FunctionDeclaration ());
-  struct ClassDeclaration *class_decl =
-    O_CAST (va_arg (*app, struct ClassDeclaration *), ClassDeclaration ());
+  struct ClassDeclaration *class_decl = O_GET_ARG (ClassDeclaration);
   fprintf (out, "; \\\n O_METHOD (");
   if (method_decl->interface_decl)
     {
@@ -168,8 +161,7 @@ ClassDeclaration_generate_constructor_registration_2 (void *_constructor_decl,
 {
   struct ConstructorDeclaration *constructor_decl =
     O_CAST (_constructor_decl, ConstructorDeclaration ());
-  struct ClassDeclaration *class_decl =
-    O_CAST (va_arg (*app, struct ClassDeclaration *), ClassDeclaration ());
+  struct ClassDeclaration *class_decl = O_GET_ARG (ClassDeclaration);
   fprintf (out, "O_OBJECT_METHOD (");
   O_CALL (class_decl->name, generate);
   fprintf (out, ", ");
@@ -187,8 +179,7 @@ ClassDeclaration_generate_destructor_registration_2 (void *_destructor_decl,
 {
   struct DestructorDeclaration *destructor_decl =
     O_CAST (_destructor_decl, DestructorDeclaration ());
-  struct ClassDeclaration *class_decl =
-    O_CAST (va_arg (*app, struct ClassDeclaration *), ClassDeclaration ());
+  struct ClassDeclaration *class_decl = O_GET_ARG (ClassDeclaration);
   fprintf (out, "O_OBJECT_METHOD (");
   O_CALL (class_decl->name, generate);
   fprintf (out, ", dtor);\n");
@@ -199,7 +190,7 @@ ClassDeclaration_generate_interface_method_registration (void *_method_decl,
 							 va_list * app)
 {
   struct Declaration *method_decl = O_CAST (_method_decl, Declaration ());
-  struct Token *token = O_CAST (va_arg (*app, struct Token *), Token ());
+  struct Token *token = O_GET_ARG (Token);
 
   fprintf (out, "O_OBJECT_IF_METHOD (");
   O_CALL (token, generate);
@@ -213,8 +204,7 @@ ClassDeclaration_generate_method_implementation_2 (void *_interface_name,
 						   va_list * app)
 {
   struct Token *interface_name = O_CAST (_interface_name, Token ());
-  struct Token *implementation_name =
-    O_CAST (va_arg (*app, struct Token *), Token ());
+  struct Token *implementation_name = O_GET_ARG (Token);
   struct Declaration *_decl =
     O_CALL (global_scope, lookup_in_this_scope, interface_name);
   struct InterfaceDeclaration *interface_decl =
@@ -235,8 +225,7 @@ ClassDeclaration_generate_constructor_implementation (void *_constructor_decl,
 {
   struct ConstructorDeclaration *constructor_decl =
     O_CAST (_constructor_decl, ConstructorDeclaration ());
-  struct ClassDeclaration *class_decl =
-    O_CAST (va_arg (*app, struct ClassDeclaration *), ClassDeclaration ());
+  struct ClassDeclaration *class_decl = O_GET_ARG (ClassDeclaration);
   fprintf (out, "O_IMPLEMENT (");
   O_CALL (class_decl->name, generate);
   fprintf (out, ", void *");
@@ -267,8 +256,7 @@ ClassDeclaration_generate_destructor_implementation (void *_destructor_decl,
 {
   struct DestructorDeclaration *destructor_decl =
     O_CAST (_destructor_decl, DestructorDeclaration ());
-  struct ClassDeclaration *class_decl =
-    O_CAST (va_arg (*app, struct ClassDeclaration *), ClassDeclaration ());
+  struct ClassDeclaration *class_decl = O_GET_ARG (ClassDeclaration);
   fprintf (out, "O_IMPLEMENT (");
   O_CALL (class_decl->name, generate);
   fprintf (out, ", void *");
@@ -290,8 +278,7 @@ ClassDeclaration_generate_method_implementation (void *_method_decl,
 {
   struct FunctionDeclaration *method_decl =
     O_CAST (_method_decl, FunctionDeclaration ());
-  struct ClassDeclaration *class_decl =
-    O_CAST (va_arg (*app, struct ClassDeclaration *), ClassDeclaration ());
+  struct ClassDeclaration *class_decl = O_GET_ARG (ClassDeclaration);
   struct FunctionType *method_type =
     o_cast (method_decl->type, FunctionType ());
   if (method_decl->interface_decl)
@@ -381,8 +368,7 @@ ClassDeclaration_generate_attribute_registration (void *_method_decl,
 {
   struct VariableDeclaration *method_decl =
     O_CAST (_method_decl, VariableDeclaration ());
-  struct ClassDeclaration *class_decl =
-    O_CAST (va_arg (*app, struct ClassDeclaration *), ClassDeclaration ());
+  struct ClassDeclaration *class_decl = O_GET_ARG (ClassDeclaration);
   fprintf (out, "; \\\n ");
   O_CALL (method_decl->type, generate);
   fprintf (out, " ");

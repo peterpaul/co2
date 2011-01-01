@@ -7,8 +7,7 @@ O_IMPLEMENT (NestedExpression, void *, ctor, (void *_self, va_list * app))
 {
   struct NestedExpression *self = O_CAST (_self, NestedExpression ());
   self = O_SUPER->ctor (self, app);
-  self->expr = O_CAST (va_arg (*app, struct Expression *), Expression ());
-  O_CALL (self->expr, retain);
+  self->expr = O_RETAIN_ARG (Expression);
   return self;
 }
 

@@ -8,8 +8,7 @@ O_IMPLEMENT (Path, void *, ctor, (void *_self, va_list * app))
 {
   struct Path *self = O_CAST (_self, Path ());
   self = O_SUPER->ctor (self, app);
-  self->path_name = O_CAST (va_arg (*app, struct RefList *), RefList ());
-  O_CALL (self->path_name, retain);
+  self->path_name = O_RETAIN_ARG (RefList);
   return self;
 }
 

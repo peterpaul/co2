@@ -10,8 +10,7 @@ O_IMPLEMENT(SizeExpression, void *, ctor, (void *_self, va_list *app))
 {
   struct SizeExpression * self = O_CAST(_self, SizeExpression());
   self = O_SUPER->ctor(self, app);
-  self->param = O_CAST(va_arg(*app, struct Type *), Type());
-  O_CALL(self->param, retain);
+  self->param = O_RETAIN_ARG (Type);
   return self;
 }
 

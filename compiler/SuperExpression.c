@@ -15,13 +15,9 @@ O_IMPLEMENT (SuperExpression, void *, ctor, (void *_self, va_list * app))
 {
   struct SuperExpression *self = O_CAST (_self, SuperExpression ());
   self = O_SUPER->ctor (self, app);
-  self->super = O_BRANCH_CAST (va_arg (*app, struct Token *), Token ());
-  self->ctor_name = O_BRANCH_CAST (va_arg (*app, struct Token *), Token ());
-  self->actual_arguments =
-    O_BRANCH_CAST (va_arg (*app, struct RefList *), RefList ());
-  O_BRANCH_CALL (self->super, retain);
-  O_BRANCH_CALL (self->ctor_name, retain);
-  O_BRANCH_CALL (self->actual_arguments, retain);
+  self->super = O_BRANCH_RETAIN_ARG (Token);
+  self->ctor_name = O_BRANCH_RETAIN_ARG (Token);
+  self->actual_arguments = O_BRANCH_RETAIN_ARG (RefList);
   return self;
 }
 

@@ -9,8 +9,7 @@ O_IMPLEMENT (DeleteStatement, void *, ctor, (void *_self, va_list * app))
 {
   struct DeleteStatement *self = O_CAST (_self, DeleteStatement ());
   self = O_SUPER->ctor (self, app);
-  self->expr = O_CAST (va_arg (*app, struct EXpression *), Expression ());
-  O_CALL (self->expr, retain);
+  self->expr = O_RETAIN_ARG (Expression);
   return self;
 }
 

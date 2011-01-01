@@ -24,11 +24,8 @@ O_IMPLEMENT (DestructorDeclaration, void *, ctor,
      self->type = O_CAST(va_arg(*app, struct FunctionType *), FunctionType());
      O_CALL(self->type, retain);
    */
-  self->class_name = O_CAST (va_arg (*app, struct Token *), Token ());
-  O_CALL (self->class_name, retain);
-  self->body =
-    O_BRANCH_CAST (va_arg (*app, struct Statement *), Statement ());
-  O_BRANCH_CALL (self->body, retain);
+  self->class_name = O_RETAIN_ARG (Token);
+  self->body = O_BRANCH_RETAIN_ARG (Statement);
   return self;
 }
 

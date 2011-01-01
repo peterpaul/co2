@@ -9,11 +9,8 @@ O_IMPLEMENT (ObjectType, void *, ctor, (void *_self, va_list * app))
 {
   struct ObjectType *self = O_CAST (_self, ObjectType ());
   self = O_SUPER->ctor (self, app);
-  self->token = O_CAST (va_arg (*app, struct Token *), Token ());
-  O_CALL (self->token, retain);
-  self->decl =
-    O_BRANCH_CAST (va_arg (*app, struct ObjectTypeDeclaration *), ObjectTypeDeclaration ());
-  O_BRANCH_CALL (self->decl, retain);
+  self->token = O_RETAIN_ARG (Token);
+  self->decl = O_BRANCH_RETAIN_ARG (ObjectTypeDeclaration);
   return self;
 }
 

@@ -15,14 +15,9 @@ O_IMPLEMENT (BinaryExpression, void *, ctor, (void *_self, va_list * app))
 {
   struct BinaryExpression *self = O_CAST (_self, BinaryExpression ());
   self = O_SUPER->ctor (self, app);
-  self->operand[0] =
-    O_BRANCH_CAST (va_arg (*app, struct Expression *), Expression ());
-  self->operator = O_BRANCH_CAST (va_arg (*app, struct Token *), Token ());
-  self->operand[1] =
-    O_BRANCH_CAST (va_arg (*app, struct Expression *), Expression ());
-  O_BRANCH_CALL (self->operand[0], retain);
-  O_BRANCH_CALL (self->operand[1], retain);
-  O_BRANCH_CALL (self->operator, retain);
+  self->operand[0] = O_BRANCH_RETAIN_ARG (Expression);
+  self->operator = O_BRANCH_RETAIN_ARG (Token);
+  self->operand[1] = O_BRANCH_RETAIN_ARG (Expression);
   return self;
 }
 
