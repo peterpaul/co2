@@ -29,14 +29,20 @@ LD		=gcc
 
 PREFIX		=${HOME}/local/Object-0.0.1
 
-DEPENDENCIES	=$(OBJS:%.o=%.d) $(LIBOBJS:%.o=%.d)
+TARGETDIR	=target
+BINDIR		=$(TARGETDIR)/bin
+
+DEPDIR		=$(TARGETDIR)/deps
+DEPENDENCIES	=$(OBJS:%.o=$(DEPDIR)/%.d) $(LIBOBJS:%.o=$(DEPDIR)/%.d)
+
+_LIBOBJS	=$(LIBOBJS:%.o=$(BINDIR)/%.o)
 
 .DEFAULT: all
 
 all::		$(BINS)
 
 clean::
-		$(RM) -f $(BINS) $(OBJS) $(LIBOBJS) $(GEN) $(DEPENDENCIES)
+		$(RM) -f $(BINS) $(OBJS) $(_LIBOBJS) $(GEN) $(DEPENDENCIES)
 
 doc::
 		doxywizard Doxyfile
@@ -44,14 +50,16 @@ doc::
 %.bin:	%.o $(LIBS)
 		$(LD) $(LDFLAGS) $< $(LIBRARIES) -o $@
 
-%.o:		%.c
+$(BINDIR)/%.o:		%.c
+		mkdir -p $(BINDIR)
 		$(CC) $(CFLAGS) -c $< -o $@
 
-%.d:		%.c
-		$(GCC) $(CFLAGS) $(DEP_FLAGS) $< > $@
+$(DEPDIR)/%.d:		%.c
+		mkdir -p $(DEPDIR)
+		$(GCC) $(CFLAGS) $(DEP_FLAGS) $< -o $@
 
-%.a: ${LIBOBJS}
-		${AR} rc $@ ${LIBOBJS}
+%.a: ${_LIBOBJS}
+		${AR} rc $@ ${_LIBOBJS}
 		${RANLIB} $@
 
 %.txt.c:	%.c
