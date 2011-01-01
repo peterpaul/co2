@@ -155,8 +155,6 @@
 %type	<statement>	throw_statement
 %type	<statement>	try_statement
 %type	<statement>	while_statement
- /* Imports */
-%type	<token>		identifier
  /* Types */
 %type	<list>		opt_type_list
 %type	<type>		type
@@ -206,11 +204,6 @@ input
   $$ = O_CALL_CLASS(File(), new, $1);
   parsed_file = $$;
 }
-;
-
-identifier
-:	IDENTIFIER
-|	TYPE_IDENTIFIER
 ;
 
 declaration_list
