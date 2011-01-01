@@ -129,6 +129,12 @@
   (void *) o
 #endif
 
+#define O_GET_ARG(type)				\
+  O_CAST(va_arg(*app, struct type *), type())
+
+#define O_BRANCH_GET_ARG(type)				\
+  O_BRANCH_CAST(va_arg(*app, struct type *), type())
+
 #define O_BRANCH_CALL(o,msg,...)					\
   ({typeof(o) _tmp = o;							\
     assertTrue(_tmp == (typeof(_tmp))0 || _tmp->class->msg,		\
