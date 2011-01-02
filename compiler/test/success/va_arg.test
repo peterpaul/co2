@@ -11,6 +11,17 @@ int accumulate(int size, va_list app)
 	return size + va_arg(app, int);
 }
 
+void procedure_1(int size, ...)
+{
+	printf("procedure_1.size = %d\n", size);
+}
+
+void procedure_2(int size, ...)
+{
+	printf("procedure_2.size = %d\n", size);
+	return;
+}
+
 int map_args(int size, ...)
 {
 	int i;
@@ -39,5 +50,7 @@ int main()
 	}
 	printf("result = %d\n", map_args(5, 1, 1, 1, 1, 1));
 	printf("fun_va_param(4, 5) = %d\n", fun_va_param(4,5));
+	procedure_1(1);
+	procedure_2(2);
 	return 0;
 }

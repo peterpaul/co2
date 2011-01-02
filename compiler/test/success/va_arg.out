@@ -1,2 +1,4 @@
 result = 5
 fun_va_param(4, 5) = 9
+procedure_1.size = 1
+procedure_2.size = 2

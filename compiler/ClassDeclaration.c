@@ -311,14 +311,6 @@ ClassDeclaration_generate_method_implementation (void *_method_decl,
   O_CALL (class_decl->name, generate);
   fprintf (out, " ());\n");
 
-  if (!o_is_of (method_type->return_type, PrimitiveType ()) ||
-      ((struct PrimitiveType *) (method_type->return_type))->token->type !=
-      VOID)
-    {
-      O_CALL (method_type->return_type, generate);
-      fprintf (out, " return_value;\n");
-    }
-
   if (method_type->has_var_args)
     {
       fprintf (out, "va_list ap;\n");
@@ -340,23 +332,11 @@ ClassDeclaration_generate_method_implementation (void *_method_decl,
 
   O_CALL (method_decl->body, generate);
 
-  if (!o_is_of (method_type->return_type, PrimitiveType ()) ||
-      ((struct PrimitiveType *) (method_type->return_type))->token->type !=
-      VOID)
-    {
-      fprintf (out, "function_end:\n");
-    }
-
-  if (method_type->has_var_args)
+  if (method_type->has_var_args && 
+      (o_is_of (method_type->return_type, PrimitiveType ())
+       && ((struct PrimitiveType *) method_type->return_type)->token->type == VOID))
     {
       fprintf (out, "va_end (ap);\n");
-    }
-
-  if (!o_is_of (method_type->return_type, PrimitiveType ()) ||
-      ((struct PrimitiveType *) (method_type->return_type))->token->type !=
-      VOID)
-    {
-      fprintf (out, "return return_value;\n");
     }
 
   fprintf (out, "}\n\n");

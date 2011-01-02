@@ -83,6 +83,13 @@ O_IMPLEMENT (FunctionDeclaration, void, generate, (void *_self))
     }
   O_BRANCH_CALL (self->body, generate);
 
+  if (function_type->has_var_args && 
+      (o_is_of (function_type->return_type, PrimitiveType ())
+       && ((struct PrimitiveType *) function_type->return_type)->token->type == VOID))
+    {
+      fprintf (out, "va_end (ap);\n");
+    }
+
   fprintf (out, "}\n\n");
 }
 

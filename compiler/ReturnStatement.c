@@ -25,6 +25,15 @@ O_IMPLEMENT (ReturnStatement, void, generate, (void *_self))
 {
   struct ReturnStatement *self = O_CAST (_self, ReturnStatement ());
 
+  fprintf (out, "{\n");
+  if (self->expr)
+    {
+      O_CALL (self->expr->type, generate);
+      fprintf (out, " __return_value = ");
+      O_CALL (self->expr, generate);
+      fprintf (out, ";\n");
+    }
+
   if (self->try_context)
     {
       fprintf (out, "ex_pop ();\n");
@@ -41,8 +50,13 @@ O_IMPLEMENT (ReturnStatement, void, generate, (void *_self))
     }
 
   fprintf (out, "return ");
-  O_BRANCH_CALL (self->expr, generate);
+  if (self->expr)
+    {
+      fprintf (out, "__return_value");
+    }
   fprintf (out, ";\n");
+  
+  fprintf (out, "}\n");
 }
 
 O_IMPLEMENT (ReturnStatement, void, type_check, (void *_self))
@@ -52,7 +66,10 @@ O_IMPLEMENT (ReturnStatement, void, type_check, (void *_self))
 
   self->function_context = O_CALL (current_context, find, FunctionDeclaration ());
   struct FunctionType *function_type = o_cast (self->function_context->type, FunctionType ());
-  O_CALL (function_type->return_type, assert_compatible, self->expr->type);
+  if (self->expr)
+    {
+      O_CALL (function_type->return_type, assert_compatible, self->expr->type);
+    }
 
   self->try_context = O_CALL (current_context, find, TryStatement ());
   self->catch_context = O_CALL (current_context, find, CatchStatement ());
