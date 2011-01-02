@@ -134,7 +134,7 @@ int yywrap()
 	return 0;
 }
 
-static void try_search_path(const char * file_name)
+void try_search_path(const char * file_name)
 {
 	unsigned i;
 	
@@ -146,11 +146,17 @@ static void try_search_path(const char * file_name)
 		if ((yyin = fopen(full_path->data, "r")) != 0) {
 			fprintf(stderr, "Found file: %s\n", full_path->data);
 			O_CALL(full_path, delete);
+			filename = file_name;
 			return;
 		}
 		O_CALL(full_path, delete);
 	}
 
+	if ((yyin = fopen(file_name, "r")) != 0) {
+		fprintf(stderr, "Found file: %s\n", file_name);
+		filename = file_name;
+		return;
+	}
 	struct Token * token = O_CALL_CLASS(Token(), new, yytext, IDENTIFIER, filename, linenumber);
 	error(token, "cannot open '%s'\n", file_name);
 	O_CALL (token, delete);

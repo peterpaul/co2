@@ -8,9 +8,9 @@
 
 #define File_Attr				\
   CompileObject_Attr;				\
-struct String * name;\
-struct String * absolute_path;\
-struct RefList * file_dependencies;\
+  struct String * name;				\
+  struct String * absolute_path;		\
+  struct RefList * file_dependencies;		\
   struct RefList * declarations
 
 O_CLASS (File, CompileObject);

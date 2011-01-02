@@ -9,6 +9,8 @@
 extern int parse (void);
 struct File *parsed_file = NULL;
 
+void try_search_path(const char *);
+
 void
 create_release_pool ()
 {
@@ -33,17 +35,13 @@ main (int argc, char **argv)
   else
     filename = NULL;
 
-  yyin = open_input (filename);
   file_path = analyze_file_name (filename);
   base_dir = determine_base_dir (file_path);
 
   path = O_CALL_CLASS (List (), new, 8, String ());
   O_CALL (path, append, base_dir);
 
-  /*
-     O_CALL(file_path, fprint, stderr);
-     fprintf(stderr, "\n");
-   */
+  try_search_path (filename);
 
   /* syntax analysis */
   parse ();
