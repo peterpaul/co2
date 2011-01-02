@@ -1,5 +1,6 @@
 #include "List.h"
 #include "String.h"
+#include "ReleasePool.h"
 #include "Iterator.h"
 
 void testIterator(struct List *list)
@@ -15,6 +16,7 @@ void testIterator(struct List *list)
 
 int main(int argc, char **argv)
 {
+	O_CALL_CLASS (ReleasePool (), new);
 	int i;
 	struct List *list = O_CALL_CLASS(List(), new, 4, String());
 	for (i = 0; i < 4; i++) {
@@ -27,5 +29,6 @@ int main(int argc, char **argv)
 
 	o_print_classes(stdout);
 
+	O_CALL (current_release_pool, delete);
 	return 0;
 }
