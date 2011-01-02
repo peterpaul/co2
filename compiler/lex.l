@@ -53,8 +53,8 @@ STRING_CONST	\"({CHAR_SYMBOL}|\')*\"
 	\n		linenumber++; BEGIN(INITIAL);
 	<<EOF>>		BEGIN(INITIAL);
 }
-<INCLUDE>[ \t]*            /* eat the whitespace */
-<INCLUDE>[^ \t\n]+ { new_input (yytext); }
+<INCLUDE>[ \t]*		/* eat the whitespace */
+<INCLUDE>[^ \t\n]+	{ new_input (yytext); }
 "catch"		return CATCH;
 "char"		yylval.token = O_CALL_CLASS(Token(), new, yytext, CHAR, filename, linenumber); return yylval.token->type;
 "class"		return CLASS;
@@ -142,7 +142,7 @@ static void try_search_path(const char * file_name)
 		struct String * item = (struct String *)O_CALL(path, get, i);
 		struct String * full_path = O_CALL_CLASS(String(), new, "%s", item->data);
 		O_CALL(full_path, append_str, "/%s.%s", file_name, "inc");
-fprintf(stderr, "trying: %s\n", full_path->data);
+		fprintf(stderr, "trying: %s\n", full_path->data);
 		if ((yyin = fopen(full_path->data, "r")) != 0) {
 			fprintf(stderr, "Found file: %s\n", full_path->data);
 			O_CALL(full_path, delete);
@@ -151,7 +151,9 @@ fprintf(stderr, "trying: %s\n", full_path->data);
 		O_CALL(full_path, delete);
 	}
 
-	error(NULL, "cannot open '%s'\n", file_name);
+	struct Token * token = O_CALL_CLASS(Token(), new, yytext, IDENTIFIER, filename, linenumber);
+	error(token, "cannot open '%s'\n", file_name);
+	O_CALL (token, delete);
 	exit(EXIT_FAILURE);
 }
 
