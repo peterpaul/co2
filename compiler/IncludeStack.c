@@ -1,7 +1,8 @@
 #include "lex.yy.h"
 #include "IncludeStack.h"
+#include "String.h"
 
-const char * input_file_name = NULL;
+struct String * input_file_name = NULL;
 int linenumber = 1;
 struct IncludeStack * include_stack = NULL;
 
@@ -14,7 +15,7 @@ O_IMPLEMENT (IncludeStack, void *, ctor, (void *_self, va_list * app))
   self->parent = include_stack;
   include_stack = self;
   self->current_line = va_arg (*app, unsigned);
-  self->current_file = va_arg (*app, char *);
+  self->current_file = O_BRANCH_GET_ARG (String);
   self->buffer_state = va_arg (*app, YY_BUFFER_STATE);
   return self;
 }

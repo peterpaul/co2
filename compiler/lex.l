@@ -5,12 +5,14 @@
 #include "IncludeStack.h"
 #include "String.h"
 #include "List.h"
+#include <limits.h>
+#include <stdlib.h>
 
 const char * filename;
 
 struct List * path;
 
-void new_input(const char *);
+void new_input(struct String *);
 %}
 
 DIGIT		[0-9]
@@ -54,7 +56,7 @@ STRING_CONST	\"({CHAR_SYMBOL}|\')*\"
 	<<EOF>>		BEGIN(INITIAL);
 }
 <INCLUDE>[ \t]*		/* eat the whitespace */
-<INCLUDE>[^ \t\n]+	{ new_input (yytext); }
+<INCLUDE>[^ \t\n]+	{ new_input (O_CALL_CLASS (String (), new, "%s", yytext)); }
 "catch"		return CATCH;
 "char"		yylval.token = O_CALL_CLASS(Token(), new, yytext, CHAR, filename, linenumber); return yylval.token->type;
 "class"		return CLASS;
@@ -126,7 +128,7 @@ int yywrap()
 	/* The input_file_name is only allocated for include files, and not for
 	   the original input file. Therefore this call to free is after the
 	   check on the include level. */
-	free((char *) input_file_name);
+	O_CALL (input_file_name, delete);
 	yy_switch_to_buffer(include_stack->buffer_state);
 	linenumber = include_stack->current_line;
 	input_file_name = include_stack->current_file;
@@ -134,41 +136,52 @@ int yywrap()
 	return 0;
 }
 
-void try_search_path(const char * file_name)
+bool try_absolute_path(struct String * file_name, struct String * _absolute_path)
+{
+	char * absolute_path = realpath(_absolute_path->data, NULL);
+	fprintf(stderr, "trying: %s\n", absolute_path);
+	if (absolute_path && (yyin = fopen(absolute_path, "r")) != 0) {
+		fprintf(stderr, "Found file: %s\n", absolute_path);
+		filename = file_name->data;
+		free(absolute_path);
+		return true;
+	}
+	if (absolute_path) {
+		free(absolute_path);
+	}
+	return false;
+}
+
+void try_search_path(struct String * file_name)
 {
 	unsigned i;
 	
 	for (i = 0; i < path->length; i++) {
 		struct String * item = (struct String *)O_CALL(path, get, i);
 		struct String * full_path = O_CALL_CLASS(String(), new, "%s", item->data);
-		O_CALL(full_path, append_str, "/%s.%s", file_name, "inc");
-		fprintf(stderr, "trying: %s\n", full_path->data);
-		if ((yyin = fopen(full_path->data, "r")) != 0) {
-			fprintf(stderr, "Found file: %s\n", full_path->data);
+		O_CALL(full_path, append_str, "/%s.%s", file_name->data, "inc");
+		if (try_absolute_path (file_name, full_path)) {
 			O_CALL(full_path, delete);
-			filename = file_name;
 			return;
 		}
 		O_CALL(full_path, delete);
 	}
 
-	if ((yyin = fopen(file_name, "r")) != 0) {
-		fprintf(stderr, "Found file: %s\n", file_name);
-		filename = file_name;
+	if (try_absolute_path (file_name, file_name)) {
 		return;
 	}
 	struct Token * token = O_CALL_CLASS(Token(), new, yytext, IDENTIFIER, filename, linenumber);
-	error(token, "cannot open '%s'\n", file_name);
+	error(token, "cannot open '%s'\n", file_name->data);
 	O_CALL (token, delete);
 	exit(EXIT_FAILURE);
 }
 
 // char * strdup(const char *);
-void new_input(const char * file_name)
+void new_input(struct String * file_name)
 {
 	O_CALL_CLASS(IncludeStack(), new, linenumber, input_file_name, YY_CURRENT_BUFFER);
 	try_search_path(file_name);
-	input_file_name = strdup(file_name);
+	input_file_name = O_CALL_CLASS(String (), new, "%s", file_name->data);
 	linenumber = 1;
 	yy_switch_to_buffer(yy_create_buffer(yyin, YY_BUF_SIZE));
 	BEGIN(INITIAL);

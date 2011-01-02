@@ -9,7 +9,7 @@
 extern int parse (void);
 struct File *parsed_file = NULL;
 
-void try_search_path(const char *);
+void try_search_path(struct String *);
 
 void
 create_release_pool ()
@@ -41,7 +41,7 @@ main (int argc, char **argv)
   path = O_CALL_CLASS (List (), new, 8, String ());
   O_CALL (path, append, base_dir);
 
-  try_search_path (filename);
+  try_search_path (O_CALL_CLASS (String (), new, "%s", filename));
 
   /* syntax analysis */
   parse ();

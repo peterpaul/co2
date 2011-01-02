@@ -10,12 +10,12 @@
   RefObject_Attr;				\
   struct IncludeStack * parent;			\
   unsigned current_line;			\
-  const char * current_file;			\
+  struct String * current_file;			\
   YY_BUFFER_STATE buffer_state
 
 O_CLASS (IncludeStack, RefObject);
 
-extern const char * input_file_name;
+extern struct String * input_file_name;
 extern int linenumber;
 
 extern struct IncludeStack * include_stack;
