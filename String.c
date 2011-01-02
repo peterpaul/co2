@@ -5,7 +5,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#define O_SUPER Object()
+#define O_SUPER RefObject()
 
 static size_t __strnlen(const char *str, size_t n)
 {
@@ -231,7 +231,7 @@ O_IMPLEMENT(String, int, compare, (void *_self, void *_other))
 	return strcmp(self->data, other->data);
 }
 
-O_OBJECT(String, Object);
+O_OBJECT(String, RefObject);
 O_OBJECT_METHOD(String, ctor);
 O_OBJECT_METHOD(String, dtor);
 O_OBJECT_METHOD(String, clone);

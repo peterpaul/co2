@@ -1,7 +1,7 @@
 #ifndef STRING_H
 #define STRING_H
 
-#include "Object.h"
+#include "RefObject.h"
 
 O_METHOD_DEF(String, void *, resize, (void *_self, int size));
 O_METHOD_DEF(String, void *, ensure, (void *_self, int size));
@@ -41,7 +41,7 @@ O_METHOD_DEF(String, int, snprint, (void *_self, char *str, int size));
 O_METHOD_DEF(String, struct List *, split, (void *_self, const char * delim));
 
 #define StringClass_Attr						\
-	ObjectClass_Attr;						\
+	RefObjectClass_Attr;						\
 	O_METHOD (String, resize);					\
 	O_METHOD (String, ensure);					\
 	O_METHOD (String, append);					\
@@ -54,10 +54,10 @@ O_METHOD_DEF(String, struct List *, split, (void *_self, const char * delim));
 	O_METHOD (String, split);					\
 
 #define String_Attr							\
-	Object_Attr;							\
+	RefObject_Attr;							\
 	char * data;							\
 	int length, max
 
-O_CLASS(String, Object);
+O_CLASS(String, RefObject);
 
 #endif

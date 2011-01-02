@@ -35,10 +35,10 @@ main (int argc, char **argv)
   else
     filename = NULL;
 
-  file_path = analyze_file_name (filename);
-  base_dir = determine_base_dir (file_path);
+  file_path = O_CALL (analyze_file_name (filename), retain);
+  base_dir = O_CALL (determine_base_dir (file_path), retain);
 
-  path = O_CALL_CLASS (List (), new, 8, String ());
+  path = O_CALL_CLASS (RefList (), new, 8, String ());
   O_CALL (path, append, base_dir);
 
   try_search_path (O_CALL_CLASS (String (), new, "%s", filename));

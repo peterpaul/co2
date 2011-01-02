@@ -10,7 +10,7 @@
 
 const char * filename;
 
-struct List * path;
+struct RefList * path;
 
 void new_input(struct String *);
 %}
