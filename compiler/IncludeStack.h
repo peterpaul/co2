@@ -3,14 +3,12 @@
 
 #include "RefObject.h"
 
-O_METHOD_DEF (IncludeStack, void, switch_back, (void *));
-
 #define IncludeStackClass_Attr			\
-  RefObjectClass_Attr;				\
-  O_METHOD (IncludeStack, switch_back)
+  RefObjectClass_Attr
 
 #define IncludeStack_Attr			\
   RefObject_Attr;				\
+  struct IncludeStack * parent;			\
   unsigned current_line;			\
   const char * current_file;			\
   YY_BUFFER_STATE buffer_state
@@ -20,5 +18,6 @@ O_CLASS (IncludeStack, RefObject);
 extern const char * input_file_name;
 extern int linenumber;
 
+extern struct IncludeStack * include_stack;
 
 #endif /* INCLUDESTACK_H */

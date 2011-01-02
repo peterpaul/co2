@@ -9,7 +9,6 @@
 const char * filename;
 
 struct List * path;
-struct RefList *include_stack = NULL;
 
 void new_input(const char *);
 %}
@@ -120,14 +119,18 @@ int yywrap()
 	yy_delete_buffer(YY_CURRENT_BUFFER);
 	fclose(yyin);
 
-	if (!include_stack || include_stack->length == 0) {
-		O_BRANCH_CALL(include_stack, delete);
-		include_stack = NULL;
+	if (!include_stack) {
 		yytext = "";
 		return 1;
 	}
-	struct IncludeStack * item = O_CALL(include_stack, remove);
-	O_CALL(item, switch_back);
+	/* The input_file_name is only allocated for include files, and not for
+	   the original input file. Therefore this call to free is after the
+	   check on the include level. */
+	free((char *) input_file_name);
+	yy_switch_to_buffer(include_stack->buffer_state);
+	linenumber = include_stack->current_line;
+	input_file_name = include_stack->current_file;
+	O_CALL(include_stack, delete);
 	return 0;
 }
 
@@ -155,11 +158,7 @@ fprintf(stderr, "trying: %s\n", full_path->data);
 // char * strdup(const char *);
 void new_input(const char * file_name)
 {
-	if (!include_stack) {
-		include_stack = O_CALL_CLASS(RefList(), new, 8, IncludeStack());
-	}
-	O_CALL(include_stack, append, 
-		O_CALL_CLASS(IncludeStack(), new, linenumber, input_file_name, YY_CURRENT_BUFFER));
+	O_CALL_CLASS(IncludeStack(), new, linenumber, input_file_name, YY_CURRENT_BUFFER);
 	try_search_path(file_name);
 	input_file_name = strdup(file_name);
 	linenumber = 1;
