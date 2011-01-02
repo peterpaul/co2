@@ -39,7 +39,7 @@ _LIBOBJS	=$(LIBOBJS:%.o=$(BINDIR)/%.o)
 
 .DEFAULT: all
 
-all::		$(BINS)
+all::		$(BINS) $(_LIBOBJS) $(OBJS) $(GEN)
 
 clean::
 		$(RM) -f $(BINS) $(OBJS) $(_LIBOBJS) $(GEN) $(DEPENDENCIES)
