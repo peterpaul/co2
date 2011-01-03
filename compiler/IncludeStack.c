@@ -15,7 +15,7 @@ O_IMPLEMENT (IncludeStack, void *, ctor, (void *_self, va_list * app))
   self->parent = include_stack;
   include_stack = self;
   self->current_line = va_arg (*app, unsigned);
-  self->current_file = O_BRANCH_GET_ARG (String);
+  self->current_file = O_RETAIN_ARG (File);
   self->buffer_state = va_arg (*app, YY_BUFFER_STATE);
   return self;
 }
@@ -23,6 +23,7 @@ O_IMPLEMENT (IncludeStack, void *, ctor, (void *_self, va_list * app))
 O_IMPLEMENT (IncludeStack, void *, dtor, (void *_self))
 {
   struct IncludeStack *self = O_CAST (_self, IncludeStack ());
+  O_CALL (self->current_file, release);
   include_stack = self->parent;
   return O_SUPER->dtor (self);
 }

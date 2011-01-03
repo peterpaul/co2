@@ -29,14 +29,22 @@ O_IMPLEMENT (File, void *, ctor, (void *_self, va_list * app))
 {
   struct File *self = O_CAST (_self, File ());
   self = O_SUPER->ctor (self, app);
-  self->declarations = O_RETAIN_ARG (RefList);
+  self->name = O_RETAIN_ARG (String);
+  self->absolute_path = O_RETAIN_ARG (String);
+  self->declarations = O_CALL_CLASS (RefList (), new, 8, Declaration ());
+  self->declarations = O_CALL (self->declarations, retain);
+  self->file_dependencies = O_CALL_CLASS (RefList (), new, 8, File ());
+  self->file_dependencies = O_CALL (self->file_dependencies, retain);
   return self;
 }
 
 O_IMPLEMENT (File, void *, dtor, (void *_self))
 {
   struct File *self = O_CAST (_self, File ());
+  O_CALL (self->name, release);
+  O_CALL (self->absolute_path, release);
   O_CALL (self->declarations, release);
+  O_CALL (self->file_dependencies, release);
   return O_SUPER->dtor (self);
 }
 

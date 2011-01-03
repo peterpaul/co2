@@ -8,8 +8,6 @@
 
 extern FILE *out;
 
-extern const char *filename;
-
 extern struct String *base_dir;
 extern struct String *file_path;
 

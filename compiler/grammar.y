@@ -1,4 +1,5 @@
 %{
+#include "Compiler.h"
   /* Declarations */
 #include "ArgumentDeclaration.h"
 #include "ClassDeclaration.h"
@@ -51,7 +52,6 @@
 #include "Token.h"
 
   extern char *yytext;
-  extern struct File * parsed_file;
   extern void yyerror(const char *);
   extern int yywrap(void);
   extern void VariableDeclaration_set_type(void *_var, va_list *app);
@@ -110,7 +110,6 @@
 %token <token> VOID
 %token <token> WHILE
 
-%type	<file>		input
  /* Declarations */
 %type	<declaration>	class_declaration
 %type	<declaration>	class_header
@@ -199,11 +198,15 @@
 %%
 
 input
-:	declaration_list
+:	global_declaration_list
+;
+
+global_declaration_list
+:	global_declaration_list declaration_list_content
 {
-  $$ = O_CALL_CLASS(File(), new, $1);
-  parsed_file = $$;
+  O_CALL (current_file->declarations, merge, $2);
 }
+|	/* empty */
 ;
 
 declaration_list

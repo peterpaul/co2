@@ -2,6 +2,7 @@
 #define INCLUDESTACK_H
 
 #include "RefObject.h"
+#include "File.h"
 
 #define IncludeStackClass_Attr			\
   RefObjectClass_Attr
@@ -10,7 +11,7 @@
   RefObject_Attr;				\
   struct IncludeStack * parent;			\
   unsigned current_line;			\
-  struct String * current_file;			\
+  struct File * current_file;			\
   YY_BUFFER_STATE buffer_state
 
 O_CLASS (IncludeStack, RefObject);

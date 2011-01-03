@@ -3,6 +3,7 @@
 #include <stdarg.h>
 #include <assert.h>
 
+#include "Compiler.h"
 #include "error.h"
 #include "io.h"
 
@@ -18,9 +19,9 @@ write_error_message (const struct Token *token, const char *type,  const char *m
     {
       result += fprintf (stderr, "%s:%d:%s: ", token->file->data, token->line, type);
     }
-  else if (filename != NULL)
+  else if (current_file->name != NULL)
     {
-      result += fprintf (stderr, "%s:0:%s: ", filename, type);
+      result += fprintf (stderr, "%s:0:%s: ", current_file->name->data, type);
     }
   else
     {

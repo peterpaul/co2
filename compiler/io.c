@@ -56,23 +56,6 @@ determine_base_dir (struct String *path)
 }
 
 FILE *
-open_input (const char *_filename)
-{
-  FILE *in;
-  if (_filename)
-    {
-      filename = _filename;
-      in = fopen (filename, "r");
-    }
-  else
-    {
-      filename = "<stdin>";
-      in = stdin;
-    }
-  return in;
-}
-
-FILE *
 open_output (const char *filename)
 {
   if (filename)

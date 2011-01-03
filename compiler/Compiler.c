@@ -1,15 +1,17 @@
+#include "Compiler.h"
 #include "RefList.h"
 #include "grammar.tab.h"
 #include "RefObject.h"
 #include "Declaration.h"
-#include "File.h"
 #include "io.h"
 #include "error.h"
 
 extern int parse (void);
-struct File *parsed_file = NULL;
 
-void try_search_path(struct String *);
+struct File *main_file = NULL;
+struct File *current_file = NULL;
+
+struct File * try_search_path(struct String *);
 
 void
 create_release_pool ()
@@ -41,24 +43,25 @@ main (int argc, char **argv)
   path = O_CALL_CLASS (RefList (), new, 8, String ());
   O_CALL (path, append, base_dir);
 
-  try_search_path (O_CALL_CLASS (String (), new, "%s", filename));
+  main_file = try_search_path (O_CALL_CLASS (String (), new, "%s", filename));
+  current_file = O_CALL (main_file, retain);
 
   /* syntax analysis */
   parse ();
-  if (parsed_file == NULL || errors != 0)
+  if (main_file == NULL || errors != 0)
     {
       delete_release_pool ();
       return 1;
     }
   /* semantic analysis */
-  O_CALL (parsed_file, type_check);
+  O_CALL (main_file, type_check);
   if (errors != 0)
     {
       delete_release_pool ();
       return 1;
     }
   /* optimization */
-  O_CALL (parsed_file, optimize);
+  O_CALL (main_file, optimize);
   if (errors != 0)
     {
       delete_release_pool ();
@@ -69,7 +72,9 @@ main (int argc, char **argv)
     open_output (argv[2]);
   else
     open_output (NULL);
-  O_CALL (parsed_file, generate);
+  O_CALL (main_file, generate);
+
+  O_CALL (main_file, release);
 
   delete_release_pool ();
   return errors;

@@ -10,8 +10,13 @@ O_IMPLEMENT (Token, void *, ctor, (void *_self, va_list * app))
   self->name = O_CALL_CLASS (String (), new, "%s", va_arg (*app, char *));
   O_CALL (self->name, retain);
   self->type = va_arg (*app, int);
-  self->file = O_CALL_CLASS (String (), new, "%s", va_arg (*app, char *));
+  struct String * file = O_GET_ARG (String);
+  self->file = O_CALL_CLASS (String (), new, "%s", file->data);
   O_CALL (self->file, retain);
+  /* TODO: should eventually be:
+   *
+   * self->file = O_RETAIN_ARG (String);
+   */
   self->line = va_arg (*app, int);
   return self;
 }
