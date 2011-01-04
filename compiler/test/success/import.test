@@ -2,6 +2,7 @@
 ["stdio.h"] int printf(char * format, ...);
 
 include MyObject
+include MyObject
 
 int main(int argc, char[][] argv)
 {

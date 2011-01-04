@@ -6,6 +6,17 @@
 
 #define O_SUPER CompileObject()
 
+struct Hash * file_hash_map = NULL;
+
+struct Hash * get_hash_map ()
+{
+  if (!file_hash_map)
+    {
+      file_hash_map = O_CALL_CLASS (Hash (), new);
+    }
+  return file_hash_map;
+}
+
 static void
 type_check (void *_declaration)
 {

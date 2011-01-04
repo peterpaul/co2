@@ -2,6 +2,7 @@
 #define File_H
 
 #include "CompileObject.h"
+#include "Hash.h"
 
 #define FileClass_Attr				\
   CompileObjectClass_Attr
@@ -14,5 +15,7 @@
   struct RefList * declarations
 
 O_CLASS (File, CompileObject);
+
+struct Hash * get_hash_map ();
 
 #endif /* File_H */

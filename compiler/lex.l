@@ -10,6 +10,9 @@
 #include "error.h"
 #include <limits.h>
 #include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 struct RefList * path;
 
@@ -133,14 +136,39 @@ int yywrap()
 	return 0;
 }
 
+/**
+ * Checks whether file already exists in the hash map.
+ * When it already exists, this function deletes file, and return NULL. If
+ * the file doesn't exist, the file is added to the hash map, opened for
+ * reading (yyin) and is returned.
+ *
+ * @param file The file to validate.
+ * @return file when the file has not been parsed yet, NULL otherwise
+ */
+struct File * validate_file(struct File * file)
+{
+	struct File * existing_file = O_CALL (get_hash_map (), get, file->absolute_path->data);
+	if (existing_file)
+	{
+		printf ("skipping already parsed file: %s\n", file->absolute_path->data);
+		O_CALL (file, delete);
+		return NULL;
+	}
+	O_CALL (get_hash_map (), add, file->absolute_path->data, file);
+	yyin = fopen (file->absolute_path->data, "r");
+	return file;
+}
+
 struct File * try_absolute_path(struct String * file_name, struct String * _absolute_path)
 {
-	char * _real_path = realpath(_absolute_path->data, NULL);
+	FILE * fp;
+	struct stat st;
+	char * _real_path = realpath (_absolute_path->data, NULL);
 	struct String * absolute_path = O_CALL_CLASS (String (), new, "%s", _real_path);
 	free (_real_path);
-	fprintf(stderr, "trying: %s\n", absolute_path->data);
-	if (absolute_path->data && (yyin = fopen(absolute_path->data, "r")) != 0) {
-		fprintf(stderr, "Found file: %s\n", absolute_path->data);
+	fprintf (stderr, "trying: %s\n", absolute_path->data);
+	if (absolute_path->data && stat (absolute_path->data, &st) == 0) {
+		fprintf (stderr, "Found file: %s\n", absolute_path->data);
 		return O_CALL_CLASS (File (), new, file_name, absolute_path);
 	}
 	O_CALL (absolute_path, delete);
@@ -157,13 +185,13 @@ struct File * try_search_path(struct String * file_name)
 		O_CALL(full_path, append_str, "/%s.%s", file_name->data, "inc");
 		if ((file = try_absolute_path (file_name, full_path))) {
 			O_CALL(full_path, delete);
-			return file;
+			return validate_file (file);
 		}
 		O_CALL(full_path, delete);
 	}
 
 	if ((file = try_absolute_path (file_name, file_name))) {
-		return file;
+		return validate_file (file);
 	}
 	struct Token * token = O_CALL_CLASS(Token(), new, yytext, IDENTIFIER, current_file, linenumber);
 	error(token, "cannot open '%s'\n", file_name->data);
@@ -175,10 +203,14 @@ struct File * try_search_path(struct String * file_name)
 // char * strdup(const char *);
 void new_input(struct String * file_name)
 {
-	O_CALL_CLASS(IncludeStack(), new, linenumber, current_file, YY_CURRENT_BUFFER);
-	current_file = try_search_path(file_name);
-	O_CALL (include_stack->current_file->file_dependencies, append, current_file);
-	linenumber = 1;
-	yy_switch_to_buffer(yy_create_buffer(yyin, YY_BUF_SIZE));
+	struct File * new_file = try_search_path(file_name);
+	if (new_file) {
+		O_CALL_CLASS(IncludeStack(), new, linenumber, current_file, YY_CURRENT_BUFFER);
+		current_file = new_file;
+		O_CALL (include_stack->current_file->file_dependencies, append, current_file);
+		linenumber = 1;
+		yy_switch_to_buffer(yy_create_buffer(yyin, YY_BUF_SIZE));
+	}
 	BEGIN(INITIAL);
+	yytext = "";
 }
