@@ -13,10 +13,7 @@ extern struct String *file_path;
 
 extern struct RefList *path;
 
-FILE *open_input (const char *filename);
 FILE *open_output (const char *filename);
-
-extern struct RefList *include_stack;
 
 /**
  * Analyzes the filename, and tries to get the full path of the filename

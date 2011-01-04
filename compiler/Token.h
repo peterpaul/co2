@@ -2,7 +2,9 @@
 #define TOKEN_H
 
 #include "CompileObject.h"
+#include "File.h"
 #include "String.h"
+#include "error.h"
 
 O_METHOD_DEF (Token, void *, ctor_from_token,
 	      (void *_self, va_list * app));
@@ -16,7 +18,7 @@ O_METHOD_DEF (Token, void *, ctor_from_token,
   CompileObject_Attr;				\
   struct String * name;				\
   int type;					\
-  struct String * file;				\
+  struct File * file;				\
   int line
 
 O_CLASS (Token, CompileObject);

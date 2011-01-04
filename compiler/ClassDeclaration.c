@@ -34,6 +34,7 @@ O_IMPLEMENT (ClassDeclaration, void *, dtor, (void *_self))
   O_BRANCH_CALL (self->interfaces, release);
   O_BRANCH_CALL (self->members, release);
   O_CALL (self->member_scope, delete);
+  return O_SUPER->dtor (self);  
 }
 
 static int
@@ -315,7 +316,6 @@ ClassDeclaration_generate_method_implementation (void *_method_decl,
     {
       fprintf (out, "va_list ap;\n");
       fprintf (out, "va_start (ap, ");
-      struct ArgumentDeclaration *arg_decl;
       if (method_decl->formal_arguments->length == 1)
 	{
 	  fprintf (out, "_self");

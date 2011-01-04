@@ -41,6 +41,7 @@ O_IMPLEMENT (File, void *, ctor, (void *_self, va_list * app))
 O_IMPLEMENT (File, void *, dtor, (void *_self))
 {
   struct File *self = O_CAST (_self, File ());
+  printf ("deleting File: %s\n", self->name->data);
   O_CALL (self->name, release);
   O_CALL (self->absolute_path, release);
   O_CALL (self->declarations, release);

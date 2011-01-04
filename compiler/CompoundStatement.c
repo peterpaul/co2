@@ -1,4 +1,5 @@
 #include "CompoundStatement.h"
+#include "Declaration.h"
 #include "io.h"
 
 #define O_SUPER Statement()

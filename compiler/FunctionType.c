@@ -87,6 +87,7 @@ O_IMPLEMENT (FunctionType, void *, dtor, (void *_self))
   struct FunctionType *self = O_CAST (_self, FunctionType ());
   O_CALL (self->return_type, release);
   O_CALL (self->parameters, release);
+  O_BRANCH_CALL (self->generated_name, release);
   return O_SUPER->dtor (self);
 }
 
@@ -150,6 +151,7 @@ O_IMPLEMENT (FunctionType, void, generate, (void *_self))
 	O_CALL_CLASS (TokenGenerator (), new);
       struct Token *token = O_CALL (self, get_token);
       self->generated_name = O_CALL (generator, create, token);
+      O_CALL (self->generated_name, retain);
       bool first_arg = true;
       fprintf (out, "typedef ");
       O_CALL (self->return_type, generate);

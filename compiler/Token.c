@@ -10,13 +10,7 @@ O_IMPLEMENT (Token, void *, ctor, (void *_self, va_list * app))
   self->name = O_CALL_CLASS (String (), new, "%s", va_arg (*app, char *));
   O_CALL (self->name, retain);
   self->type = va_arg (*app, int);
-  struct String * file = O_GET_ARG (String);
-  self->file = O_CALL_CLASS (String (), new, "%s", file->data);
-  O_CALL (self->file, retain);
-  /* TODO: should eventually be:
-   *
-   * self->file = O_RETAIN_ARG (String);
-   */
+  self->file = O_GET_ARG (File); // don't retain, this is a weak reference
   self->line = va_arg (*app, int);
   return self;
 }
@@ -29,12 +23,7 @@ O_IMPLEMENT (Token, void *, ctor_from_token, (void *_self, va_list * app))
   self->name = O_CALL_CLASS (String (), new, "%s", va_arg (*app, char *));
   O_CALL (self->name, retain);
   self->type = va_arg (*app, int);
-  self->file = O_CALL_CLASS (String (), new, "%s", base->file->data);
-  O_CALL (self->file, retain);
-  /* TODO: should eventually be:
-   *
-   * self->file = O_CALL (base->file, retain);
-   */
+  self->file = base->file; // don't retain, this is a weak reference
   self->line = base->line;
   return self;
 }
@@ -43,7 +32,7 @@ O_IMPLEMENT (Token, void *, dtor, (void *_self))
 {
   struct Token *self = O_CAST (_self, Token ());
   O_CALL (self->name, release);
-  O_CALL (self->file, release);
+  return O_SUPER->dtor (self);  
 }
 
 O_IMPLEMENT (Token, void, generate, (void *_self))

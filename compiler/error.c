@@ -17,7 +17,7 @@ write_error_message (const struct Token *token, const char *type,  const char *m
   int result = 0;
   if (token)
     {
-      result += fprintf (stderr, "%s:%d:%s: ", token->file->data, token->line, type);
+      result += fprintf (stderr, "%s:%d:%s: ", token->file->name->data, token->line, type);
     }
   else if (current_file->name != NULL)
     {

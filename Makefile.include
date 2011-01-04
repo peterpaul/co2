@@ -11,7 +11,7 @@ DEBUGFLG	= -g3 -DO_DEBUG
 ANSIFLGS	=
 #ANSIFLGS	= -ansi -pedantic
 
-OPTFLAGS	= -O0
+OPTFLAGS	= -O0 -Wall
 #OPTFLAGS	= -O9 -march=i686 -ffast-math -funroll-loops -fomit-frame-pointer
 #OPTFLAGS	= -O9 -mfpmath=sse -ffast-math -funroll-loops -fomit-frame-pointer
 #OPTFLAGS	= -O2

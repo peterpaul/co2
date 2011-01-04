@@ -7,6 +7,7 @@
 #include "String.h"
 #include "List.h"
 #include "File.h"
+#include "error.h"
 #include <limits.h>
 #include <stdlib.h>
 
@@ -58,63 +59,63 @@ STRING_CONST	\"({CHAR_SYMBOL}|\')*\"
 <INCLUDE>[ \t]*		/* eat the whitespace */
 <INCLUDE>[^ \t\n]+	{ new_input (O_CALL_CLASS (String (), new, "%s", yytext)); }
 "catch"		return CATCH;
-"char"		yylval.token = O_CALL_CLASS(Token(), new, yytext, CHAR, current_file->name, linenumber); return yylval.token->type;
+"char"		yylval.token = O_CALL_CLASS(Token(), new, yytext, CHAR, current_file, linenumber); return yylval.token->type;
 "class"		return CLASS;
 "delete"	return DELETE;
 "do"		return DO;
 "else"		return ELSE;
 "finally"	return FINALLY;
-"float"		yylval.token = O_CALL_CLASS(Token(), new, yytext, FLOAT, current_file->name, linenumber); return yylval.token->type;
+"float"		yylval.token = O_CALL_CLASS(Token(), new, yytext, FLOAT, current_file, linenumber); return yylval.token->type;
 "for"		return FOR;
 "if"		return IF;
 "import"	return IMPORT;
-"int"		yylval.token = O_CALL_CLASS(Token(), new, yytext, INT, current_file->name, linenumber); return yylval.token->type;
+"int"		yylval.token = O_CALL_CLASS(Token(), new, yytext, INT, current_file, linenumber); return yylval.token->type;
 "interface"	return INTERFACE;
 "new"		return NEW;
-"null"		yylval.token = O_CALL_CLASS(Token(), new, yytext, _NULL, current_file->name, linenumber); return yylval.token->type;
+"null"		yylval.token = O_CALL_CLASS(Token(), new, yytext, _NULL, current_file, linenumber); return yylval.token->type;
 "package"	return PACKAGE;
 "return"	return RETURN;
-"self"		yylval.token = O_CALL_CLASS(Token(), new, yytext, SELF, current_file->name, linenumber); return yylval.token->type;
+"self"		yylval.token = O_CALL_CLASS(Token(), new, yytext, SELF, current_file, linenumber); return yylval.token->type;
 "sizeof"	return SIZEOF;
-"super"		yylval.token = O_CALL_CLASS(Token(), new, yytext, SUPER, current_file->name, linenumber); return yylval.token->type;
+"super"		yylval.token = O_CALL_CLASS(Token(), new, yytext, SUPER, current_file, linenumber); return yylval.token->type;
 "throw"		return THROW;
 "try"		return TRY;
-"unsigned"	yylval.token = O_CALL_CLASS(Token(), new, yytext, UNSIGNED, current_file->name, linenumber); return yylval.token->type;
+"unsigned"	yylval.token = O_CALL_CLASS(Token(), new, yytext, UNSIGNED, current_file, linenumber); return yylval.token->type;
 "va_arg"	return GET_VA_ARG;
-"va_list"	yylval.token = O_CALL_CLASS(Token(), new, yytext, VA_LIST, current_file->name, linenumber); return yylval.token->type;
-"void"		yylval.token = O_CALL_CLASS(Token(), new, yytext, VOID, current_file->name, linenumber); return yylval.token->type;
+"va_list"	yylval.token = O_CALL_CLASS(Token(), new, yytext, VA_LIST, current_file, linenumber); return yylval.token->type;
+"void"		yylval.token = O_CALL_CLASS(Token(), new, yytext, VOID, current_file, linenumber); return yylval.token->type;
 "while"		return WHILE;
-"..."		yylval.token = O_CALL_CLASS(Token(), new, yytext, VA_ARG, current_file->name, linenumber); return yylval.token->type;
-"&&"		yylval.token = O_CALL_CLASS(Token(), new, yytext, AND, current_file->name, linenumber); return yylval.token->type;
-"||"		yylval.token = O_CALL_CLASS(Token(), new, yytext, OR, current_file->name, linenumber); return yylval.token->type;
-"=="		yylval.token = O_CALL_CLASS(Token(), new, yytext, EQ, current_file->name, linenumber); return yylval.token->type;
-"!="		yylval.token = O_CALL_CLASS(Token(), new, yytext, NEQ, current_file->name, linenumber); return yylval.token->type;
-"##"		yylval.token = O_CALL_CLASS(Token(), new, yytext, XOR, current_file->name, linenumber); return yylval.token->type;
-"<="		yylval.token = O_CALL_CLASS(Token(), new, yytext, LEQ, current_file->name, linenumber); return yylval.token->type;
-">="		yylval.token = O_CALL_CLASS(Token(), new, yytext, GEQ, current_file->name, linenumber); return yylval.token->type;
-">>"		yylval.token = O_CALL_CLASS(Token(), new, yytext, SHIFTR, current_file->name, linenumber); return yylval.token->type;
-"<<"		yylval.token = O_CALL_CLASS(Token(), new, yytext, SHIFTL, current_file->name, linenumber); return yylval.token->type;
-"+="		yylval.token = O_CALL_CLASS(Token(), new, yytext, INCREASE, current_file->name, linenumber); return yylval.token->type;
-"-="		yylval.token = O_CALL_CLASS(Token(), new, yytext, DECREASE, current_file->name, linenumber); return yylval.token->type;
-"*="		yylval.token = O_CALL_CLASS(Token(), new, yytext, MULTIPLY, current_file->name, linenumber); return yylval.token->type;
-"/="		yylval.token = O_CALL_CLASS(Token(), new, yytext, DIVIDE, current_file->name, linenumber); return yylval.token->type;
-"^="		yylval.token = O_CALL_CLASS(Token(), new, yytext, POWER, current_file->name, linenumber); return yylval.token->type;
-"%="		yylval.token = O_CALL_CLASS(Token(), new, yytext, REMINDER, current_file->name, linenumber); return yylval.token->type;
-"&="		yylval.token = O_CALL_CLASS(Token(), new, yytext, AND_IS, current_file->name, linenumber); return yylval.token->type;
-"|="		yylval.token = O_CALL_CLASS(Token(), new, yytext, OR_IS, current_file->name, linenumber); return yylval.token->type;
-"#="		yylval.token = O_CALL_CLASS(Token(), new, yytext, XOR_IS, current_file->name, linenumber); return yylval.token->type;
-{INT_CONST}	yylval.token = O_CALL_CLASS(Token(), new, yytext, INT_CONSTANT, current_file->name, linenumber); return yylval.token->type;
-{FLOAT_CONST}	yylval.token = O_CALL_CLASS(Token(), new, yytext, FLOAT_CONSTANT, current_file->name, linenumber); return yylval.token->type;
-{IDENTIFIER}	yylval.token = O_CALL_CLASS(Token(), new, yytext, IDENTIFIER, current_file->name, linenumber); return yylval.token->type;
-{TYPE_IDENT}	yylval.token = O_CALL_CLASS(Token(), new, yytext, TYPE_IDENTIFIER, current_file->name, linenumber); return yylval.token->type;
-{MACRO_IDENT}	yylval.token = O_CALL_CLASS(Token(), new, yytext, MACRO_IDENTIFIER, current_file->name, linenumber); return yylval.token->type;
-{CHAR_CONST}	yylval.token = O_CALL_CLASS(Token(), new, yytext, CHAR_CONSTANT, current_file->name, linenumber); return yylval.token->type;
-{CHAR_CONST_ERR}  yylval.token = O_CALL_CLASS(Token(), new, yytext, CHAR_CONSTANT, current_file->name, linenumber); error(yylval.token, "invalid character constant %s", yytext); return yylval.token->type;
-{STRING_CONST}	yylval.token = O_CALL_CLASS(Token(), new, yytext, STRING_CONSTANT, current_file->name, linenumber); return yylval.token->type;
+"..."		yylval.token = O_CALL_CLASS(Token(), new, yytext, VA_ARG, current_file, linenumber); return yylval.token->type;
+"&&"		yylval.token = O_CALL_CLASS(Token(), new, yytext, AND, current_file, linenumber); return yylval.token->type;
+"||"		yylval.token = O_CALL_CLASS(Token(), new, yytext, OR, current_file, linenumber); return yylval.token->type;
+"=="		yylval.token = O_CALL_CLASS(Token(), new, yytext, EQ, current_file, linenumber); return yylval.token->type;
+"!="		yylval.token = O_CALL_CLASS(Token(), new, yytext, NEQ, current_file, linenumber); return yylval.token->type;
+"##"		yylval.token = O_CALL_CLASS(Token(), new, yytext, XOR, current_file, linenumber); return yylval.token->type;
+"<="		yylval.token = O_CALL_CLASS(Token(), new, yytext, LEQ, current_file, linenumber); return yylval.token->type;
+">="		yylval.token = O_CALL_CLASS(Token(), new, yytext, GEQ, current_file, linenumber); return yylval.token->type;
+">>"		yylval.token = O_CALL_CLASS(Token(), new, yytext, SHIFTR, current_file, linenumber); return yylval.token->type;
+"<<"		yylval.token = O_CALL_CLASS(Token(), new, yytext, SHIFTL, current_file, linenumber); return yylval.token->type;
+"+="		yylval.token = O_CALL_CLASS(Token(), new, yytext, INCREASE, current_file, linenumber); return yylval.token->type;
+"-="		yylval.token = O_CALL_CLASS(Token(), new, yytext, DECREASE, current_file, linenumber); return yylval.token->type;
+"*="		yylval.token = O_CALL_CLASS(Token(), new, yytext, MULTIPLY, current_file, linenumber); return yylval.token->type;
+"/="		yylval.token = O_CALL_CLASS(Token(), new, yytext, DIVIDE, current_file, linenumber); return yylval.token->type;
+"^="		yylval.token = O_CALL_CLASS(Token(), new, yytext, POWER, current_file, linenumber); return yylval.token->type;
+"%="		yylval.token = O_CALL_CLASS(Token(), new, yytext, REMINDER, current_file, linenumber); return yylval.token->type;
+"&="		yylval.token = O_CALL_CLASS(Token(), new, yytext, AND_IS, current_file, linenumber); return yylval.token->type;
+"|="		yylval.token = O_CALL_CLASS(Token(), new, yytext, OR_IS, current_file, linenumber); return yylval.token->type;
+"#="		yylval.token = O_CALL_CLASS(Token(), new, yytext, XOR_IS, current_file, linenumber); return yylval.token->type;
+{INT_CONST}	yylval.token = O_CALL_CLASS(Token(), new, yytext, INT_CONSTANT, current_file, linenumber); return yylval.token->type;
+{FLOAT_CONST}	yylval.token = O_CALL_CLASS(Token(), new, yytext, FLOAT_CONSTANT, current_file, linenumber); return yylval.token->type;
+{IDENTIFIER}	yylval.token = O_CALL_CLASS(Token(), new, yytext, IDENTIFIER, current_file, linenumber); return yylval.token->type;
+{TYPE_IDENT}	yylval.token = O_CALL_CLASS(Token(), new, yytext, TYPE_IDENTIFIER, current_file, linenumber); return yylval.token->type;
+{MACRO_IDENT}	yylval.token = O_CALL_CLASS(Token(), new, yytext, MACRO_IDENTIFIER, current_file, linenumber); return yylval.token->type;
+{CHAR_CONST}	yylval.token = O_CALL_CLASS(Token(), new, yytext, CHAR_CONSTANT, current_file, linenumber); return yylval.token->type;
+{CHAR_CONST_ERR}  yylval.token = O_CALL_CLASS(Token(), new, yytext, CHAR_CONSTANT, current_file, linenumber); error(yylval.token, "invalid character constant %s", yytext); return yylval.token->type;
+{STRING_CONST}	yylval.token = O_CALL_CLASS(Token(), new, yytext, STRING_CONSTANT, current_file, linenumber); return yylval.token->type;
 \n		linenumber++; /* count lines */
 [ \t]		/* eat whitespace */
 [\(\)\]\{\}\;\:\,]	return yytext[0]; /* no Token for these characters */
-.		yylval.token = O_CALL_CLASS(Token(), new, yytext, yytext[0], current_file->name, linenumber); return yylval.token->type;
+.		yylval.token = O_CALL_CLASS(Token(), new, yytext, yytext[0], current_file, linenumber); return yylval.token->type;
 %%
 int yywrap()
 {
@@ -164,7 +165,7 @@ struct File * try_search_path(struct String * file_name)
 	if ((file = try_absolute_path (file_name, file_name))) {
 		return file;
 	}
-	struct Token * token = O_CALL_CLASS(Token(), new, yytext, IDENTIFIER, current_file->name, linenumber);
+	struct Token * token = O_CALL_CLASS(Token(), new, yytext, IDENTIFIER, current_file, linenumber);
 	error(token, "cannot open '%s'\n", file_name->data);
 	O_CALL (token, delete);
 	exit(EXIT_FAILURE);
@@ -175,7 +176,8 @@ struct File * try_search_path(struct String * file_name)
 void new_input(struct String * file_name)
 {
 	O_CALL_CLASS(IncludeStack(), new, linenumber, current_file, YY_CURRENT_BUFFER);
-	current_file = O_CALL (try_search_path(file_name), retain);
+	current_file = try_search_path(file_name);
+	O_CALL (include_stack->current_file->file_dependencies, append, current_file);
 	linenumber = 1;
 	yy_switch_to_buffer(yy_create_buffer(yyin, YY_BUF_SIZE));
 	BEGIN(INITIAL);

@@ -2,7 +2,6 @@
 #include "IncludeStack.h"
 #include "String.h"
 
-struct String * input_file_name = NULL;
 int linenumber = 1;
 struct IncludeStack * include_stack = NULL;
 

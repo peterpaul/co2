@@ -1,5 +1,3 @@
-
-
 class ObjectA
 {
 	ObjectA(int f) {

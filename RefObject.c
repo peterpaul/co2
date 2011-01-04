@@ -15,6 +15,9 @@ O_IMPLEMENT(RefObject, void *, ctor, (void *_self, va_list * app))
 O_IMPLEMENT(RefObject, void *, dtor, (void *_self))
 {
   struct RefObject *self = O_CAST(_self, RefObject());
+#ifdef O_DEBUG
+  assertTrue (self->ref_count <= 0, "Do not delete a RefObject with references (%d) to it.", self->ref_count);
+#endif
   if (self->ref_count <= 0)
     {
       /* Remove self from auto release pool */

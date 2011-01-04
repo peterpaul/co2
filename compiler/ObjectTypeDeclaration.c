@@ -33,6 +33,7 @@ O_IMPLEMENT (ObjectTypeDeclaration, void *, dtor, (void *_self))
     O_CAST (_self, ObjectTypeDeclaration ());
   O_BRANCH_CALL (self->members, release);
   O_CALL (self->member_scope, delete);
+  return O_SUPER->dtor (self);
 }
 
 int
@@ -380,7 +381,6 @@ ObjectTypeDeclaration_generate_method_implementation (void *_method_decl,
     {
       fprintf (out, "va_list ap;\n");
       fprintf (out, "va_start (ap, ");
-      struct ArgumentDeclaration *arg_decl;
       if (method_decl->formal_arguments->length == 1)
 	{
 	  fprintf (out, "_self");

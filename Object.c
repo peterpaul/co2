@@ -132,8 +132,12 @@ O_IMPLEMENT(Object, void *, ctor, (void *_self, va_list * argp))
 O_IMPLEMENT(Object, void *, dtor, (void *_self))
 {
 	struct Object *self = o_cast(_self, Object());
+#ifdef O_DEBUG
+	memset (self, 0, self->class->size);
+#else
 	self->class = NULL;
-	return self;
+#endif
+	return NULL;
 }
 
 O_IMPLEMENT(Object, void *, new, (void *_self,...))
@@ -381,10 +385,6 @@ void o_add_class(void *_class)
 
 void *o_get_class(const char *class_name)
 {
-	if (!class_hashmap) {
-		return NULL;
-	}
-
 	unsigned long index =
 	    hash_function((unsigned char *) class_name) % CLASS_HASHMAP_SIZE;
 
