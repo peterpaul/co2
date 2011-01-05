@@ -80,6 +80,7 @@ STRING_CONST	\"({CHAR_SYMBOL}|\')*\"
 "return"	return RETURN;
 "self"		yylval.token = O_CALL_CLASS(Token(), new, yytext, SELF, current_file, linenumber); return yylval.token->type;
 "sizeof"	return SIZEOF;
+"struct"	return STRUCT;
 "super"		yylval.token = O_CALL_CLASS(Token(), new, yytext, SUPER, current_file, linenumber); return yylval.token->type;
 "throw"		return THROW;
 "try"		return TRY;

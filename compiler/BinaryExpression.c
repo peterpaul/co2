@@ -5,6 +5,7 @@
 #include "Declaration.h"
 #include "ArrayType.h"
 #include "ObjectTypeDeclaration.h"
+#include "StructDeclaration.h"
 #include "io.h"
 #include "PrimitiveType.h"
 #include "grammar.tab.h"
@@ -36,9 +37,19 @@ O_IMPLEMENT (BinaryExpression, void, generate, (void *_self))
   switch (self->operator->type)
     {
     case '.':
-      O_CALL (self->operand[0], generate);
-      fprintf (out, "->");
-      O_CALL (self->operand[1], generate_left, false);
+      {
+	struct ObjectType * type = o_cast (self->operand[0]->type, ObjectType ());
+	O_CALL (self->operand[0], generate);
+	if (o_is_of (type->decl, StructDeclaration ()))
+	  {
+	    fprintf (out, ".");
+	  }
+	else
+	  {
+	    fprintf (out, "->");
+	  }
+	O_CALL (self->operand[1], generate_left, false);
+      }
       break;
     case '[':
       O_CALL (self->operand[0], generate);

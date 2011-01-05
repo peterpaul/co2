@@ -9,6 +9,7 @@
 #include "FunctionDeclaration.h"
 #include "InterfaceDeclaration.h"
 #include "MacroDeclaration.h"
+#include "StructDeclaration.h"
 #include "VariableDeclaration.h"
   /* Statements */
 #include "CatchStatement.h"
@@ -100,6 +101,7 @@
 %token <token> SELF
 %token <token> SIZEOF
 %token <token> STRING_CONSTANT
+%token <token> STRUCT
 %token <token> SUPER
 %token <token> THROW
 %token <token> TRY
@@ -134,6 +136,8 @@
 %type	<declaration>	macro_declaration
 %type	<list>		macro_identifier_list
 %type	<list>		opt_formal_argument_list
+%type	<declaration>	struct_declaration
+%type	<list>		struct_declaration_body
 %type	<declaration>	variable_declaration_id
 %type	<list>		variable_declaration_id_list
 %type	<list>		variable_declaration_list
@@ -235,6 +239,7 @@ declaration
 {
   O_CALL(current_scope, declare, $1);
 }
+|	struct_declaration
 |	class_declaration
 |	interface_declaration
 {
@@ -389,6 +394,30 @@ formal_argument
 {
   $$ = O_CALL_CLASS(ArgumentDeclaration(), new, $2, $1);
   O_CALL(current_scope, declare, $$);
+}
+;
+
+struct_declaration
+:	STRUCT TYPE_IDENTIFIER
+{
+  $<scope>$ = O_CALL_CLASS (Scope (), new, STRUCT_SCOPE, $2);
+}
+'{' struct_declaration_body '}'
+{
+  O_CALL (current_scope, leave);
+  $$ = O_CALL_CLASS (StructDeclaration (), new, $2, $<scope>3, $5);
+  O_CALL (current_scope, declare, $$);
+}
+;
+
+struct_declaration_body
+:	struct_declaration_body variable_declaration_list
+{
+  O_CALL ($1, merge, $2);
+}
+|	/* empty */
+{
+  $$ = O_CALL_CLASS (RefList (), new, 8, VariableDeclaration ());
 }
 ;
 

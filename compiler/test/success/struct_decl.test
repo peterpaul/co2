@@ -1,0 +1,16 @@
+["stdio.h"] int printf(char * format, ...);
+
+struct Foo
+{
+	int bar;
+	float baz;
+}
+
+int main()
+{
+	Foo f;
+	f.bar = 1;
+	f.baz = 1.0;
+	printf ("Foo.bar = %d\nFoo.baz = %f\n", f.bar, f.baz);
+	return f.bar;	
+}

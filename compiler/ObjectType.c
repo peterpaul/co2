@@ -1,6 +1,7 @@
 #include "ObjectType.h"
 #include "Token.h"
 #include "ObjectTypeDeclaration.h"
+#include "StructDeclaration.h"
 #include "io.h"
 
 #define O_SUPER Type()
@@ -35,9 +36,17 @@ O_IMPLEMENT (ObjectType, void, type_check, (void *_self))
 O_IMPLEMENT (ObjectType, void, generate, (void *_self))
 {
   struct ObjectType *self = O_CAST (_self, ObjectType ());
-  fprintf (out, "struct ");
-  O_CALL (self->token, generate);
-  fprintf (out, "*");
+  if (o_is_of (self->decl, StructDeclaration ()))
+    {
+      fprintf (out, "struct ");
+      O_CALL (self->token, generate);
+    }
+  else
+    {
+      fprintf (out, "struct ");
+      O_CALL (self->token, generate);
+      fprintf (out, "*");
+    }
 }
 
 O_IMPLEMENT (ObjectType, struct Token *, get_token, (void *_self))
