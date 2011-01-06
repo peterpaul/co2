@@ -1,0 +1,19 @@
+typedef Boolean = int;
+
+["vector.h"] {
+	struct vec
+	{
+		int bar, baz;
+	}
+
+	typedef Vec = struct vec;
+}
+
+int main()
+{
+	Boolean a = 5;
+	Vec b;
+	b.bar = 1;
+	b.baz = 2;
+	return 0;
+}

@@ -2,6 +2,7 @@
 #include "Token.h"
 #include "ObjectTypeDeclaration.h"
 #include "StructDeclaration.h"
+#include "TypeDeclaration.h"
 #include "io.h"
 
 #define O_SUPER Type()
@@ -41,6 +42,11 @@ O_IMPLEMENT (ObjectType, void, generate, (void *_self))
       fprintf (out, "struct ");
       O_CALL (self->token, generate);
     }
+  else if (o_is_of (self->decl, TypeDeclaration ()))
+    {
+      struct TypeDeclaration * decl = O_CAST (self->decl, TypeDeclaration ());
+      O_CALL (decl->type, generate);
+    }
   else
     {
       fprintf (out, "struct ");
@@ -66,8 +72,16 @@ O_IMPLEMENT (ObjectType, bool, is_compatible, (void *_self, void *_other))
   struct ObjectType *self = O_CAST (_self, ObjectType ());
   if (O_SUPER->is_compatible (self, _other))
     {
-      struct ObjectType *other = O_CAST (_other, ObjectType ());
-      return O_CALL(self->decl, is_compatible, other->decl);
+      if (o_is_of (_other, ObjectType ()))
+	{
+	  struct ObjectType *other = O_CAST (_other, ObjectType ());
+	  return O_CALL(self->decl, is_compatible, other->decl);
+	}
+      else
+	{
+	  /* due to TypeDeclaration */
+	  return true;
+	}
     }
   else
     {

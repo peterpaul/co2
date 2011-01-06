@@ -10,6 +10,7 @@
 #include "InterfaceDeclaration.h"
 #include "MacroDeclaration.h"
 #include "StructDeclaration.h"
+#include "TypeDeclaration.h"
 #include "VariableDeclaration.h"
   /* Statements */
 #include "CatchStatement.h"
@@ -105,6 +106,7 @@
 %token <token> SUPER
 %token <token> THROW
 %token <token> TRY
+%token <token> TYPEDEF
 %token <token> TYPE_IDENTIFIER
 %token <token> UNSIGNED
 %token <token> VA_ARG /* '...' */
@@ -138,6 +140,7 @@
 %type	<list>		opt_formal_argument_list
 %type	<declaration>	struct_declaration
 %type	<list>		struct_declaration_body
+%type	<declaration>	type_declaration
 %type	<declaration>	variable_declaration_id
 %type	<list>		variable_declaration_id_list
 %type	<list>		variable_declaration_list
@@ -257,6 +260,31 @@ declaration
 {
   O_CALL(current_scope, declare, $1);
 }
+|	type_declaration
+{
+  O_CALL(current_scope, declare, $1);
+}
+;
+
+type_declaration
+:	TYPEDEF TYPE_IDENTIFIER '=' type ';'
+{
+  $$ = O_CALL_CLASS (TypeDeclaration (), new, $2, $4, false);
+}
+|	TYPEDEF TYPE_IDENTIFIER '=' STRUCT type ';'
+{
+  $$ = O_CALL_CLASS (TypeDeclaration (), new, $2, $5, true);
+}
+|	TYPEDEF TYPE_IDENTIFIER '=' IDENTIFIER ';'
+{
+  struct Type * type = O_CALL_CLASS (PrimitiveType (), new, $4);
+  $$ = O_CALL_CLASS (TypeDeclaration (), new, $2, type, false);
+}
+|	TYPEDEF TYPE_IDENTIFIER '=' STRUCT IDENTIFIER ';'
+{
+  struct Type * type = O_CALL_CLASS (PrimitiveType (), new, $5);
+  $$ = O_CALL_CLASS (TypeDeclaration (), new, $2, type, true);
+}
 ;
 
 definition_declaration
@@ -281,14 +309,19 @@ definition_list
 ;
 
 definition
-:	variable_declaration_list
-|	function_header ';'
+:	function_header ';'
 {
   O_CALL(current_scope, leave);
   O_CALL(current_scope, declare, $1);
   $$ = O_CALL_CLASS(RefList(), new, 8, Declaration());
   O_CALL($$, append, $1);
 }
+|	declaration 
+{
+  $$ = O_CALL_CLASS(RefList(), new, 8, Declaration()); 
+  O_CALL($$, append, $1); 
+}
+|	variable_declaration_list
 ;
 
 header_file
@@ -399,6 +432,16 @@ formal_argument
 
 struct_declaration
 :	STRUCT TYPE_IDENTIFIER
+{
+  $<scope>$ = O_CALL_CLASS (Scope (), new, STRUCT_SCOPE, $2);
+}
+'{' struct_declaration_body '}'
+{
+  O_CALL (current_scope, leave);
+  $$ = O_CALL_CLASS (StructDeclaration (), new, $2, $<scope>3, $5);
+  O_CALL (current_scope, declare, $$);
+}
+|	STRUCT IDENTIFIER
 {
   $<scope>$ = O_CALL_CLASS (Scope (), new, STRUCT_SCOPE, $2);
 }

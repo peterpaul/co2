@@ -28,6 +28,12 @@ write_error_message (const struct Token *token, const char *type,  const char *m
       result += fprintf (stderr, "<null>:0:%s: ", type);
     }
   result += vfprintf (stderr, msg, *app);
+
+#ifdef O_ABORT
+  char * a = NULL;
+  *a = '.';
+#endif
+
   return result;
 }
 

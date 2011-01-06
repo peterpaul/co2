@@ -1,6 +1,8 @@
 #include "Type.h"
 #include "ArrayType.h"
 #include "PrimitiveType.h"
+#include "ObjectType.h"
+#include "TypeDeclaration.h"
 #include "Token.h"
 #include "grammar.tab.h"
 
@@ -16,8 +18,22 @@ O_IMPLEMENT (Type, void *, ctor, (void *_self, va_list * app))
 O_IMPLEMENT (Type, void *, dtor, (void *_self))
 {
   struct Type *self = O_CAST (_self, Type ());
-  /* TODO cleanup */
   return O_SUPER->dtor (self);
+}
+
+O_IMPLEMENT (Type, struct Type *, get_declared_type, (void *_self))
+{
+  struct Type *self = O_CAST (_self, Type ());
+  if (o_is_of (self, ObjectType ()))
+    {
+      struct ObjectType * o_type = O_CAST (self, ObjectType ());
+      if (o_type->decl && o_is_of (o_type->decl, TypeDeclaration ()))
+	{
+	  struct TypeDeclaration * o_type_decl = O_CAST (o_type->decl, TypeDeclaration ());
+	  return o_type_decl->type;
+	}
+    }
+  return self;
 }
 
 O_IMPLEMENT (Type, bool, is_compatible, (void *_self, void *_other))
@@ -26,7 +42,8 @@ O_IMPLEMENT (Type, bool, is_compatible, (void *_self, void *_other))
   if (_other)
     {
       struct Type *other = O_CAST (_other, Type ());
-      return o_is_a (other, self->class);
+      other = O_CALL (other, get_declared_type);
+      return o_is_a (other, O_CALL (self, get_declared_type)->class);
     }
   else
     {
@@ -91,4 +108,5 @@ O_OBJECT_METHOD (Type, is_compatible);
 O_OBJECT_METHOD (Type, assert_compatible);
 O_OBJECT_METHOD (Type, type_check);
 O_OBJECT_METHOD (Type, is_void_ptr);
+O_OBJECT_METHOD (Type, get_declared_type);
 O_END_OBJECT

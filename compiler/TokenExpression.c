@@ -67,7 +67,7 @@ O_IMPLEMENT (TokenExpression, void, type_check, (void *_self))
 	{
 	  return;
 	}
-      self->type = O_CALL (self->decl->type, retain);
+      self->type = O_CALL (O_CALL (self->decl->type, get_declared_type), retain);
       break;
     case SELF:
       {

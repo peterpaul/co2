@@ -29,8 +29,8 @@ CC_SRCS		=ArgumentDeclaration.c ArrayType.c BinaryExpression.c\
 		PrimitiveType.c RefList.c ReturnStatement.c Scope.c\
 		SizeExpression.c Statement.c StructDeclaration.c SuperExpression.c\
 		ThrowStatement.c Token.c TokenExpression.c TokenGenerator.c\
-		TryStatement.c Type.c UnaryExpression.c VarArgExpression.c\
-		VariableDeclaration.c WhileStatement.c
+		TryStatement.c Type.c TypeDeclaration.c UnaryExpression.c\
+		VarArgExpression.c VariableDeclaration.c WhileStatement.c
 LIBSRCS		=$(CC_SRCS) $(YACC_GEN_C) ${LEX_GEN_C}
 LIBHDRS		=${LIBSRCS:%.c=%.h}
 LIBOBJS		=${LIBSRCS:%.c=%.o}

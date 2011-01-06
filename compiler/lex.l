@@ -84,6 +84,7 @@ STRING_CONST	\"({CHAR_SYMBOL}|\')*\"
 "super"		yylval.token = O_CALL_CLASS(Token(), new, yytext, SUPER, current_file, linenumber); return yylval.token->type;
 "throw"		return THROW;
 "try"		return TRY;
+"typedef"	return TYPEDEF;
 "unsigned"	yylval.token = O_CALL_CLASS(Token(), new, yytext, UNSIGNED, current_file, linenumber); return yylval.token->type;
 "va_arg"	return GET_VA_ARG;
 "va_list"	yylval.token = O_CALL_CLASS(Token(), new, yytext, VA_LIST, current_file, linenumber); return yylval.token->type;
