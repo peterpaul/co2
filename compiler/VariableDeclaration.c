@@ -51,6 +51,10 @@ O_IMPLEMENT (VariableDeclaration, void, type_check, (void *_self))
   if (self->expr)
     {
       O_CALL (self->expr, type_check);
+      if (!self->expr->type)
+	{
+	  return;
+	}
       O_CALL (self->type, assert_compatible, self->expr->type);
     }
 

@@ -59,18 +59,19 @@ ClassDeclaration_generate_constructor_arguments (void *_arg)
   if (o_is_a (arg->type, ObjectType ()))
     {
       struct ObjectType *type = (struct ObjectType *) arg->type;
-      fprintf (out, " = O_BRANCH_CAST (va_arg(*app, ");
-      O_CALL (type, generate);
-      fprintf (out, "), ");
-      O_CALL (type->token, generate);
-      fprintf (out, "());\n");
+      if (o_is_of (type->decl, ClassDeclaration ()))
+	{
+	  fprintf (out, " = O_BRANCH_CAST (va_arg(*app, ");
+	  O_CALL (type, generate);
+	  fprintf (out, "), ");
+	  O_CALL (type->token, generate);
+	  fprintf (out, "());\n");
+	  return;
+	}
     }
-  else
-    {
-      fprintf (out, " = va_arg (*app, ");
-      O_CALL (arg->type, generate);
-      fprintf (out, ");\n");
-    }
+  fprintf (out, " = va_arg (*app, ");
+  O_CALL (arg->type, generate);
+  fprintf (out, ");\n");
 }
 
 static void

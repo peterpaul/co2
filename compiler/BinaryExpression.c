@@ -164,6 +164,11 @@ O_IMPLEMENT (BinaryExpression, void, type_check, (void *_self))
     {
     case '.':
       O_CALL (self->operand[0], type_check);
+      if (!o_is_of (self->operand[0]->type, ObjectType ()))
+	{
+	  error (self->operator, "Expected ObjectType\n");
+	  return;
+	}
       struct ObjectType *object_type =
 	o_cast (self->operand[0]->type, ObjectType ());
       struct ObjectTypeDeclaration *class_decl =
@@ -182,9 +187,12 @@ O_IMPLEMENT (BinaryExpression, void, type_check, (void *_self))
     default:
       O_CALL (self->operand[0], type_check);
       O_CALL (self->operand[1], type_check);
-      O_BRANCH_CALL (self->operand[0]->type, assert_compatible,
-		     self->operand[1]->type);
-      self->type = O_BRANCH_CALL (self->operand[0]->type, retain);
+      if (self->operand[1]->type)
+	{
+	  O_BRANCH_CALL (self->operand[0]->type, assert_compatible,
+			 self->operand[1]->type);
+	  self->type = O_BRANCH_CALL (self->operand[0]->type, retain);
+	}
       break;
     }
 }

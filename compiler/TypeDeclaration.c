@@ -56,9 +56,18 @@ O_IMPLEMENT(TypeDeclaration, void, generate, (void *_self))
     }
 }
 
+O_IMPLEMENT (TypeDeclaration, bool, is_compatible,
+	     (void *_self, void *_other))
+{
+  struct TypeDeclaration *self = O_CAST (_self, TypeDeclaration ());
+  /* TODO: do stuff? */
+  return true;
+}
+
 O_OBJECT(TypeDeclaration, ObjectTypeDeclaration);
 O_OBJECT_METHOD(TypeDeclaration, ctor);
 O_OBJECT_METHOD(TypeDeclaration, dtor);
 O_OBJECT_METHOD(TypeDeclaration, type_check);
 O_OBJECT_METHOD(TypeDeclaration, generate);
+O_OBJECT_METHOD(TypeDeclaration, is_compatible);
 O_END_OBJECT

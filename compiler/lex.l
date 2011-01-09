@@ -184,7 +184,7 @@ struct File * try_search_path(struct String * file_name)
 	for (i = 0; i < path->length; i++) {
 		struct String * item = (struct String *)O_CALL(path, get, i);
 		struct String * full_path = O_CALL_CLASS(String(), new, "%s", item->data);
-		O_CALL(full_path, append_str, "/%s.%s", file_name->data, "inc");
+		O_CALL(full_path, append_str, "/%s.%s", file_name->data, "c3");
 		if ((file = try_absolute_path (file_name, full_path))) {
 			O_CALL(full_path, delete);
 			return validate_file (file);

@@ -21,6 +21,10 @@ function test_separator {
 mkdir -p ${TARGET}/success > /dev/null
 mkdir -p ${TARGET}/fail > /dev/null
 
+cp ${TESTDIR}/success/*.h ${TARGET}/success
+cp ${TESTDIR}/fail/*.h ${TARGET}/fail
+
+
 test_separator
 echo "Success test-cases"
 test_separator

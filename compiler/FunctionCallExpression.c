@@ -176,6 +176,7 @@ O_IMPLEMENT (FunctionCallExpression, void, type_check_arguments, (void *_self, s
 	    O_CALL (self->actual_arguments, get, i);
 	  
 	  O_CALL (arg_expr, type_check);
+	  O_CALL (arg_type, type_check);
 	  O_CALL (arg_type, assert_compatible, arg_expr->type);
 	}
       else
