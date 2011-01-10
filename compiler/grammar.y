@@ -179,9 +179,6 @@
  /* Solve shift-reduce conflict for constructor, in combination with '(' */
 %nonassoc	CONSTRUCTX
 
- /* Solve shift-reduce conflict for casts */
-%nonassoc	CASTX
-
 %nonassoc	CATCHX
 %nonassoc	CATCH
 %nonassoc	FINALLY
@@ -197,6 +194,8 @@
 %left		<token>	'+' '-'
 %left		<token>	'*' '/' '%' '^'
 %right		<token>	'!' UNARY_MINUS UNARY_PLUS
+ /* Solve shift-reduce conflict for casts */
+%right	CASTX
 %left		<token>	'(' '[' '.'
 
 %start input
