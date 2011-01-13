@@ -28,6 +28,12 @@ not_type_filter (void *_member, va_list * app)
   return !type_filter (_member, app);;
 }
 
+O_IMPLEMENT (CompileObject, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+{
+  struct CompileObject *self = O_CAST (_self, CompileObject ());
+  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+}
+
 O_OBJECT (CompileObject, RefObject);
 O_OBJECT_METHOD (CompileObject, ctor);
 O_OBJECT_METHOD (CompileObject, dtor);

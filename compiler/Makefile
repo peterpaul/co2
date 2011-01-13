@@ -16,9 +16,11 @@ LEX_FLAGS	=--header-file=${LEX_GEN_H}
 
 GEN		= ${YACC_GEN_C} ${YACC_GEN_H} ${LEX_GEN_C} ${LEX_GEN_H}
 
-CC_SRCS		=ArgumentDeclaration.c ArrayType.c BinaryExpression.c\
+CC_SRCS		=ArgumentDeclaration.c ArrayType.c BaseCompileObjectVisitor.c\
+		BinaryExpression.c\
 		CastExpression.c CatchStatement.c ClassDeclaration.c\
-		CompileObject.c Compiler.c CompoundStatement.c\
+		CompileObject.c CompileObjectVisitor.c Compiler.c\
+		CompoundStatement.c\
 		ConstructorDeclaration.c Context.c Declaration.c DeleteStatement.c\
 		DestructorDeclaration.c DoStatement.c error.c Expression.c\
 		ExpressionStatement.c File.c ForEachStatement.c ForStatement.c\
