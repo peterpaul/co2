@@ -45,7 +45,8 @@ O_IMPLEMENT (ObjectType, void, generate, (void *_self))
   else if (o_is_of (self->decl, TypeDeclaration ()))
     {
       struct TypeDeclaration * decl = O_CAST (self->decl, TypeDeclaration ());
-      O_CALL (decl->type, generate);
+      // O_CALL (decl->type, generate);
+      O_CALL (self->token, generate);
     }
   else
     {

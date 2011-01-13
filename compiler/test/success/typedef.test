@@ -1,13 +1,11 @@
 typedef Boolean = int;
 
-["vector.h"] {
-	struct vec
-	{
-		int bar, baz;
-	}
-
-	typedef Vec = struct vec;
+struct vec
+{
+	int bar, baz;
 }
+
+typedef Vec = struct vec;
 
 int main()
 {

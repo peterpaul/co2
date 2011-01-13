@@ -171,6 +171,7 @@
 %type	<expression>	expression
 %type	<list>		opt_actual_argument_list
 %type	<token>		string_constant
+%type	<token>		identifier
 
  /* Solve shift-reduce conflict for if-else */
 %nonassoc	IFX
@@ -430,7 +431,7 @@ formal_argument
 ;
 
 struct_declaration
-:	STRUCT TYPE_IDENTIFIER
+:	STRUCT identifier
 {
   $<scope>$ = O_CALL_CLASS (Scope (), new, STRUCT_SCOPE, $2);
 }
@@ -440,16 +441,12 @@ struct_declaration
   $$ = O_CALL_CLASS (StructDeclaration (), new, $2, $<scope>3, $5);
   O_CALL (current_scope, declare, $$);
 }
-|	STRUCT IDENTIFIER
-{
-  $<scope>$ = O_CALL_CLASS (Scope (), new, STRUCT_SCOPE, $2);
-}
-'{' struct_declaration_body '}'
-{
-  O_CALL (current_scope, leave);
-  $$ = O_CALL_CLASS (StructDeclaration (), new, $2, $<scope>3, $5);
-  O_CALL (current_scope, declare, $$);
-}
+;
+
+identifier
+: TYPE_IDENTIFIER
+| IDENTIFIER
+| MACRO_IDENTIFIER
 ;
 
 struct_declaration_body

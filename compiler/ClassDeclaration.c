@@ -32,8 +32,6 @@ O_IMPLEMENT (ClassDeclaration, void *, dtor, (void *_self))
   struct ClassDeclaration *self = O_CAST (_self, ClassDeclaration ());
   O_BRANCH_CALL (self->superclass, release);
   O_BRANCH_CALL (self->interfaces, release);
-  O_BRANCH_CALL (self->members, release);
-  // O_CALL (self->member_scope, delete);
   return O_SUPER->dtor (self);  
 }
 
@@ -372,6 +370,14 @@ generate_superclass (struct ClassDeclaration *self)
 O_IMPLEMENT (ClassDeclaration, void, generate, (void *_self))
 {
   struct ClassDeclaration *self = O_CAST (_self, ClassDeclaration ());
+  // don't generate if external definition
+  if (self->include_file)
+    {
+      fprintf (out, "#include ");
+      O_CALL (self->include_file, generate);
+      fprintf (out, "\n");
+      return;
+    }
   /* filter the members */
   struct RefList *attributes =
     O_CALL (self->members, filter_args, type_filter, VariableDeclaration ());

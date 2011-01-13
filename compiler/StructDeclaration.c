@@ -1,4 +1,6 @@
 #include "StructDeclaration.h"
+#include "TypeDeclaration.h"
+#include "ObjectType.h"
 #include "Scope.h"
 #include "io.h"
 
@@ -31,8 +33,18 @@ O_IMPLEMENT (StructDeclaration, bool, is_compatible,
 	     (void *_self, void *_other))
 {
   struct StructDeclaration *self = O_CAST (_self, StructDeclaration ());
-  struct StructDeclaration *other = o_cast (_other, StructDeclaration ());
-  return self == other;
+  struct StructDeclaration *other;
+  if (o_is_of (_other, TypeDeclaration ()))
+    {
+      struct TypeDeclaration * type_decl = O_CAST (_other, TypeDeclaration ());
+      struct ObjectType * object_type = O_CAST (type_decl->type, ObjectType ());
+      other = o_cast (object_type->decl, StructDeclaration ());
+    }
+  else
+    {
+      other = o_cast (_other, StructDeclaration ());
+    }
+      return self == other;
 }
 
 static void Declaration_list_generate (void *_self)
@@ -44,6 +56,14 @@ static void Declaration_list_generate (void *_self)
 O_IMPLEMENT (StructDeclaration, void, generate, (void *_self))
 {
   struct StructDeclaration *self = O_CAST (_self, StructDeclaration ());
+  // don't generate if external definition
+  if (self->include_file)
+    {
+      fprintf (out, "#include ");
+      O_CALL (self->include_file, generate);
+      fprintf (out, "\n");
+      return;
+    }
   fprintf (out, "struct ");
   O_CALL (self->name, generate);
   fprintf (out, " {\n");
