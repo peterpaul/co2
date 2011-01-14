@@ -19,6 +19,13 @@ O_IMPLEMENT (CompoundStatement, void *, dtor, (void *_self))
   return O_SUPER->dtor (self);
 }
 
+O_IMPLEMENT (CompoundStatement, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+{
+  struct CompoundStatement *self = O_CAST (_self, CompoundStatement ());
+  O_CALL (self->body, map_args, accept, visitor);
+  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+}
+
 void
 CompoundStatement_generate_body (void *_item)
 {
@@ -55,6 +62,7 @@ O_IMPLEMENT (CompoundStatement, void, type_check, (void *_self))
 O_OBJECT (CompoundStatement, Statement);
 O_OBJECT_METHOD (CompoundStatement, ctor);
 O_OBJECT_METHOD (CompoundStatement, dtor);
+O_OBJECT_METHOD (CompoundStatement, accept);
 O_OBJECT_METHOD (CompoundStatement, generate);
 O_OBJECT_METHOD (CompoundStatement, type_check);
 O_END_OBJECT

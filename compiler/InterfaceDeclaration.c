@@ -22,7 +22,15 @@ O_IMPLEMENT (InterfaceDeclaration, void *, dtor, (void *_self))
 {
   struct InterfaceDeclaration *self = O_CAST (_self, InterfaceDeclaration ());
   O_BRANCH_CALL (self->interfaces, release);
+  O_BRANCH_CALL (self->members, release);
   return O_SUPER->dtor (self);
+}
+
+O_IMPLEMENT (InterfaceDeclaration, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+{
+  struct InterfaceDeclaration *self = O_CAST (_self, InterfaceDeclaration ());
+  O_CALL (self->members, map_args, accept, visitor);
+  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
 }
 
 static void
@@ -188,6 +196,7 @@ O_IMPLEMENT (InterfaceDeclaration, bool, is_compatible,
 O_OBJECT (InterfaceDeclaration, Declaration);
 O_OBJECT_METHOD (InterfaceDeclaration, ctor);
 O_OBJECT_METHOD (InterfaceDeclaration, dtor);
+O_OBJECT_METHOD (InterfaceDeclaration, accept);
 O_OBJECT_METHOD (InterfaceDeclaration, type_check);
 O_OBJECT_METHOD (InterfaceDeclaration, generate);
 O_OBJECT_METHOD (InterfaceDeclaration, is_compatible);

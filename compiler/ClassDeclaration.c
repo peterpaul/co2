@@ -35,6 +35,13 @@ O_IMPLEMENT (ClassDeclaration, void *, dtor, (void *_self))
   return O_SUPER->dtor (self);  
 }
 
+O_IMPLEMENT (ClassDeclaration, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+{
+  struct ClassDeclaration *self = O_CAST (_self, ClassDeclaration ());
+  O_CALL (self->members, map_args, accept, visitor);
+  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+}
+
 static int
 new_constructor_filter (void *_constructor)
 {
@@ -520,6 +527,7 @@ O_IMPLEMENT (ClassDeclaration, bool, is_compatible,
 O_OBJECT (ClassDeclaration, Declaration);
 O_OBJECT_METHOD (ClassDeclaration, ctor);
 O_OBJECT_METHOD (ClassDeclaration, dtor);
+O_OBJECT_METHOD (ClassDeclaration, accept);
 O_OBJECT_METHOD (ClassDeclaration, generate);
 O_OBJECT_METHOD (ClassDeclaration, type_check);
 O_OBJECT_METHOD (ClassDeclaration, is_compatible);

@@ -5,6 +5,7 @@
 #include "Declaration.h"
 #include "io.h"
 #include "error.h"
+#include "HelloWorldVisitor.h"
 
 extern int parse (void);
 
@@ -53,6 +54,10 @@ main (int argc, char **argv)
       delete_release_pool ();
       return 1;
     }
+
+  struct CompileObjectVisitor * visitor = O_CALL_CLASS (HelloWorldVisitor (), new);
+  O_CALL (main_file, accept, visitor);
+
   /* semantic analysis */
   O_CALL (main_file, type_check);
   if (errors != 0)

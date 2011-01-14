@@ -91,6 +91,14 @@ O_IMPLEMENT (FunctionType, void *, dtor, (void *_self))
   return O_SUPER->dtor (self);
 }
 
+O_IMPLEMENT (FunctionType, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+{
+  struct FunctionType *self = O_CAST (_self, FunctionType ());
+  O_CALL (self->return_type, accept, visitor);
+  O_CALL (self->parameters, map_args, accept, visitor);
+  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+}
+
 static void
 FunctionType_generate_parameter (void *_parameter, va_list * app)
 {
@@ -201,10 +209,17 @@ O_IMPLEMENT (FunctionType, struct Token *, get_token, (void *_self))
   return O_CALL (self->return_type, get_token);
 }
 
+static void type_check(void *_type)
+{
+  struct Type * type = O_CAST (_type, Type ());
+  O_CALL (type, type_check);
+}
+
 O_IMPLEMENT (FunctionType, void, type_check, (void *_self))
 {
   struct FunctionType *self = O_CAST (_self, FunctionType ());
   O_CALL (self->return_type, type_check);
+  O_CALL (self->parameters, map, type_check);
 }
 
 O_OBJECT (FunctionType, Type);
@@ -212,6 +227,7 @@ O_OBJECT_METHOD (FunctionType, ctor);
 O_OBJECT_METHOD (FunctionType, ctor_from_decl);
 O_OBJECT_METHOD (FunctionType, ctor_from_expr);
 O_OBJECT_METHOD (FunctionType, dtor);
+O_OBJECT_METHOD (FunctionType, accept);
 O_OBJECT_METHOD (FunctionType, is_compatible);
 O_OBJECT_METHOD (FunctionType, get_token);
 O_OBJECT_METHOD (FunctionType, generate);

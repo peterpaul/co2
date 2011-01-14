@@ -59,6 +59,13 @@ O_IMPLEMENT (File, void *, dtor, (void *_self))
   return O_SUPER->dtor (self);
 }
 
+O_IMPLEMENT (File, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+{
+  struct File *self = O_CAST (_self, File ());
+  O_CALL (self->declarations, map_args, accept, visitor);
+  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+}
+
 O_IMPLEMENT (File, void, type_check, (void *_self))
 {
   struct File *self = O_CAST (_self, File ());
@@ -111,4 +118,5 @@ O_OBJECT_METHOD (File, dtor);
 O_OBJECT_METHOD (File, type_check);
 O_OBJECT_METHOD (File, optimize);
 O_OBJECT_METHOD (File, generate);
+O_OBJECT_METHOD (File, accept);
 O_END_OBJECT

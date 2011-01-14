@@ -20,6 +20,13 @@ O_IMPLEMENT(ThrowStatement, void *, dtor, (void *_self))
   return O_SUPER->dtor(self);
 }
 
+O_IMPLEMENT (ThrowStatement, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+{
+  struct ThrowStatement *self = O_CAST (_self, ThrowStatement ());
+  O_BRANCH_CALL (self->expr, accept, visitor);
+  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+}
+
 O_IMPLEMENT(ThrowStatement, void, type_check, (void *_self))
 {
   struct ThrowStatement *self = O_CAST(_self, ThrowStatement());
@@ -47,6 +54,7 @@ O_IMPLEMENT(ThrowStatement, void, generate, (void *_self))
 O_OBJECT(ThrowStatement, Statement);
 O_OBJECT_METHOD(ThrowStatement, ctor);
 O_OBJECT_METHOD(ThrowStatement, dtor);
+O_OBJECT_METHOD(ThrowStatement, accept);
 O_OBJECT_METHOD(ThrowStatement, type_check);
 O_OBJECT_METHOD(ThrowStatement, generate);
 O_END_OBJECT

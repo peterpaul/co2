@@ -16,8 +16,16 @@ O_IMPLEMENT (VarArgExpression, void *, dtor, (void *_self))
 {
   struct VarArgExpression *self = O_CAST (_self, VarArgExpression ());
   O_CALL (self->va_arg_type, release);
-  O_BRANCH_CALL (self->va_arg_type, release);
+  O_BRANCH_CALL (self->va_arg_expr, release);
   return O_SUPER->dtor (self);
+}
+
+O_IMPLEMENT (VarArgExpression, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+{
+  struct VarArgExpression *self = O_CAST (_self, VarArgExpression ());
+  O_CALL (self->va_arg_type, accept, visitor);
+  O_BRANCH_CALL (self->va_arg_expr, accept, visitor);
+  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
 }
 
 O_IMPLEMENT (VarArgExpression, void, type_check, (void *_self))
@@ -50,6 +58,7 @@ O_IMPLEMENT (VarArgExpression, void, generate, (void *_self))
 O_OBJECT (VarArgExpression, Expression);
 O_OBJECT_METHOD (VarArgExpression, ctor);
 O_OBJECT_METHOD (VarArgExpression, dtor);
+O_OBJECT_METHOD (VarArgExpression, accept);
 O_OBJECT_METHOD (VarArgExpression, type_check);
 O_OBJECT_METHOD (VarArgExpression, generate);
 O_END_OBJECT

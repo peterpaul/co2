@@ -18,6 +18,13 @@ O_IMPLEMENT (NestedExpression, void *, dtor, (void *_self))
   return O_SUPER->dtor (self);
 }
 
+O_IMPLEMENT (NestedExpression, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+{
+  struct NestedExpression *self = O_CAST (_self, NestedExpression ());
+  O_CALL (self->expr, accept, visitor);
+  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+}
+
 O_IMPLEMENT (NestedExpression, void, type_check, (void *_self))
 {
   struct NestedExpression *self = O_CAST (_self, NestedExpression ());
@@ -35,6 +42,7 @@ O_IMPLEMENT (NestedExpression, void, generate, (void *_self))
 O_OBJECT (NestedExpression, Expression);
 O_OBJECT_METHOD (NestedExpression, ctor);
 O_OBJECT_METHOD (NestedExpression, dtor);
+O_OBJECT_METHOD (NestedExpression, accept);
 O_OBJECT_METHOD (NestedExpression, type_check);
 O_OBJECT_METHOD (NestedExpression, generate);
 O_END_OBJECT

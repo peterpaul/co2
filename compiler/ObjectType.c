@@ -20,7 +20,7 @@ O_IMPLEMENT (ObjectType, void *, dtor, (void *_self))
 {
   struct ObjectType *self = O_CAST (_self, ObjectType ());
   O_CALL (self->token, release);
-  O_CALL (self->decl, release);
+  O_BRANCH_CALL (self->decl, release);
   return O_SUPER->dtor (self);
 }
 

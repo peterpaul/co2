@@ -21,6 +21,13 @@ O_IMPLEMENT(SizeExpression, void *, dtor, (void *_self))
   return O_SUPER->dtor(self);
 }
 
+O_IMPLEMENT (SizeExpression, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+{
+  struct SizeExpression *self = O_CAST (_self, SizeExpression ());
+  O_CALL (self->param, accept, visitor);
+  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+}
+
 O_IMPLEMENT(SizeExpression, void, type_check, (void *_self))
 {
   struct SizeExpression *self = O_CAST(_self, SizeExpression());
@@ -42,6 +49,7 @@ O_IMPLEMENT(SizeExpression, void, generate, (void *_self))
 O_OBJECT(SizeExpression, Expression);
 O_OBJECT_METHOD(SizeExpression, ctor);
 O_OBJECT_METHOD(SizeExpression, dtor);
+O_OBJECT_METHOD(SizeExpression, accept);
 O_OBJECT_METHOD(SizeExpression, generate);
 O_OBJECT_METHOD(SizeExpression, type_check);
 O_END_OBJECT

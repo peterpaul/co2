@@ -31,6 +31,15 @@ O_IMPLEMENT (BinaryExpression, void *, dtor, (void *_self))
   return O_SUPER->dtor (self);
 }
 
+O_IMPLEMENT (BinaryExpression, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+{
+  struct BinaryExpression *self = O_CAST (_self, BinaryExpression ());
+  O_BRANCH_CALL (self->operand[0], accept, visitor);
+  O_BRANCH_CALL (self->operator, accept, visitor);
+  O_BRANCH_CALL (self->operand[1], accept, visitor);
+  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+}
+
 O_IMPLEMENT (BinaryExpression, void, generate, (void *_self))
 {
   struct BinaryExpression *self = O_CAST (_self, BinaryExpression ());
@@ -206,6 +215,7 @@ O_IMPLEMENT (BinaryExpression, void, set_scope, (void *_self, void *_scope))
 O_OBJECT (BinaryExpression, Expression);
 O_OBJECT_METHOD (BinaryExpression, ctor);
 O_OBJECT_METHOD (BinaryExpression, dtor);
+O_OBJECT_METHOD (BinaryExpression, accept);
 O_OBJECT_METHOD (BinaryExpression, generate);
 O_OBJECT_METHOD (BinaryExpression, type_check);
 O_OBJECT_METHOD (BinaryExpression, set_scope);

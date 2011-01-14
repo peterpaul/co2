@@ -25,6 +25,16 @@ O_IMPLEMENT (ForStatement, void *, dtor, (void *_self))
   return O_SUPER->dtor (self);
 }
 
+O_IMPLEMENT (ForStatement, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+{
+  struct ForStatement *self = O_CAST (_self, ForStatement ());
+  O_CALL (self->initialization, accept, visitor);
+  O_CALL (self->condition, accept, visitor);
+  O_CALL (self->iteration, accept, visitor);
+  O_CALL (self->body, accept, visitor);
+  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+}
+
 O_IMPLEMENT (ForStatement, void, type_check, (void *_self))
 {
   struct ForStatement *self = O_CAST (_self, ForStatement ());
@@ -50,6 +60,7 @@ O_IMPLEMENT (ForStatement, void, generate, (void *_self))
 O_OBJECT (ForStatement, Statement);
 O_OBJECT_METHOD (ForStatement, ctor);
 O_OBJECT_METHOD (ForStatement, dtor);
+O_OBJECT_METHOD (ForStatement, accept);
 O_OBJECT_METHOD (ForStatement, type_check);
 O_OBJECT_METHOD (ForStatement, generate);
 O_END_OBJECT

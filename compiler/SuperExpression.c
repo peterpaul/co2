@@ -30,6 +30,15 @@ O_IMPLEMENT (SuperExpression, void *, dtor, (void *_self))
   return O_SUPER->dtor (self);
 }
 
+O_IMPLEMENT (SuperExpression, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+{
+  struct SuperExpression *self = O_CAST (_self, SuperExpression ());
+  O_BRANCH_CALL (self->super, accept, visitor);
+  O_BRANCH_CALL (self->ctor_name, accept, visitor);
+  O_BRANCH_CALL (self->actual_arguments, map_args, accept, visitor);
+  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+}
+
 O_IMPLEMENT (SuperExpression, void, type_check, (void *_self))
 {
   struct SuperExpression *self = O_CAST (_self, SuperExpression ());
@@ -163,6 +172,7 @@ O_IMPLEMENT (SuperExpression, void, generate, (void *_self))
 O_OBJECT (SuperExpression, Expression);
 O_OBJECT_METHOD (SuperExpression, ctor);
 O_OBJECT_METHOD (SuperExpression, dtor);
+O_OBJECT_METHOD (SuperExpression, accept);
 O_OBJECT_METHOD (SuperExpression, generate);
 O_OBJECT_METHOD (SuperExpression, type_check);
 O_END_OBJECT

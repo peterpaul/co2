@@ -50,6 +50,7 @@ O_METHOD_DEF(CompileObjectVisitor, void, visitObjectType, (void *_self, void *ty
 O_METHOD_DEF(CompileObjectVisitor, void, visitPrimitiveType, (void *_self, void *type));
 O_METHOD_DEF(CompileObjectVisitor, void, visitType, (void *_self, void *type));
 
+O_METHOD_DEF(CompileObjectVisitor, void, visitFile, (void *_self, void *file));
 
 #define CompileObjectVisitorClass_Attr		\
   InterfaceClass_Attr
@@ -97,7 +98,8 @@ O_METHOD_DEF(CompileObjectVisitor, void, visitType, (void *_self, void *type));
   O_METHOD(CompileObjectVisitor, visitFunctionType);		\
   O_METHOD(CompileObjectVisitor, visitObjectType);		\
   O_METHOD(CompileObjectVisitor, visitPrimitiveType);		\
-  O_METHOD(CompileObjectVisitor, visitType)
+  O_METHOD(CompileObjectVisitor, visitType);			\
+  O_METHOD(CompileObjectVisitor, visitFile)
 
 
 

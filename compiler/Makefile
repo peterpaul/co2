@@ -25,6 +25,7 @@ CC_SRCS		=ArgumentDeclaration.c ArrayType.c BaseCompileObjectVisitor.c\
 		DestructorDeclaration.c DoStatement.c error.c Expression.c\
 		ExpressionStatement.c File.c ForEachStatement.c ForStatement.c\
 		FunctionType.c FunctionDeclaration.c FunctionCallExpression.c\
+		HelloWorldVisitor.c\
 		IfStatement.c IncludeStack.c InterfaceDeclaration.c io.c\
 		MacroDeclaration.c NewExpression.c NestedExpression.c\
 		NullExpression.c ObjectType.c ObjectTypeDeclaration.c Path.c\

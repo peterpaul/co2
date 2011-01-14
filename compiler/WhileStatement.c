@@ -17,7 +17,15 @@ O_IMPLEMENT (WhileStatement, void *, dtor, (void *_self))
   return O_SUPER->dtor (self);
 }
 
+O_IMPLEMENT (WhileStatement, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+{
+  struct WhileStatement *self = O_CAST (_self, WhileStatement ());
+  /* TODO implement */
+  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+}
+
 O_OBJECT (WhileStatement, Statement);
 O_OBJECT_METHOD (WhileStatement, ctor);
 O_OBJECT_METHOD (WhileStatement, dtor);
+O_OBJECT_METHOD (WhileStatement, accept);
 O_END_OBJECT

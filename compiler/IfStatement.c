@@ -23,6 +23,15 @@ O_IMPLEMENT (IfStatement, void *, dtor, (void *_self))
   return O_SUPER->dtor (self);
 }
 
+O_IMPLEMENT (IfStatement, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+{
+  struct IfStatement *self = O_CAST (_self, IfStatement ());
+  O_CALL (self->condition, accept, visitor);
+  O_CALL (self->then_clause, accept, visitor);
+  O_BRANCH_CALL (self->else_clause, accept, visitor);
+  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+}
+
 O_IMPLEMENT (IfStatement, void, type_check, (void *_self))
 {
   struct IfStatement *self = O_CAST (_self, IfStatement ());
@@ -48,6 +57,7 @@ O_IMPLEMENT (IfStatement, void, generate, (void *_self))
 O_OBJECT (IfStatement, Statement);
 O_OBJECT_METHOD (IfStatement, ctor);
 O_OBJECT_METHOD (IfStatement, dtor);
+O_OBJECT_METHOD (IfStatement, accept);
 O_OBJECT_METHOD (IfStatement, type_check);
 O_OBJECT_METHOD (IfStatement, generate);
 O_END_OBJECT

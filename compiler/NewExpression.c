@@ -44,6 +44,15 @@ O_IMPLEMENT (NewExpression, void *, dtor, (void *_self))
   return O_SUPER->dtor (self);
 }
 
+O_IMPLEMENT (NewExpression, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+{
+  struct NewExpression *self = O_CAST (_self, NewExpression ());
+  O_BRANCH_CALL (self->ctor_name, accept, visitor);
+  O_BRANCH_CALL (self->array_size, accept, visitor);
+  O_BRANCH_CALL (self->ctor_arguments, map_args, accept, visitor);
+  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+}
+
 O_IMPLEMENT (NewExpression, void, generate, (void *_self))
 {
   struct NewExpression *self = O_CAST (_self, NewExpression ());
@@ -183,6 +192,7 @@ O_IMPLEMENT (NewExpression, void, set_ctor_name,
 O_OBJECT (NewExpression, Expression);
 O_OBJECT_METHOD (NewExpression, ctor);
 O_OBJECT_METHOD (NewExpression, dtor);
+O_OBJECT_METHOD (NewExpression, accept);
 O_OBJECT_METHOD (NewExpression, set_ctor_name);
 O_OBJECT_METHOD (NewExpression, generate);
 O_OBJECT_METHOD (NewExpression, type_check);

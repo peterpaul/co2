@@ -36,6 +36,15 @@ O_IMPLEMENT (FunctionDeclaration, void *, dtor, (void *_self))
   return O_SUPER->dtor (self);
 }
 
+O_IMPLEMENT (FunctionDeclaration, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+{
+  struct FunctionDeclaration *self = O_CAST (_self, FunctionDeclaration ());
+  O_CALL (self->type, accept, visitor);
+  O_CALL (self->formal_arguments, map_args, accept, visitor);
+  O_BRANCH_CALL (self->body, accept, visitor);
+  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+}
+
 void
 FunctionDeclaration_generate_formal_arg (void *_decl, va_list * ap)
 {
@@ -153,6 +162,7 @@ O_IMPLEMENT (FunctionDeclaration, void, type_check, (void *_self))
 O_OBJECT (FunctionDeclaration, Declaration);
 O_OBJECT_METHOD (FunctionDeclaration, ctor);
 O_OBJECT_METHOD (FunctionDeclaration, dtor);
+O_OBJECT_METHOD (FunctionDeclaration, accept);
 O_OBJECT_METHOD (FunctionDeclaration, generate);
 O_OBJECT_METHOD (FunctionDeclaration, type_check);
 O_END_OBJECT

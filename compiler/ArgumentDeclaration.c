@@ -20,6 +20,13 @@ O_IMPLEMENT (ArgumentDeclaration, void *, dtor, (void *_self))
   return O_SUPER->dtor (self);
 }
 
+O_IMPLEMENT (ArgumentDeclaration, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+{
+  struct ArgumentDeclaration *self = O_CAST (_self, ArgumentDeclaration ());
+  O_CALL (self->type, accept, visitor);
+  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+}
+
 O_IMPLEMENT (ArgumentDeclaration, void, generate, (void *_self))
 {
   struct ArgumentDeclaration *self = O_CAST (_self, ArgumentDeclaration ());
@@ -46,6 +53,7 @@ O_IMPLEMENT (ArgumentDeclaration, void, type_check, (void *_self))
 O_OBJECT (ArgumentDeclaration, Declaration);
 O_OBJECT_METHOD (ArgumentDeclaration, ctor);
 O_OBJECT_METHOD (ArgumentDeclaration, dtor);
+O_OBJECT_METHOD (ArgumentDeclaration, accept);
 O_OBJECT_METHOD (ArgumentDeclaration, generate);
 O_OBJECT_METHOD (ArgumentDeclaration, type_check);
 O_END_OBJECT

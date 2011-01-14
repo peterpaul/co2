@@ -44,6 +44,8 @@
 #include "PrimitiveType.h"
 #include "Type.h"
 
+#include "File.h"
+
 #include "BaseCompileObjectVisitor.h"
 
 #define O_SUPER RefObject()
@@ -180,6 +182,8 @@ O_IMPLEMENT_IF(BaseCompileObjectVisitor, void, visit, (void *_self, void *object
     O_CALL (self, visitExpression, object);
   else if (o_is_of (object, Type ()))
     O_CALL (self, visitType, object);
+  else if (o_is_of (object, File ()))
+    O_CALL (self, visitFile, object);
   else
     {
     }

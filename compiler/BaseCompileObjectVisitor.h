@@ -47,7 +47,8 @@
   O_METHOD(CompileObjectVisitor, visitFunctionType);		\
   O_METHOD(CompileObjectVisitor, visitObjectType);		\
   O_METHOD(CompileObjectVisitor, visitPrimitiveType);		\
-  O_METHOD(CompileObjectVisitor, visitType)
+  O_METHOD(CompileObjectVisitor, visitType);		\
+  O_METHOD(CompileObjectVisitor, visitFile)
 
 #define BaseCompileObjectVisitor_Attr		\
   RefObject_Attr

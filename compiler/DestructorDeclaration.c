@@ -38,6 +38,13 @@ O_IMPLEMENT (DestructorDeclaration, void *, dtor, (void *_self))
   return O_SUPER->dtor (self);
 }
 
+O_IMPLEMENT (DestructorDeclaration, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+{
+  struct DestructorDeclaration *self = O_CAST (_self, DestructorDeclaration ());
+  O_CALL (self->body, accept, visitor);
+  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+}
+
 O_IMPLEMENT (DestructorDeclaration, void, generate, (void *_self))
 {
   struct DestructorDeclaration *self =
@@ -64,6 +71,7 @@ O_IMPLEMENT (DestructorDeclaration, void, type_check, (void *_self))
 O_OBJECT (DestructorDeclaration, Declaration);
 O_OBJECT_METHOD (DestructorDeclaration, ctor);
 O_OBJECT_METHOD (DestructorDeclaration, dtor);
+O_OBJECT_METHOD (DestructorDeclaration, accept);
 O_OBJECT_METHOD (DestructorDeclaration, generate);
 O_OBJECT_METHOD (DestructorDeclaration, type_check);
 O_END_OBJECT

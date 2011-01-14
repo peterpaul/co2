@@ -19,6 +19,13 @@ O_IMPLEMENT (ArrayType, void *, dtor, (void *_self))
   return O_SUPER->dtor (self);
 }
 
+O_IMPLEMENT (ArrayType, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+{
+  struct ArrayType *self = O_CAST (_self, ArrayType ());
+  O_CALL (self->base_type, accept, visitor);
+  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+}
+
 O_IMPLEMENT (ArrayType, void, type_check, (void *_self))
 {
   struct ArrayType *self = O_CAST (_self, ArrayType ());
@@ -64,6 +71,7 @@ O_IMPLEMENT (ArrayType, bool, is_compatible, (void *_self, void *_other))
 O_OBJECT (ArrayType, Type);
 O_OBJECT_METHOD (ArrayType, ctor);
 O_OBJECT_METHOD (ArrayType, dtor);
+O_OBJECT_METHOD (ArrayType, accept);
 O_OBJECT_METHOD (ArrayType, type_check);
 O_OBJECT_METHOD (ArrayType, generate);
 O_OBJECT_METHOD (ArrayType, to_string);

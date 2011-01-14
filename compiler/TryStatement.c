@@ -25,6 +25,15 @@ O_IMPLEMENT(TryStatement, void *, dtor, (void *_self))
   return O_SUPER->dtor(self);
 }
 
+O_IMPLEMENT (TryStatement, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+{
+  struct TryStatement *self = O_CAST (_self, TryStatement ());
+  O_CALL (self->try_clause, accept, visitor);
+  O_CALL (self->catch_clause, map_args, accept, visitor);
+  O_BRANCH_CALL (self->finally_clause, accept, visitor);
+  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+}
+
 static void TryStatement_type_check_catch(void *_self)
 {
   struct CatchStatement *self = O_CAST (_self, CatchStatement ());
@@ -95,6 +104,7 @@ O_IMPLEMENT(TryStatement, void, generate, (void *_self))
 O_OBJECT(TryStatement, Statement);
 O_OBJECT_METHOD(TryStatement, ctor);
 O_OBJECT_METHOD(TryStatement, dtor);
+O_OBJECT_METHOD(TryStatement, accept);
 O_OBJECT_METHOD(TryStatement, type_check);
 O_OBJECT_METHOD(TryStatement, generate);
 O_END_OBJECT

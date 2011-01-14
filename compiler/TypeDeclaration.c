@@ -22,6 +22,13 @@ O_IMPLEMENT(TypeDeclaration, void *, dtor, (void *_self))
   return O_SUPER->dtor(self);
 }
 
+O_IMPLEMENT (TypeDeclaration, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+{
+  struct TypeDeclaration *self = O_CAST (_self, TypeDeclaration ());
+  O_CALL (self->type, accept, visitor);
+  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+}
+
 O_IMPLEMENT(TypeDeclaration, void, type_check, (void *_self))
 {
   struct TypeDeclaration *self = O_CAST(_self, TypeDeclaration());
@@ -67,6 +74,7 @@ O_IMPLEMENT (TypeDeclaration, bool, is_compatible,
 O_OBJECT(TypeDeclaration, ObjectTypeDeclaration);
 O_OBJECT_METHOD(TypeDeclaration, ctor);
 O_OBJECT_METHOD(TypeDeclaration, dtor);
+O_OBJECT_METHOD(TypeDeclaration, accept);
 O_OBJECT_METHOD(TypeDeclaration, type_check);
 O_OBJECT_METHOD(TypeDeclaration, generate);
 O_OBJECT_METHOD(TypeDeclaration, is_compatible);
