@@ -6,6 +6,8 @@
 #include "io.h"
 #include "error.h"
 #include "HelloWorldVisitor.h"
+#include "GenerateHeaderVisitor.h"
+#include "GenerateSourceVisitor.h"
 
 extern int parse (void);
 
@@ -55,8 +57,8 @@ main (int argc, char **argv)
       return 1;
     }
 
-  struct CompileObjectVisitor * visitor = O_CALL_CLASS (HelloWorldVisitor (), new);
-  O_CALL (main_file, accept, visitor);
+  // struct BaseCompileObjectVisitor * visitor = O_CALL_CLASS (HelloWorldVisitor (), new);
+  // O_CALL (main_file, accept, visitor);
 
   /* semantic analysis */
   O_CALL (main_file, type_check);
@@ -77,7 +79,13 @@ main (int argc, char **argv)
     open_output (argv[2]);
   else
     open_output (NULL);
-  O_CALL (main_file, generate);
+
+  struct GenerateHeaderVisitor * header_visitor = O_CALL_CLASS (GenerateHeaderVisitor (), new, out);
+  O_CALL (main_file, accept, header_visitor);
+  struct GenerateSourceVisitor * source_visitor = O_CALL_CLASS (GenerateSourceVisitor (), new, out);
+  O_CALL (main_file, accept, source_visitor);
+
+  // O_CALL (main_file, generate);
 
   O_CALL (main_file, release);
 

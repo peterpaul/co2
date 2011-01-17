@@ -91,12 +91,12 @@ O_IMPLEMENT (FunctionType, void *, dtor, (void *_self))
   return O_SUPER->dtor (self);
 }
 
-O_IMPLEMENT (FunctionType, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+O_IMPLEMENT (FunctionType, void, accept, (void *_self, struct BaseCompileObjectVisitor *visitor))
 {
   struct FunctionType *self = O_CAST (_self, FunctionType ());
   O_CALL (self->return_type, accept, visitor);
   O_CALL (self->parameters, map_args, accept, visitor);
-  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+  O_CALL (visitor, visit, self);
 }
 
 static void

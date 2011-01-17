@@ -22,12 +22,12 @@ O_IMPLEMENT (UnaryExpression, void *, dtor, (void *_self))
   return O_SUPER->dtor (self);
 }
 
-O_IMPLEMENT (UnaryExpression, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+O_IMPLEMENT (UnaryExpression, void, accept, (void *_self, struct BaseCompileObjectVisitor *visitor))
 {
   struct UnaryExpression *self = O_CAST (_self, UnaryExpression ());
   O_BRANCH_CALL (self->operator, accept, visitor);
   O_BRANCH_CALL (self->operand, accept, visitor);
-  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+  O_CALL (visitor, visit, self);
 }
 
 O_IMPLEMENT (UnaryExpression, void, type_check, (void *_self))

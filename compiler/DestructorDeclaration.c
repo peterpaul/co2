@@ -38,11 +38,11 @@ O_IMPLEMENT (DestructorDeclaration, void *, dtor, (void *_self))
   return O_SUPER->dtor (self);
 }
 
-O_IMPLEMENT (DestructorDeclaration, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+O_IMPLEMENT (DestructorDeclaration, void, accept, (void *_self, struct BaseCompileObjectVisitor *visitor))
 {
   struct DestructorDeclaration *self = O_CAST (_self, DestructorDeclaration ());
   O_CALL (self->body, accept, visitor);
-  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+  O_CALL (visitor, visit, self);
 }
 
 O_IMPLEMENT (DestructorDeclaration, void, generate, (void *_self))

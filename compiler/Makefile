@@ -23,7 +23,9 @@ CC_SRCS		=ArgumentDeclaration.c ArrayType.c BaseCompileObjectVisitor.c\
 		CompoundStatement.c\
 		ConstructorDeclaration.c Context.c Declaration.c DeleteStatement.c\
 		DestructorDeclaration.c DoStatement.c error.c Expression.c\
-		ExpressionStatement.c File.c ForEachStatement.c ForStatement.c\
+		ExpressionStatement.c GenerateHeaderVisitor.c\
+		GenerateSourceVisitor.c File.c\
+		ForEachStatement.c ForStatement.c\
 		FunctionType.c FunctionDeclaration.c FunctionCallExpression.c\
 		HelloWorldVisitor.c\
 		IfStatement.c IncludeStack.c InterfaceDeclaration.c io.c\

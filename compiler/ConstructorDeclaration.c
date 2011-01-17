@@ -31,12 +31,12 @@ O_IMPLEMENT (ConstructorDeclaration, void *, dtor, (void *_self))
   return O_SUPER->dtor (self);
 }
 
-O_IMPLEMENT (ConstructorDeclaration, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+O_IMPLEMENT (ConstructorDeclaration, void, accept, (void *_self, struct BaseCompileObjectVisitor *visitor))
 {
   struct ConstructorDeclaration *self = O_CAST (_self, ConstructorDeclaration ());
   O_CALL (self->formal_arguments, map_args, accept, visitor);
   O_CALL (self->body, accept, visitor);
-  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+  O_CALL (visitor, visit, self);
 }
 
 O_IMPLEMENT (ConstructorDeclaration, void, type_check, (void *_self))

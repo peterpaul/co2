@@ -12,7 +12,7 @@
 
 #define O_SUPER Declaration()
 
-static struct FunctionType *
+struct FunctionType *
 get_type (struct FunctionDeclaration *self)
 {
   return o_cast (self->type, FunctionType ());
@@ -36,13 +36,13 @@ O_IMPLEMENT (FunctionDeclaration, void *, dtor, (void *_self))
   return O_SUPER->dtor (self);
 }
 
-O_IMPLEMENT (FunctionDeclaration, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+O_IMPLEMENT (FunctionDeclaration, void, accept, (void *_self, struct BaseCompileObjectVisitor *visitor))
 {
   struct FunctionDeclaration *self = O_CAST (_self, FunctionDeclaration ());
   O_CALL (self->type, accept, visitor);
   O_CALL (self->formal_arguments, map_args, accept, visitor);
   O_BRANCH_CALL (self->body, accept, visitor);
-  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+  O_CALL (visitor, visit, self);
 }
 
 void

@@ -35,14 +35,14 @@ O_IMPLEMENT (ClassDeclaration, void *, dtor, (void *_self))
   return O_SUPER->dtor (self);  
 }
 
-O_IMPLEMENT (ClassDeclaration, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+O_IMPLEMENT (ClassDeclaration, void, accept, (void *_self, struct BaseCompileObjectVisitor *visitor))
 {
   struct ClassDeclaration *self = O_CAST (_self, ClassDeclaration ());
   O_CALL (self->members, map_args, accept, visitor);
-  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+  O_CALL (visitor, visit, self);
 }
 
-static int
+int
 new_constructor_filter (void *_constructor)
 {
   struct ConstructorDeclaration *constructor =
@@ -56,7 +56,7 @@ new_constructor_filter (void *_constructor)
   return false;
 }
 
-static void
+void
 ClassDeclaration_generate_constructor_arguments (void *_arg)
 {
   struct ArgumentDeclaration *arg = O_CAST (_arg, ArgumentDeclaration ());
@@ -79,7 +79,7 @@ ClassDeclaration_generate_constructor_arguments (void *_arg)
   fprintf (out, ");\n");
 }
 
-static void
+void
 ClassDeclaration_generate_constructor_definition (void *_constructor_decl,
 						  va_list * app)
 {
@@ -97,7 +97,7 @@ ClassDeclaration_generate_constructor_definition (void *_constructor_decl,
   fprintf (out, ", (void *_self, va_list *app));\n");
 }
 
-static void
+void
 ClassDeclaration_generate_method_definition (void *_method_decl,
 					     va_list * app)
 {
@@ -123,7 +123,7 @@ ClassDeclaration_generate_method_definition (void *_method_decl,
   fprintf (out, "));\n");
 }
 
-static void
+void
 ClassDeclaration_generate_constructor_registration (void *_constructor_decl,
 						    va_list * app)
 {
@@ -141,7 +141,7 @@ ClassDeclaration_generate_constructor_registration (void *_constructor_decl,
   fprintf (out, ")");
 }
 
-static void
+void
 ClassDeclaration_generate_method_registration (void *_method_decl,
 					       va_list * app)
 {
@@ -162,7 +162,7 @@ ClassDeclaration_generate_method_registration (void *_method_decl,
   fprintf (out, ")");
 }
 
-static void
+void
 ClassDeclaration_generate_constructor_registration_2 (void *_constructor_decl,
 						      va_list * app)
 {
@@ -180,7 +180,7 @@ ClassDeclaration_generate_constructor_registration_2 (void *_constructor_decl,
   fprintf (out, ");\n");
 }
 
-static void
+void
 ClassDeclaration_generate_destructor_registration_2 (void *_destructor_decl,
 						     va_list * app)
 {
@@ -192,7 +192,7 @@ ClassDeclaration_generate_destructor_registration_2 (void *_destructor_decl,
   fprintf (out, ", dtor);\n");
 }
 
-static void
+void
 ClassDeclaration_generate_interface_method_registration (void *_method_decl,
 							 va_list * app)
 {
@@ -206,7 +206,7 @@ ClassDeclaration_generate_interface_method_registration (void *_method_decl,
   fprintf (out, ");\n");
 }
 
-static void
+void
 ClassDeclaration_generate_method_implementation_2 (void *_interface_name,
 						   va_list * app)
 {
@@ -226,7 +226,7 @@ ClassDeclaration_generate_method_implementation_2 (void *_interface_name,
   fprintf (out, "O_OBJECT_IF_END\n");
 }
 
-static void
+void
 ClassDeclaration_generate_constructor_implementation (void *_constructor_decl,
 						      va_list * app)
 {
@@ -257,7 +257,7 @@ ClassDeclaration_generate_constructor_implementation (void *_constructor_decl,
   fprintf (out, "}\n\n");
 }
 
-static void
+void
 ClassDeclaration_generate_destructor_implementation (void *_destructor_decl,
 						     va_list * app)
 {
@@ -279,7 +279,7 @@ ClassDeclaration_generate_destructor_implementation (void *_destructor_decl,
   fprintf (out, "}\n\n");
 }
 
-static void
+void
 ClassDeclaration_generate_method_implementation (void *_method_decl,
 						 va_list * app)
 {
@@ -348,7 +348,7 @@ ClassDeclaration_generate_method_implementation (void *_method_decl,
   fprintf (out, "}\n\n");
 }
 
-static void
+void
 ClassDeclaration_generate_attribute_registration (void *_method_decl,
 						  va_list * app)
 {
@@ -361,7 +361,7 @@ ClassDeclaration_generate_attribute_registration (void *_method_decl,
   O_CALL (method_decl->name, generate);
 }
 
-static void
+void
 generate_superclass (struct ClassDeclaration *self)
 {
   if (self->superclass)

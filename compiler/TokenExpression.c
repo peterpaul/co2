@@ -34,12 +34,11 @@ O_IMPLEMENT (TokenExpression, void *, dtor, (void *_self))
   return O_SUPER->dtor (self);
 }
 
-O_IMPLEMENT (TokenExpression, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+O_IMPLEMENT (TokenExpression, void, accept, (void *_self, struct BaseCompileObjectVisitor *visitor))
 {
   struct TokenExpression *self = O_CAST (_self, TokenExpression ());
   O_CALL (self->token, accept, visitor);
-  O_BRANCH_CALL (self->decl, accept, visitor);
-  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+  O_CALL (visitor, visit, self);
 }
 
 O_IMPLEMENT (TokenExpression, void, generate_left, (void *_self, bool left))

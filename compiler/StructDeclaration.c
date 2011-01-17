@@ -21,11 +21,11 @@ O_IMPLEMENT(StructDeclaration, void *, dtor, (void *_self))
   return O_SUPER->dtor(self);
 }
 
-O_IMPLEMENT (StructDeclaration, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+O_IMPLEMENT (StructDeclaration, void, accept, (void *_self, struct BaseCompileObjectVisitor *visitor))
 {
   struct StructDeclaration *self = O_CAST (_self, StructDeclaration ());
   O_CALL (self->members, map_args, accept, visitor);
-  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+  O_CALL (visitor, visit, self);
 }
 
 O_IMPLEMENT (StructDeclaration, void, type_check, (void *_self))
@@ -54,7 +54,7 @@ O_IMPLEMENT (StructDeclaration, bool, is_compatible,
       return self == other;
 }
 
-static void Declaration_list_generate (void *_self)
+void Declaration_list_generate (void *_self)
 {
   struct Declaration * self = O_CAST (_self, Declaration ());
   O_CALL (self, generate);

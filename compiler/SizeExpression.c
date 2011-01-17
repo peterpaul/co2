@@ -21,11 +21,11 @@ O_IMPLEMENT(SizeExpression, void *, dtor, (void *_self))
   return O_SUPER->dtor(self);
 }
 
-O_IMPLEMENT (SizeExpression, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+O_IMPLEMENT (SizeExpression, void, accept, (void *_self, struct BaseCompileObjectVisitor *visitor))
 {
   struct SizeExpression *self = O_CAST (_self, SizeExpression ());
   O_CALL (self->param, accept, visitor);
-  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+  O_CALL (visitor, visit, self);
 }
 
 O_IMPLEMENT(SizeExpression, void, type_check, (void *_self))

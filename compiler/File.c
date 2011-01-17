@@ -59,11 +59,11 @@ O_IMPLEMENT (File, void *, dtor, (void *_self))
   return O_SUPER->dtor (self);
 }
 
-O_IMPLEMENT (File, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+O_IMPLEMENT (File, void, accept, (void *_self, struct BaseCompileObjectVisitor *visitor))
 {
   struct File *self = O_CAST (_self, File ());
   O_CALL (self->declarations, map_args, accept, visitor);
-  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+  O_CALL (visitor, visit, self);
 }
 
 O_IMPLEMENT (File, void, type_check, (void *_self))

@@ -36,10 +36,10 @@ accept (void *_object, va_list *app)
   O_CALL (object, accept, visitor);
 }
 
-O_IMPLEMENT (CompileObject, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+O_IMPLEMENT (CompileObject, void, accept, (void *_self, struct BaseCompileObjectVisitor *visitor))
 {
   struct CompileObject *self = O_CAST (_self, CompileObject ());
-  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+  O_CALL (visitor, visit, self);
 }
 
 O_OBJECT (CompileObject, RefObject);

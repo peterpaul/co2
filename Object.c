@@ -88,13 +88,29 @@ int o_implements(const void *_self, const void *_interface)
 	return IF != NULL;
 }
 
+void *o_get_interface_of_class(void *_class, void *_interface)
+{
+	struct Class *class = O_IS_CLASS(_class);
+	struct Interface *interface = O_IS_OBJECT(_interface);
+	struct Interface *IF = class->interface_list;
+	while (IF && !o_is_of(IF, interface)) {
+		IF = IF->next;
+	}
+	return IF;
+}
+
 void *o_get_interface(void *_self, void *_interface)
 {
 	struct Object *self = O_IS_OBJECT(_self);
 	struct Interface *interface = O_IS_OBJECT(_interface);
-	struct Interface *IF = self->class->interface_list;
-	while (IF && !o_is_of(IF, interface)) {
-		IF = IF->next;
+	struct Interface *IF = NULL;
+	struct Class *class = self->class;
+	do {
+		IF = o_get_interface_of_class(class, interface);
+		class = class->super;
+	} while (!IF && class != Object ());
+	if (!IF) {
+		IF = o_get_interface_of_class(Object (), interface);
 	}
 	assertTrue(IF, "%s at 0x%x does not implement %s.", self->class->name,
 		   (int) self, interface->class->name);

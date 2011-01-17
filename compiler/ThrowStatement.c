@@ -20,11 +20,11 @@ O_IMPLEMENT(ThrowStatement, void *, dtor, (void *_self))
   return O_SUPER->dtor(self);
 }
 
-O_IMPLEMENT (ThrowStatement, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+O_IMPLEMENT (ThrowStatement, void, accept, (void *_self, struct BaseCompileObjectVisitor *visitor))
 {
   struct ThrowStatement *self = O_CAST (_self, ThrowStatement ());
   O_BRANCH_CALL (self->expr, accept, visitor);
-  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+  O_CALL (visitor, visit, self);
 }
 
 O_IMPLEMENT(ThrowStatement, void, type_check, (void *_self))

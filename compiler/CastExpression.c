@@ -25,12 +25,12 @@ O_IMPLEMENT(CastExpression, void *, dtor, (void *_self))
   return O_SUPER->dtor(self);
 }
 
-O_IMPLEMENT (CastExpression, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+O_IMPLEMENT (CastExpression, void, accept, (void *_self, struct BaseCompileObjectVisitor *visitor))
 {
   struct CastExpression *self = O_CAST (_self, CastExpression ());
   O_CALL (self->cast_type, accept, visitor);
   O_CALL (self->expression, accept, visitor);
-  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+  O_CALL (visitor, visit, self);
 }
 
 O_IMPLEMENT(CastExpression, void, type_check, (void *_self))

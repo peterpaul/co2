@@ -3,13 +3,13 @@
 
 #include "RefObject.h"
 #include "Context.h"
-#include "CompileObjectVisitor.h"
+#include "BaseCompileObjectVisitor.h"
 
 O_METHOD_DEF (CompileObject, void, type_check, (void *_self));
 O_METHOD_DEF (CompileObject, void, optimize, (void *_self));
 O_METHOD_DEF (CompileObject, void, generate, (void *_self));
 O_METHOD_DEF (CompileObject, struct Token *, get_token, (void *_self));
-O_METHOD_DEF (CompileObject, void, accept, (void *_self, struct CompileObjectVisitor *visitor));
+O_METHOD_DEF (CompileObject, void, accept, (void *_self, struct BaseCompileObjectVisitor *visitor));
 
 #define CompileObjectClass_Attr			\
   RefObjectClass_Attr;				\

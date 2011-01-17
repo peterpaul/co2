@@ -19,11 +19,11 @@ O_IMPLEMENT (CompoundStatement, void *, dtor, (void *_self))
   return O_SUPER->dtor (self);
 }
 
-O_IMPLEMENT (CompoundStatement, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+O_IMPLEMENT (CompoundStatement, void, accept, (void *_self, struct BaseCompileObjectVisitor *visitor))
 {
   struct CompoundStatement *self = O_CAST (_self, CompoundStatement ());
   O_CALL (self->body, map_args, accept, visitor);
-  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+  O_CALL (visitor, visit, self);
 }
 
 void

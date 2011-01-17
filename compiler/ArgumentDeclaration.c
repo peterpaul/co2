@@ -20,11 +20,11 @@ O_IMPLEMENT (ArgumentDeclaration, void *, dtor, (void *_self))
   return O_SUPER->dtor (self);
 }
 
-O_IMPLEMENT (ArgumentDeclaration, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+O_IMPLEMENT (ArgumentDeclaration, void, accept, (void *_self, struct BaseCompileObjectVisitor *visitor))
 {
   struct ArgumentDeclaration *self = O_CAST (_self, ArgumentDeclaration ());
   O_CALL (self->type, accept, visitor);
-  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+  O_CALL (visitor, visit, self);
 }
 
 O_IMPLEMENT (ArgumentDeclaration, void, generate, (void *_self))

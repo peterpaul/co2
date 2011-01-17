@@ -23,12 +23,12 @@ O_IMPLEMENT(CatchStatement, void *, dtor, (void *_self))
   return O_SUPER->dtor(self);
 }
 
-O_IMPLEMENT (CatchStatement, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+O_IMPLEMENT (CatchStatement, void, accept, (void *_self, struct BaseCompileObjectVisitor *visitor))
 {
   struct CatchStatement *self = O_CAST (_self, CatchStatement ());
   O_CALL (self->argument, accept, visitor);
   O_CALL (self->body, accept, visitor);
-  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+  O_CALL (visitor, visit, self);
 }
 
 O_IMPLEMENT(CatchStatement, void, type_check, (void *_self))

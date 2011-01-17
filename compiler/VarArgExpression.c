@@ -20,12 +20,12 @@ O_IMPLEMENT (VarArgExpression, void *, dtor, (void *_self))
   return O_SUPER->dtor (self);
 }
 
-O_IMPLEMENT (VarArgExpression, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+O_IMPLEMENT (VarArgExpression, void, accept, (void *_self, struct BaseCompileObjectVisitor *visitor))
 {
   struct VarArgExpression *self = O_CAST (_self, VarArgExpression ());
   O_CALL (self->va_arg_type, accept, visitor);
   O_BRANCH_CALL (self->va_arg_expr, accept, visitor);
-  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+  O_CALL (visitor, visit, self);
 }
 
 O_IMPLEMENT (VarArgExpression, void, type_check, (void *_self))

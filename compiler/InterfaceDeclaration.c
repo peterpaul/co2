@@ -26,14 +26,14 @@ O_IMPLEMENT (InterfaceDeclaration, void *, dtor, (void *_self))
   return O_SUPER->dtor (self);
 }
 
-O_IMPLEMENT (InterfaceDeclaration, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+O_IMPLEMENT (InterfaceDeclaration, void, accept, (void *_self, struct BaseCompileObjectVisitor *visitor))
 {
   struct InterfaceDeclaration *self = O_CAST (_self, InterfaceDeclaration ());
   O_CALL (self->members, map_args, accept, visitor);
-  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+  O_CALL (visitor, visit, self);
 }
 
-static void
+void
 InterfaceDeclaration_generate_method_definition (void *_method_decl,
 						 va_list * app)
 {
@@ -56,7 +56,7 @@ InterfaceDeclaration_generate_method_definition (void *_method_decl,
   fprintf (out, "));\n");
 }
 
-static void
+void
 InterfaceDeclaration_generate_method_registration (void *_method_decl,
 						   va_list * app)
 {
@@ -72,7 +72,7 @@ InterfaceDeclaration_generate_method_registration (void *_method_decl,
   fprintf (out, ")");
 }
 
-static void
+void
 InterfaceDeclaration_generate_method_implementation (void *_method_decl,
 						     va_list * app)
 {
@@ -160,7 +160,7 @@ O_IMPLEMENT (InterfaceDeclaration, void, type_check, (void *_self))
   O_CALL (current_context, remove_last);
 }
 
-static void InterfaceDeclaration_is_compatible_with_class(void *_self, va_list *app)
+void InterfaceDeclaration_is_compatible_with_class(void *_self, va_list *app)
 {
   struct Token *self = O_CAST(_self, Token ());
   struct InterfaceDeclaration *interface = O_CAST(va_arg(*app, struct InterfaceDeclaration*), InterfaceDeclaration ());

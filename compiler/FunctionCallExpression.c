@@ -35,12 +35,12 @@ O_IMPLEMENT (FunctionCallExpression, void *, dtor, (void *_self))
   return O_SUPER->dtor (self);
 }
 
-O_IMPLEMENT (FunctionCallExpression, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+O_IMPLEMENT (FunctionCallExpression, void, accept, (void *_self, struct BaseCompileObjectVisitor *visitor))
 {
   struct FunctionCallExpression *self = O_CAST (_self, FunctionCallExpression ());
   O_CALL (self->function, accept, visitor);
   O_CALL (self->actual_arguments, map_args, accept, visitor);
-  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+  O_CALL (visitor, visit, self);
 }
 
 O_IMPLEMENT (FunctionCallExpression, void, generate, (void *_self))

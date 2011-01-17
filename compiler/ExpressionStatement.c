@@ -18,11 +18,11 @@ O_IMPLEMENT (ExpressionStatement, void *, dtor, (void *_self))
   return O_SUPER->dtor (self);
 }
 
-O_IMPLEMENT (ExpressionStatement, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+O_IMPLEMENT (ExpressionStatement, void, accept, (void *_self, struct BaseCompileObjectVisitor *visitor))
 {
   struct ExpressionStatement *self = O_CAST (_self, ExpressionStatement ());
   O_CALL (self->expr, accept, visitor);
-  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+  O_CALL (visitor, visit, self);
 }
 
 O_IMPLEMENT (ExpressionStatement, void, generate, (void *_self))

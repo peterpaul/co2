@@ -14,12 +14,12 @@ O_IMPLEMENT (VariableDeclaration, void *, ctor, (void *_self, va_list * app))
   return self;
 }
 
-O_IMPLEMENT (VariableDeclaration, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+O_IMPLEMENT (VariableDeclaration, void, accept, (void *_self, struct BaseCompileObjectVisitor *visitor))
 {
   struct VariableDeclaration *self = O_CAST (_self, VariableDeclaration ());
   O_CALL (self->type, accept, visitor);
   O_BRANCH_CALL (self->expr, accept, visitor);
-  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+  O_CALL (visitor, visit, self);
 }
 
 O_IMPLEMENT (VariableDeclaration, void, set_type,

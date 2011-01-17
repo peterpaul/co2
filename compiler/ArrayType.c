@@ -19,11 +19,11 @@ O_IMPLEMENT (ArrayType, void *, dtor, (void *_self))
   return O_SUPER->dtor (self);
 }
 
-O_IMPLEMENT (ArrayType, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+O_IMPLEMENT (ArrayType, void, accept, (void *_self, struct BaseCompileObjectVisitor *visitor))
 {
   struct ArrayType *self = O_CAST (_self, ArrayType ());
   O_CALL (self->base_type, accept, visitor);
-  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+  O_CALL (visitor, visit, self);
 }
 
 O_IMPLEMENT (ArrayType, void, type_check, (void *_self))

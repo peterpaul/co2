@@ -17,11 +17,11 @@ O_IMPLEMENT (ForEachStatement, void *, dtor, (void *_self))
   return O_SUPER->dtor (self);
 }
 
-O_IMPLEMENT (ForEachStatement, void, accept, (void *_self, struct CompileObjectVisitor *visitor))
+O_IMPLEMENT (ForEachStatement, void, accept, (void *_self, struct BaseCompileObjectVisitor *visitor))
 {
   struct ForEachStatement *self = O_CAST (_self, ForEachStatement ());
   /* TODO implement */
-  O_CALL_IF (CompileObjectVisitor, visitor, visit, self);
+  O_CALL (visitor, visit, self);
 }
 
 O_OBJECT (ForEachStatement, Statement);
