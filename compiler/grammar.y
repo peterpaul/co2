@@ -79,6 +79,7 @@
 %token <token> CHAR_CONSTANT
 %token <token> CLASS
 %token <token> DO
+%token <token> DOUBLE
 %token <token> DELETE
 %token <token> ELSE
 %token <token> FINALLY
@@ -721,6 +722,10 @@ type
   $$ = O_CALL_CLASS(PrimitiveType(), new, $1);
 }
 |	FLOAT
+{
+  $$ = O_CALL_CLASS(PrimitiveType(), new, $1);
+}
+|	DOUBLE
 {
   $$ = O_CALL_CLASS(PrimitiveType(), new, $1);
 }
