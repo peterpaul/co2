@@ -73,7 +73,7 @@ O_IMPLEMENT (ReturnStatement, void, type_check, (void *_self))
 
   self->function_context = O_CALL (current_context, find, FunctionDeclaration ());
   struct FunctionType *function_type = o_cast (self->function_context->type, FunctionType ());
-  if (self->expr)
+  if (self->expr && self->expr->type)
     {
       O_CALL (function_type->return_type, assert_compatible, self->expr->type);
     }
