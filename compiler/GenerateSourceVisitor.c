@@ -14,6 +14,8 @@
 #include "PrimitiveType.h"
 #include "grammar.tab.h"
 #include "Expression.h"
+#include "FunctionType.h"
+#include "Type.h"
 #include "io.h"
 
 int new_constructor_filter (void *_constructor);
@@ -27,6 +29,8 @@ void ClassDeclaration_generate_method_implementation_2 (void *_interface_name, v
 void FunctionDeclaration_generate_formal_arg (void *_decl, va_list * ap);
 
 void InterfaceDeclaration_generate_method_implementation (void *_method_decl, va_list * app);
+
+struct FunctionType *get_type (struct DestructorDeclaration *self);
 
 #define O_SUPER BaseCompileObjectVisitor()
 
@@ -144,7 +148,20 @@ O_IMPLEMENT_IF(GenerateSourceVisitor, void, visitDeclaration, (void *_self, void
     }
 }
 
-O_IMPLEMENT_IF(GenerateSourceVisitor, void, visitDestructorDeclaration, (void *_self, void *object), (_self, object)) {}
+O_IMPLEMENT_IF(GenerateSourceVisitor, void, visitDestructorDeclaration, (void *_self, void *_object), (_self, _object))
+{
+  struct GenerateSourceVisitor *visitor = O_CAST (_self, GenerateSourceVisitor ());
+  struct DestructorDeclaration *self = O_CAST (_object, DestructorDeclaration ());
+
+  O_CALL (get_type (self)->return_type, generate);
+  fprintf (out, " ");
+  O_CALL (self->name, generate);
+  fprintf (out, "(");
+  fprintf (out, ")\n");
+  fprintf (out, "{\n");
+  O_CALL (self->body, generate);
+  fprintf (out, "}\n");
+}
 
 O_IMPLEMENT_IF(GenerateSourceVisitor, void, visitFunctionDeclaration, (void *_self, void *_object), (_self, _object))
 {

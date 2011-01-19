@@ -374,118 +374,6 @@ generate_superclass (struct ClassDeclaration *self)
     }
 }
 
-O_IMPLEMENT (ClassDeclaration, void, generate, (void *_self))
-{
-  struct ClassDeclaration *self = O_CAST (_self, ClassDeclaration ());
-  // don't generate if external definition
-  if (self->include_file)
-    {
-      fprintf (out, "#include ");
-      O_CALL (self->include_file, generate);
-      fprintf (out, "\n");
-      return;
-    }
-  /* filter the members */
-  struct RefList *attributes =
-    O_CALL (self->members, filter_args, type_filter, VariableDeclaration ());
-  O_CALL (attributes, retain);
-  struct RefList *methods =
-    O_CALL (self->members, filter_args, type_filter, FunctionDeclaration ());
-  O_CALL (methods, retain);
-  struct RefList *constructors =
-    O_CALL (self->members, filter_args, type_filter,
-	    ConstructorDeclaration ());
-  O_CALL (constructors, retain);
-  struct RefList *destructors =
-    O_CALL (self->members, filter_args, type_filter,
-	    DestructorDeclaration ());
-  O_CALL (destructors, retain);
-
-  struct RefList *new_methods =
-    O_CALL (methods, filter_args, Declaration_new_member_filter,
-	    FunctionDeclaration ());
-  O_CALL (new_methods, retain);
-
-  struct RefList *new_constructors =
-    O_CALL (constructors, filter, new_constructor_filter);
-  O_CALL (new_constructors, retain);
-
-  /* generate the class */
-  O_CALL (new_constructors, map_args,
-	  ClassDeclaration_generate_constructor_definition, self);
-  fprintf (out, "\n");
-
-  O_CALL (new_methods, map_args, ClassDeclaration_generate_method_definition,
-	  self);
-  fprintf (out, "\n");
-
-  fprintf (out, "#define ");
-  O_CALL (self->name, generate);
-  fprintf (out, "Class_Attr\\\n ");
-  generate_superclass (self);
-  fprintf (out, "Class_Attr");
-  O_CALL (new_constructors, map_args,
-	  ClassDeclaration_generate_constructor_registration, self);
-  O_CALL (new_methods, map_args,
-	  ClassDeclaration_generate_method_registration, self);
-  fprintf (out, "\n\n");
-
-  fprintf (out, "#define ");
-  O_CALL (self->name, generate);
-  fprintf (out, "_Attr\\\n ");
-  generate_superclass (self);
-  fprintf (out, "_Attr");
-  O_CALL (attributes, map_args,
-	  ClassDeclaration_generate_attribute_registration, self);
-  fprintf (out, "\n\n");
-
-  fprintf (out, "O_CLASS (");
-  O_CALL (self->name, generate);
-  fprintf (out, ", ");
-  generate_superclass (self);
-  fprintf (out, ");\n\n");
-
-  fprintf (out, "#define O_SUPER ");
-  generate_superclass (self);
-  fprintf (out, " ()\n\n");
-
-  O_CALL (constructors, map_args,
-	  ClassDeclaration_generate_constructor_implementation, self);
-  O_CALL (destructors, map_args,
-	  ClassDeclaration_generate_destructor_implementation, self);
-  O_CALL (methods, map_args, ClassDeclaration_generate_method_implementation,
-	  self);
-
-  fprintf (out, "O_OBJECT (");
-  O_CALL (self->name, generate);
-  fprintf (out, ", ");
-  generate_superclass (self);
-  fprintf (out, ");\n");
-
-  O_CALL (constructors, map_args,
-	  ClassDeclaration_generate_constructor_registration_2, self);
-  O_CALL (destructors, map_args,
-	  ClassDeclaration_generate_destructor_registration_2, self);
-  O_CALL (methods, map_args,
-	  ObjectTypeDeclaration_generate_method_registration_2, self);
-
-  if (self->interfaces)
-    {
-      O_CALL (self->interfaces, map_args,
-	      ClassDeclaration_generate_method_implementation_2, self->name);
-    }
-
-  fprintf (out, "O_END_OBJECT\n\n");
-
-  fprintf (out, "#undef O_SUPER\n\n");
-
-  O_CALL (attributes, release);
-  O_CALL (methods, release);
-  O_CALL (new_methods, release);
-  O_CALL (constructors, release);
-  O_CALL (destructors, release);
-}
-
 O_IMPLEMENT (ClassDeclaration, void, type_check, (void *_self))
 {
   struct ClassDeclaration *self = O_CAST (_self, ClassDeclaration ());
@@ -528,7 +416,6 @@ O_OBJECT (ClassDeclaration, Declaration);
 O_OBJECT_METHOD (ClassDeclaration, ctor);
 O_OBJECT_METHOD (ClassDeclaration, dtor);
 O_OBJECT_METHOD (ClassDeclaration, accept);
-O_OBJECT_METHOD (ClassDeclaration, generate);
 O_OBJECT_METHOD (ClassDeclaration, type_check);
 O_OBJECT_METHOD (ClassDeclaration, is_compatible);
 O_END_OBJECT

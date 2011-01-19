@@ -22,7 +22,9 @@ O_METHOD_DEF (Declaration, void, set_include_file,
   struct Scope * scope;				\
   struct Type * type;				\
   struct Token * include_file;			\
-  struct ClassDeclaration * class_decl
+  struct ClassDeclaration * class_decl;		\
+  bool declared;				\
+  bool defined
 
 O_CLASS (Declaration, CompileObject);
 

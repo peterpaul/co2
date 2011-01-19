@@ -98,60 +98,6 @@ InterfaceDeclaration_generate_method_implementation (void *_method_decl,
   fprintf (out, "));\n");
 }
 
-O_IMPLEMENT (InterfaceDeclaration, void, generate, (void *_self))
-{
-  struct InterfaceDeclaration *self = O_CAST (_self, InterfaceDeclaration ());
-  /* filter the members */
-  struct RefList *methods =
-    O_CALL (self->members, filter_args, type_filter, FunctionDeclaration ());
-  O_CALL (methods, retain);
-  struct RefList *new_methods =
-    O_CALL (methods, filter_args, Declaration_new_member_filter,
-	    FunctionDeclaration ());
-  O_CALL (new_methods, retain);
-
-  fprintf (out, "#include \"Interface.h\"\n");
-
-  /* generate the class */
-  O_CALL (new_methods, map_args,
-	  InterfaceDeclaration_generate_method_definition, self);
-  fprintf (out, "\n");
-
-  fprintf (out, "#define ");
-  O_CALL (self->name, generate);
-  fprintf (out, "Class_Attr\\\n ");
-  fprintf (out, "InterfaceClass_Attr");
-  fprintf (out, "\n\n");
-
-  fprintf (out, "#define ");
-  O_CALL (self->name, generate);
-  fprintf (out, "_Attr\\\n ");
-  fprintf (out, "Interface_Attr");
-  O_CALL (new_methods, map_args,
-	  InterfaceDeclaration_generate_method_registration, self);
-  fprintf (out, "\n\n");
-
-  fprintf (out, "O_CLASS (");
-  O_CALL (self->name, generate);
-  fprintf (out, ", Interface);\n\n");
-
-  fprintf (out, "#define O_SUPER Interface ()\n\n");
-
-  O_CALL (methods, map_args,
-	  InterfaceDeclaration_generate_method_implementation, self);
-  fprintf (out, "\n");
-
-  fprintf (out, "O_OBJECT (");
-  O_CALL (self->name, generate);
-  fprintf (out, ", Interface);\n");
-  fprintf (out, "O_END_OBJECT\n\n");
-
-  fprintf (out, "#undef O_SUPER\n\n");
-
-  O_CALL (methods, release);
-  O_CALL (new_methods, release);
-}
-
 O_IMPLEMENT (InterfaceDeclaration, void, type_check, (void *_self))
 {
   struct InterfaceDeclaration *self = O_CAST (_self, InterfaceDeclaration ());
@@ -198,6 +144,5 @@ O_OBJECT_METHOD (InterfaceDeclaration, ctor);
 O_OBJECT_METHOD (InterfaceDeclaration, dtor);
 O_OBJECT_METHOD (InterfaceDeclaration, accept);
 O_OBJECT_METHOD (InterfaceDeclaration, type_check);
-O_OBJECT_METHOD (InterfaceDeclaration, generate);
 O_OBJECT_METHOD (InterfaceDeclaration, is_compatible);
 O_END_OBJECT

@@ -10,8 +10,8 @@ O_IMPLEMENT(StructDeclaration, void *, ctor, (void *_self, va_list *app))
 {
   struct StructDeclaration * self = O_CAST(_self, StructDeclaration());
   self = O_SUPER->ctor(self, app);
-  self->member_scope = O_GET_ARG (Scope);
-  self->members = O_RETAIN_ARG (RefList);
+  self->member_scope = O_BRANCH_GET_ARG (Scope);
+  self->members = O_BRANCH_RETAIN_ARG (RefList);
   return self;
 }
 

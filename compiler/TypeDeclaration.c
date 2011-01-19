@@ -47,22 +47,6 @@ O_IMPLEMENT(TypeDeclaration, void, type_check, (void *_self))
     }
 }
 
-O_IMPLEMENT(TypeDeclaration, void, generate, (void *_self))
-{
-  struct TypeDeclaration *self = O_CAST(_self, TypeDeclaration());
-  if (self->is_struct)
-    {
-    }
-  else
-    {
-      fprintf (out, "typedef ");
-      O_CALL (self->type, generate);
-      fprintf (out, " ");
-      O_CALL (self->name, generate);
-      fprintf (out, ";\n");
-    }
-}
-
 O_IMPLEMENT (TypeDeclaration, bool, is_compatible,
 	     (void *_self, void *_other))
 {
@@ -76,6 +60,5 @@ O_OBJECT_METHOD(TypeDeclaration, ctor);
 O_OBJECT_METHOD(TypeDeclaration, dtor);
 O_OBJECT_METHOD(TypeDeclaration, accept);
 O_OBJECT_METHOD(TypeDeclaration, type_check);
-O_OBJECT_METHOD(TypeDeclaration, generate);
 O_OBJECT_METHOD(TypeDeclaration, is_compatible);
 O_END_OBJECT

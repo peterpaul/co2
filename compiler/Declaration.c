@@ -34,8 +34,7 @@ O_IMPLEMENT (Declaration, void *, ctor, (void *_self, va_list * app))
 {
   struct Declaration *self = O_CAST (_self, Declaration ());
   self = O_SUPER->ctor (self, app);
-  self->name = O_CAST (va_arg (*app, struct Token *), Token ());
-  O_CALL (self->name, retain);
+  self->name = O_RETAIN_ARG (Token);
   return self;
 }
 
