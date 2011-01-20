@@ -43,11 +43,11 @@ static void TryStatement_type_check_catch(void *_self)
 O_IMPLEMENT(TryStatement, void, type_check, (void *_self))
 {
   struct TryStatement *self = O_CAST(_self, TryStatement());
-  O_CALL (current_context, add, self);
+  O_BRANCH_CALL (current_context, add, self);
   O_CALL (self->try_clause, type_check);
   O_CALL (self->catch_clause, map, TryStatement_type_check_catch);
   O_BRANCH_CALL (self->finally_clause, type_check);
-  O_CALL (current_context, remove_last);
+  O_BRANCH_CALL (current_context, remove_last);
 }
 
 static void TryStatement_generate_catch(void *_catch, va_list *app)

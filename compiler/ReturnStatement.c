@@ -71,15 +71,15 @@ O_IMPLEMENT (ReturnStatement, void, type_check, (void *_self))
   struct ReturnStatement *self = O_CAST (_self, ReturnStatement ());
   O_BRANCH_CALL (self->expr, type_check);
 
-  self->function_context = O_CALL (current_context, find, FunctionDeclaration ());
+  self->function_context = O_BRANCH_CALL (current_context, find, FunctionDeclaration ());
   struct FunctionType *function_type = o_cast (self->function_context->type, FunctionType ());
   if (self->expr && self->expr->type)
     {
       O_CALL (function_type->return_type, assert_compatible, self->expr->type);
     }
 
-  self->try_context = O_CALL (current_context, find, TryStatement ());
-  self->catch_context = O_CALL (current_context, find, CatchStatement ());
+  self->try_context = O_BRANCH_CALL (current_context, find, TryStatement ());
+  self->catch_context = O_BRANCH_CALL (current_context, find, CatchStatement ());
 }
 
 O_OBJECT (ReturnStatement, Statement);

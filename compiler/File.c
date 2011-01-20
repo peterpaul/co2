@@ -62,17 +62,20 @@ O_IMPLEMENT (File, void *, dtor, (void *_self))
 O_IMPLEMENT (File, void, accept, (void *_self, struct BaseCompileObjectVisitor *visitor))
 {
   struct File *self = O_CAST (_self, File ());
+  O_BRANCH_CALL (current_context, add, self);
   O_CALL (self->declarations, map_args, accept, visitor);
   O_CALL (visitor, visit, self);
+  O_BRANCH_CALL (current_context, remove_last);
 }
 
 O_IMPLEMENT (File, void, type_check, (void *_self))
 {
   struct File *self = O_CAST (_self, File ());
   current_context = O_CALL_CLASS (Context (), new);
-  O_CALL (current_context, retain);
+  O_BRANCH_CALL (current_context, retain);
   O_CALL (self->declarations, map, type_check);
-  O_CALL (current_context, release);
+  O_BRANCH_CALL (current_context, release);
+  current_context = NULL;
 }
 
 O_IMPLEMENT (File, void, optimize, (void *_self))

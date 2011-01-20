@@ -23,8 +23,10 @@ O_IMPLEMENT (ArgumentDeclaration, void *, dtor, (void *_self))
 O_IMPLEMENT (ArgumentDeclaration, void, accept, (void *_self, struct BaseCompileObjectVisitor *visitor))
 {
   struct ArgumentDeclaration *self = O_CAST (_self, ArgumentDeclaration ());
+  O_BRANCH_CALL (current_context, add, self);
   O_CALL (self->type, accept, visitor);
   O_CALL (visitor, visit, self);
+  O_BRANCH_CALL (current_context, remove_last);
 }
 
 O_IMPLEMENT (ArgumentDeclaration, void, generate, (void *_self))
@@ -45,9 +47,9 @@ O_IMPLEMENT (ArgumentDeclaration, void, generate, (void *_self))
 O_IMPLEMENT (ArgumentDeclaration, void, type_check, (void *_self))
 {
   struct ArgumentDeclaration *self = O_CAST (_self, ArgumentDeclaration ());
-  O_CALL (current_context, add, self);
+  O_BRANCH_CALL (current_context, add, self);
   O_CALL (self->type, type_check);
-  O_CALL (current_context, remove_last);
+  O_BRANCH_CALL (current_context, remove_last);
 }
 
 O_OBJECT (ArgumentDeclaration, Declaration);

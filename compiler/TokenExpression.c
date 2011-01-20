@@ -79,7 +79,7 @@ O_IMPLEMENT (TokenExpression, void, type_check, (void *_self))
     case SELF:
       {
 	struct ClassDeclaration *class_decl =
-	  O_CALL (current_context, find, ClassDeclaration ());
+	  O_BRANCH_CALL (current_context, find, ClassDeclaration ());
 	self->type =
 	  O_CALL_CLASS (ObjectType (), new, class_decl->name, class_decl);
 	O_CALL (self->type, retain);

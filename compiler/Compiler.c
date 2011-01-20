@@ -82,8 +82,11 @@ main (int argc, char **argv)
 
   struct GenerateHeaderVisitor * header_visitor = O_CALL_CLASS (GenerateHeaderVisitor (), new, out);
   O_CALL (main_file, accept, header_visitor);
+  O_CALL (header_visitor, delete);
+
   struct GenerateSourceVisitor * source_visitor = O_CALL_CLASS (GenerateSourceVisitor (), new, out);
   O_CALL (main_file, accept, source_visitor);
+  O_CALL (source_visitor, delete);
 
   // O_CALL (main_file, generate);
 

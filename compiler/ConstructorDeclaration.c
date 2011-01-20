@@ -34,18 +34,20 @@ O_IMPLEMENT (ConstructorDeclaration, void *, dtor, (void *_self))
 O_IMPLEMENT (ConstructorDeclaration, void, accept, (void *_self, struct BaseCompileObjectVisitor *visitor))
 {
   struct ConstructorDeclaration *self = O_CAST (_self, ConstructorDeclaration ());
+  O_BRANCH_CALL (current_context, add, self);
   O_CALL (self->formal_arguments, map_args, accept, visitor);
   O_CALL (self->body, accept, visitor);
   O_CALL (visitor, visit, self);
+  O_BRANCH_CALL (current_context, remove_last);
 }
 
 O_IMPLEMENT (ConstructorDeclaration, void, type_check, (void *_self))
 {
   struct ConstructorDeclaration *self =
     O_CAST (_self, ConstructorDeclaration ());
-  O_CALL (current_context, add, self);
+  O_BRANCH_CALL (current_context, add, self);
   struct Declaration *class_decl =
-    O_CALL (current_context, find, ClassDeclaration ());
+    O_BRANCH_CALL (current_context, find, ClassDeclaration ());
   if (class_decl == NULL)
     {
       error (self->class_name,
@@ -64,7 +66,7 @@ O_IMPLEMENT (ConstructorDeclaration, void, type_check, (void *_self))
   O_CALL (self->type, retain);
 
   O_CALL (self->body, type_check);
-  O_CALL (current_context, remove_last);
+  O_BRANCH_CALL (current_context, remove_last);
 }
 
 O_OBJECT (ConstructorDeclaration, Declaration);

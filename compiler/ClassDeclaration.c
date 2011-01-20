@@ -38,8 +38,10 @@ O_IMPLEMENT (ClassDeclaration, void *, dtor, (void *_self))
 O_IMPLEMENT (ClassDeclaration, void, accept, (void *_self, struct BaseCompileObjectVisitor *visitor))
 {
   struct ClassDeclaration *self = O_CAST (_self, ClassDeclaration ());
+  O_BRANCH_CALL (current_context, add, self);
   O_CALL (self->members, map_args, accept, visitor);
   O_CALL (visitor, visit, self);
+  O_BRANCH_CALL (current_context, remove_last);
 }
 
 int
@@ -77,50 +79,6 @@ ClassDeclaration_generate_constructor_arguments (void *_arg)
   fprintf (out, " = va_arg (*app, ");
   O_CALL (arg->type, generate);
   fprintf (out, ");\n");
-}
-
-void
-ClassDeclaration_generate_constructor_definition (void *_constructor_decl,
-						  va_list * app)
-{
-  struct ConstructorDeclaration *constructor_decl =
-    O_CAST (_constructor_decl, ConstructorDeclaration ());
-  struct ClassDeclaration *class_decl = O_GET_ARG (ClassDeclaration);
-  fprintf (out, "O_METHOD_DEF (");
-  O_CALL (class_decl->name, generate);
-  fprintf (out, ", void *, ");
-  if (strcmp (constructor_decl->name->name->data, "ctor") != 0)
-    {
-      fprintf (out, "ctor_");
-    }
-  O_CALL (constructor_decl->name, generate);
-  fprintf (out, ", (void *_self, va_list *app));\n");
-}
-
-void
-ClassDeclaration_generate_method_definition (void *_method_decl,
-					     va_list * app)
-{
-  struct FunctionDeclaration *method_decl =
-    O_CAST (_method_decl, FunctionDeclaration ());
-  if (method_decl->interface_decl)
-    {
-      return;
-    }
-
-  struct ClassDeclaration *class_decl = O_GET_ARG (ClassDeclaration);
-  struct FunctionType *method_type =
-    o_cast (method_decl->type, FunctionType ());
-  fprintf (out, "O_METHOD_DEF (");
-  O_CALL (class_decl->name, generate);
-  fprintf (out, ", ");
-  O_CALL (method_type->return_type, generate);
-  fprintf (out, ", ");
-  O_CALL (method_decl->name, generate);
-  fprintf (out, ", (void *_self");
-  O_CALL (method_decl->formal_arguments, map,
-	  ObjectTypeDeclaration_generate_method_arguments);
-  fprintf (out, "));\n");
 }
 
 void
@@ -227,128 +185,6 @@ ClassDeclaration_generate_method_implementation_2 (void *_interface_name,
 }
 
 void
-ClassDeclaration_generate_constructor_implementation (void *_constructor_decl,
-						      va_list * app)
-{
-  struct ConstructorDeclaration *constructor_decl =
-    O_CAST (_constructor_decl, ConstructorDeclaration ());
-  struct ClassDeclaration *class_decl = O_GET_ARG (ClassDeclaration);
-  fprintf (out, "O_IMPLEMENT (");
-  O_CALL (class_decl->name, generate);
-  fprintf (out, ", void *");
-  fprintf (out, ", ");
-  if (strcmp (constructor_decl->name->name->data, "ctor") != 0)
-    {
-      fprintf (out, "ctor_");
-    }
-  O_CALL (constructor_decl->name, generate);
-  fprintf (out, ", (void *_self, va_list *app))\n");
-  fprintf (out, "{\n");
-  fprintf (out, "struct ");
-  O_CALL (class_decl->name, generate);
-  fprintf (out, "* self = O_CAST (_self, ");
-  O_CALL (class_decl->name, generate);
-  fprintf (out, " ());\n");
-  O_CALL (constructor_decl->formal_arguments, map,
-	  ClassDeclaration_generate_constructor_arguments);
-
-  O_CALL (constructor_decl->body, generate);
-  fprintf (out, "return self;\n");
-  fprintf (out, "}\n\n");
-}
-
-void
-ClassDeclaration_generate_destructor_implementation (void *_destructor_decl,
-						     va_list * app)
-{
-  struct DestructorDeclaration *destructor_decl =
-    O_CAST (_destructor_decl, DestructorDeclaration ());
-  struct ClassDeclaration *class_decl = O_GET_ARG (ClassDeclaration);
-  fprintf (out, "O_IMPLEMENT (");
-  O_CALL (class_decl->name, generate);
-  fprintf (out, ", void *");
-  fprintf (out, ", dtor, (void *_self))\n");
-  fprintf (out, "{\n");
-  fprintf (out, "struct ");
-  O_CALL (class_decl->name, generate);
-  fprintf (out, "* self = O_CAST (_self, ");
-  O_CALL (class_decl->name, generate);
-  fprintf (out, " ());\n");
-  O_CALL (destructor_decl->body, generate);
-  fprintf (out, "return O_SUPER->dtor (self);\n");
-  fprintf (out, "}\n\n");
-}
-
-void
-ClassDeclaration_generate_method_implementation (void *_method_decl,
-						 va_list * app)
-{
-  struct FunctionDeclaration *method_decl =
-    O_CAST (_method_decl, FunctionDeclaration ());
-  struct ClassDeclaration *class_decl = O_GET_ARG (ClassDeclaration);
-  struct FunctionType *method_type =
-    o_cast (method_decl->type, FunctionType ());
-  if (method_decl->interface_decl)
-    {
-      fprintf (out, "O_IMPLEMENT_IF (");
-    }
-  else
-    {
-      fprintf (out, "O_IMPLEMENT (");
-    }
-  O_CALL (class_decl->name, generate);
-  fprintf (out, ", ");
-  O_CALL (method_type->return_type, generate);
-  fprintf (out, ", ");
-  O_CALL (method_decl->name, generate);
-  fprintf (out, ", (void *_self");
-  O_CALL (method_decl->formal_arguments, map,
-	  ObjectTypeDeclaration_generate_method_arguments);
-  if (method_decl->interface_decl)
-    {
-      fprintf (out, "), (_self");
-      O_CALL (method_decl->formal_arguments, map,
-	      ObjectTypeDeclaration_generate_method_argument_names);
-    }
-  fprintf (out, "))\n");
-  fprintf (out, "{\n");
-  fprintf (out, "struct ");
-  O_CALL (class_decl->name, generate);
-  fprintf (out, "* self = O_CAST (_self, ");
-  O_CALL (class_decl->name, generate);
-  fprintf (out, " ());\n");
-
-  if (method_type->has_var_args)
-    {
-      fprintf (out, "va_list ap;\n");
-      fprintf (out, "va_start (ap, ");
-      if (method_decl->formal_arguments->length == 1)
-	{
-	  fprintf (out, "_self");
-	}
-      else
-	{
-	  struct ArgumentDeclaration *arg_decl =
-	    O_CALL (method_decl->formal_arguments, get,
-		    method_decl->formal_arguments->length - 2);
-	  O_CALL (arg_decl->name, generate);
-	}
-      fprintf (out, ");\n");
-    }
-
-  O_CALL (method_decl->body, generate);
-
-  if (method_type->has_var_args && 
-      (o_is_of (method_type->return_type, PrimitiveType ())
-       && ((struct PrimitiveType *) method_type->return_type)->token->type == VOID))
-    {
-      fprintf (out, "va_end (ap);\n");
-    }
-
-  fprintf (out, "}\n\n");
-}
-
-void
 ClassDeclaration_generate_attribute_registration (void *_method_decl,
 						  va_list * app)
 {
@@ -377,7 +213,7 @@ generate_superclass (struct ClassDeclaration *self)
 O_IMPLEMENT (ClassDeclaration, void, type_check, (void *_self))
 {
   struct ClassDeclaration *self = O_CAST (_self, ClassDeclaration ());
-  O_CALL (current_context, add, self);
+  O_BRANCH_CALL (current_context, add, self);
   if (self->superclass)
     {
       struct Declaration *_super_class =
@@ -395,7 +231,7 @@ O_IMPLEMENT (ClassDeclaration, void, type_check, (void *_self))
    * 3. class (including superclasses) implements all methods of all interfaces, if not: fail
    */
   O_CALL (self->members, map, Declaration_list_type_check);
-  O_CALL (current_context, remove_last);
+  O_BRANCH_CALL (current_context, remove_last);
 }
 
 O_IMPLEMENT (ClassDeclaration, bool, is_compatible,

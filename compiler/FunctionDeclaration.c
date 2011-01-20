@@ -39,10 +39,12 @@ O_IMPLEMENT (FunctionDeclaration, void *, dtor, (void *_self))
 O_IMPLEMENT (FunctionDeclaration, void, accept, (void *_self, struct BaseCompileObjectVisitor *visitor))
 {
   struct FunctionDeclaration *self = O_CAST (_self, FunctionDeclaration ());
+  O_BRANCH_CALL (current_context, add, self);
   O_CALL (self->type, accept, visitor);
   O_CALL (self->formal_arguments, map_args, accept, visitor);
   O_BRANCH_CALL (self->body, accept, visitor);
   O_CALL (visitor, visit, self);
+  O_BRANCH_CALL (current_context, remove_last);
 }
 
 void
@@ -58,7 +60,7 @@ FunctionDeclaration_generate_formal_arg (void *_decl, va_list * ap)
   O_CALL (decl, generate);
 }
 
-static void
+void
 FunctionDeclaration_find_in_interface (void *_self, va_list * app)
 {
   struct Token *self = O_CAST (_self, Token ());
@@ -91,14 +93,14 @@ void FunctionDeclaration_type_check_formal_arg (void *_self)
 O_IMPLEMENT (FunctionDeclaration, void, type_check, (void *_self))
 {
   struct FunctionDeclaration *self = O_CAST (_self, FunctionDeclaration ());
-  O_CALL (current_context, add, self);
+  O_BRANCH_CALL (current_context, add, self);
   O_CALL (self->type, type_check);
   O_CALL (self->formal_arguments, map, FunctionDeclaration_type_check_formal_arg);
   O_BRANCH_CALL (self->body, type_check);
 
   struct FunctionType *function_type = get_type (self);
   struct ClassDeclaration *class_decl =
-    O_CALL (current_context, find, ClassDeclaration ());
+    O_BRANCH_CALL (current_context, find, ClassDeclaration ());
   if (function_type->has_var_args)
     {
       if (class_decl == NULL && self->formal_arguments->length <= 1)
@@ -112,7 +114,7 @@ O_IMPLEMENT (FunctionDeclaration, void, type_check, (void *_self))
       O_CALL (class_decl->interfaces, map_args,
 	      FunctionDeclaration_find_in_interface, self);
     }
-  O_CALL (current_context, remove_last);
+  O_BRANCH_CALL (current_context, remove_last);
 }
 
 O_OBJECT (FunctionDeclaration, Declaration);

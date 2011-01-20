@@ -17,9 +17,11 @@ O_IMPLEMENT (VariableDeclaration, void *, ctor, (void *_self, va_list * app))
 O_IMPLEMENT (VariableDeclaration, void, accept, (void *_self, struct BaseCompileObjectVisitor *visitor))
 {
   struct VariableDeclaration *self = O_CAST (_self, VariableDeclaration ());
+  O_BRANCH_CALL (current_context, add, self);
   O_CALL (self->type, accept, visitor);
   O_BRANCH_CALL (self->expr, accept, visitor);
   O_CALL (visitor, visit, self);
+  O_BRANCH_CALL (current_context, remove_last);
 }
 
 O_IMPLEMENT (VariableDeclaration, void, set_type,
@@ -54,7 +56,7 @@ O_IMPLEMENT (VariableDeclaration, void, generate, (void *_self))
 O_IMPLEMENT (VariableDeclaration, void, type_check, (void *_self))
 {
   struct VariableDeclaration *self = O_CAST (_self, VariableDeclaration ());
-  O_CALL (current_context, add, self);
+  O_BRANCH_CALL (current_context, add, self);
   O_CALL (self->type, type_check);
   if (self->expr)
     {
@@ -75,7 +77,7 @@ O_IMPLEMENT (VariableDeclaration, void, type_check, (void *_self))
 	     self->name->name->data, first_decl->name->file->name->data,
 	     first_decl->name->line);
     }
-  O_CALL (current_context, remove_last);
+  O_BRANCH_CALL (current_context, remove_last);
 }
 
 O_OBJECT (VariableDeclaration, Declaration);

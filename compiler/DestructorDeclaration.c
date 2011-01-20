@@ -41,37 +41,24 @@ O_IMPLEMENT (DestructorDeclaration, void *, dtor, (void *_self))
 O_IMPLEMENT (DestructorDeclaration, void, accept, (void *_self, struct BaseCompileObjectVisitor *visitor))
 {
   struct DestructorDeclaration *self = O_CAST (_self, DestructorDeclaration ());
+  O_BRANCH_CALL (current_context, add, self);
   O_CALL (self->body, accept, visitor);
   O_CALL (visitor, visit, self);
-}
-
-O_IMPLEMENT (DestructorDeclaration, void, generate, (void *_self))
-{
-  struct DestructorDeclaration *self =
-    O_CAST (_self, DestructorDeclaration ());
-  O_CALL (get_type (self)->return_type, generate);
-  fprintf (out, " ");
-  O_CALL (self->name, generate);
-  fprintf (out, "(");
-  fprintf (out, ")\n");
-  fprintf (out, "{\n");
-  O_CALL (self->body, generate);
-  fprintf (out, "}\n");
+  O_BRANCH_CALL (current_context, remove_last);
 }
 
 O_IMPLEMENT (DestructorDeclaration, void, type_check, (void *_self))
 {
   struct DestructorDeclaration *self =
     O_CAST (_self, DestructorDeclaration ());
-  O_CALL (current_context, add, self);
+  O_BRANCH_CALL (current_context, add, self);
   O_CALL (self->body, type_check);
-  O_CALL (current_context, remove_last);
+  O_BRANCH_CALL (current_context, remove_last);
 }
 
 O_OBJECT (DestructorDeclaration, Declaration);
 O_OBJECT_METHOD (DestructorDeclaration, ctor);
 O_OBJECT_METHOD (DestructorDeclaration, dtor);
 O_OBJECT_METHOD (DestructorDeclaration, accept);
-O_OBJECT_METHOD (DestructorDeclaration, generate);
 O_OBJECT_METHOD (DestructorDeclaration, type_check);
 O_END_OBJECT

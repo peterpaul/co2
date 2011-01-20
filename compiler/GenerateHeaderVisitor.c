@@ -15,11 +15,7 @@
 int
 new_constructor_filter (void *_constructor);
 void
-ClassDeclaration_generate_method_definition (void *_method_decl,
-					     va_list * app);
-void
-ClassDeclaration_generate_constructor_definition (void *_constructor_decl,
-					     va_list * app);
+generate_superclass (struct ClassDeclaration *self);
 void
 ClassDeclaration_generate_constructor_registration (void *_constructor_decl,
 						    va_list * app);
@@ -33,9 +29,6 @@ ClassDeclaration_generate_attribute_registration (void *_method_decl,
 void
 FunctionDeclaration_generate_formal_arg (void *_decl, va_list * ap);
 
-void
-InterfaceDeclaration_generate_method_definition (void *_method_decl,
-						 va_list * app);
 void
 InterfaceDeclaration_generate_method_registration (void *_method_decl,
 						   va_list * app);
@@ -52,13 +45,16 @@ O_IMPLEMENT(GenerateHeaderVisitor, void *, ctor, (void *_self, va_list *app))
   struct GenerateHeaderVisitor * self = O_CAST(_self, GenerateHeaderVisitor());
   self = O_SUPER->ctor(self, app);
   self->fp = va_arg (*app, FILE *);
+  current_context = O_CALL_CLASS (Context (), new);
+  O_BRANCH_CALL (current_context, retain);
   return self;
 }
 
 O_IMPLEMENT(GenerateHeaderVisitor, void *, dtor, (void *_self))
 {
   struct GenerateHeaderVisitor *self = O_CAST(_self, GenerateHeaderVisitor());
-  /* TODO cleanup */
+  O_BRANCH_CALL (current_context, release);
+  current_context = NULL;
   return O_SUPER->dtor(self);
 }
 
@@ -96,14 +92,6 @@ O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitClassDeclaration, (void *_self,
   O_CALL (new_constructors, retain);
 
   /* generate the class */
-  O_CALL (new_constructors, map_args,
-	  ClassDeclaration_generate_constructor_definition, self);
-  fprintf (out, "\n");
-
-  O_CALL (new_methods, map_args, ClassDeclaration_generate_method_definition,
-	  self);
-  fprintf (out, "\n");
-
   fprintf (out, "#define ");
   O_CALL (self->name, generate);
   fprintf (out, "Class_Attr\\\n ");
@@ -137,18 +125,31 @@ O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitClassDeclaration, (void *_self,
   O_CALL (destructors, release);
 }
 
-O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitConstructorDeclaration, (void *_self, void *_object), (_self, _object)) {}
+O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitConstructorDeclaration, (void *_self, void *_object), (_self, _object))
+{
+  struct GenerateHeaderVisitor *visitor = O_CAST (_self, GenerateHeaderVisitor ());
+  struct ConstructorDeclaration *self =
+    O_CAST (_object, ConstructorDeclaration ());
+  if (new_constructor_filter (self))
+    {
+      struct ClassDeclaration *class_decl = O_CALL (current_context, find, ClassDeclaration ());
+      fprintf (out, "O_METHOD_DEF (");
+      O_CALL (class_decl->name, generate);
+      fprintf (out, ", void *, ");
+      if (strcmp (self->name->name->data, "ctor") != 0)
+	{
+	  fprintf (out, "ctor_");
+	}
+      O_CALL (self->name, generate);
+      fprintf (out, ", (void *_self, va_list *app));\n\n");
+    }
+}
 
 O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitDeclaration, (void *_self, void *_object), (_self, _object))
 {
   struct GenerateHeaderVisitor *visitor = O_CAST (_self, GenerateHeaderVisitor ());
   struct Declaration *self = O_CAST (_object, Declaration ());
-  if (self->scope && self->scope->type != GLOBAL_SCOPE)
-    {
-      // only generate global declarations
-      return;
-    }
-  else if (self->include_file)
+  if (self->include_file)
     {
       // don't generate if external definition
       fprintf (out, "#include ");
@@ -170,16 +171,55 @@ O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitFunctionDeclaration, (void *_se
 {
   struct BaseCompileObjectVisitor *visitor = O_CAST(_self, BaseCompileObjectVisitor());
   struct FunctionDeclaration *self = O_CAST(_object, FunctionDeclaration ());
-
-  bool first_formal_arg = true;
-  struct FunctionType *function_type = get_type (self);
-  O_CALL (function_type->return_type, generate);
-  fprintf (out, " ");
-  O_CALL (self->name, generate);
-  fprintf (out, " (");
-  O_CALL (self->formal_arguments, map_args,
-	  FunctionDeclaration_generate_formal_arg, &first_formal_arg);
-  fprintf (out, ");\n");
+  struct ClassDeclaration *class_decl = O_CALL (current_context, find, ClassDeclaration ());
+  struct InterfaceDeclaration *interface_decl = O_CALL (current_context, find, InterfaceDeclaration ());
+  if (class_decl)
+    {
+      if (self->interface_decl)
+	{
+	  return;
+	}
+      
+      struct FunctionType *method_type =
+	o_cast (self->type, FunctionType ());
+      fprintf (out, "O_METHOD_DEF (");
+      O_CALL (class_decl->name, generate);
+      fprintf (out, ", ");
+      O_CALL (method_type->return_type, generate);
+      fprintf (out, ", ");
+      O_CALL (self->name, generate);
+      fprintf (out, ", (void *_self");
+      O_CALL (self->formal_arguments, map,
+	      ObjectTypeDeclaration_generate_method_arguments);
+      fprintf (out, "));\n");
+    }
+  else if (interface_decl)
+    {
+      struct FunctionType *method_type =
+	o_cast (self->type, FunctionType ());
+      fprintf (out, "O_METHOD_DEF (");
+      O_CALL (interface_decl->name, generate);
+      fprintf (out, ", ");
+      O_CALL (method_type->return_type, generate);
+      fprintf (out, ", ");
+      O_CALL (self->name, generate);
+      fprintf (out, ", (void *_self");
+      O_CALL (self->formal_arguments, map,
+	      ObjectTypeDeclaration_generate_method_arguments);
+      fprintf (out, "));\n");
+    }
+  else
+    {
+      bool first_formal_arg = true;
+      struct FunctionType *function_type = get_type (self);
+      O_CALL (function_type->return_type, generate);
+      fprintf (out, " ");
+      O_CALL (self->name, generate);
+      fprintf (out, " (");
+      O_CALL (self->formal_arguments, map_args,
+	      FunctionDeclaration_generate_formal_arg, &first_formal_arg);
+      fprintf (out, ");\n");
+    }
 }
 
 O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitInterfaceDeclaration, (void *_self, void *_object), (_self, _object))
@@ -198,10 +238,6 @@ O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitInterfaceDeclaration, (void *_s
   fprintf (out, "#include \"Interface.h\"\n");
 
   /* generate the class */
-  O_CALL (new_methods, map_args,
-	  InterfaceDeclaration_generate_method_definition, self);
-  fprintf (out, "\n");
-
   fprintf (out, "#define ");
   O_CALL (self->name, generate);
   fprintf (out, "Class_Attr\\\n ");
@@ -233,7 +269,6 @@ O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitStructDeclaration, (void *_self
   fprintf (out, " {\n");
   O_CALL (self->members, map, Declaration_list_generate);
   fprintf (out, "};\n\n");
-
 }
 
 O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitTypeDeclaration, (void *_self, void *_object), (_self, _object))
@@ -252,6 +287,11 @@ O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitVariableDeclaration, (void *_se
   struct BaseCompileObjectVisitor *visitor = O_CAST(_self, BaseCompileObjectVisitor());
   struct VariableDeclaration *self = O_CAST(_object, VariableDeclaration());
 
+  if (self->scope && self->scope->type != GLOBAL_SCOPE)
+    {
+      // only generate global declarations
+      return;
+    }
   if (!o_is_of (self->type, FunctionType ()))
     {
       fprintf (out, "extern ");
@@ -365,6 +405,52 @@ O_OBJECT_METHOD (GenerateHeaderVisitor, visitPrimitiveType);
 O_OBJECT_METHOD (GenerateHeaderVisitor, visitFile);
 
 O_OBJECT_IF(CompileObjectVisitor);
-O_OBJECT_IF_METHOD(GenerateHeaderVisitor, visitClassDeclaration);
+// O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visit);
+O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitArgumentDeclaration);
+O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitClassDeclaration);
+O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitConstructorDeclaration);
+O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitDeclaration);
+O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitDestructorDeclaration);
+O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitFunctionDeclaration);
+O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitInterfaceDeclaration);
+O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitMacroDeclaration);
+O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitStructDeclaration);
+O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitTypeDeclaration);
+O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitVariableDeclaration);
+
+O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitCatchStatement);
+O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitCompoundStatement);
+O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitDeleteStatement);
+O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitDoStatement);
+O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitExpressionStatement);
+O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitForEachStatement);
+O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitForStatement);
+O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitIfStatement);
+O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitReturnStatement);
+// O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitStatement);
+O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitThrowStatement);
+O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitTryStatement);
+O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitWhileStatement);
+
+O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitBinaryExpression);
+O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitCastExpression);
+// O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitExpression);
+O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitFunctionCallExpression);
+O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitNestedExpression);
+O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitNewExpression);
+O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitNullExpression);
+O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitSizeExpression);
+O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitSuperExpression);
+O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitTokenExpression);
+O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitUnaryExpression);
+O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitVarArgExpression);
+
+O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitArrayType);
+O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitFunctionType);
+O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitObjectType);
+O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitPrimitiveType);
+// O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitType);
+
+O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitFile);
 O_OBJECT_IF_END
 O_END_OBJECT

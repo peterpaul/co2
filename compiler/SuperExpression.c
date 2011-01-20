@@ -43,14 +43,14 @@ O_IMPLEMENT (SuperExpression, void, type_check, (void *_self))
 {
   struct SuperExpression *self = O_CAST (_self, SuperExpression ());
   /* get class context */
-  self->class_context = O_CALL (current_context, find, ClassDeclaration ());
+  self->class_context = O_BRANCH_CALL (current_context, find, ClassDeclaration ());
   /* get method context */
   self->method_context =
-    O_CALL (current_context, find, ConstructorDeclaration ());;
+    O_BRANCH_CALL (current_context, find, ConstructorDeclaration ());;
   if (self->method_context == NULL)
     {
       self->method_context =
-	O_CALL (current_context, find, FunctionDeclaration ());
+	O_BRANCH_CALL (current_context, find, FunctionDeclaration ());
     }
 
   if (self->class_context->superclass == NULL)
@@ -135,12 +135,15 @@ O_IMPLEMENT (SuperExpression, void, generate, (void *_self))
 {
   struct SuperExpression *self = O_CAST (_self, SuperExpression ());
 
+  struct ClassDeclaration *class_decl = O_CALL (current_context, find, ClassDeclaration ());
   if (o_is_of (self->method_context, ConstructorDeclaration ()))
     {
       if (self->ctor_name == NULL)
 	{
 	  bool is_first_arg = false;
-	  fprintf (out, "self = o_super_ctor(self, O_SUPER");
+	  fprintf (out, "self = o_super_ctor (self, ");
+	  O_CALL (class_decl->superclass, generate);
+	  fprintf (out, " ()");
 	  O_CALL (self->actual_arguments, map_args,
 		  Expression_generate_actual_argument, &is_first_arg);
 	  fprintf (out, ")");
@@ -148,7 +151,7 @@ O_IMPLEMENT (SuperExpression, void, generate, (void *_self))
       else
 	{
 	  bool is_first_arg = false;
-	  fprintf (out, "self = o_super_ctor_named(self, _");
+	  fprintf (out, "self = o_super_ctor_named (self, _");
 	  O_CALL (self->class_context->superclass, generate);
 	  fprintf (out, "_ctor_");
 	  O_CALL (self->ctor_name, generate);
@@ -160,9 +163,10 @@ O_IMPLEMENT (SuperExpression, void, generate, (void *_self))
   else
     {
       bool is_first_arg = false;
-      fprintf (out, "O_SUPER->");
+      O_CALL (class_decl->superclass, generate);
+      fprintf (out, " ()->");
       O_CALL (self->method_context->name, generate);
-      fprintf (out, "(self");
+      fprintf (out, " (self");
       O_CALL (self->actual_arguments, map_args,
 	      Expression_generate_actual_argument, &is_first_arg);
       fprintf (out, ")");

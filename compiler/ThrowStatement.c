@@ -30,8 +30,8 @@ O_IMPLEMENT (ThrowStatement, void, accept, (void *_self, struct BaseCompileObjec
 O_IMPLEMENT(ThrowStatement, void, type_check, (void *_self))
 {
   struct ThrowStatement *self = O_CAST(_self, ThrowStatement());
-  self->catch_context = O_CALL (current_context, find, CatchStatement ());
-  self->try_context = O_CALL (current_context, find, TryStatement ());
+  self->catch_context = O_BRANCH_CALL (current_context, find, CatchStatement ());
+  self->try_context = O_BRANCH_CALL (current_context, find, TryStatement ());
   O_CALL (self->expr, type_check);
 }
 

@@ -34,14 +34,14 @@ O_IMPLEMENT (CatchStatement, void, accept, (void *_self, struct BaseCompileObjec
 O_IMPLEMENT(CatchStatement, void, type_check, (void *_self))
 {
   struct CatchStatement *self = O_CAST(_self, CatchStatement());
-  O_CALL (current_context, add, self);
+  O_BRANCH_CALL (current_context, add, self);
   if (!o_is_of (self->argument->type, ObjectType ()))
     {
       error (self->argument->name, "Expected class.\n");
     }
   O_CALL (self->argument, type_check);
   O_CALL (self->body, type_check);
-  O_CALL (current_context, remove_last);
+  O_BRANCH_CALL (current_context, remove_last);
 }
 
 O_IMPLEMENT(CatchStatement, void, generate, (void *_self))
