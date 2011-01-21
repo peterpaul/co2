@@ -140,7 +140,7 @@ O_IMPLEMENT(FunctionCallExpression, struct Token *, get_token, (void *_self))
   return O_CALL(self->function, get_token);
 }
 
-static void argument_error(struct FunctionCallExpression * self, struct FunctionType * function_type)
+void argument_error(struct FunctionCallExpression * self, struct FunctionType * function_type)
 {
   struct Token * token = O_CALL(self, get_token);
   // TODO determine the name of the function here

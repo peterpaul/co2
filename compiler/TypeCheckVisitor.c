@@ -1,17 +1,54 @@
 #include "TypeCheckVisitor.h"
-#include "CompileObject.h"
+  /* Declarations */
+#include "ArgumentDeclaration.h"
 #include "ClassDeclaration.h"
-#include "VariableDeclaration.h"
-#include "FunctionDeclaration.h"
 #include "ConstructorDeclaration.h"
+#include "Declaration.h"
 #include "DestructorDeclaration.h"
-#include "VariableDeclaration.h"
+#include "FunctionDeclaration.h"
+#include "InterfaceDeclaration.h"
+#include "MacroDeclaration.h"
+#include "StructDeclaration.h"
 #include "TypeDeclaration.h"
+#include "VariableDeclaration.h"
+  /* Statements */
+#include "CatchStatement.h"
+#include "CompoundStatement.h"
+#include "DeleteStatement.h"
+#include "DoStatement.h"
+#include "ExpressionStatement.h"
+#include "ForEachStatement.h"
+#include "ForStatement.h"
+#include "IfStatement.h"
+#include "ReturnStatement.h"
+#include "Statement.h"
+#include "TryStatement.h"
+#include "ThrowStatement.h"
+#include "WhileStatement.h"
+  /* Expressions */
+#include "BinaryExpression.h"
+#include "CastExpression.h"
+#include "Expression.h"
+#include "FunctionCallExpression.h"
+#include "NestedExpression.h"
+#include "NewExpression.h"
+#include "NullExpression.h"
+#include "SizeExpression.h"
+#include "SuperExpression.h"
+#include "TokenExpression.h"
+#include "UnaryExpression.h"
+#include "VarArgExpression.h"
+  /* Types */
+#include "ArrayType.h"
 #include "FunctionType.h"
 #include "ObjectType.h"
-#include "Expression.h"
 #include "PrimitiveType.h"
+#include "Type.h"
+  /* Support */
+#include "grammar.tab.h"
 #include "io.h"
+
+void argument_error(struct FunctionCallExpression * self, struct FunctionType * function_type);
 
 #define O_SUPER BaseCompileObjectVisitor()
 
@@ -162,35 +199,150 @@ O_IMPLEMENT_IF(TypeCheckVisitor, void, visitVariableDeclaration, (void *_self, v
     }
 }
 
-O_IMPLEMENT_IF(TypeCheckVisitor, void, visitCatchStatement, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(TypeCheckVisitor, void, visitCompoundStatement, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(TypeCheckVisitor, void, visitDeleteStatement, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(TypeCheckVisitor, void, visitDoStatement, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(TypeCheckVisitor, void, visitExpressionStatement, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(TypeCheckVisitor, void, visitForEachStatement, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(TypeCheckVisitor, void, visitForStatement, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(TypeCheckVisitor, void, visitIfStatement, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(TypeCheckVisitor, void, visitReturnStatement, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(TypeCheckVisitor, void, visitThrowStatement, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(TypeCheckVisitor, void, visitTryStatement, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(TypeCheckVisitor, void, visitWhileStatement, (void *_self, void *_object), (_self, _object)) {}
+O_IMPLEMENT_IF(TypeCheckVisitor, void, visitCatchStatement, (void *_self, void *_object), (_self, _object))
+{
+  struct CatchStatement *self = O_CAST (_object, CatchStatement ());
+  if (!o_is_of (self->argument->type, ObjectType ()))
+    {
+      error (self->argument->name, "Expected class.\n");
+    }
+}
 
-O_IMPLEMENT_IF(TypeCheckVisitor, void, visitBinaryExpression, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(TypeCheckVisitor, void, visitCastExpression, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(TypeCheckVisitor, void, visitFunctionCallExpression, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(TypeCheckVisitor, void, visitNestedExpression, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(TypeCheckVisitor, void, visitNewExpression, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(TypeCheckVisitor, void, visitNullExpression, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(TypeCheckVisitor, void, visitSizeExpression, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(TypeCheckVisitor, void, visitSuperExpression, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(TypeCheckVisitor, void, visitTokenExpression, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(TypeCheckVisitor, void, visitUnaryExpression, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(TypeCheckVisitor, void, visitVarArgExpression, (void *_self, void *_object), (_self, _object)) {}
+O_IMPLEMENT_IF(TypeCheckVisitor, void, visitCompoundStatement, (void *_self, void *_object), (_self, _object))
+{
+  /* nothing to do */
+}
 
-O_IMPLEMENT_IF(TypeCheckVisitor, void, visitArrayType, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(TypeCheckVisitor, void, visitFunctionType, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(TypeCheckVisitor, void, visitObjectType, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(TypeCheckVisitor, void, visitPrimitiveType, (void *_self, void *_object), (_self, _object)) {}
+O_IMPLEMENT_IF(TypeCheckVisitor, void, visitDeleteStatement, (void *_self, void *_object), (_self, _object))
+{
+  /* nothing to do */
+}
+
+O_IMPLEMENT_IF(TypeCheckVisitor, void, visitDoStatement, (void *_self, void *_object), (_self, _object))
+{
+  /* TODO, check whether condition is of type int (bool) */
+}
+
+O_IMPLEMENT_IF(TypeCheckVisitor, void, visitExpressionStatement, (void *_self, void *_object), (_self, _object))
+{
+  /* nothing to do */
+}
+
+O_IMPLEMENT_IF(TypeCheckVisitor, void, visitForEachStatement, (void *_self, void *_object), (_self, _object))
+{
+  /* TODO */
+}
+
+O_IMPLEMENT_IF(TypeCheckVisitor, void, visitForStatement, (void *_self, void *_object), (_self, _object))
+{
+  /* TODO, check whether condition is of type int (bool) */
+}
+
+O_IMPLEMENT_IF(TypeCheckVisitor, void, visitIfStatement, (void *_self, void *_object), (_self, _object))
+{
+  /* TODO, check whether condition is of type int (bool) */
+}
+
+O_IMPLEMENT_IF(TypeCheckVisitor, void, visitReturnStatement, (void *_self, void *_object), (_self, _object))
+{
+  struct ReturnStatement * self = O_CAST (_object, ReturnStatement ());
+  self->function_context = O_BRANCH_CALL (current_context, find, FunctionDeclaration ());
+  struct FunctionType *function_type = o_cast (self->function_context->type, FunctionType ());
+  if (self->expr && self->expr->type)
+    {
+      O_CALL (function_type->return_type, assert_compatible, self->expr->type);
+    }
+}
+
+O_IMPLEMENT_IF(TypeCheckVisitor, void, visitThrowStatement, (void *_self, void *_object), (_self, _object))
+{
+  /* TODO check whether expression is a ClassDeclaration */
+}
+
+O_IMPLEMENT_IF(TypeCheckVisitor, void, visitTryStatement, (void *_self, void *_object), (_self, _object))
+{
+  /* nothing to do */
+}
+
+O_IMPLEMENT_IF(TypeCheckVisitor, void, visitWhileStatement, (void *_self, void *_object), (_self, _object))
+{
+  /* TODO, check whether condition is of type int (bool) */
+}
+
+O_IMPLEMENT_IF(TypeCheckVisitor, void, visitBinaryExpression, (void *_self, void *_object), (_self, _object))
+{
+  struct BinaryExpression *self = O_CAST (_object, BinaryExpression ());
+}
+
+O_IMPLEMENT_IF(TypeCheckVisitor, void, visitCastExpression, (void *_self, void *_object), (_self, _object))
+{
+  struct CastExpression *self = O_CAST(_object, CastExpression());
+}
+
+O_IMPLEMENT_IF(TypeCheckVisitor, void, visitFunctionCallExpression, (void *_self, void *_object), (_self, _object))
+{
+  struct FunctionCallExpression *self = O_CAST (_object, FunctionCallExpression ());
+}
+
+O_IMPLEMENT_IF(TypeCheckVisitor, void, visitNestedExpression, (void *_self, void *_object), (_self, _object))
+{
+  struct NestedExpression *self = O_CAST (_object, NestedExpression ());
+}
+
+O_IMPLEMENT_IF(TypeCheckVisitor, void, visitNewExpression, (void *_self, void *_object), (_self, _object))
+{
+  struct NewExpression *self = O_CAST (_object, NewExpression ());
+}
+
+O_IMPLEMENT_IF(TypeCheckVisitor, void, visitNullExpression, (void *_self, void *_object), (_self, _object))
+{
+  struct NullExpression *self = O_CAST (_object, NullExpression ());
+}
+
+O_IMPLEMENT_IF(TypeCheckVisitor, void, visitSizeExpression, (void *_self, void *_object), (_self, _object))
+{
+  struct SizeExpression *self = O_CAST (_object, SizeExpression ());
+}
+
+O_IMPLEMENT_IF(TypeCheckVisitor, void, visitSuperExpression, (void *_self, void *_object), (_self, _object))
+{
+  struct SuperExpression *self = O_CAST (_object, SuperExpression ());
+}
+
+O_IMPLEMENT_IF(TypeCheckVisitor, void, visitTokenExpression, (void *_self, void *_object), (_self, _object))
+{
+  struct TokenExpression *self = O_CAST (_object, TokenExpression ());
+}
+
+O_IMPLEMENT_IF(TypeCheckVisitor, void, visitUnaryExpression, (void *_self, void *_object), (_self, _object))
+{
+  struct UnaryExpression *self = O_CAST (_object, UnaryExpression ());
+}
+
+O_IMPLEMENT_IF(TypeCheckVisitor, void, visitVarArgExpression, (void *_self, void *_object), (_self, _object))
+{
+  struct VarArgExpression *self = O_CAST (_object, VarArgExpression ());
+}
+
+O_IMPLEMENT_IF(TypeCheckVisitor, void, visitArrayType, (void *_self, void *_object), (_self, _object))
+{
+  struct ArrayType *self = O_CAST (_object, ArrayType ());
+}
+
+O_IMPLEMENT_IF(TypeCheckVisitor, void, visitFunctionType, (void *_self, void *_object), (_self, _object))
+{
+  struct FunctionType *self = O_CAST (_object, FunctionType ());
+}
+
+O_IMPLEMENT_IF(TypeCheckVisitor, void, visitObjectType, (void *_self, void *_object), (_self, _object))
+{
+  struct ObjectType *self = O_CAST (_object, ObjectType ());
+}
+
+O_IMPLEMENT_IF(TypeCheckVisitor, void, visitPrimitiveType, (void *_self, void *_object), (_self, _object))
+{
+  struct PrimitiveType *self = O_CAST (_object, PrimitiveType ());
+}
 
 O_OBJECT(TypeCheckVisitor, BaseCompileObjectVisitor);
 O_OBJECT_METHOD(TypeCheckVisitor, ctor);

@@ -6,6 +6,7 @@
 #include "io.h"
 #include "error.h"
 #include "HelloWorldVisitor.h"
+#include "TypeCheckVisitor.h"
 #include "GenerateHeaderVisitor.h"
 #include "GenerateSourceVisitor.h"
 
@@ -59,6 +60,12 @@ main (int argc, char **argv)
 
   // struct BaseCompileObjectVisitor * visitor = O_CALL_CLASS (HelloWorldVisitor (), new);
   // O_CALL (main_file, accept, visitor);
+
+  /*
+  struct TypeCheckVisitor * type_check_visitor = O_CALL_CLASS (TypeCheckVisitor (), new, out);
+  O_CALL (main_file, accept, type_check_visitor);
+  O_CALL (type_check_visitor, delete);
+  */
 
   /* semantic analysis */
   O_CALL (main_file, type_check);
