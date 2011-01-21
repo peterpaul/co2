@@ -12,12 +12,6 @@
 
 #define O_SUPER Declaration()
 
-struct FunctionType *
-get_type (struct FunctionDeclaration *self)
-{
-  return o_cast (self->type, FunctionType ());
-}
-
 O_IMPLEMENT (FunctionDeclaration, void *, ctor, (void *_self, va_list * app))
 {
   struct FunctionDeclaration *self = O_CAST (_self, FunctionDeclaration ());
@@ -60,7 +54,7 @@ FunctionDeclaration_generate_formal_arg (void *_decl, va_list * ap)
   O_CALL (decl, generate);
 }
 
-void
+static void
 FunctionDeclaration_find_in_interface (void *_self, va_list * app)
 {
   struct Token *self = O_CAST (_self, Token ());
@@ -84,7 +78,7 @@ FunctionDeclaration_find_in_interface (void *_self, va_list * app)
     }
 }
 
-void FunctionDeclaration_type_check_formal_arg (void *_self)
+static void FunctionDeclaration_type_check_formal_arg (void *_self)
 {
   struct Declaration *self = O_CAST (_self, Declaration ());
   O_CALL (self, type_check);
@@ -98,7 +92,7 @@ O_IMPLEMENT (FunctionDeclaration, void, type_check, (void *_self))
   O_CALL (self->formal_arguments, map, FunctionDeclaration_type_check_formal_arg);
   O_BRANCH_CALL (self->body, type_check);
 
-  struct FunctionType *function_type = get_type (self);
+  struct FunctionType *function_type = o_cast (self->type, FunctionType ());
   struct ClassDeclaration *class_decl =
     O_BRANCH_CALL (current_context, find, ClassDeclaration ());
   if (function_type->has_var_args)

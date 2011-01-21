@@ -15,18 +15,100 @@
 #include "grammar.tab.h"
 #include "Expression.h"
 #include "FunctionType.h"
+#include "ObjectType.h"
 #include "Type.h"
 #include "io.h"
 
 int new_constructor_filter (void *_constructor);
-void ClassDeclaration_generate_constructor_arguments (void *_constructor_decl, va_list * app);
-void ClassDeclaration_generate_constructor_registration_2 (void *_constructor_decl, va_list * app);
-void ClassDeclaration_generate_destructor_registration_2 (void *_destructor_decl, va_list * app);
-void ClassDeclaration_generate_method_implementation_2 (void *_interface_name, va_list * app);
-
 void FunctionDeclaration_generate_formal_arg (void *_decl, va_list * ap);
 
-struct FunctionType *get_type (struct DestructorDeclaration *self);
+
+static void
+ClassDeclaration_generate_constructor_arguments (void *_arg)
+{
+  struct ArgumentDeclaration *arg = O_CAST (_arg, ArgumentDeclaration ());
+  O_CALL (arg, generate);
+  if (o_is_a (arg->type, ObjectType ()))
+    {
+      struct ObjectType *type = (struct ObjectType *) arg->type;
+      if (o_is_of (type->decl, ClassDeclaration ()))
+	{
+	  fprintf (out, " = O_BRANCH_CAST (va_arg(*app, ");
+	  O_CALL (type, generate);
+	  fprintf (out, "), ");
+	  O_CALL (type->token, generate);
+	  fprintf (out, "());\n");
+	  return;
+	}
+    }
+  fprintf (out, " = va_arg (*app, ");
+  O_CALL (arg->type, generate);
+  fprintf (out, ");\n");
+}
+
+static void
+ClassDeclaration_generate_constructor_registration_2 (void *_constructor_decl,
+						      va_list * app)
+{
+  struct ConstructorDeclaration *constructor_decl =
+    O_CAST (_constructor_decl, ConstructorDeclaration ());
+  struct ClassDeclaration *class_decl = O_GET_ARG (ClassDeclaration);
+  fprintf (out, "O_OBJECT_METHOD (");
+  O_CALL (class_decl->name, generate);
+  fprintf (out, ", ");
+  if (strcmp (constructor_decl->name->name->data, "ctor") != 0)
+    {
+      fprintf (out, "ctor_");
+    }
+  O_CALL (constructor_decl->name, generate);
+  fprintf (out, ");\n");
+}
+
+static void
+ClassDeclaration_generate_destructor_registration_2 (void *_destructor_decl,
+						     va_list * app)
+{
+  struct DestructorDeclaration *destructor_decl =
+    O_CAST (_destructor_decl, DestructorDeclaration ());
+  struct ClassDeclaration *class_decl = O_GET_ARG (ClassDeclaration);
+  fprintf (out, "O_OBJECT_METHOD (");
+  O_CALL (class_decl->name, generate);
+  fprintf (out, ", dtor);\n");
+}
+
+static void
+ClassDeclaration_generate_interface_method_registration (void *_method_decl,
+							 va_list * app)
+{
+  struct Declaration *method_decl = O_CAST (_method_decl, Declaration ());
+  struct Token *token = O_GET_ARG (Token);
+
+  fprintf (out, "O_OBJECT_IF_METHOD (");
+  O_CALL (token, generate);
+  fprintf (out, ", ");
+  O_CALL (method_decl->name, generate);
+  fprintf (out, ");\n");
+}
+
+static void
+ClassDeclaration_generate_method_implementation_2 (void *_interface_name,
+						   va_list * app)
+{
+  struct Token *interface_name = O_CAST (_interface_name, Token ());
+  struct Token *implementation_name = O_GET_ARG (Token);
+  struct Declaration *_decl =
+    O_CALL (global_scope, lookup_in_this_scope, interface_name);
+  struct InterfaceDeclaration *interface_decl =
+    O_CAST (_decl, InterfaceDeclaration ());
+
+  fprintf (out, "O_OBJECT_IF (");
+  O_CALL (interface_name, generate);
+  fprintf (out, ");\n");
+  O_CALL (interface_decl->members, map_args,
+	  ClassDeclaration_generate_interface_method_registration,
+	  implementation_name);
+  fprintf (out, "O_OBJECT_IF_END\n");
+}
 
 #define O_SUPER BaseCompileObjectVisitor()
 
@@ -269,7 +351,7 @@ O_IMPLEMENT_IF(GenerateSourceVisitor, void, visitFunctionDeclaration, (void *_se
   else
     {
       bool first_formal_arg = true;
-      struct FunctionType *function_type = get_type (self);
+      struct FunctionType *function_type = o_cast (self->type, FunctionType ());
       O_CALL (function_type->return_type, generate);
       fprintf (out, " ");
       O_CALL (self->name, generate);

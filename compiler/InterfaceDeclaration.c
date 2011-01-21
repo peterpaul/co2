@@ -35,22 +35,6 @@ O_IMPLEMENT (InterfaceDeclaration, void, accept, (void *_self, struct BaseCompil
   O_BRANCH_CALL (current_context, remove_last);
 }
 
-void
-InterfaceDeclaration_generate_method_registration (void *_method_decl,
-						   va_list * app)
-{
-  struct FunctionDeclaration *method_decl =
-    O_CAST (_method_decl, FunctionDeclaration ());
-  struct InterfaceDeclaration *class_decl =
-    O_CAST (va_arg (*app, struct InterfaceDeclaration *),
-	    InterfaceDeclaration ());
-  fprintf (out, "; \\\n O_METHOD (");
-  O_CALL (class_decl->name, generate);
-  fprintf (out, ", ");
-  O_CALL (method_decl->name, generate);
-  fprintf (out, ")");
-}
-
 O_IMPLEMENT (InterfaceDeclaration, void, type_check, (void *_self))
 {
   struct InterfaceDeclaration *self = O_CAST (_self, InterfaceDeclaration ());
@@ -59,7 +43,7 @@ O_IMPLEMENT (InterfaceDeclaration, void, type_check, (void *_self))
   O_BRANCH_CALL (current_context, remove_last);
 }
 
-void InterfaceDeclaration_is_compatible_with_class(void *_self, va_list *app)
+static void InterfaceDeclaration_is_compatible_with_class(void *_self, va_list *app)
 {
   struct Token *self = O_CAST(_self, Token ());
   struct InterfaceDeclaration *interface = O_CAST(va_arg(*app, struct InterfaceDeclaration*), InterfaceDeclaration ());

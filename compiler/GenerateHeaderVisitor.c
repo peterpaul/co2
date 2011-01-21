@@ -12,31 +12,78 @@
 #include "ObjectType.h"
 #include "io.h"
 
-int
-new_constructor_filter (void *_constructor);
-void
-generate_superclass (struct ClassDeclaration *self);
-void
-ClassDeclaration_generate_constructor_registration (void *_constructor_decl,
-						    va_list * app);
-void
-ClassDeclaration_generate_method_registration (void *_method_decl,
-					       va_list * app);
-void
-ClassDeclaration_generate_attribute_registration (void *_method_decl,
-						  va_list * app);
-
-void
-FunctionDeclaration_generate_formal_arg (void *_decl, va_list * ap);
-
-void
-InterfaceDeclaration_generate_method_registration (void *_method_decl,
-						   va_list * app);
-
-struct FunctionType *
-get_type (struct FunctionDeclaration *self);
-
+int new_constructor_filter (void *_constructor);
+void generate_superclass (struct ClassDeclaration *self);
+void FunctionDeclaration_generate_formal_arg (void *_decl, va_list * ap);
 void Declaration_list_generate (void *_self);
+
+static void
+ClassDeclaration_generate_constructor_registration (void *_constructor_decl,
+						    va_list * app)
+{
+  struct ConstructorDeclaration *constructor_decl =
+    O_CAST (_constructor_decl, ConstructorDeclaration ());
+  struct ClassDeclaration *class_decl = O_GET_ARG (ClassDeclaration);
+  fprintf (out, "; \\\n O_METHOD (");
+  O_CALL (class_decl->name, generate);
+  fprintf (out, ", ");
+  if (strcmp (constructor_decl->name->name->data, "ctor") != 0)
+    {
+      fprintf (out, "ctor_");
+    }
+  O_CALL (constructor_decl->name, generate);
+  fprintf (out, ")");
+}
+
+static void
+ClassDeclaration_generate_method_registration (void *_method_decl,
+					       va_list * app)
+{
+  struct FunctionDeclaration *method_decl =
+    O_CAST (_method_decl, FunctionDeclaration ());
+  struct ClassDeclaration *class_decl = O_GET_ARG (ClassDeclaration);
+  fprintf (out, "; \\\n O_METHOD (");
+  if (method_decl->interface_decl)
+    {
+      O_CALL (method_decl->interface_decl->name, generate);
+    }
+  else
+    {
+      O_CALL (class_decl->name, generate);
+    }
+  fprintf (out, ", ");
+  O_CALL (method_decl->name, generate);
+  fprintf (out, ")");
+}
+
+static void
+ClassDeclaration_generate_attribute_registration (void *_method_decl,
+						  va_list * app)
+{
+  struct VariableDeclaration *method_decl =
+    O_CAST (_method_decl, VariableDeclaration ());
+  struct ClassDeclaration *class_decl = O_GET_ARG (ClassDeclaration);
+  fprintf (out, "; \\\n ");
+  O_CALL (method_decl->type, generate);
+  fprintf (out, " ");
+  O_CALL (method_decl->name, generate);
+}
+
+static void
+InterfaceDeclaration_generate_method_registration (void *_method_decl,
+						   va_list * app)
+{
+  struct FunctionDeclaration *method_decl =
+    O_CAST (_method_decl, FunctionDeclaration ());
+  struct InterfaceDeclaration *class_decl =
+    O_CAST (va_arg (*app, struct InterfaceDeclaration *),
+	    InterfaceDeclaration ());
+  fprintf (out, "; \\\n O_METHOD (");
+  O_CALL (class_decl->name, generate);
+  fprintf (out, ", ");
+  O_CALL (method_decl->name, generate);
+  fprintf (out, ")");
+}
 
 #define O_SUPER BaseCompileObjectVisitor()
 
@@ -211,7 +258,7 @@ O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitFunctionDeclaration, (void *_se
   else
     {
       bool first_formal_arg = true;
-      struct FunctionType *function_type = get_type (self);
+      struct FunctionType *function_type = o_cast (self->type, FunctionType ());
       O_CALL (function_type->return_type, generate);
       fprintf (out, " ");
       O_CALL (self->name, generate);

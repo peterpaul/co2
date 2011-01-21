@@ -7,12 +7,6 @@
 
 #define O_SUPER Declaration()
 
-static struct FunctionType *
-get_type (struct DestructorDeclaration *self)
-{
-  return o_cast (self->type, FunctionType ());
-}
-
 O_IMPLEMENT (DestructorDeclaration, void *, ctor,
 	     (void *_self, va_list * app))
 {
