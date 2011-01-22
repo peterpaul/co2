@@ -66,6 +66,5 @@ open_output (const char *filename)
     {
       out = stdout;
     }
-  fprintf (out, "#include \"Object.h\"\n");
   return out;
 }

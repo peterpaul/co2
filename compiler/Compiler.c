@@ -16,6 +16,17 @@ static void File_include_dependencies(void *_self)
   fprintf (out, "#include \"%s.h\"\n", self->name->data);
 }
 
+static char * extract_name(char * file)
+{
+  char * start = strrchr (file, '/');
+  char * end = strrchr (file, '.');
+  int size = (int) end - (int) start - 1;
+  char * base = malloc (size + 1);
+  strncpy (base, start + 1, size);
+  base[size] = '\0';
+  return base;
+}
+
 char * get_header_file (char * c_file)
 {
   int len = strlen (c_file);
@@ -108,9 +119,15 @@ main (int argc, char **argv)
     open_output (NULL);
 
   struct GenerateHeaderVisitor * header_visitor = O_CALL_CLASS (GenerateHeaderVisitor (), new, out);
+  char * header_name = extract_name (main_file->name->data);
+  fprintf (out, "#ifndef %s_H\n", header_name);
+  fprintf (out, "#define %s_H\n", header_name);
+  fprintf (out, "#include \"Object.h\"\n");
   O_CALL (main_file->file_dependencies, map, File_include_dependencies);
   O_CALL (main_file, accept, header_visitor);
+  fprintf (out, "#endif /* %s_H */\n", header_name);
   O_CALL (header_visitor, delete);
+  free (header_name);
 
   if (out != stdout)
     {
@@ -121,13 +138,9 @@ main (int argc, char **argv)
   if (argc >= 3)
     {
       open_output (argv[2]);
-      char * start = strrchr (argv[2], '/');
-      char * end = strrchr (argv[2], '.');
-      int size = (int) end - (int) start;
-      char * base = malloc (size + 1);
-      strncpy (base, start + 1, size);
-      base[size] = '\0';
-      fprintf (out, "#include \"%sh\"\n", base);
+      char * base = extract_name (argv[2]);
+      fprintf (out, "#include \"%s.h\"\n", base);
+      free (base);
     }
   else
     open_output (NULL);
