@@ -269,6 +269,11 @@ O_IMPLEMENT_IF(GenerateSourceVisitor, void, visitFunctionDeclaration, (void *_se
   struct InterfaceDeclaration *interface_decl = O_CALL (current_context, find, InterfaceDeclaration ());
   if (class_decl)
     {
+      // don't generate for included classes
+      if (class_decl->include_file)
+	{
+	  return;
+	}
       struct FunctionType *method_type =
 	o_cast (self->type, FunctionType ());
       if (self->interface_decl)
@@ -332,6 +337,11 @@ O_IMPLEMENT_IF(GenerateSourceVisitor, void, visitFunctionDeclaration, (void *_se
     }
   else if (interface_decl)
     {
+      // don't generate for included classes
+      if (interface_decl->include_file)
+	{
+	  return;
+	}
       struct FunctionType *method_type =
 	o_cast (self->type, FunctionType ());
       fprintf (out, "O_METHOD_IF (");

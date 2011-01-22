@@ -222,6 +222,11 @@ O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitFunctionDeclaration, (void *_se
   struct InterfaceDeclaration *interface_decl = O_CALL (current_context, find, InterfaceDeclaration ());
   if (class_decl)
     {
+      if (class_decl->include_file)
+	{
+	  return;
+	}
+
       if (self->interface_decl)
 	{
 	  return;
@@ -242,6 +247,10 @@ O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitFunctionDeclaration, (void *_se
     }
   else if (interface_decl)
     {
+      if (interface_decl->include_file)
+	{
+	  return;
+	}
       struct FunctionType *method_type =
 	o_cast (self->type, FunctionType ());
       fprintf (out, "O_METHOD_DEF (");
