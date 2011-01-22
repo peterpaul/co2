@@ -67,32 +67,12 @@ delete_release_pool ()
   O_CALL (current_release_pool, delete);
 }
 
-int
-main (int argc, char **argv)
+int mainImpl(char * output_file)
 {
-  create_release_pool ();
-  const char *filename;
-
-  /* io */
-  if (argc >= 2)
-    filename = argv[1];
-  else
-    filename = NULL;
-
-  file_path = O_CALL (analyze_file_name (filename), retain);
-  base_dir = O_CALL (determine_base_dir (file_path), retain);
-
-  path = O_CALL_CLASS (RefList (), new, 8, String ());
-  O_CALL (path, append, base_dir);
-
-  main_file = try_search_path (O_CALL_CLASS (String (), new, "%s", filename));
-  current_file = O_CALL (main_file, retain);
-
   /* syntax analysis */
   parse ();
   if (main_file == NULL || errors != 0)
     {
-      delete_release_pool ();
       return 1;
     }
 
@@ -109,21 +89,19 @@ main (int argc, char **argv)
   O_CALL (main_file, type_check);
   if (errors != 0)
     {
-      delete_release_pool ();
       return 1;
     }
   /* optimization */
   O_CALL (main_file, optimize);
   if (errors != 0)
     {
-      delete_release_pool ();
       return 1;
     }
 
   /* code generation */
-  if (argc >= 3)
+  if (output_file)
     {
-      char * header_file = get_header_file(argv[2]);
+      char * header_file = get_header_file(output_file);
       open_output (header_file);
       free (header_file);
     }
@@ -147,10 +125,10 @@ main (int argc, char **argv)
     }
 
   /* code generation */
-  if (argc >= 3)
+  if (output_file)
     {
-      open_output (argv[2]);
-      char * base = extract_name (argv[2]);
+      open_output (output_file);
+      char * base = extract_name (output_file);
       fprintf (out, "#include \"%s.h\"\n", base);
       free (base);
     }
@@ -168,8 +146,38 @@ main (int argc, char **argv)
 
   // O_CALL (main_file, generate);
 
+  return errors;
+}
+
+int
+main (int argc, char **argv)
+{
+  create_release_pool ();
+  const char *input_file = NULL;
+  const char *output_file = NULL;
+
+  /* io */
+  if (argc >= 2)
+    input_file = argv[1];
+
+  if (argc >= 3)
+    output_file = argv[2];
+
+  file_path = O_CALL (analyze_file_name (input_file), retain);
+  base_dir = O_CALL (determine_base_dir (file_path), retain);
+
+  path = O_CALL_CLASS (RefList (), new, 8, String ());
+  O_CALL (path, append, base_dir);
+
+  main_file = try_search_path (O_CALL_CLASS (String (), new, "%s", input_file));
+  current_file = O_CALL (main_file, retain);
+
+  int retval = mainImpl (output_file);
+
   O_CALL (main_file, release);
+  O_CALL (file_path, release);
+  O_CALL (base_dir, release);
 
   delete_release_pool ();
-  return errors;
+  return retval;
 }

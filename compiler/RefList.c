@@ -28,7 +28,7 @@ static void
 List_delete_items (void *_item)
 {
   struct RefObject *item = o_cast (_item, RefObject ());
-  O_CALL (item, release);
+  O_BRANCH_CALL (item, release);
 }
 
 O_IMPLEMENT (RefList, void *, dtor, (void *_self))
