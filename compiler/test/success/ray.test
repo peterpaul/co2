@@ -1,0 +1,225 @@
+["stdlib.h"] {
+	int atoi (char *nptr);
+}
+
+["math.h"] {
+	double sqrt (double x);
+}
+
+["stdio.h"] {
+	int printf (char * fmt, ...);
+	int fprintf (int stream, char *format, ...);
+	int stdout;
+}
+
+typedef Bool = bool;
+["Object.h"] {
+	Bool true, false;
+}
+
+int max_childs = 5;
+
+["vector.h"] {
+	double infinity;
+	double epsilon;
+	struct vec_ {
+		double x, y, z;
+	}
+	typedef Vec = struct vec_;
+	Vec vec (double x, double y, double z);
+	Vec plus_v_v (Vec a, Vec b);
+	Vec minus_v_v (Vec a, Vec b);
+	Vec product_s_v (double a, Vec b);
+	double dot_v_v (Vec a, Vec b);
+	double length_v (Vec a);
+	Vec norm_v (Vec a);
+
+}
+
+class Hit {
+	double distance;
+	Vec normal;
+
+	Hit (double d, Vec n) {
+ 		distance = d;
+		normal = n; 
+	}
+}
+
+Hit the_hit;
+
+class Ray {
+	Vec orig, dir;
+
+	Ray (Vec o, Vec d) {
+		orig = o;
+		dir = d;
+	}
+}
+
+class Scene {
+	void intersect (Ray r) {}
+	Bool shadow (Ray r) {return true;}
+	void bound (Sphere s) {} 
+}
+
+class Sphere : Scene {
+	Vec center;
+	double radius;
+
+	Sphere (Vec c, double r) {
+		center = c;
+		radius = r;
+	}
+
+	double ray_sphere (Ray ray) {
+		Vec v = minus_v_v (center, ray.orig);
+		double b = dot_v_v (v, ray.dir);
+		double disc = b * b - dot_v_v (v, v) + radius * radius;
+		if (disc < 0.0) return infinity;
+		double d = sqrt (disc), t2 = b + d;
+		if (t2 < 0.0) return infinity;
+		double t1 = b - d;
+		if (t1 > 0.0) return t1;
+		else return t2; 
+	}
+
+	Bool sray_sphere (Ray ray) {
+		Vec v = minus_v_v (center, ray.orig);
+		double b = dot_v_v (v, ray.dir);
+		double disc = b * b - dot_v_v (v, v) + radius * radius;
+		if (disc < 0.0) return false;
+		else return b + sqrt (disc) >= 0.0;
+	}
+
+	void intersect (Ray ray) {
+		double l = ray_sphere (ray);
+		if (l < the_hit.distance) {
+			delete the_hit;
+			the_hit = new Hit (l, norm_v (plus_v_v (ray.orig, minus_v_v (product_s_v (l, ray.dir), center))));
+		}
+	}
+
+	Bool shadow (Ray ray) {
+		return sray_sphere (ray);
+	}
+
+	void bound (Sphere b) {
+		double a = length_v (minus_v_v (center, b.center)) + radius;
+		if (a > b.radius) b.radius = a;
+	}
+}
+
+class Group : Scene {
+	Sphere boundary;
+	Scene[] child;
+	int childs;
+
+	Group (Sphere b) {
+		child = new Scene[max_childs];
+		childs = 0;
+		boundary = b;
+	}
+
+	~Group () {
+		delete boundary;
+		int i;
+		for (i = 0; i<childs; i += 1)
+			delete child[i];
+	}
+
+	void push_back (Scene s) {
+		if (childs < max_childs) {
+			child[childs] = s;
+			childs += 1;
+		}
+	}
+
+	void intersect (Ray ray) {
+		double l = boundary.ray_sphere (ray);
+		if (l < the_hit.distance) {
+			int i;
+			for (i = 0; i<childs; i += 1)
+				child[i].intersect (ray);
+		}
+	}
+
+	Bool shadow (Ray ray) {
+		if (boundary.sray_sphere (ray)) {
+			int i;
+			for (i = 0; i<childs; i += 1)
+				if (child[i].shadow (ray)) return true;
+		}
+		return false;
+	}
+
+	void bound (Sphere b) {
+		int i;
+		for (i = 0; i<childs; i += 1)
+			child[i].bound (b);
+	}
+}
+
+double ray_trace (Vec light, Ray ray, Scene s) {
+	the_hit = new Hit (infinity, vec (0.0, 0.0, 0.0));
+	s.intersect (ray);
+	if (the_hit.distance == infinity)
+		return 0.0;
+	double g;
+	if ((g = dot_v_v (the_hit.normal, light)) >= 0.0)
+		return 0.0;
+	Ray final_ray = new Ray (plus_v_v ( ray.orig, plus_v_v ( product_s_v (
+			the_hit.distance, ray.dir), 
+			product_s_v (epsilon, the_hit.normal))), product_s_v ( - 1.0, light));
+	if (s.shadow (final_ray)) return 0.0;
+	else return - g;
+}
+
+Scene create (int level, Vec c, double r) {
+	Scene s = new Sphere (c, r);
+	if (level == 1) return s;
+	Sphere sphere = new Sphere (plus_v_v (c, vec (0.0, r, 0.0)), r);
+	Group g = new Group (sphere);
+	g.push_back (s);
+	double rn = 3.0*r/sqrt (12.0);
+	int dz;
+	for (dz = - 1; dz <= 1; dz += 2) {
+		int dx;
+		for (dx = - 1; dx <= 1; dx += 2) {
+			g.push_back (create (level - 1, plus_v_v (c, product_s_v (rn, vec ((double)dx, 1.0, (double)dz))), r / 2.0));
+		}
+	}
+	g.bound (g.boundary);
+	return g;
+}
+
+int main (int argc, char ** argv)
+ {
+	int level;
+	if (argc == 3) level = atoi (argv[1]); else level = 5;
+	int n;
+	if (argc == 3) n = atoi (argv[2]); else n = 64;
+	int ss = 4;
+	Vec light = norm_v (vec ( - 1.0, - 3.0, 2.0));
+	Scene s = create (level, vec (0.0, - 1.0, 0.0), 1.0);
+	fprintf (stdout, "P5\n%d %d\n255\n", n, n);
+	int y;
+	for (y = n - 1; y >= 0; y -= 1) {
+		int x;
+		for (x = 0; x < n; x += 1) {
+			double g = 0.0;
+			int dx;
+			for (dx = 0; dx < ss; dx += 1) {
+				int dy;
+				for (dy = 0; dy < ss; dy += 1) {
+					Vec dir = norm_v (vec ((double)x+ (double)dx*1.0/ (double)ss - (double)n/2.0, (double)y+ (double)dy*1.0/ (double)ss - (double)n/2.0, (double)n));
+					g += ray_trace (light, new Ray (vec (0.0, 0.0, - 4.0), dir), s);
+				}
+			}
+			fprintf (stdout, "%c", (char) (int) (0.5+255.0*g/(double)(ss*ss)));
+		}
+	}
+	delete (s);
+
+	return 0;
+}
