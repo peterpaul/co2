@@ -10,6 +10,15 @@
 #include "GenerateHeaderVisitor.h"
 #include "GenerateSourceVisitor.h"
 
+char * get_header_file (char * c_file)
+{
+  int len = strlen (c_file);
+  char * header_file = malloc (len + 1);
+  strcpy (header_file, c_file);
+  header_file[len -1] = 'h';
+  return header_file;
+}
+
 extern int parse (void);
 
 struct File *main_file = NULL;
@@ -81,9 +90,14 @@ main (int argc, char **argv)
       delete_release_pool ();
       return 1;
     }
+
   /* code generation */
   if (argc >= 3)
-    open_output (argv[2]);
+    {
+      char * header_file = get_header_file(argv[2]);
+      open_output (header_file);
+      free (header_file);
+    }
   else
     open_output (NULL);
 
@@ -91,9 +105,34 @@ main (int argc, char **argv)
   O_CALL (main_file, accept, header_visitor);
   O_CALL (header_visitor, delete);
 
+  if (out != stdout)
+    {
+      fclose(out);
+    }
+
+  /* code generation */
+  if (argc >= 3)
+    {
+      open_output (argv[2]);
+      int start, end;
+      start = strrchr (argv[2], '/');
+      end = strrchr (argv[2], '.');
+      char * base = malloc (end - start + 1);
+      strncpy (base, start + 1, end - start);
+      base[end - start] = '\0';
+      fprintf (out, "#include \"%sh\"\n", base);
+    }
+  else
+    open_output (NULL);
+
   struct GenerateSourceVisitor * source_visitor = O_CALL_CLASS (GenerateSourceVisitor (), new, out);
   O_CALL (main_file, accept, source_visitor);
   O_CALL (source_visitor, delete);
+
+  if (out != stdout)
+    {
+      fclose(out);
+    }
 
   // O_CALL (main_file, generate);
 
