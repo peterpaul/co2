@@ -19,10 +19,22 @@ static void File_include_dependencies(void *_self)
 static char * extract_name(char * file)
 {
   char * start = strrchr (file, '/');
+  if (start == NULL)
+    {
+      start = file;
+    }
+  else
+    {
+      start += 1;
+    }
   char * end = strrchr (file, '.');
-  int size = (int) end - (int) start - 1;
+  if (end == NULL)
+    {
+      end = &file[strlen(file)];
+    }
+  int size = (int) end - (int) start;
   char * base = malloc (size + 1);
-  strncpy (base, start + 1, size);
+  strncpy (base, start, size);
   base[size] = '\0';
   return base;
 }
