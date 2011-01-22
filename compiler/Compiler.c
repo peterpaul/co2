@@ -10,6 +10,12 @@
 #include "GenerateHeaderVisitor.h"
 #include "GenerateSourceVisitor.h"
 
+static void File_include_dependencies(void *_self)
+{
+  struct File * self = O_CAST (_self, File ());
+  fprintf (out, "#include \"%s.h\"\n", self->name->data);
+}
+
 char * get_header_file (char * c_file)
 {
   int len = strlen (c_file);
@@ -102,6 +108,7 @@ main (int argc, char **argv)
     open_output (NULL);
 
   struct GenerateHeaderVisitor * header_visitor = O_CALL_CLASS (GenerateHeaderVisitor (), new, out);
+  O_CALL (main_file->file_dependencies, map, File_include_dependencies);
   O_CALL (main_file, accept, header_visitor);
   O_CALL (header_visitor, delete);
 
@@ -114,12 +121,12 @@ main (int argc, char **argv)
   if (argc >= 3)
     {
       open_output (argv[2]);
-      int start, end;
-      start = strrchr (argv[2], '/');
-      end = strrchr (argv[2], '.');
-      char * base = malloc (end - start + 1);
-      strncpy (base, start + 1, end - start);
-      base[end - start] = '\0';
+      char * start = strrchr (argv[2], '/');
+      char * end = strrchr (argv[2], '.');
+      int size = (int) end - (int) start;
+      char * base = malloc (size + 1);
+      strncpy (base, start + 1, size);
+      base[size] = '\0';
       fprintf (out, "#include \"%sh\"\n", base);
     }
   else
