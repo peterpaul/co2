@@ -1,0 +1,64 @@
+["stdlib.h"] {
+	void *malloc(int size);
+	void *calloc(int nmemb, int size);
+	void *realloc(void *data, int size);
+	void free(void *ptr);
+}
+
+class List
+{
+	int capacity;
+	int length;
+	void ** data;
+
+	List(int c) {
+		capacity = c;
+		if (capacity < 1) {
+			capacity = 1;
+		}
+		data = (void **) calloc (capacity, sizeof(void *));		
+	}
+
+	~List() {
+		free ((void *) data);
+	}
+
+	List resize(int c) {
+		if (c < length) {
+			c = length;
+		}
+		void ** new_data = (void **) realloc ((void *) data, c);
+		if (new_data != null) {
+			data = new_data;
+			capacity = c;
+		}
+		return self;
+	}
+
+	void * append(void * item) {
+		if (length == capacity) {
+			resize(capacity * 2);
+		}
+		data[length] = item;
+		length += 1;
+		return item;
+	}
+
+	void * remove_last() {
+		length -= 1;
+		return data[length];
+	}
+
+	void * get(unsigned index) {
+		if (index < length) {
+			return data[index];
+		} else {
+			
+		}
+	}
+}
+
+int main(int argc, char ** argv)
+{
+	return 0;
+}
