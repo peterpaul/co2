@@ -12,7 +12,7 @@ libcarbon_1_0_la_SOURCES =  co2/grammar.y co2/lex.l co2/ArgumentDeclaration.c co
 		co2/GenerateSourceVisitor.c co2/File.c\
 		co2/ForEachStatement.c co2/ForStatement.c\
 		co2/FunctionType.c co2/FunctionDeclaration.c co2/FunctionCallExpression.c\
-		co2/HelloWorldVisitor.c\
+		co2/Hash.c co2/HelloWorldVisitor.c\
 		co2/IfStatement.c co2/IncludeStack.c co2/InterfaceDeclaration.c co2/io.c\
 		co2/MacroDeclaration.c co2/NewExpression.c co2/NestedExpression.c\
 		co2/NullExpression.c co2/ObjectType.c co2/ObjectTypeDeclaration.c co2/Path.c\
@@ -27,4 +27,4 @@ libcarbon_1_0_la_CPPFLAGS = -I$(top_srcdir)/include
 bin_PROGRAMS = carbon
 carbon_SOURCES = co2/Compiler.c
 carbon_CPPFLAGS = -I$(top_srcdir)/include
-carbon_LDFLAGS = -lco2-1.0 -lcarbon-1.0 -lpthread
+carbon_LDFLAGS = $(CO2_LIBS) -lcarbon-1.0

@@ -10,7 +10,7 @@ library_include_HEADERS = co2/ArgumentDeclaration.h co2/ArrayType.h co2/BaseComp
 		co2/GenerateSourceVisitor.h co2/File.h\
 		co2/ForEachStatement.h co2/ForStatement.h\
 		co2/FunctionType.h co2/FunctionDeclaration.h co2/FunctionCallExpression.h\
-		co2/HelloWorldVisitor.h\
+		co2/Hash.h co2/HelloWorldVisitor.h\
 		co2/IfStatement.h co2/IncludeStack.h co2/InterfaceDeclaration.h co2/io.h\
 		co2/MacroDeclaration.h co2/NewExpression.h co2/NestedExpression.h\
 		co2/NullExpression.h co2/ObjectType.h co2/ObjectTypeDeclaration.h co2/Path.h\

@@ -9,4 +9,4 @@ URL: localhost
 Version: @VERSION@
 Requires: 
 Cflags: -I${includedir}/carbon-1.0
-Libs: -L${libdir}
+Libs: -L${libdir} -lcarbon-1.0

@@ -11,6 +11,9 @@ AC_CONFIG_HEADERS([config.h])
 # Checks for programs.
 AC_PROG_CC
 AC_PROG_LIBTOOL
+AC_PROG_CPP
+AC_PROG_INSTALL
+AC_PROG_RANLIB
 
 # Checks for libraries.
 
@@ -24,11 +27,11 @@ AC_TYPE_SIZE_T
 # Checks for library functions.
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
-AC_CHECK_FUNCS([memmove memset strdup strstr])
+AC_CHECK_FUNCS([memset strdup strstr])
 
 AC_CONFIG_FILES([Makefile
                  include/Makefile
                  src/Makefile
-		 co2-1.0.pc])
+                 co2-1.0.pc])
 
 AC_OUTPUT
