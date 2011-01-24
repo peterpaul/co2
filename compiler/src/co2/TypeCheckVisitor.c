@@ -52,7 +52,6 @@ void argument_error(struct FunctionCallExpression * self, struct FunctionType * 
 
 #define O_SUPER BaseCompileObjectVisitor()
 
-struct FunctionType * get_type (struct FunctionDeclaration *self);
 void FunctionDeclaration_find_in_interface (void *_self, va_list * app);
 
 O_IMPLEMENT(TypeCheckVisitor, void *, ctor, (void *_self, va_list *app))
@@ -130,7 +129,7 @@ O_IMPLEMENT_IF(TypeCheckVisitor, void, visitDestructorDeclaration, (void *_self,
 O_IMPLEMENT_IF(TypeCheckVisitor, void, visitFunctionDeclaration, (void *_self, void *_object), (_self, _object))
 {
   struct FunctionDeclaration *self = O_CAST(_object, FunctionDeclaration ());
-  struct FunctionType *function_type = get_type (self);
+  struct FunctionType *function_type = o_cast (self->type, FunctionType ());
   struct ClassDeclaration *class_decl =
     O_BRANCH_CALL (current_context, find, ClassDeclaration ());
   if (function_type->has_var_args)

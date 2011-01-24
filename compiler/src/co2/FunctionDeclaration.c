@@ -54,7 +54,7 @@ FunctionDeclaration_generate_formal_arg (void *_decl, va_list * ap)
   O_CALL (decl, generate);
 }
 
-static void
+void
 FunctionDeclaration_find_in_interface (void *_self, va_list * app)
 {
   struct Token *self = O_CAST (_self, Token ());
