@@ -112,7 +112,7 @@ int mainImpl(char * output_file)
   char * header_name = extract_name (main_file->name->data);
   fprintf (out, "#ifndef %s_H\n", header_name);
   fprintf (out, "#define %s_H\n", header_name);
-  fprintf (out, "#include \"Object.h\"\n");
+  fprintf (out, "#include \"co2/Object.h\"\n");
   O_CALL (main_file->file_dependencies, map, File_include_dependencies);
   O_CALL (main_file, accept, header_visitor);
   fprintf (out, "#endif /* %s_H */\n", header_name);

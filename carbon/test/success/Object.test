@@ -1,4 +1,4 @@
-["Object.h"] {
+["co2/Object.h"] {
 	class Object {
 		Class klass;
 
@@ -16,7 +16,7 @@
 	FILE * stdout, stdin, stderr;
 }
 
-["String.h"] {
+["co2/String.h"] {
 	class String : Object {
 		char * data;
 		int length, max;

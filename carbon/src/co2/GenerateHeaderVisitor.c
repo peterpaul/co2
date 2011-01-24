@@ -291,7 +291,7 @@ O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitInterfaceDeclaration, (void *_s
 	    FunctionDeclaration ());
   O_CALL (new_methods, retain);
 
-  fprintf (out, "#include \"Interface.h\"\n");
+  fprintf (out, "#include \"co2/Interface.h\"\n");
 
   /* generate the class */
   fprintf (out, "#define ");
