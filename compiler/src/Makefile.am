@@ -1,8 +1,6 @@
 AM_YFLAGS = -d
-# AM_LFLAGS =--header-file=$(<:co2/%.l=${srcdir}/%.h)
 
 lib_LTLIBRARIES = libcarbon-1.0.la
-
 libcarbon_1_0_la_SOURCES =  co2/grammar.y co2/lex.l co2/ArgumentDeclaration.c co2/ArrayType.c co2/BaseCompileObjectVisitor.c\
 		co2/BinaryExpression.c\
 		co2/CastExpression.c co2/CatchStatement.c co2/ClassDeclaration.c\
@@ -24,7 +22,6 @@ libcarbon_1_0_la_SOURCES =  co2/grammar.y co2/lex.l co2/ArgumentDeclaration.c co
 		co2/TryStatement.c co2/Type.c co2/TypeCheckVisitor.c co2/TypeDeclaration.c\
 		co2/UnaryExpression.c\
 		co2/VarArgExpression.c co2/VariableDeclaration.c co2/WhileStatement.c
-
 libcarbon_1_0_la_CPPFLAGS = -I$(top_srcdir)/include
 
 bin_PROGRAMS = carbon

@@ -2,6 +2,8 @@
 *.d
 *.bin
 *.a
+*.lo
+*.la
 target
-grammar.tab.[ch]
-lex.yy.[ch]
+grammar.[ch]
+lex.[ch]

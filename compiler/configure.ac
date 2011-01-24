@@ -33,5 +33,7 @@ AC_CHECK_FUNCS([memmove memset strdup strstr])
 
 AC_CONFIG_FILES([Makefile
                  include/Makefile
-                 src/Makefile])
+                 src/Makefile
+		 carbon-1.0.pc])
+
 AC_OUTPUT
