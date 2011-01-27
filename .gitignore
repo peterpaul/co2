@@ -7,3 +7,5 @@
 target
 grammar.[ch]
 lex.[ch]
+*~
+build-aux
