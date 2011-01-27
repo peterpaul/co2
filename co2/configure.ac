@@ -30,7 +30,6 @@ AC_FUNC_REALLOC
 AC_CHECK_FUNCS([memset strdup strstr])
 
 AC_CONFIG_FILES([Makefile
-                 include/Makefile
                  src/Makefile
                  co2-1.0.pc])
 
