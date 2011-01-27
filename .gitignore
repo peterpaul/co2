@@ -9,3 +9,5 @@ grammar.[ch]
 lex.[ch]
 *~
 build-aux
+Makefile
+Makefile.in
