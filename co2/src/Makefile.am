@@ -1,3 +1,5 @@
+MAINTAINERCLEANFILES = Makefile.in
+
 lib_LTLIBRARIES = libco2-1.0.la
 libco2_1_0_ladir=$(includedir)/co2-1.0/co2
 

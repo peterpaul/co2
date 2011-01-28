@@ -1,12 +1,10 @@
 *.o
-*.d
-*.bin
-*.a
 *.lo
 *.la
-*.Po
-*.Plo
 *.pc
+
+.deps
+.libs
 
 target
 grammar.[ch]
