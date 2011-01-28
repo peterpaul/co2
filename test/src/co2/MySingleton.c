@@ -5,7 +5,7 @@
  *      Author: epetkle
  */
 
-#include "MySingleton.h"
+#include "co2/MySingleton.h"
 
 #define O_SUPER Singleton()
 

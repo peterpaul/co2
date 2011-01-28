@@ -11,9 +11,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "MyObject.h"
-#include "MySingleton.h"
-#include "TestInterface.h"
+#include "co2/MyObject.h"
+#include "co2/MySingleton.h"
+#include "co2/TestInterface.h"
 
 int test_if(void *_self)
 {

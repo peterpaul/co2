@@ -105,6 +105,7 @@ O_METHOD_DEF(IList, void *, remove_last, (void *_self));
 	Interface_Attr;				\
 	O_METHOD(IList, prepend);		\
 	O_METHOD(IList, append);		\
+	O_METHOD(IList, prepend_list);		\
 	O_METHOD(IList, append_list);		\
 	O_METHOD(IList, merge);			\
 	O_METHOD(IList, map);			\

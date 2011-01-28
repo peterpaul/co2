@@ -8,7 +8,7 @@
 #ifndef MYSINGLETON_H_
 #define MYSINGLETON_H_
 
-#include "Singleton.h"
+#include "co2/Singleton.h"
 
 #define MySingletonClass_Attr			\
 	SingletonClass_Attr

@@ -1,3 +1,4 @@
+#include "co2/IList.h"
 #include "co2/Iterator.h"
 
 #define O_SUPER Interface()
@@ -20,5 +21,5 @@ O_METHOD_IF(IList, void *, get_last, (void *_self), (_self));
 O_METHOD_IF(IList, void *, remove_last, (void *_self), (_self));
 
 
-O_OBJECT(Iterator, Interface);
+O_OBJECT(IList, Interface);
 O_END_OBJECT

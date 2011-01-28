@@ -49,6 +49,8 @@ libcarbon_1_0_la_HEADERS = co2/ArgumentDeclaration.h co2/ArrayType.h co2/BaseCom
 
 libcarbon_1_0_la_CPPFLAGS = -I$(top_srcdir)/include
 
+grammar.h: grammar.c
+
 bin_PROGRAMS = carbon
 carbon_SOURCES = co2/Compiler.c
 carbon_CPPFLAGS = -I$(top_srcdir)/include

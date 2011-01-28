@@ -1,4 +1,4 @@
-#include "MyInterface.h"
+#include "co2/MyInterface.h"
 
 #define O_SUPER Interface()
 

@@ -1,4 +1,4 @@
-#include "TestInterface.h"
+#include "co2/TestInterface.h"
 
 #define O_SUPER Object()
 

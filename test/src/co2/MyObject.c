@@ -14,23 +14,33 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef _MYOBJECT_H
-#define _MYOBJECT_H
+#include "co2/MyObject.h"
 
-#include "Object.h"
+#define O_SUPER Object()
 
-O_METHOD_DEF(MyObject, int, getValue, (void *_self));
-O_METHOD_DEF(MyObject, int, setValue, (void *_self, int value));
+void *MyObject_ctor(void *_self, va_list * argp)
+{
+	struct MyObject *self = o_cast(_self, MyObject());
+	self = O_SUPER->ctor(self, argp);
+	self->value = va_arg(*argp, int);
+	return self;
+}
 
-#define MyObjectClass_Attr					\
-	ObjectClass_Attr;						\
-	O_METHOD(MyObject, getValue);			\
-	O_METHOD(MyObject, setValue)
+int MyObject_getValue(void *_self)
+{
+	struct MyObject *self = o_cast(_self, MyObject());
+	return self->value;
+}
 
-#define MyObject_Attr						\
-	Object_Attr;							\
-	int value
+int MyObject_setValue(void *_self, int value)
+{
+	struct MyObject *self = o_cast(_self, MyObject());
+	self->value = value;
+	return value;
+}
 
-O_CLASS(MyObject, Object);
-
-#endif				/* _MYOBJECT_H */
+O_OBJECT(MyObject, Object);
+self->ctor = MyObject_ctor;
+self->getValue = MyObject_getValue;
+self->setValue = MyObject_setValue;
+O_OBJECT_END

@@ -1,7 +1,7 @@
 #ifndef _MY_INTERFACE_H
 #define _MY_INTERFACE_H
 
-#include "Interface.h"
+#include "co2/Interface.h"
 
 O_METHOD_DEF(MyInterface, int, getValue, (void *_self));
 

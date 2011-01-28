@@ -2,7 +2,7 @@
 #define _TESTINTERFACE_H
 
 /* This object implements MyInterface */
-#include "MyInterface.h"
+#include "co2/MyInterface.h"
 
 /* Implement interface method */
 #define TestInterfaceClass_Attr \
