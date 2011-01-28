@@ -4,10 +4,43 @@
 *.a
 *.lo
 *.la
+*.Po
+*.Plo
+*.pc
+
 target
 grammar.[ch]
 lex.[ch]
 *~
 build-aux
+
+# The actual Makefiles produced
 Makefile
 Makefile.in
+
+# The local aclocal.m4 file
+aclocal.m4
+
+# The output of the configure script
+config.guess
+config.log
+config.status
+config.sub
+
+# The configure script itself
+configure
+
+# The include directory artifacts
+config.h
+config.h.in
+stamp-h1
+
+# Various scripts used for libtool and the like
+#install-sh
+libtool
+#ltmain.sh
+#missing
+#depcomp
+
+# Not sure what this one is for
+autom4te.cache
