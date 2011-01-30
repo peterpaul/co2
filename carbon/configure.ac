@@ -5,6 +5,7 @@ AC_PREREQ([2.67])
 AC_INIT([carbon], [0.0.1], [pp_kl_h@hotmail.com])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE
+AM_SILENT_RULES([yes])
 AC_CONFIG_SRCDIR([src/co2/Compiler.c])
 AC_CONFIG_HEADERS([config.h])
 
@@ -13,17 +14,19 @@ AC_PROG_CXX
 AC_PROG_AWK
 AC_PROG_CC
 AC_PROG_LIBTOOL
-AC_PROG_YACC
-AM_PROG_LEX
+DOLT
 AC_PROG_CPP
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
+AC_PROG_LEX
+AC_PROG_MKDIR_P
+AC_PROG_YACC
 
 # Checks for libraries.
 AC_CHECK_LIB([pthread], [pthread_create])
-PKG_CHECK_MODULES([CO2], [co2-1.0 >= 0.0.1],,exit)
+PKG_CHECK_MODULES([CO2], [co2-1.0 >= 0.0.1],,AC_MSG_ERROR([required module missing]))
 CFLAGS="$CFLAGS $CO2_CFLAGS"
 LDFLAGS="$LDFLAGS $CO2_LIBS"
 
@@ -50,7 +53,7 @@ AC_CHECK_FUNCS([getcwd memset realpath sqrt strdup strrchr])
 
 AC_CONFIG_FILES([Makefile
                  src/Makefile
-		 test/Makefile
+                 test/Makefile
                  carbon-1.0.pc
 		 ])
 

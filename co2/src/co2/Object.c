@@ -112,8 +112,8 @@ void *o_get_interface(void *_self, void *_interface)
 	if (!IF) {
 		IF = o_get_interface_of_class(Object (), interface);
 	}
-	assertTrue(IF, "%s at 0x%x does not implement %s.", self->class->name,
-		   (int) self, interface->class->name);
+	assertTrue(IF, "%s at %p does not implement %s.", self->class->name,
+		   self, interface->class->name);
 	return IF;
 }
 

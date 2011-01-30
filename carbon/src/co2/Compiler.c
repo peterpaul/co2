@@ -16,9 +16,9 @@ static void File_include_dependencies(void *_self)
   fprintf (out, "#include \"%s.h\"\n", self->name->data);
 }
 
-static char * extract_name(char * file)
+static char * extract_name(const char * file)
 {
-  char * start = strrchr (file, '/');
+  const char * start = strrchr (file, '/');
   if (start == NULL)
     {
       start = file;
@@ -27,19 +27,23 @@ static char * extract_name(char * file)
     {
       start += 1;
     }
-  char * end = strrchr (file, '.');
+  const char * end = strrchr (file, '.');
   if (end == NULL)
     {
       end = &file[strlen(file)];
     }
-  int size = (int) end - (int) start;
+  int size = 0;
+  while (end > start) {
+    size++;
+    end--;
+  }
   char * base = malloc (size + 1);
   strncpy (base, start, size);
   base[size] = '\0';
   return base;
 }
 
-char * get_header_file (char * c_file)
+char * get_header_file (const char * c_file)
 {
   int len = strlen (c_file);
   char * header_file = malloc (len + 1);
@@ -67,7 +71,7 @@ delete_release_pool ()
   O_CALL (current_release_pool, delete);
 }
 
-int mainImpl(char * output_file)
+int mainImpl(const char * output_file)
 {
   /* syntax analysis */
   parse ();

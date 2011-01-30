@@ -1,4 +1,5 @@
 #include "co2/io.h"
+#include <unistd.h>
 
 FILE *out;
 
