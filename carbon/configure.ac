@@ -51,6 +51,7 @@ AC_CHECK_FUNCS([getcwd memset realpath sqrt strdup strrchr])
 AC_CONFIG_FILES([Makefile
                  src/Makefile
 		 test/Makefile
-                 carbon-1.0.pc])
+                 carbon-1.0.pc
+		 ])
 
 AC_OUTPUT

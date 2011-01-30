@@ -6,7 +6,6 @@
 .deps
 .libs
 
-target
 grammar.[ch]
 lex.[ch]
 *~

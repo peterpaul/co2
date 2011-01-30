@@ -17,89 +17,42 @@ function test_separator {
     echo "---------------------------------------------------------------------------"
 }
 
-# Create output folder
-mkdir -p ${TARGET}/success > /dev/null
-mkdir -p ${TARGET}/fail > /dev/null
+function run_tests {
+    local TYPE=$1 # success or fail
+    local SCRIPT=$2 # ./run_succes_test.sh or ./run_fail_test.sh
 
-cp ${TESTDIR}/success/*.h ${TARGET}/success
-cp ${TESTDIR}/fail/*.h ${TARGET}/fail
+    # Create output folder
+    mkdir -p ${TARGET}/${TYPE} > /dev/null
+    cp ${TESTDIR}/${TYPE}/*.h ${TARGET}/${TYPE}
 
+    test_separator
+    echo "${TYPE} test-cases"
+    test_separator
+    local TESTS=`find ${TESTDIR}/${TYPE} -name "*.test" | sort`
+    for TEST in ${TESTS}
+    do
+	local BASENAME=`basename ${TEST} .test`
+	echo -n "--- ${BASENAME}... "
+	TOTAL=$(( TOTAL + 1 ))
+	${SCRIPT} ${TEST}
+	if [[ "$?" != "0" ]];
+	then
+	    fail_test "ERROR: ${TEST} failed."
+	else
+	    echo "OK"
+	fi
+    done
+}
 
-test_separator
-echo "Success test-cases"
-test_separator
+# Initialize counters
 ERRORS=0
 TOTAL=0
+
 # Testcases that should work
-TESTS=`find ${TESTDIR}/success -name "*.test" | sort`
-for TEST in ${TESTS}
-do
-    TOTAL=$(( TOTAL + 1 ))
-    # Compile the testcase
-    BASENAME=`basename ${TEST} .test`
-    echo -n "--- ${BASENAME}... "
-    TARGETNAME=${TARGET}/success/${BASENAME}
-    ${COMPILER} ${TEST} ${TARGETNAME}.c > ${TARGETNAME}.err 2>&1
-    if [[ "$?" != "0" ]]
-    then
-	
-	fail_test "ERROR: ${TEST} failed: Compiler error"
-	# cat ${TARGETNAME}.err
-	echo "Command: ${COMPILER} ${TEST} ${TARGETNAME}.c" >> ${TARGETNAME}.err
-    else
-	# Compile the generated code with gcc
-	pushd `dirname ${TARGETNAME}.bin` > /dev/null 2>&1
-	gcc -g3 ${TARGETNAME}.c -o `basename ${TARGETNAME}.bin` ${CFLAGS} ${LDFLAGS} -lm > ${TARGETNAME}.err 2>&1
-	GCC_STATUS=$?
-	popd > /dev/null 2>&1
-	if [[ "${GCC_STATUS}" != "0" ]]
-	then
-	    fail_test "ERROR: ${TEST} failed: GCC error"
-	    # cat ${TARGETNAME}.err
-	    echo "Command: gcc -g3 ${TARGETNAME}.c -o `basename ${TARGETNAME}.bin` ${CFLAGS} ${LDFLAGS} -lm" >> ${TARGETNAME}.err
-	else
-	    # When no input and output exists, create empty in/output.
-	    TESTINPUT=${TESTDIR}/success/${BASENAME}.in
-	    TESTOUTPUT=${TESTDIR}/success/${BASENAME}.out
-	    if [[ ! -f ${TESTINPUT} ]]; then touch ${TESTINPUT}; fi
-	    if [[ ! -f ${TESTOUTPUT} ]]; then touch ${TESTOUTPUT}; fi
-	    # Run program with input, and compare the output with the expected output.
-	    cat  ${TESTINPUT} | ${TARGETNAME}.bin > ${TARGETNAME}.out
-	    diff ${TESTOUTPUT} ${TARGETNAME}.out
-	    if [[ "$?" != "0" ]]
-	    then
-		fail_test "ERROR: ${TEST} failed: output error"
-	    else
-		echo "OK"
-		rm ${TARGETNAME}.err
-	    fi
-	fi
-    fi
-done
+run_tests success ./run_succes_test.sh
 
-test_separator
-echo "Fail test-cases"
-test_separator
 # Testcases that should not work
-TESTS=`find ${TESTDIR}/fail -name "*.test" | sort`
-for TEST in ${TESTS}
-do
-    TOTAL=$(( TOTAL + 1 ))
-
-    BASENAME=`basename ${TEST} .test`
-    echo -n "--- ${BASENAME}... "
-    TARGETNAME=${TARGET}/fail/${BASENAME}
-    ${COMPILER} ${TEST} ${TARGETNAME}.c > ${TARGETNAME}.err 2>&1
-    if [[ "$?" == "0" ]]
-    then
-	fail_test "ERROR: ${TEST} failed."
-	# cat ${TARGETNAME}.err
-	echo "Command: ${COMPILER} ${TEST} ${TARGETNAME}.c" >> ${TARGETNAME}.err
-    else
-	echo "OK"
-	# rm -f ${TARGETNAME}.err
-    fi
-done
+run_tests fail ./run_fail_test.sh
 
 test_separator
 # TODO add commandline flag to prevent deleting test results
