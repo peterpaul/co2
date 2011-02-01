@@ -168,7 +168,6 @@ struct File * try_absolute_path(struct String * file_name, struct String * _abso
 	char * _real_path = realpath (_absolute_path->data, NULL);
 	struct String * absolute_path = O_CALL_CLASS (String (), new, "%s", _real_path);
 	free (_real_path);
-	fprintf (stderr, "trying: %s\n", absolute_path->data);
 	if (absolute_path->data && stat (absolute_path->data, &st) == 0) {
 		fprintf (stderr, "Found file: %s\n", absolute_path->data);
 		return O_CALL_CLASS (File (), new, file_name, absolute_path);
@@ -184,7 +183,9 @@ struct File * try_search_path(struct String * file_name)
 	for (i = 0; i < path->length; i++) {
 		struct String * item = (struct String *)O_CALL(path, get, i);
 		struct String * full_path = O_CALL_CLASS(String(), new, "%s", item->data);
-		O_CALL(full_path, append_str, "/%s.%s", file_name->data, "c3");
+		O_CALL(full_path, append_str, "/%s.%s", file_name->data, "co2");
+
+		fprintf (stderr, "trying: %s\n", full_path->data);
 		if ((file = try_absolute_path (file_name, full_path))) {
 			O_CALL(full_path, delete);
 			return validate_file (file);

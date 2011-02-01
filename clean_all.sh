@@ -20,5 +20,6 @@ do
 
     pushd ${DIR}
     run make clean
+    rm configure.scan autoscan.log
     popd
 done

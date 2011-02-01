@@ -1,0 +1,3 @@
+success/MyObject.sh
+fail/interface_method_in_two_interfaces.sh
+fail/interface_not_implemented.sh
