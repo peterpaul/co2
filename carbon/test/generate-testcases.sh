@@ -46,8 +46,8 @@ function generate_testcase {
     IGNORE=$( grep ${TARGET} testignore | wc -l )
     if [[ ${IGNORE} == 0 ]];
     then
-	echo '\' >> Makefile.am
-	echo -n ${TARGET} >> Makefile.am
+	echo '\'
+	echo -n ${TARGET}
     fi
 }
 
@@ -67,7 +67,7 @@ function generate_makefile_am_header {
     echo
     echo 'targetdir = target'
     echo
-    echo 'TESTS_ENVIRONMENT = CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)"'
+    echo 'TESTS_ENVIRONMENT = CC="$(CC)" CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" LD="$(LD)"'
     echo
     echo 'distclean-local:'
     echo '	-rm -rf $(targetdir)'
@@ -81,7 +81,7 @@ function generate_makefile_am_header {
     echo -n 'TESTS='
 }
 
-generate_makefile_am_header > Makefile.am
+generate_makefile_am_header | tee Makefile.am
 
-generate_testcases success "${succes_cases}"
-generate_testcases fail "${fail_cases}"
+generate_testcases success "${succes_cases}" | tee -a Makefile.am
+generate_testcases fail "${fail_cases}" | tee -a Makefile.am

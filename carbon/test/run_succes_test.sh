@@ -1,10 +1,17 @@
 #!/bin/bash -u
+LD=gcc
 
 BASEDIR=`pwd`
 COMPILER=${BASEDIR}/../src/carbon
 
 TESTDIR=${BASEDIR}
 TARGET=${TESTDIR}/target
+
+LOGFILE=${TARGET}/${!#}.log
+if [[ -e ${LOGFILE} ]]
+then
+    rm -f ${LOGFILE}
+fi
 
 mkdir -p ${TARGET}/success
 find success -name "*.h" -exec cp -t ${TARGET}/success {} \;
@@ -22,25 +29,24 @@ function compile_library_test {
     fi
     local TARGETNAME=${TARGET}/success/${BASENAME}
     # Compile the testcase
-    ${COMPILER} ${TEST} ${TARGETNAME}.c > ${TARGETNAME}.err 2>&1
+    echo "Command: ${COMPILER} ${TEST} ${TARGETNAME}.c" >> ${LOGFILE}
+    ${COMPILER} ${TEST} ${TARGETNAME}.c >> ${LOGFILE} 2>&1
     if [[ "$?" != "0" ]]
     then
-	echo "ERROR: ${TEST} failed: Compiler error" >> ${TARGETNAME}.err
-	echo "Command: ${COMPILER} ${TEST} ${TARGETNAME}.c" >> ${TARGETNAME}.err
+	echo "ERROR: ${TEST} failed: Compiler error" >> ${LOGFILE}
 	return 1
     fi
-    # Compile the generated code with gcc
-    pushd `dirname ${TARGETNAME}.bin` > /dev/null 2>&1
-    gcc -g3 -c ${TARGETNAME}.c -o `basename ${TARGETNAME}.o` ${CFLAGS} > ${TARGETNAME}.err 2>&1
-    local GCC_STATUS=$?
-    popd > /dev/null 2>&1
-    if [[ "${GCC_STATUS}" != "0" ]]
+    # Compile the generated code with ${CC}
+    pushd `dirname ${TARGETNAME}.bin` >> ${LOGFILE} 2>&1
+    echo "Command: ${CC} -g3 -c ${TARGETNAME}.c -o `basename ${TARGETNAME}.o` ${CFLAGS}" >> ${LOGFILE}
+    ${CC} -g3 -c ${TARGETNAME}.c -o `basename ${TARGETNAME}.o` ${CFLAGS} >> ${LOGFILE} 2>&1
+    local CC_STATUS=$?
+    popd >> ${LOGFILE} 2>&1
+    if [[ "${CC_STATUS}" != "0" ]]
     then
-	echo "ERROR: ${TEST} failed: GCC error" >> ${TARGETNAME}.err
-	echo "Command: gcc -g3 -c ${TARGETNAME}.c -o `basename ${TARGETNAME}.o` ${CFLAGS}" >> ${TARGETNAME}.err
+	echo "ERROR: ${TEST} failed: CC error" >> ${LOGFILE}
 	return 1
     else
-	rm ${TARGETNAME}.err
 	OBJECTS="${OBJECTS} $( basename ${TARGETNAME}.o )"
     fi
     return 0
@@ -56,23 +62,15 @@ function run_succes_test {
 	local BASENAME=`basename ${TEST} .co2`
     fi
     local TARGETNAME=${TARGET}/success/${BASENAME}
-    # Compile the testcase
-    ${COMPILER} ${TEST} ${TARGETNAME}.c > ${TARGETNAME}.err 2>&1
-    if [[ "$?" != "0" ]]
+    # Compile the generated code with ${CC}
+    pushd `dirname ${TARGETNAME}.bin` >> ${LOGFILE} 2>&1
+    echo "Command: ${LD} ${OBJECTS} -o `basename ${TARGETNAME}.bin` ${LDFLAGS} -lc -lm" >> ${LOGFILE}
+    ${LD} ${OBJECTS} -o `basename ${TARGETNAME}.bin` ${LDFLAGS} -lc -lm >> ${LOGFILE} 2>&1
+    local LD_STATUS=$?
+    popd >> ${LOGFILE} 2>&1
+    if [[ "${LD_STATUS}" != "0" ]]
     then
-	echo "ERROR: ${TEST} failed: Compiler error" >> ${TARGETNAME}.err
-	echo "Command: ${COMPILER} ${TEST} ${TARGETNAME}.c" >> ${TARGETNAME}.err
-	return 1
-    fi
-    # Compile the generated code with gcc
-    pushd `dirname ${TARGETNAME}.bin` > /dev/null 2>&1
-    gcc -g3 ${TARGETNAME}.c ${OBJECTS} -o `basename ${TARGETNAME}.bin` ${CFLAGS} ${LDFLAGS} -lm > ${TARGETNAME}.err 2>&1
-    local GCC_STATUS=$?
-    popd > /dev/null 2>&1
-    if [[ "${GCC_STATUS}" != "0" ]]
-    then
-	echo "ERROR: ${TEST} failed: GCC error" >> ${TARGETNAME}.err
-	echo "Command: gcc -g3 ${TARGETNAME}.c -o `basename ${TARGETNAME}.bin` ${CFLAGS} ${LDFLAGS} -lm" >> ${TARGETNAME}.err
+	echo "ERROR: ${TEST} failed: LD error" >> ${LOGFILE}
 	return 1
     fi
     # When no input and output exists, create empty in/output.
@@ -85,22 +83,21 @@ function run_succes_test {
     diff ${TESTOUTPUT} ${TARGETNAME}.out
     if [[ "$?" != "0" ]]
     then
-	echo "ERROR: ${TEST} failed: output error" >> ${TARGETNAME}.err
+	echo "ERROR: ${TEST} failed: output error" >> ${LOGFILE}
 	return 1
-    else
-	rm ${TARGETNAME}.err
     fi
     return 0
 }
 
-if [[ $# > 1 ]]
-then
-    while [[ $# > 1 ]];
-    do
-	compile_library_test $1
-	shift 1
-    done
-    run_succes_test $1
-else
-    run_succes_test $1
-fi
+MAIN=""
+while [[ $# > 0 ]];
+do
+    compile_library_test $1
+    if [[ $# == 1 ]]
+    then
+	MAIN=$1
+    fi
+    shift 1
+done
+run_succes_test ${MAIN}
+

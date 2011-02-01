@@ -27,3 +27,5 @@ Language Features:
 * add missing c types (like double)
 * add structs
 * add typedefs
+
+* bash scripts for tests aren't really portable yet.

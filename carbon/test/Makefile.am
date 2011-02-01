@@ -3,7 +3,7 @@ MAINTAINERCLEANFILES = Makefile.in
 
 targetdir = target
 
-TESTS_ENVIRONMENT = CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)"
+TESTS_ENVIRONMENT = CC="$(CC)" CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" LD="$(LD)"
 
 distclean-local:
 	-rm -rf $(targetdir)
