@@ -121,14 +121,39 @@ NewExpression_type_check_arguments (struct TokenExpression *ctor_token,
 	     ctor_decl->formal_arguments->length, actual_arguments->length);
       return;
     }
+  else if (actual_arguments->length > ctor_decl->formal_arguments->length)
+    {
+      /* TODO check for varargs, if not, raise error. */
+    }
+  else
+    {
+    }
+
+  int expected_length = ctor_decl->formal_arguments->length;
+  /* if last parameter is vararg, expected_length -1 */
+  if (expected_length > 0)
+    {
+      struct ArgumentDeclaration *arg_decl =
+	O_CALL (ctor_decl->formal_arguments, get, expected_length - 1);
+      if (arg_decl->name->type == VA_ARG)
+	{
+	  expected_length --;
+	}
+    }
   int i;
-  for (i = 0; i < ctor_decl->formal_arguments->length; i++)
+  for (i = 0; i < expected_length; i++)
     {
       struct ArgumentDeclaration *arg_decl =
 	O_CALL (ctor_decl->formal_arguments, get, i);
       struct Expression *arg_expr = O_CALL (actual_arguments, get, i);
       O_CALL (arg_expr, type_check);
+      O_CALL (arg_decl->type, type_check);
       O_CALL (arg_decl->type, assert_compatible, arg_expr->type);
+    }
+  for (i = expected_length; i < actual_arguments->length; i++)
+    {
+      struct Expression *arg_expr = O_CALL (actual_arguments, get, i);
+      O_CALL (arg_expr, type_check);
     }
 }
 
@@ -167,6 +192,7 @@ O_IMPLEMENT (NewExpression, void, type_check, (void *_self))
 	  else
 	    {
 	      /* accept empty constructor */
+	      O_CALL (self->ctor_arguments, map, Declaration_list_type_check);
 	    }
 	}
       self->type = O_CALL (self->new_type, retain);

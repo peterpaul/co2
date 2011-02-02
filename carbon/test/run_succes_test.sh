@@ -18,6 +18,11 @@ find success -name "*.h" -exec cp -t ${TARGET}/success {} \;
 
 OBJECTS=
 
+echo "CC=${CC}" >> ${LOGFILE}
+echo "CFLAGS=${CFLAGS}" >> ${LOGFILE}
+echo "LDFLAGS=${LDFLAGS}" >> ${LOGFILE}
+echo "LD=${LD}" >> ${LOGFILE}
+
 function compile_library_test {
     local TEST=$1
 
@@ -90,9 +95,13 @@ function run_succes_test {
 }
 
 MAIN=""
-while [[ $# > 0 ]];
+while [[ $# > 0 ]]
 do
     compile_library_test $1
+    if [[ $? != 0 ]]
+    then
+	exit 1
+    fi
     if [[ $# == 1 ]]
     then
 	MAIN=$1

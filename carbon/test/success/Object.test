@@ -12,6 +12,12 @@
 		char * name;
 	}
 
+	class ReleasePool : Object {
+		/* empty */
+	}
+
+	ReleasePool current_release_pool;
+
 	typedef FILE = int;
 	FILE * stdout, stdin, stderr;
 }
@@ -20,6 +26,8 @@
 	class String : Object {
 		char * data;
 		int length, max;
+
+		String(char * fmt, ...){}
 
 		String resize(int size){return null;}
 		String ensure(int size){return null;}
@@ -44,8 +52,10 @@ class MyObject : Object {
 
 int main()
 {
-	Object o = new MyObject(13);
-	String s = o.to_string();
+	new ReleasePool ();
+	Object o = new MyObject (13);
+	String s = o.to_string ();
 	s.fprint(stdout);
+	delete current_release_pool;
 	return 0;
 }

@@ -78,18 +78,12 @@ FunctionDeclaration_find_in_interface (void *_self, va_list * app)
     }
 }
 
-static void FunctionDeclaration_type_check_formal_arg (void *_self)
-{
-  struct Declaration *self = O_CAST (_self, Declaration ());
-  O_CALL (self, type_check);
-}
-
 O_IMPLEMENT (FunctionDeclaration, void, type_check, (void *_self))
 {
   struct FunctionDeclaration *self = O_CAST (_self, FunctionDeclaration ());
   O_BRANCH_CALL (current_context, add, self);
   O_CALL (self->type, type_check);
-  O_CALL (self->formal_arguments, map, FunctionDeclaration_type_check_formal_arg);
+  O_CALL (self->formal_arguments, map, Declaration_list_type_check);
   O_BRANCH_CALL (self->body, type_check);
 
   struct FunctionType *function_type = o_cast (self->type, FunctionType ());

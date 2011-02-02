@@ -36,7 +36,7 @@ O_IMPLEMENT (ConstructorDeclaration, void, accept, (void *_self, struct BaseComp
   struct ConstructorDeclaration *self = O_CAST (_self, ConstructorDeclaration ());
   O_BRANCH_CALL (current_context, add, self);
   O_CALL (self->formal_arguments, map_args, accept, visitor);
-  O_CALL (self->body, accept, visitor);
+  O_BRANCH_CALL (self->body, accept, visitor);
   O_CALL (visitor, visit, self);
   O_BRANCH_CALL (current_context, remove_last);
 }
@@ -60,6 +60,8 @@ O_IMPLEMENT (ConstructorDeclaration, void, type_check, (void *_self))
       error (self->class_name, "Constructor should be called '%s'\n",
 	     class_decl->name->name->data);
     }
+
+  O_CALL (self->formal_arguments, map, Declaration_list_type_check);
 
   self->type =
     O_CALL_CLASS (ObjectType (), new, self->class_name, class_decl);

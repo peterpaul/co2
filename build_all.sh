@@ -23,8 +23,8 @@ do
     run ./configure --prefix=${HOME}/local/co2-0.0.1
     run make clean
     run autoscan
-    run make
-    run make check
-    run make install
+    run make -j3
+    run make -j3 check
+    run make -j3 install
     popd
 done

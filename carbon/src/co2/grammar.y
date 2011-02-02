@@ -897,7 +897,7 @@ constructor_declaration
   $<token>$ = O_CALL_CLASS(Token(), new_ctor, _Token_ctor_from_token, $1, "ctor", IDENTIFIER);
   O_CALL_CLASS(Scope(), new, ARGUMENT_SCOPE, $<token>$);
 }
-opt_formal_argument_list ')' statement
+formal_argument_list_var ')' statement
 {
   $$ = O_CALL_CLASS(ConstructorDeclaration(), new, $<token>3, $1, $4, $6);
   O_CALL(current_scope, leave);
@@ -906,7 +906,7 @@ opt_formal_argument_list ')' statement
 { 
   O_CALL_CLASS(Scope(), new, ARGUMENT_SCOPE, $3); 
 }
-opt_formal_argument_list ')' statement
+formal_argument_list_var ')' statement
 {
   $$ = O_CALL_CLASS(ConstructorDeclaration(), new, $3, $1, $6, $8);
   O_CALL(current_scope, leave);
