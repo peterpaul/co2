@@ -3,6 +3,8 @@
 
 #include "co2/RefObject.h"
 
+struct String;
+
 O_METHOD_DEF(String, void *, resize, (void *_self, int size));
 O_METHOD_DEF(String, void *, ensure, (void *_self, int size));
 O_METHOD_DEF(String, void *, append, (void *_self, struct String * str));

@@ -173,34 +173,6 @@ O_IMPLEMENT(List, void *, dtor, (void *_self))
 	return O_SUPER->dtor(self);
 }
 
-O_IMPLEMENT(List, struct String *, to_string, (void *_self))
-{
-	struct List *self = O_CAST(_self, List());
-	struct String *str = O_SUPER->to_string(self);
-
-	struct String *enter = O_CALL_CLASS(String(), new, "\n");
-	struct String *item_enter = O_CALL_CLASS(String(), new, "\n\t");
-
-	int i;
-	const unsigned length = self->length;
-	O_CALL(str, append_str, " [\n");
-	for (i = 0; i < length; i++) {
-		struct Object *item = O_CALL(self, get, i);
-		struct String *item_str = O_CALL(item, to_string);
-		O_CALL(item_str, replace, enter, item_enter);
-		O_CALL(str, append_str, "\t");
-		O_CALL(str, append, item_str);
-		O_CALL(item_str, delete);
-		O_CALL(str, append_str, ";\n");
-	}
-	O_CALL(str, append_str, "]");
-
-	O_CALL(enter, delete);
-	O_CALL(item_enter, delete);
-
-	return str;
-}
-
 O_IMPLEMENT(List, void *, getIterator, (void *_self))
 {
 	struct List *self = O_CAST(_self, List());
@@ -221,6 +193,5 @@ O_OBJECT_METHOD(List, map);
 O_OBJECT_METHOD(List, map_args);
 O_OBJECT_METHOD(List, filter);
 O_OBJECT_METHOD(List, filter_args);
-O_OBJECT_METHOD(List, to_string);
 O_OBJECT_METHOD(List, getIterator);
 O_END_OBJECT
