@@ -13,8 +13,8 @@ then
     rm -f ${LOGFILE}
 fi
 
-mkdir -p ${TARGET}/success
-find success -name "*.h" -exec cp -t ${TARGET}/success {} \;
+mkdir -p ${TARGET}/pass
+find pass -name "*.h" -exec cp -t ${TARGET}/pass {} \;
 
 OBJECTS=
 
@@ -32,7 +32,7 @@ function compile_library_test {
     then
 	local BASENAME=`basename ${TEST} .co2`
     fi
-    local TARGETNAME=${TARGET}/success/${BASENAME}
+    local TARGETNAME=${TARGET}/pass/${BASENAME}
     # Compile the testcase
     echo "Command: ${COMPILER} ${TEST} ${TARGETNAME}.c" >> ${LOGFILE}
     ${COMPILER} ${TEST} ${TARGETNAME}.c >> ${LOGFILE} 2>&1
@@ -57,7 +57,7 @@ function compile_library_test {
     return 0
 }
 
-function run_succes_test {
+function run_pass_test {
     local TEST=$1
 
     local BASENAME=`basename ${TEST} .test`
@@ -66,7 +66,7 @@ function run_succes_test {
     then
 	local BASENAME=`basename ${TEST} .co2`
     fi
-    local TARGETNAME=${TARGET}/success/${BASENAME}
+    local TARGETNAME=${TARGET}/pass/${BASENAME}
     # Compile the generated code with ${CC}
     pushd `dirname ${TARGETNAME}.bin` >> ${LOGFILE} 2>&1
     echo "Command: ${LD} ${OBJECTS} -o `basename ${TARGETNAME}.bin` ${LDFLAGS} -lc -lm" >> ${LOGFILE}
@@ -79,8 +79,8 @@ function run_succes_test {
 	return 1
     fi
     # When no input and output exists, create empty in/output.
-    local TESTINPUT=${TESTDIR}/success/${BASENAME}.in
-    local TESTOUTPUT=${TESTDIR}/success/${BASENAME}.out
+    local TESTINPUT=${TESTDIR}/pass/${BASENAME}.in
+    local TESTOUTPUT=${TESTDIR}/pass/${BASENAME}.out
     if [[ ! -f ${TESTINPUT} ]]; then touch ${TESTINPUT}; fi
     if [[ ! -f ${TESTOUTPUT} ]]; then touch ${TESTOUTPUT}; fi
     # Run program with input, and compare the output with the expected output.
@@ -108,5 +108,5 @@ do
     fi
     shift 1
 done
-run_succes_test ${MAIN}
+run_pass_test ${MAIN}
 

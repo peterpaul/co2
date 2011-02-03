@@ -16,7 +16,6 @@ mkdir -p ${TARGET}/fail
 find fail -name "*.h" -exec cp -t ${TARGET}/fail {} \;
 
 function run_fail_test {
-    echo "--- ${LOGFILE} ---"
     local TEST=$1
     local BASENAME=`basename ${TEST} .test`
     local TARGETNAME=${TARGET}/fail/${BASENAME}

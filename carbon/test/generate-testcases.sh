@@ -1,6 +1,6 @@
 #!/bin/bash
 
-succes_cases=$( for i in $( ls success/*.test ); do echo $( basename $i ); done )
+pass_cases=$( for i in $( ls pass/*.test ); do echo $( basename $i ); done )
 fail_cases=$( for i in $( ls fail/*.test ); do echo $( basename $i ); done )
 
 DEPENDENCIES=
@@ -16,7 +16,7 @@ function generate_dependencies {
 }
 
 function generate_testcase {
-    local TYPE=$1 # success/fail
+    local TYPE=$1 # pass/fail
     local NAME=$2
 
     local BASENAME=$( basename ${NAME} .test )
@@ -31,10 +31,10 @@ function generate_testcase {
 	echo "#!/bin/bash -u" > ${TARGET}
 	echo >> ${TARGET}
 
-	if [[ "${TYPE}" == "success" ]];
+	if [[ "${TYPE}" == "pass" ]];
 	then
 	    generate_dependencies ${TYPE}/${BASENAME}.test ${TYPE}
-	    echo "./run_succes_test.sh ${DEPENDENCIES} ${TYPE}/${BASENAME}.test" >> ${TARGET}
+	    echo "./run_pass_test.sh ${DEPENDENCIES} ${TYPE}/${BASENAME}.test" >> ${TARGET}
 	else
 	    generate_dependencies ${TYPE}/${BASENAME}.test ${TYPE}
 	    echo "./run_fail_test.sh ${DEPENDENCIES} ${TYPE}/${BASENAME}.test" >> ${TARGET}
@@ -62,7 +62,7 @@ function generate_testcases {
 }
 
 function generate_makefile_am_header {
-    echo 'EXTRA_DIST = success fail generate-testcases.sh run_succes_test.sh run_fail_test.sh'
+    echo 'EXTRA_DIST = pass fail generate-testcases.sh run_pass_test.sh run_fail_test.sh'
     echo 'MAINTAINERCLEANFILES = Makefile.in'
     echo
     echo 'targetdir = target'
@@ -83,5 +83,5 @@ function generate_makefile_am_header {
 
 generate_makefile_am_header | tee Makefile.am
 
-generate_testcases success "${succes_cases}" | tee -a Makefile.am
+generate_testcases pass "${pass_cases}" | tee -a Makefile.am
 generate_testcases fail "${fail_cases}" | tee -a Makefile.am

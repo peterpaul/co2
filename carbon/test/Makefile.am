@@ -1,4 +1,4 @@
-EXTRA_DIST = success fail generate-testcases.sh run_succes_test.sh run_fail_test.sh
+EXTRA_DIST = pass fail generate-testcases.sh run_pass_test.sh run_fail_test.sh
 MAINTAINERCLEANFILES = Makefile.in
 
 targetdir = target
@@ -15,43 +15,43 @@ ${TESTS}, Makefile.am: ./generate-testcases.sh
 	./generate-testcases.sh
 
 TESTS=\
-success/arithmetic_expressions.sh\
-success/array.sh\
-success/cast_expression.sh\
-success/class_decl_constructor_parameters.sh\
-success/class_decl_constructor.sh\
-success/class_decl_destructor.sh\
-success/class_decl_names.sh\
-success/class_decl_object_vars.sh\
-success/class_decl_self.sh\
-success/class_decl_super.sh\
-success/class_decl.sh\
-success/class_intergrated.sh\
-success/external_definition.sh\
-success/function_call.sh\
-success/fun_decl.sh\
-success/fun_decl_vararg.sh\
-success/fun_type.sh\
-success/global_scope.sh\
-success/import.sh\
-success/interface_decl.sh\
-success/interface_implementation.sh\
-success/List.sh\
-success/Object.sh\
-success/ray.sh\
-success/scope_simple.sh\
-success/scope.sh\
-success/size_expression.sh\
-success/struct_decl.sh\
-success/try_statement_finally.sh\
-success/try_statement_nested_finally.sh\
-success/try_statement_nested_return.sh\
-success/try_statement_nested.sh\
-success/try_statement_return.sh\
-success/try_statement.sh\
-success/typedef.sh\
-success/va_arg.sh\
-success/var_decl.sh\
+pass/arithmetic_expressions.sh\
+pass/array.sh\
+pass/cast_expression.sh\
+pass/class_decl_constructor_parameters.sh\
+pass/class_decl_constructor.sh\
+pass/class_decl_destructor.sh\
+pass/class_decl_names.sh\
+pass/class_decl_object_vars.sh\
+pass/class_decl_self.sh\
+pass/class_decl_super.sh\
+pass/class_decl.sh\
+pass/class_intergrated.sh\
+pass/external_definition.sh\
+pass/function_call.sh\
+pass/fun_decl.sh\
+pass/fun_decl_vararg.sh\
+pass/fun_type.sh\
+pass/global_scope.sh\
+pass/import.sh\
+pass/interface_decl.sh\
+pass/interface_implementation.sh\
+pass/List.sh\
+pass/Object.sh\
+pass/ray.sh\
+pass/scope_simple.sh\
+pass/scope.sh\
+pass/size_expression.sh\
+pass/struct_decl.sh\
+pass/try_statement_finally.sh\
+pass/try_statement_nested_finally.sh\
+pass/try_statement_nested_return.sh\
+pass/try_statement_nested.sh\
+pass/try_statement_return.sh\
+pass/try_statement.sh\
+pass/typedef.sh\
+pass/va_arg.sh\
+pass/var_decl.sh\
 fail/cast_expression.sh\
 fail/class_decl_constructor_arguments.sh\
 fail/class_decl_constructor_decl.sh\

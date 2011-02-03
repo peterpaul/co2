@@ -1,6 +1,6 @@
 #!/bin/bash
 
-succes_cases=$( for i in $( ls success/*.test ); do echo $( basename $i ); done )
+pass_cases=$( for i in $( ls pass/*.test ); do echo $( basename $i ); done )
 fail_cases=$( for i in $( ls fail/*.test ); do echo $( basename $i ); done )
 
 function generate_testcase {
@@ -39,5 +39,5 @@ function generate_makefile {
     done
 }
 
-generate_makefile "${succes_cases}" > success/Makefile.am
+generate_makefile "${pass_cases}" > pass/Makefile.am
 generate_makefile "${fail_cases}" > fail/Makefile.am
