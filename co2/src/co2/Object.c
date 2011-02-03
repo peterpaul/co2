@@ -6,7 +6,6 @@
  */
 
 #include "co2/Object.h"
-#include "co2/String.h"
 #include "co2/Interface.h"
 
 /* General functions */
@@ -221,28 +220,6 @@ O_IMPLEMENT(Object, void *, init_ctor,
 	return object;
 }
 
-O_IMPLEMENT(Object, struct String *, to_string, (void *_self))
-{
-	struct Object *self = O_CAST(_self, Object());
-	return O_CALL_CLASS(String(), new, "%s at %p", self->class->name,
-			    _self);
-}
-
-O_IMPLEMENT(Object, void *, clone, (void *_self))
-{
-	struct Object *self = O_CAST(_self, Object());
-	struct Object *clone = o_alloc(self->class);
-	memcpy(clone, self, self->class->size);
-	return clone;
-}
-
-O_IMPLEMENT(Object, int, compare, (void *_self, void *_other))
-{
-	struct Object *self = O_CAST(_self, Object());
-	struct Object *other = o_cast(_other, Object());
-	return self - other;
-}
-
 /* Class methods */
 #define O_SUPER Object()
 
@@ -306,9 +283,6 @@ struct Class *Object()
 		O_OBJECT_METHOD(Object, init);
 		O_OBJECT_METHOD(Object, init_ctor);
 		O_OBJECT_METHOD(Object, delete);
-		O_OBJECT_METHOD(Object, to_string);
-		O_OBJECT_METHOD(Object, clone);
-		O_OBJECT_METHOD(Object, compare);
 	}
 	return self;
 }
@@ -333,9 +307,6 @@ struct Class *Class()
 		O_OBJECT_METHOD(Object, init);
 		O_OBJECT_METHOD(Object, init_ctor);
 		O_OBJECT_METHOD(Class, delete);
-		O_OBJECT_METHOD(Object, to_string);
-		/* O_OBJECT_METHOD(Object,clone); */
-		O_OBJECT_METHOD(Object, compare);
 	}
 	return self;
 }

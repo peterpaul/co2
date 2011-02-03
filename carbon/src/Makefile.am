@@ -55,7 +55,7 @@ grammar.h: grammar.c
 bin_PROGRAMS = carbon
 carbon_SOURCES = co2/Compiler.c
 carbon_CPPFLAGS = -I$(top_srcdir)/include
-carbon_LDFLAGS = $(CO2_LIBS) -lcarbon-1.0
+carbon_LDFLAGS = $(CO2_LIBS) $(CO2BASE_LIBS) -lcarbon-1.0
 
 distclean-local:
 	-rm -r ${bin_PROGRAMS}

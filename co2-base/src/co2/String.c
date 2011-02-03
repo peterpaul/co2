@@ -188,6 +188,7 @@ O_IMPLEMENT(String, int, snprint, (void *_self, char *str, int size))
 	return snprintf(str, size, "%s", self->data);
 }
 
+/*
 O_IMPLEMENT(String, void *, clone, (void *_self))
 {
 	struct String *self = O_CAST(_self, String());
@@ -197,6 +198,7 @@ O_IMPLEMENT(String, void *, clone, (void *_self))
 	clone->length = self->length;
 	return clone;
 }
+*/
 
 O_IMPLEMENT(String, void *, dtor, (void *_self))
 {
@@ -224,17 +226,18 @@ O_IMPLEMENT(String, struct List *, split, (void *_self, const char *delim))
 	return list;
 }
 
+/*
 O_IMPLEMENT(String, int, compare, (void *_self, void *_other))
 {
 	struct String *self = O_CAST(_self, String());
 	struct String *other = O_CAST(_other, String());
 	return strcmp(self->data, other->data);
 }
+*/
 
 O_OBJECT(String, RefObject);
 O_OBJECT_METHOD(String, ctor);
 O_OBJECT_METHOD(String, dtor);
-O_OBJECT_METHOD(String, clone);
 O_OBJECT_METHOD(String, resize);
 O_OBJECT_METHOD(String, ensure);
 O_OBJECT_METHOD(String, append);
@@ -245,5 +248,4 @@ O_OBJECT_METHOD(String, fprint);
 O_OBJECT_METHOD(String, snprint);
 O_OBJECT_METHOD(String, ctor_from_file);
 O_OBJECT_METHOD(String, split);
-O_OBJECT_METHOD(String, compare);
 O_END_OBJECT
