@@ -17,7 +17,7 @@ class ReleasePoolItem {
 			delete self;
 			return result;
 		} else {
-			if (next != null) {
+			if (next) {
 				next = next.remove(anItem);
 			}
 			return self;
@@ -25,7 +25,7 @@ class ReleasePoolItem {
 	}
 
 	void clearList() {
-		if (next != null) {
+		if (next) {
 			next.clearList();
 		}
 		delete item;
