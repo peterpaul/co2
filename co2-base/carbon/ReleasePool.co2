@@ -5,13 +5,13 @@ include ReleasePoolItem
 	void free(void *ptr);
 }
 
+int releasePoolHashSize = 1223;
+
 class ReleasePool {
-	int releasePoolHashSize;
 	ReleasePool parent;
 	ReleasePoolItem[] hashmap;
 
 	ReleasePool() {
-		releasePoolHashSize = 1223;
 		parent = current_release_pool;
 		current_release_pool = self;
 		hashmap = calloc(sizeof(ReleasePoolItem), releasePoolHashSize);
@@ -31,20 +31,20 @@ class ReleasePool {
 		parent = null;
 	}
 
-	Object add(Object anItem) {
+	RefObject add(RefObject anItem) {
 		int index = (int) anItem % releasePoolHashSize;
-		ReleasePoolItem item = new ReleasePoolItem (anItem);
+//		ReleasePoolItem item = new ReleasePoolItem (anItem);
 		if (hashmap[index] == null) {
-			hashmap[index] = item;
+//			hashmap[index] = item;
 		} else {
-			hashmap[index] = hashmap[index].add(item);
+//			hashmap[index] = hashmap[index].add(item);
 		}
 		return anItem;
 	}
 
-	Object remove(Object anItem) {
+	RefObject remove(RefObject anItem) {
 		int index = (int) anItem % releasePoolHashSize;
-		if (hashmap[index] != null) {
+		if (hashmap[index]) {
 			hashmap[index] = hashmap[index].remove(anItem);
 		}
 		return anItem;

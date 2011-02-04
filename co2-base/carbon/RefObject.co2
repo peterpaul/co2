@@ -7,22 +7,40 @@ class RefObject : Object {
 	RefObject() {
 		refCount = 0;
 		// add self to auto release pool
-		// current_release_pool.add(self);
+		current_release_pool.add(self);
 	}
 
 	~RefObject() {
 		if (refCount <= 0) {
 			// remove self from auto release pool
-			// current_release_pool.remove(self);
+			current_release_pool.remove(self);
 		}
 	}
 
 	RefObject retain() {
+		if (refCount <= 0) {
+			// remove self from auto release pool
+			current_release_pool.remove(self);
+			refCount = 0;
+		}
+		refCount += 1;
+		return self;
 	}
 
 	RefObject release() {
+		refCount -= 1;
+		if (refCount == 0) {
+			delete self;
+			self = null;
+		}
+		return self;
 	}
 
 	RefObject autoRelease() {
+		refCount -= 1;
+		if (refCount == 0) {
+			current_release_pool.add(self);
+		}
+		return self;
 	}
 }
