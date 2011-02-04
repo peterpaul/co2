@@ -1,0 +1,10 @@
+["co2/Object.h"] {
+	class Object {
+		Class klass;
+	}
+
+	class Class : Object {
+		int size;
+		char * name;
+	}
+}

@@ -1,0 +1,37 @@
+include RefObject
+
+class ReleasePoolItem {
+	ReleasePoolItem(RefObject anObject) {
+		item = anObject;
+		next = null;
+	}
+
+	ReleasePoolItem add(ReleasePoolItem anItem) {
+		anItem.next = self;
+		return anItem;
+	}
+
+	ReleasePoolItem remove(RefObject anItem) {
+		if (item == anItem) {
+			ReleasePoolItem result = next;
+			delete self;
+			return result;
+		} else {
+			if (next != null) {
+				next = next.remove(anItem);
+			}
+			return self;
+		}
+	}
+
+	void clearList() {
+		if (next != null) {
+			next.clearList();
+		}
+		delete item;
+		delete self;
+	}
+
+	ReleasePoolItem next;
+	RefObject item;
+}

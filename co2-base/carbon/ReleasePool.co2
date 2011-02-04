@@ -1,0 +1,54 @@
+include ReleasePoolItem
+
+["stdlib.h"] {
+	void *calloc(int elem_size, int elem_count);
+	void free(void *ptr);
+}
+
+class ReleasePool {
+	int releasePoolHashSize;
+	ReleasePool parent;
+	ReleasePoolItem[] hashmap;
+
+	ReleasePool() {
+		releasePoolHashSize = 1223;
+		parent = current_release_pool;
+		current_release_pool = self;
+		hashmap = calloc(sizeof(ReleasePoolItem), releasePoolHashSize);
+	}
+
+	~ReleasePool() {
+		int i;
+		for (i = 0; i < releasePoolHashSize; i += 1) {
+			ReleasePoolItem list = hashmap[i];
+			hashmap[i] = null;
+			if (list) list.clearList();
+		}
+		free (hashmap);
+		hashmap = null;
+
+		current_release_pool = parent;
+		parent = null;
+	}
+
+	Object add(Object anItem) {
+		int index = (int) anItem % releasePoolHashSize;
+		ReleasePoolItem item = new ReleasePoolItem (anItem);
+		if (hashmap[index] == null) {
+			hashmap[index] = item;
+		} else {
+			hashmap[index] = hashmap[index].add(item);
+		}
+		return anItem;
+	}
+
+	Object remove(Object anItem) {
+		int index = (int) anItem % releasePoolHashSize;
+		if (hashmap[index] != null) {
+			hashmap[index] = hashmap[index].remove(anItem);
+		}
+		return anItem;
+	}
+}
+
+ReleasePool current_release_pool;

@@ -40,6 +40,7 @@ AC_CHECK_FUNCS([strdup strstr])
 
 AC_CONFIG_FILES([Makefile
                  src/Makefile
+                 carbon/Makefile
                  co2-base-1.0.pc])
 
 AC_OUTPUT
