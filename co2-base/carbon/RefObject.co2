@@ -1,0 +1,28 @@
+include Object
+include ReleasePool
+
+class RefObject : Object {
+	int refCount;
+
+	RefObject() {
+		refCount = 0;
+		// add self to auto release pool
+		// current_release_pool.add(self);
+	}
+
+	~RefObject() {
+		if (refCount <= 0) {
+			// remove self from auto release pool
+			// current_release_pool.remove(self);
+		}
+	}
+
+	RefObject retain() {
+	}
+
+	RefObject release() {
+	}
+
+	RefObject autoRelease() {
+	}
+}
