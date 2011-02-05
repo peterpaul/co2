@@ -201,7 +201,7 @@
 %left		<token>	SHIFTL SHIFTR
 %left		<token>	'+' '-'
 %left		<token>	'*' '/' '%' '^'
-%right		<token>	'!' UNARY_MINUS UNARY_PLUS
+%right		<token>	'!' UNARY_MINUS UNARY_PLUS ADDRESS_OF DEREFERENCE
  /* Solve shift-reduce conflict for casts */
 %right	CASTX
 %left		<token>	'(' '[' '.'
@@ -836,6 +836,8 @@ expression
 |	'-' expression %prec UNARY_MINUS { $$ = O_CALL_CLASS(UnaryExpression(), new, $1, $2); }
 |	'+' expression %prec UNARY_PLUS { $$ = O_CALL_CLASS(UnaryExpression(), new, $1, $2); }
 |	'!' expression { $$ = O_CALL_CLASS(UnaryExpression(), new, $1, $2); }
+|	'&' expression %prec ADDRESS_OF { $$ = O_CALL_CLASS(UnaryExpression(), new, $1, $2); }
+|	'*' expression %prec DEREFERENCE { $$ = O_CALL_CLASS(UnaryExpression(), new, $1, $2); }
 |	'(' expression ')' { $$ = O_CALL_CLASS(NestedExpression(), new, $2); }
 |	NEW type '[' expression ']' { $$ = O_CALL_CLASS(NewExpression(), new, $2, $4); }
 |	NEW type '(' opt_actual_argument_list ')' { $$ = O_CALL_CLASS(NewExpression(), new, $2, $4); }
