@@ -1,0 +1,14 @@
+["stdio.h"] {
+	int vprintf(char *format, va_list ap);
+}
+
+class MyObject {
+	MyObject(char[] format, ...) {
+		vprintf(format, ...);
+	}
+}
+
+int main() {
+	new MyObject("TEST: %s\n", "Hello World!");
+	return 0;
+}
