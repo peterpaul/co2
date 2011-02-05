@@ -114,32 +114,30 @@ NewExpression_type_check_arguments (struct TokenExpression *ctor_token,
     }
   struct ConstructorDeclaration *ctor_decl =
     (struct ConstructorDeclaration *) ctor_token->decl;
-  if (actual_arguments->length < ctor_decl->formal_arguments->length)
+  int expected_length = ctor_decl->formal_arguments->length;
+  /* if last parameter is vararg, expected_length -1 */
+  if (O_CALL (ctor_decl, has_var_args))
     {
-      error (ctor_token->token, "'%s' needs %d arguments, but got %d.\n",
-	     ctor_token->token->name->data,
-	     ctor_decl->formal_arguments->length, actual_arguments->length);
-      return;
-    }
-  else if (actual_arguments->length > ctor_decl->formal_arguments->length)
-    {
-      /* TODO check for varargs, if not, raise error. */
+	  expected_length --;
+	  if (actual_arguments->length < expected_length)
+	    {
+	      error (ctor_token->token, "'%s' needs %d arguments, but got %d.\n",
+		     ctor_token->token->name->data,
+		     expected_length, actual_arguments->length);
+	      return;
+	    }
     }
   else
     {
-    }
-
-  int expected_length = ctor_decl->formal_arguments->length;
-  /* if last parameter is vararg, expected_length -1 */
-  if (expected_length > 0)
-    {
-      struct ArgumentDeclaration *arg_decl =
-	O_CALL (ctor_decl->formal_arguments, get, expected_length - 1);
-      if (arg_decl->name->type == VA_ARG)
+      if (actual_arguments->length != expected_length)
 	{
-	  expected_length --;
+	  error (ctor_token->token, "'%s' needs %d arguments, but got %d.\n",
+		 ctor_token->token->name->data,
+		 expected_length, actual_arguments->length);
+	  return;
 	}
     }
+
   int i;
   for (i = 0; i < expected_length; i++)
     {

@@ -3,8 +3,11 @@
 
 #include "co2/Declaration.h"
 
+O_METHOD_DEF (ConstructorDeclaration, bool, has_var_args, (void *_self));
+
 #define ConstructorDeclarationClass_Attr		\
-  DeclarationClass_Attr
+  DeclarationClass_Attr;				\
+  O_METHOD (ConstructorDeclaration, has_var_args)
 
 #define ConstructorDeclaration_Attr		\
   Declaration_Attr;				\

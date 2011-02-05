@@ -9,6 +9,7 @@ class MyObject {
 }
 
 int main() {
-	new MyObject("TEST: %s\n", "Hello World!");
+	new MyObject("TEST: %s %s\n", "Hello", "World!");
+	new MyObject("TAST: \n");
 	return 0;
 }
