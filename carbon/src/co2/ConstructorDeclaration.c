@@ -54,6 +54,7 @@ O_IMPLEMENT (ConstructorDeclaration, void, type_check, (void *_self))
 {
   struct ConstructorDeclaration *self =
     O_CAST (_self, ConstructorDeclaration ());
+  O_CALL (self->type, type_check);
   O_BRANCH_CALL (current_context, add, self);
   struct Declaration *class_decl =
     O_BRANCH_CALL (current_context, find, ClassDeclaration ());
