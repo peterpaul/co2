@@ -38,6 +38,7 @@ pass/import.sh\
 pass/interface_decl.sh\
 pass/interface_implementation.sh\
 pass/List.sh\
+pass/loops.sh\
 pass/Object.sh\
 pass/ray.sh\
 pass/scope_simple.sh\

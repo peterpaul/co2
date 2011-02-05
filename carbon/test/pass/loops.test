@@ -1,0 +1,25 @@
+["stdio.h"] {
+	int printf(char *format, ...);
+}
+
+int main() {
+	int i, size = 10;
+	int[] array;
+	
+	array = new int[size];
+
+	for (i = 0; i < size; i += 1) {
+		array[i] = i;
+	}
+
+	i = 0;
+	do {
+		printf("array[%d] = %d\n", array[i], i);
+		i += 1;
+	} while i < size;
+
+	while ((i -= 1) >= 0) {
+		printf("array[%d] = %d\n", array[i], i);
+		if (i < 5) break;		
+	}
+}

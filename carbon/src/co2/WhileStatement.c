@@ -28,14 +28,14 @@ O_IMPLEMENT (WhileStatement, void, accept, (void *_self, struct BaseCompileObjec
   O_CALL (visitor, visit, self);
 }
 
-O_IMPLEMENT (WhileStatement, void, type_check, (void *_self, struct BaseCompileObjectVisitor *visitor))
+O_IMPLEMENT (WhileStatement, void, type_check, (void *_self))
 {
   struct WhileStatement *self = O_CAST (_self, WhileStatement ());
   O_CALL (self->condition, type_check);
   O_CALL (self->body, type_check);
 }
 
-O_IMPLEMENT (WhileStatement, void, generate, (void *_self, struct BaseCompileObjectVisitor *visitor))
+O_IMPLEMENT (WhileStatement, void, generate, (void *_self))
 {
   struct WhileStatement *self = O_CAST (_self, WhileStatement ());
   fprintf (out, "while (");

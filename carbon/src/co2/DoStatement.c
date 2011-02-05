@@ -28,14 +28,14 @@ O_IMPLEMENT (DoStatement, void, accept, (void *_self, struct BaseCompileObjectVi
   O_CALL (visitor, visit, self);
 }
 
-O_IMPLEMENT (DoStatement, void, type_check, (void *_self, struct BaseCompileObjectVisitor *visitor))
+O_IMPLEMENT (DoStatement, void, type_check, (void *_self))
 {
   struct DoStatement *self = O_CAST (_self, DoStatement ());
   O_CALL (self->body, type_check);
   O_CALL (self->condition, type_check);
 }
 
-O_IMPLEMENT (DoStatement, void, generate, (void *_self, struct BaseCompileObjectVisitor *visitor))
+O_IMPLEMENT (DoStatement, void, generate, (void *_self))
 {
   struct DoStatement *self = O_CAST (_self, DoStatement ());
   fprintf (out, "do\n");

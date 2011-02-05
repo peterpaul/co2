@@ -13,8 +13,10 @@
 #include "co2/TypeDeclaration.h"
 #include "co2/VariableDeclaration.h"
   /* Statements */
+#include "co2/BreakStatement.h"
 #include "co2/CatchStatement.h"
 #include "co2/CompoundStatement.h"
+#include "co2/ContinueStatement.h"
 #include "co2/DeleteStatement.h"
 #include "co2/DoStatement.h"
 #include "co2/ExpressionStatement.h"
@@ -74,10 +76,12 @@
   struct Scope * scope;
 }
 
+%token <token> BREAK
 %token <token> CATCH
 %token <token> CHAR
 %token <token> CHAR_CONSTANT
 %token <token> CLASS
+%token <token> CONTINUE
 %token <token> DO
 %token <token> DOUBLE
 %token <token> DELETE
@@ -146,11 +150,13 @@
 %type	<list>		variable_declaration_id_list
 %type	<list>		variable_declaration_list
  /* Statements */
+%type	<statement>	break_statement
 %type	<statement>	catch_statement
 %type	<list>		catch_statement_list
 %type	<list>		compound_content
 %type	<list>		compound_content_list
 %type	<statement>	compound_statement
+%type	<statement>	continue_statement
 %type	<statement>	delete_statement
 %type	<statement>	do_statement
 %type	<statement>	expression_statement
@@ -521,6 +527,8 @@ statement
 |	delete_statement
 |	try_statement
 |	throw_statement
+|	break_statement
+|	continue_statement
 ;
 
 compound_statement
@@ -669,6 +677,18 @@ delete_statement
   $$ = O_CALL_CLASS(DeleteStatement(), new, $2);
 }
 ;
+
+break_statement
+:	BREAK ';'
+{
+  $$ = O_CALL_CLASS(BreakStatement(), new);
+}
+
+continue_statement
+:	CONTINUE ';'
+{
+  $$ = O_CALL_CLASS(ContinueStatement(), new);
+}
 
 interface_declaration
 :	interface_header 
