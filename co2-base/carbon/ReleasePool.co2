@@ -46,6 +46,8 @@ class ReleasePool {
 		int index = (int) anItem % releasePoolHashSize;
 		if (hashmap[index]) {
 			hashmap[index] = hashmap[index].remove(anItem);
+		} else {
+			throw new Exception();
 		}
 		return anItem;
 	}
