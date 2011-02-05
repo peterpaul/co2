@@ -18,6 +18,15 @@ O_IMPLEMENT (ConstructorDeclaration, void *, ctor,
   self->class_name = O_RETAIN_ARG (Token);
   self->formal_arguments = O_RETAIN_ARG (RefList);
   self->body = O_BRANCH_RETAIN_ARG (Statement);
+
+  struct Declaration * class_decl = O_CALL (global_scope, lookup, self->class_name);
+  if (class_decl)
+    {
+      self->type =
+	O_CALL_CLASS (ObjectType (), new, self->class_name, class_decl);
+      O_CALL (self->type, retain);
+    }
+
   return self;
 }
 
@@ -48,6 +57,7 @@ O_IMPLEMENT (ConstructorDeclaration, void, type_check, (void *_self))
   O_BRANCH_CALL (current_context, add, self);
   struct Declaration *class_decl =
     O_BRANCH_CALL (current_context, find, ClassDeclaration ());
+
   if (class_decl == NULL)
     {
       error (self->class_name,
@@ -60,12 +70,6 @@ O_IMPLEMENT (ConstructorDeclaration, void, type_check, (void *_self))
       error (self->class_name, "Constructor should be called '%s'\n",
 	     class_decl->name->name->data);
     }
-
-  O_CALL (self->formal_arguments, map, Declaration_list_type_check);
-
-  self->type =
-    O_CALL_CLASS (ObjectType (), new, self->class_name, class_decl);
-  O_CALL (self->type, retain);
 
   O_CALL (self->body, type_check);
   O_BRANCH_CALL (current_context, remove_last);
