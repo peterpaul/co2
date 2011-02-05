@@ -2,10 +2,12 @@ include RefObject
 
 ["string.h"] {
 	int strlen (char[] str);
+	char *strcpy(char *dest, char *src);
 }
 
 ["stdlib.h"] {
 	void *malloc(int size);
+	void *realloc(void *ptr, int size);
 }
 
 ["stdarg.h"] {
@@ -37,9 +39,9 @@ class String : RefObject {
 			va_list ap;
 			va_copy (ap, ...);
 			n = vsnprintf(data, size, format, ap);
-			if (n > -1 && n < size) break;
 			if (n > -1) {
-				size = n + 1;
+				if (n < size) break;
+				else size = n + 1;
 			} else {
 				size *= 2;
 			}
@@ -53,4 +55,21 @@ class String : RefObject {
 		}
 	}
 
+	String resize (int size) {
+		data = realloc (data, size);
+		max = size;
+		return self;
+	}
+
+	String ensure (int size) {
+		if (size > max) return resize(size);
+		return self;
+	}
+
+	String append (String str) {
+		ensure (length + str.length + 1);
+		strcpy (&data[length], str.data);
+		length += str.length;
+		return self;
+	}
 }
