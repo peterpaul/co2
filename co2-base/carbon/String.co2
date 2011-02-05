@@ -23,12 +23,12 @@ include RefObject
 class String : RefObject {
 	char[] data;
 	int length, max;
-
+/*
 	String.from_file (String filename) {
 		super ();
 		// TODO
 	}
-
+*/
 	String (char[] format, ...) {
 		super ();
 		int n, size = strlen (format) + 1;

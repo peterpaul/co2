@@ -1,4 +1,5 @@
 include ReleasePoolItem
+include Exception
 
 ["stdlib.h"] {
 	void *calloc(int elem_size, int elem_count);
