@@ -1,0 +1,22 @@
+include RefObject
+
+class TestRefObject : RefObject {
+	int val;
+
+	TestRefObject (int aVal) {
+		super();
+		val = aVal;
+	}
+}
+
+RefObject create(int a) {
+	RefObject b = new TestRefObject(15);
+	b.retain();
+	return b.autoRelease();
+}
+
+int main() {
+	new ReleasePool ();
+	RefObject a = create (15);
+	delete current_release_pool;
+}

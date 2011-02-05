@@ -1,0 +1,14 @@
+include RefObject
+
+class Exception : RefObject {
+	String message;
+
+	Exception () {
+		message = new String("");
+	}
+
+	Exception.withMessage(String aMessage) {
+		super ();
+		message = aMessage;
+	}
+}
