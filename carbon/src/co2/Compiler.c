@@ -8,13 +8,9 @@
 #include "co2/HelloWorldVisitor.h"
 #include "co2/TypeCheckVisitor.h"
 #include "co2/GenerateHeaderVisitor.h"
+#include "co2/GenerateHeaderIncludesVisitor.h"
 #include "co2/GenerateSourceVisitor.h"
-
-static void File_include_dependencies(void *_self)
-{
-  struct File * self = O_CAST (_self, File ());
-  fprintf (out, "#include \"%s.h\"\n", self->name->data);
-}
+#include "co2/GenerateSourceIncludesVisitor.h"
 
 static char * extract_name(const char * file)
 {
@@ -112,15 +108,20 @@ int mainImpl(const char * output_file)
   else
     open_output (NULL);
 
-  struct GenerateHeaderVisitor * header_visitor = O_CALL_CLASS (GenerateHeaderVisitor (), new, out);
   char * header_name = extract_name (main_file->name->data);
   fprintf (out, "#ifndef %s_H\n", header_name);
   fprintf (out, "#define %s_H\n", header_name);
   fprintf (out, "#include \"co2/Object.h\"\n");
-  O_CALL (main_file->file_dependencies, map, File_include_dependencies);
+
+  struct GenerateHeaderIncludesVisitor * include_visitor = O_CALL_CLASS (GenerateHeaderIncludesVisitor (), new, out);
+  O_CALL (main_file, accept, include_visitor);
+  O_CALL (include_visitor, delete);
+
+  struct GenerateHeaderVisitor * header_visitor = O_CALL_CLASS (GenerateHeaderVisitor (), new, out);
   O_CALL (main_file, accept, header_visitor);
-  fprintf (out, "#endif /* %s_H */\n", header_name);
   O_CALL (header_visitor, delete);
+
+  fprintf (out, "#endif /* %s_H */\n", header_name);
   free (header_name);
 
   if (out != stdout)
@@ -138,6 +139,10 @@ int mainImpl(const char * output_file)
     }
   else
     open_output (NULL);
+
+  struct GenerateSourceIncludesVisitor * source_include_visitor = O_CALL_CLASS (GenerateSourceIncludesVisitor (), new, out);
+  O_CALL (main_file, accept, source_include_visitor);
+  O_CALL (source_include_visitor, delete);
 
   struct GenerateSourceVisitor * source_visitor = O_CALL_CLASS (GenerateSourceVisitor (), new, out);
   O_CALL (main_file, accept, source_visitor);

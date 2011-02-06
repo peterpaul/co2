@@ -1,6 +1,5 @@
 MAINTAINERCLEANFILES = Makefile.in
 ACLOCAL_AMFLAGS = -I m4
-ACLOCAL_AMFLAGS = -I m4
 
 AM_YFLAGS = -d
 
@@ -13,8 +12,8 @@ libcarbon_1_0_la_SOURCES =  co2/grammar.y co2/lex.l co2/ArgumentDeclaration.c co
 		co2/CompoundStatement.c\
 		co2/ConstructorDeclaration.c co2/Context.c co2/ContinueStatement.c co2/Declaration.c co2/DeleteStatement.c\
 		co2/DestructorDeclaration.c co2/DoStatement.c co2/error.c co2/Expression.c\
-		co2/ExpressionStatement.c co2/GenerateHeaderVisitor.c\
-		co2/GenerateSourceVisitor.c co2/File.c\
+		co2/ExpressionStatement.c co2/GenerateHeaderIncludesVisitor.c co2/GenerateHeaderVisitor.c\
+		co2/GenerateSourceIncludesVisitor.c co2/GenerateSourceVisitor.c co2/File.c\
 		co2/ForEachStatement.c co2/ForStatement.c\
 		co2/FunctionType.c co2/FunctionDeclaration.c co2/FunctionCallExpression.c\
 		co2/Hash.c co2/HelloWorldVisitor.c\
@@ -34,8 +33,8 @@ libcarbon_1_0_la_HEADERS = co2/ArgumentDeclaration.h co2/ArrayType.h co2/BaseCom
 		co2/CompoundStatement.h\
 		co2/ConstructorDeclaration.h co2/Context.h co2/ContinueStatement.h co2/Declaration.h co2/DeleteStatement.h\
 		co2/DestructorDeclaration.h co2/DoStatement.h co2/error.h co2/Expression.h\
-		co2/ExpressionStatement.h co2/GenerateHeaderVisitor.h\
-		co2/GenerateSourceVisitor.h co2/File.h\
+		co2/ExpressionStatement.h co2/GenerateHeaderIncludesVisitor.h co2/GenerateHeaderVisitor.h\
+		co2/GenerateSourceIncludesVisitor.h co2/GenerateSourceVisitor.h co2/File.h\
 		co2/ForEachStatement.h co2/ForStatement.h\
 		co2/FunctionType.h co2/FunctionDeclaration.h co2/FunctionCallExpression.h\
 		co2/Hash.h co2/HelloWorldVisitor.h\

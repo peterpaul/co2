@@ -2,6 +2,7 @@
 #include "co2/Token.h"
 #include "co2/Type.h"
 #include "co2/ClassDeclaration.h"
+#include "co2/Compiler.h"
 
 #define O_SUPER CompileObject()
 
@@ -35,6 +36,7 @@ O_IMPLEMENT (Declaration, void *, ctor, (void *_self, va_list * app))
   struct Declaration *self = O_CAST (_self, Declaration ());
   self = O_SUPER->ctor (self, app);
   self->name = O_RETAIN_ARG (Token);
+  self->file = current_file;
   return self;
 }
 

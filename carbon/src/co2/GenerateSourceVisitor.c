@@ -240,9 +240,6 @@ O_IMPLEMENT_IF(GenerateSourceVisitor, void, visitDeclaration, (void *_self, void
   if (self->include_file)
     {
       // don't generate if external definition
-      fprintf (out, "#include ");
-      O_CALL (self->include_file, generate);
-      fprintf (out, "\n");
       return;
     }
   else

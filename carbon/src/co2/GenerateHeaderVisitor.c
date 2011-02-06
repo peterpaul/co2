@@ -198,10 +198,6 @@ O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitDeclaration, (void *_self, void
   struct Declaration *self = O_CAST (_object, Declaration ());
   if (self->include_file)
     {
-      // don't generate if external definition
-      fprintf (out, "#include ");
-      O_CALL (self->include_file, generate);
-      fprintf (out, "\n");
       return;
     }
   else
