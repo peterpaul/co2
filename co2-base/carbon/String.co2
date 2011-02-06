@@ -1,8 +1,14 @@
 include RefObject
+include ArrayList
+include List
 
 ["string.h"] {
 	int strlen (char[] str);
 	char *strcpy(char *dest, char *src);
+	char *strncpy(char *dest, char *src, int n);
+	char *strstr(char *haystack, char *needle);
+	char *strdup(char *s);
+	char *strtok_r(char *str, char *delim, char **saveptr);
 }
 
 ["stdlib.h"] {
@@ -16,9 +22,18 @@ include RefObject
 }
 
 ["stdio.h"] {
+	typedef FILE = void;
+	int fprintf(FILE *stream, char *format, ...);
+	int snprintf(char *str, int size, char *format, ...);
 	int vsnprintf(char *str, int size, char *format, va_list ap);
 }
 
+int strnlen__(char[] str, int n)
+{
+	int i = 0;
+	while ((int) str[i] && i < n) i += 1;
+	return i;
+}
 
 class String : RefObject {
 	char[] data;
@@ -55,6 +70,11 @@ class String : RefObject {
 		}
 	}
 
+	~String() {
+		free (data);
+		data = null;
+	}
+
 	String resize (int size) {
 		data = realloc (data, size);
 		max = size;
@@ -72,4 +92,73 @@ class String : RefObject {
 		length += str.length;
 		return self;
 	}
+
+	String append_str (char[] format, ...) {
+		int n, nn = strlen (format);
+		ensure (length + nn + 1);
+		while (1) {
+			va_list ap2;
+			va_copy (ap2, ...);
+			ensure (length + nn);
+			n = vsnprintf (&data[length], nn, format, ap2);
+			if (n > -1 && n < nn) break;
+			if (n > -1) nn = n + 1;
+			else nn *= 2;
+			va_end (ap2);
+		}
+		if (n > -1) length += n;
+		else length = strlen (data);
+		return self;
+	}
+
+	String append_str_n (char[] str, int n) {
+		if (n == 0) return self;
+		int nn = strnlen__(str, n);
+		ensure (length + nn + 1);
+		strncpy (&data[length], str, nn);
+		length += nn;
+		return self;
+	}
+
+	String replace (String that, String this) {
+		String orig = new String ("%s", data);
+		length = 0;
+		int curr = 0;
+		int prev = 0;
+		char *next;
+		while ((next = strstr (&orig.data[curr], that.data))) {
+			while (&orig.data[curr] != next) curr += 1;
+			append_str_n (&orig.data[prev], curr - prev);
+			append (this);
+			curr += that.length;
+			prev = curr;
+		}
+		append_str (&orig.data[prev]);
+		delete orig;
+		return self;
+	}
+
+	int fprint (FILE * fp) {
+		return fprintf (fp, "%s", data);
+	}
+
+	int snprint (char[] str, int size) {
+		return snprintf (str, size, "%s", data);
+	}
+
+	List split (char[] delim) {
+		List list = new ArrayList (8);
+		char[] saveptr;
+		char[] token;
+		char[] data = strdup (data);
+		char[] str = data;
+		do {
+			token = strtok_r (str, delim, &saveptr);
+			if (token == null) break;
+			list.append (new String ("%s", token));
+		} while ((str = null));
+		delete data;
+		return list;
+	}
+
 }
