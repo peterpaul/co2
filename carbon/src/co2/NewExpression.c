@@ -47,6 +47,7 @@ O_IMPLEMENT (NewExpression, void *, dtor, (void *_self))
 O_IMPLEMENT (NewExpression, void, accept, (void *_self, struct BaseCompileObjectVisitor *visitor))
 {
   struct NewExpression *self = O_CAST (_self, NewExpression ());
+  O_BRANCH_CALL (self->new_type, accept, visitor);
   O_BRANCH_CALL (self->ctor_name, accept, visitor);
   O_BRANCH_CALL (self->array_size, accept, visitor);
   O_BRANCH_CALL (self->ctor_arguments, map_args, accept, visitor);
