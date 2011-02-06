@@ -57,7 +57,6 @@ O_IMPLEMENT_IF(GenerateSourceIncludesVisitor, void, visitDeclaration, (void *_se
   if (self->include_file)
     {
       O_CALL(visitor->map, set, self->include_file->name->data, self->include_file->name);
-      return;
     }
   if (self->file && self->file != main_file)
     {
@@ -126,13 +125,9 @@ O_IMPLEMENT_IF(GenerateSourceIncludesVisitor, void, visitTokenExpression, (void 
   struct GenerateSourceIncludesVisitor *visitor = O_CAST(_self, GenerateSourceIncludesVisitor());
   struct TokenExpression *self = O_CAST (_object, TokenExpression ());
 
-  if (self->decl)
+  if (self->type && o_is_of (self->type, ObjectType ()))
     {
-      if (o_is_of (self->decl->type, ObjectType ()))
-	{
-	  printf ("PPPPPPPPPPPPPPPPPPPPPPPPP %s\n", self->decl->name->name->data);
-	  O_CALL (visitor, visitObjectType, self->decl->type);
-	}
+      O_CALL (visitor, visitObjectType, self->type);
     }
 }
 
