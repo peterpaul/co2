@@ -1,0 +1,4 @@
+include List
+
+class ArrayList : List {
+}
