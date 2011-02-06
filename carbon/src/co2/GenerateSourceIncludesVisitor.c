@@ -121,7 +121,20 @@ O_IMPLEMENT_IF(GenerateSourceIncludesVisitor, void, visitNewExpression, (void *_
 O_IMPLEMENT_IF(GenerateSourceIncludesVisitor, void, visitNullExpression, (void *_self, void *_object), (_self, _object)) {}
 O_IMPLEMENT_IF(GenerateSourceIncludesVisitor, void, visitSizeExpression, (void *_self, void *_object), (_self, _object)) {}
 O_IMPLEMENT_IF(GenerateSourceIncludesVisitor, void, visitSuperExpression, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(GenerateSourceIncludesVisitor, void, visitTokenExpression, (void *_self, void *_object), (_self, _object)) {}
+O_IMPLEMENT_IF(GenerateSourceIncludesVisitor, void, visitTokenExpression, (void *_self, void *_object), (_self, _object))
+{
+  struct GenerateSourceIncludesVisitor *visitor = O_CAST(_self, GenerateSourceIncludesVisitor());
+  struct TokenExpression *self = O_CAST (_object, TokenExpression ());
+
+  if (self->decl)
+    {
+      if (o_is_of (self->decl->type, ObjectType ()))
+	{
+	  printf ("PPPPPPPPPPPPPPPPPPPPPPPPP %s\n", self->decl->name->name->data);
+	  O_CALL (visitor, visitObjectType, self->decl->type);
+	}
+    }
+}
 
 O_IMPLEMENT_IF(GenerateSourceIncludesVisitor, void, visitUnaryExpression, (void *_self, void *_object), (_self, _object)) {}
 O_IMPLEMENT_IF(GenerateSourceIncludesVisitor, void, visitVarArgExpression, (void *_self, void *_object), (_self, _object)) {}
