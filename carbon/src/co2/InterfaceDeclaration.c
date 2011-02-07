@@ -67,7 +67,7 @@ O_IMPLEMENT (InterfaceDeclaration, bool, is_compatible,
 	{
 	  O_BRANCH_CALL (class_decl->interfaces, map_args, InterfaceDeclaration_is_compatible_with_class, self, &found);
 	} 
-      while (!found && class_decl->superclass);
+      while (!found && (class_decl = class_decl->superclass));
       return found;
     }
   else
