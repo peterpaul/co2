@@ -155,7 +155,7 @@ struct File * validate_file(struct File * file)
 	struct File * existing_file = O_CALL (get_hash_map (), get, file->absolute_path->data);
 	if (existing_file)
 	{
-		printf ("skipping already parsed file: %s\n", file->absolute_path->data);
+		/* printf ("skipping already parsed file: %s\n", file->absolute_path->data); */
 		O_CALL (file, delete);
 		return NULL;
 	}
@@ -171,7 +171,7 @@ struct File * try_absolute_path(struct String * file_name, struct String * _abso
 	struct String * absolute_path = O_CALL_CLASS (String (), new, "%s", _real_path);
 	free (_real_path);
 	if (absolute_path->data && stat (absolute_path->data, &st) == 0) {
-		fprintf (stderr, "Found file: %s\n", absolute_path->data);
+		/* fprintf (stderr, "Found file: %s\n", absolute_path->data); */
 		return O_CALL_CLASS (File (), new, file_name, absolute_path);
 	}
 	O_CALL (absolute_path, delete);
@@ -187,7 +187,7 @@ struct File * try_search_path(struct String * file_name)
 		struct String * full_path = O_CALL_CLASS(String(), new, "%s", item->data);
 		O_CALL(full_path, append_str, "/%s.%s", file_name->data, "co2");
 
-		fprintf (stderr, "trying: %s\n", full_path->data);
+		/* fprintf (stderr, "trying: %s\n", full_path->data); */
 		if ((file = try_absolute_path (file_name, full_path))) {
 			O_CALL(full_path, delete);
 			return validate_file (file);
