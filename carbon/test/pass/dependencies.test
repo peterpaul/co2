@@ -1,0 +1,8 @@
+include ObjectA
+include ObjectB
+
+int main() {
+	ObjectA a = new ObjectA (null);
+	ObjectB b = new ObjectB (a);
+	return 0;
+}

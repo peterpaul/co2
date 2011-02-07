@@ -41,6 +41,19 @@ function compile_library_test {
 	echo "ERROR: ${TEST} failed: Compiler error" >> ${LOGFILE}
 	return 1
     fi
+    return 0
+}
+
+function compile_library_gcc {
+    local TEST=$1
+
+    local BASENAME=`basename ${TEST} .test`
+    local CO2=$( echo ${BASENAME} | grep ".co2" | wc -l )
+    if [[ $CO2 == 1 ]]
+    then
+	local BASENAME=`basename ${TEST} .co2`
+    fi
+    local TARGETNAME=${TARGET}/pass/${BASENAME}
     # Compile the generated code with ${CC}
     pushd `dirname ${TARGETNAME}.bin` >> ${LOGFILE} 2>&1
     echo "Command: ${CC} -g3 -c ${TARGETNAME}.c -o `basename ${TARGETNAME}.o` ${CFLAGS}" >> ${LOGFILE}
@@ -94,19 +107,31 @@ function run_pass_test {
     return 0
 }
 
-MAIN=""
+MAIN=${!#}
+FILES=""
 while [[ $# > 0 ]]
 do
-    compile_library_test $1
+    FILES="${FILES} $1"
+    shift 1
+done
+
+for FILE in ${FILES}
+do
+    compile_library_test ${FILE}
     if [[ $? != 0 ]]
     then
 	exit 1
     fi
-    if [[ $# == 1 ]]
-    then
-	MAIN=$1
-    fi
-    shift 1
 done
+
+for FILE in ${FILES}
+do
+    compile_library_gcc ${FILE}
+    if [[ $? != 0 ]]
+    then
+	exit 1
+    fi
+done
+
 run_pass_test ${MAIN}
 

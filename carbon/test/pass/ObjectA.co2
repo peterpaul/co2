@@ -1,0 +1,9 @@
+include ObjectB
+
+class ObjectA : ObjectB {
+	ObjectB bar;
+
+	ObjectA(ObjectB b) {
+		bar = b;
+	}
+}

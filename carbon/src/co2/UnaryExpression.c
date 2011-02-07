@@ -1,7 +1,7 @@
 #include "co2/UnaryExpression.h"
 #include "co2/Token.h"
 #include "co2/io.h"
-#include "co2/Type.h"
+#include "co2/ArrayType.h"
 
 #define O_SUPER Expression()
 
@@ -34,7 +34,26 @@ O_IMPLEMENT (UnaryExpression, void, type_check, (void *_self))
 {
   struct UnaryExpression *self = O_CAST (_self, UnaryExpression ());
   O_CALL (self->operand, type_check);
-  self->type = O_CALL(self->operand->type, retain);
+  switch (self->operator->type)
+    {
+    case '&':
+      self->type = O_CALL_CLASS (ArrayType (), new, self->operand->type);
+      O_CALL (self->type, retain);
+      break;
+    case '*':
+      if (o_is_of (self->operand->type, ArrayType ()))
+	{
+	  struct ArrayType * array_type = O_CAST (self->operand->type, ArrayType ());
+	  self->type = O_CALL (array_type->base_type, retain);
+	}
+      else
+	{
+	  error (O_CALL (self->operand->type, get_token), "Cannot dereference %c type.\n", self->operand->type->class->name);
+	}
+      break;
+    default:
+      self->type = O_CALL(self->operand->type, retain);
+    }
 }
 
 O_IMPLEMENT (UnaryExpression, void, generate, (void *_self))

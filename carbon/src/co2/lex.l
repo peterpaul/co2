@@ -61,9 +61,11 @@ STRING_CONST	\"({CHAR_SYMBOL}|\')*\"
 }
 <INCLUDE>[ \t]*		/* eat the whitespace */
 <INCLUDE>[^ \t\n]+	{ new_input (O_CALL_CLASS (String (), new, "%s", yytext)); }
+"break"		return BREAK;
 "catch"		return CATCH;
 "char"		yylval.token = O_CALL_CLASS(Token(), new, yytext, CHAR, current_file, linenumber); return yylval.token->type;
 "class"		return CLASS;
+"continue"	return CONTINUE;
 "delete"	return DELETE;
 "do"		return DO;
 "double"	yylval.token = O_CALL_CLASS(Token(), new, yytext, DOUBLE, current_file, linenumber); return yylval.token->type;

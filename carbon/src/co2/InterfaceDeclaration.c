@@ -54,6 +54,17 @@ static void InterfaceDeclaration_is_compatible_with_class(void *_self, va_list *
     }
 }
 
+static struct ClassDeclaration *InterfaceDeclaration_get_super_class(struct ClassDeclaration *decl)
+{
+  struct Token *superclass = decl->superclass;
+  if (superclass && O_CALL (global_scope, exists, superclass))
+    {
+      struct Declaration * superdecl = O_CALL (global_scope, lookup, superclass);
+      return O_CAST (superdecl, ClassDeclaration ());
+    }
+    return NULL;
+}
+
 O_IMPLEMENT (InterfaceDeclaration, bool, is_compatible,
 	     (void *_self, void *_other))
 {
@@ -67,7 +78,7 @@ O_IMPLEMENT (InterfaceDeclaration, bool, is_compatible,
 	{
 	  O_BRANCH_CALL (class_decl->interfaces, map_args, InterfaceDeclaration_is_compatible_with_class, self, &found);
 	} 
-      while (!found && class_decl->superclass);
+      while (!found && (class_decl = InterfaceDeclaration_get_super_class (class_decl)));
       return found;
     }
   else
@@ -76,7 +87,7 @@ O_IMPLEMENT (InterfaceDeclaration, bool, is_compatible,
     }
 }
 
-O_OBJECT (InterfaceDeclaration, Declaration);
+O_OBJECT (InterfaceDeclaration, ObjectTypeDeclaration);
 O_OBJECT_METHOD (InterfaceDeclaration, ctor);
 O_OBJECT_METHOD (InterfaceDeclaration, dtor);
 O_OBJECT_METHOD (InterfaceDeclaration, accept);

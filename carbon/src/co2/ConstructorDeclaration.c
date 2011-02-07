@@ -1,11 +1,13 @@
 #include "co2/ConstructorDeclaration.h"
 #include "co2/ClassDeclaration.h"
+#include "co2/ArgumentDeclaration.h"
 #include "co2/Type.h"
 #include "co2/RefList.h"
 #include "co2/Statement.h"
 #include "co2/io.h"
 #include "co2/FunctionType.h"
 #include "co2/ObjectType.h"
+#include "grammar.h"
 
 #define O_SUPER Declaration()
 
@@ -18,6 +20,15 @@ O_IMPLEMENT (ConstructorDeclaration, void *, ctor,
   self->class_name = O_RETAIN_ARG (Token);
   self->formal_arguments = O_RETAIN_ARG (RefList);
   self->body = O_BRANCH_RETAIN_ARG (Statement);
+
+  struct Declaration * class_decl = O_CALL (global_scope, lookup, self->class_name);
+  if (class_decl)
+    {
+      self->type =
+	O_CALL_CLASS (ObjectType (), new, self->class_name, class_decl);
+      O_CALL (self->type, retain);
+    }
+
   return self;
 }
 
@@ -45,9 +56,11 @@ O_IMPLEMENT (ConstructorDeclaration, void, type_check, (void *_self))
 {
   struct ConstructorDeclaration *self =
     O_CAST (_self, ConstructorDeclaration ());
+  O_CALL (self->type, type_check);
   O_BRANCH_CALL (current_context, add, self);
   struct Declaration *class_decl =
     O_BRANCH_CALL (current_context, find, ClassDeclaration ());
+
   if (class_decl == NULL)
     {
       error (self->class_name,
@@ -61,14 +74,23 @@ O_IMPLEMENT (ConstructorDeclaration, void, type_check, (void *_self))
 	     class_decl->name->name->data);
     }
 
-  O_CALL (self->formal_arguments, map, Declaration_list_type_check);
-
-  self->type =
-    O_CALL_CLASS (ObjectType (), new, self->class_name, class_decl);
-  O_CALL (self->type, retain);
-
   O_CALL (self->body, type_check);
   O_BRANCH_CALL (current_context, remove_last);
+}
+
+O_IMPLEMENT (ConstructorDeclaration, bool, has_var_args, (void *_self))
+{
+  struct ConstructorDeclaration *self =
+    O_CAST (_self, ConstructorDeclaration ());
+  if (self->formal_arguments->length > 0)
+    {
+      struct ArgumentDeclaration * last_arg = O_CALL (self->formal_arguments, get, self->formal_arguments->length -1);
+      if (last_arg->name->type == VA_ARG)
+	{
+	  return true;
+	}
+    }
+  return false;
 }
 
 O_OBJECT (ConstructorDeclaration, Declaration);
@@ -76,4 +98,5 @@ O_OBJECT_METHOD (ConstructorDeclaration, ctor);
 O_OBJECT_METHOD (ConstructorDeclaration, dtor);
 O_OBJECT_METHOD (ConstructorDeclaration, accept);
 O_OBJECT_METHOD (ConstructorDeclaration, type_check);
+O_OBJECT_METHOD (ConstructorDeclaration, has_var_args);
 O_END_OBJECT

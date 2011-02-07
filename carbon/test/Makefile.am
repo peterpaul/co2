@@ -20,6 +20,7 @@ pass/array.sh\
 pass/cast_expression.sh\
 pass/class_decl_constructor_parameters.sh\
 pass/class_decl_constructor.sh\
+pass/class_decl_constructor_vararg.sh\
 pass/class_decl_destructor.sh\
 pass/class_decl_names.sh\
 pass/class_decl_object_vars.sh\
@@ -27,6 +28,7 @@ pass/class_decl_self.sh\
 pass/class_decl_super.sh\
 pass/class_decl.sh\
 pass/class_intergrated.sh\
+pass/dependencies.sh\
 pass/external_definition.sh\
 pass/function_call.sh\
 pass/fun_decl.sh\
@@ -37,6 +39,7 @@ pass/import.sh\
 pass/interface_decl.sh\
 pass/interface_implementation.sh\
 pass/List.sh\
+pass/loops.sh\
 pass/Object.sh\
 pass/ray.sh\
 pass/scope_simple.sh\

@@ -27,23 +27,31 @@ static void
 ClassDeclaration_generate_constructor_arguments (void *_arg)
 {
   struct ArgumentDeclaration *arg = O_CAST (_arg, ArgumentDeclaration ());
-  O_CALL (arg, generate);
-  if (o_is_a (arg->type, ObjectType ()))
+  if (arg->name->type == VA_ARG)
     {
-      struct ObjectType *type = (struct ObjectType *) arg->type;
-      if (o_is_of (type->decl, ClassDeclaration ()))
-	{
-	  fprintf (out, " = O_BRANCH_CAST (va_arg(*app, ");
-	  O_CALL (type, generate);
-	  fprintf (out, "), ");
-	  O_CALL (type->token, generate);
-	  fprintf (out, "());\n");
-	  return;
-	}
+      fprintf (out, "va_list ap;\n");
+      fprintf (out, "va_copy (ap, *app);\n");
     }
-  fprintf (out, " = va_arg (*app, ");
-  O_CALL (arg->type, generate);
-  fprintf (out, ");\n");
+  else
+    {
+      O_CALL (arg, generate);
+      if (o_is_a (arg->type, ObjectType ()))
+	{
+	  struct ObjectType *type = (struct ObjectType *) arg->type;
+	  if (o_is_of (type->decl, ClassDeclaration ()))
+	    {
+	      fprintf (out, " = O_BRANCH_CAST (va_arg(*app, ");
+	      O_CALL (type, generate);
+	      fprintf (out, "), ");
+	      O_CALL (type->token, generate);
+	      fprintf (out, "());\n");
+	      return;
+	    }
+	}
+      fprintf (out, " = va_arg (*app, ");
+      O_CALL (arg->type, generate);
+      fprintf (out, ");\n");
+    }
 }
 
 static void
@@ -213,6 +221,14 @@ O_IMPLEMENT_IF(GenerateSourceVisitor, void, visitConstructorDeclaration, (void *
 	  ClassDeclaration_generate_constructor_arguments);
 
   O_CALL (self->body, generate);
+  if (self->formal_arguments->length > 0)
+    {
+      struct ArgumentDeclaration * last_arg = O_CALL (self->formal_arguments, get, self->formal_arguments->length -1);
+      if (last_arg->name->type == VA_ARG)
+	{
+	  fprintf (out, "va_end (ap);\n");
+	}
+    }
   fprintf (out, "return self;\n");
   fprintf (out, "}\n\n");
 }
@@ -224,9 +240,6 @@ O_IMPLEMENT_IF(GenerateSourceVisitor, void, visitDeclaration, (void *_self, void
   if (self->include_file)
     {
       // don't generate if external definition
-      fprintf (out, "#include ");
-      O_CALL (self->include_file, generate);
-      fprintf (out, "\n");
       return;
     }
   else
