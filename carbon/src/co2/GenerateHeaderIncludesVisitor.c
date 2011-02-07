@@ -40,6 +40,22 @@ O_IMPLEMENT(GenerateHeaderIncludesVisitor, void *, dtor, (void *_self))
 // O_IMPLEMENT_IF(GenerateHeaderIncludesVisitor, void, visit, (void *_self, void *_object), (_self, _object)) {}
 O_IMPLEMENT_IF(GenerateHeaderIncludesVisitor, void, visitArgumentDeclaration, (void *_self, void *_object), (_self, _object)) {}
 
+void handle_interface (void *_token, va_list *app)
+{
+  struct Token * token = O_CAST (_token, Token ());
+  struct Declaration * decl = O_CALL (global_scope, lookup, token);
+  struct GenerateHeaderIncludesVisitor * visitor = O_GET_ARG (GenerateHeaderIncludesVisitor);
+  if (decl)
+    {
+      if (decl->file && decl->file != main_file)
+	{
+	  struct String * filename = O_CALL_CLASS (String (), new, "\"%s.h\"", decl->file->name->data);
+	  O_CALL (filename, retain);
+	  O_CALL (visitor->map, set, filename->data, filename);
+	}
+    }
+}
+
 O_IMPLEMENT_IF(GenerateHeaderIncludesVisitor, void, visitClassDeclaration, (void *_self, void *_object), (_self, _object))
 {
   struct GenerateHeaderIncludesVisitor *visitor = O_CAST(_self, GenerateHeaderIncludesVisitor());
@@ -47,7 +63,6 @@ O_IMPLEMENT_IF(GenerateHeaderIncludesVisitor, void, visitClassDeclaration, (void
   
   if (self->superclass) 
     {
-      printf ("----------------> %s: %s\n", self->name->name->data, self->superclass->name->data);
       struct Declaration *super = O_CALL (global_scope, lookup, self->superclass);
       if (super->file && super->file != main_file)
 	{
@@ -56,9 +71,9 @@ O_IMPLEMENT_IF(GenerateHeaderIncludesVisitor, void, visitClassDeclaration, (void
 	  O_CALL (visitor->map, set, filename->data, filename);
 	}
     }
-  else
+  if (self->interfaces)
     {
-      printf ("----------------> %s\n", self->name->name->data);
+      O_CALL (self->interfaces, map_args, handle_interface, visitor);
     }
 }
 

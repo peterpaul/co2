@@ -31,6 +31,15 @@ O_IMPLEMENT (ReturnStatement, void, accept, (void *_self, struct BaseCompileObje
 O_IMPLEMENT (ReturnStatement, void, generate, (void *_self))
 {
   struct ReturnStatement *self = O_CAST (_self, ReturnStatement ());
+  struct FunctionType *function_type = o_cast (self->function_context->type, FunctionType ());
+
+  if (!self->try_context && !function_type->has_var_args)
+    {
+      fprintf (out, "return ");
+      O_BRANCH_CALL (self->expr, generate);
+      fprintf (out, ";\n");
+      return;
+    }
 
   fprintf (out, "{\n");
   if (self->expr)
@@ -50,7 +59,6 @@ O_IMPLEMENT (ReturnStatement, void, generate, (void *_self))
 	}
     }
 
-  struct FunctionType *function_type = o_cast (self->function_context->type, FunctionType ());
   if (function_type->has_var_args)
     {
       fprintf (out, "va_end (ap);\n");

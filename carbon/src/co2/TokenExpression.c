@@ -21,6 +21,15 @@ O_IMPLEMENT (TokenExpression, void *, ctor, (void *_self, va_list * app))
   if (self->token->type == IDENTIFIER)
     {
       self->scope = current_scope;
+      if (self->scope && O_CALL (self->scope, exists, self->token))
+	{
+	  self->decl = O_CALL (self->scope, lookup, self->token);
+	}
+      if (!self->decl && O_CALL (global_scope, exists, self->token))
+	{
+	  self->decl = O_CALL (global_scope, lookup, self->token);
+	}
+      O_BRANCH_CALL (self->decl, retain);
     }
   self->check_global_scope = true;
   return self;
@@ -69,7 +78,10 @@ O_IMPLEMENT (TokenExpression, void, type_check, (void *_self))
   switch (self->token->type)
     {
     case IDENTIFIER:
-      O_CALL (self, lookup);
+      if (!self->decl || !self->check_global_scope)
+	{
+	  O_CALL (self, lookup);
+	}
       if (!self->decl)
 	{
 	  return;
@@ -137,6 +149,7 @@ O_IMPLEMENT (TokenExpression, void, type_check, (void *_self))
 O_IMPLEMENT (TokenExpression, void, lookup, (void *_self))
 {
   struct TokenExpression *self = O_CAST (_self, TokenExpression ());
+  O_BRANCH_CALL (self->decl, release);
   if (self->check_global_scope)
     {
       if (O_CALL (self->scope, exists, self->token))
