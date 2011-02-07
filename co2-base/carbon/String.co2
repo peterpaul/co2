@@ -2,32 +2,6 @@ include RefObject
 include ArrayList
 include List
 
-["string.h"] {
-	int strlen (char[] str);
-	char *strcpy(char *dest, char *src);
-	char *strncpy(char *dest, char *src, int n);
-	char *strstr(char *haystack, char *needle);
-	char *strdup(char *s);
-	char *strtok_r(char *str, char *delim, char **saveptr);
-}
-
-["stdlib.h"] {
-	void *malloc(int size);
-	void *realloc(void *ptr, int size);
-}
-
-["stdarg.h"] {
-	void va_copy(va_list dest, va_list src);
-	void va_end(va_list va);
-}
-
-["stdio.h"] {
-	typedef FILE = void;
-	int fprintf(FILE *stream, char *format, ...);
-	int snprintf(char *str, int size, char *format, ...);
-	int vsnprintf(char *str, int size, char *format, va_list ap);
-}
-
 int strnlen__(char[] str, int n)
 {
 	int i = 0;
@@ -150,14 +124,14 @@ class String : RefObject {
 		List list = new ArrayList (8);
 		char[] saveptr;
 		char[] token;
-		char[] data = strdup (data);
-		char[] str = data;
+		char[] data_bak = strdup (data);
+		char[] str = data_bak;
 		do {
 			token = strtok_r (str, delim, &saveptr);
 			if (token == null) break;
 			list.append (new String ("%s", token));
 		} while ((str = null));
-		delete data;
+		delete data_bak;
 		return list;
 	}
 

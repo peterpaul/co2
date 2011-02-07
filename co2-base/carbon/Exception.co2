@@ -3,6 +3,7 @@ include String
 
 class Exception : RefObject {
 	String message;
+	Exception reason;
 
 	Exception () {
 		message = new String("");
@@ -11,5 +12,18 @@ class Exception : RefObject {
 	Exception.withMessage(String aMessage) {
 		super ();
 		message = aMessage;
+		reason = null;
+	}
+
+	Exception.withReason(Exception anException) {
+		super ();
+		message = null;
+		reason = anException;
+	}
+
+	Exception.withMessageAndReason(String aMessage, Exception anException) {
+		super ();
+		message = aMessage;
+		reason = anException;
 	}
 }

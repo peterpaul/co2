@@ -1,11 +1,6 @@
 include ReleasePoolItem
 include Exception
 
-["stdlib.h"] {
-	void *calloc(int elem_size, int elem_count);
-	void free(void *ptr);
-}
-
 int releasePoolHashSize = 1223;
 
 class ReleasePool {

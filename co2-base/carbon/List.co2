@@ -1,2 +1,8 @@
+include RefObject
+
 interface List {
+	unsigned length ();
+	RefObject get(unsigned index);
+	RefObject set(unsigned index, RefObject item);
+	RefObject append(RefObject item);
 }

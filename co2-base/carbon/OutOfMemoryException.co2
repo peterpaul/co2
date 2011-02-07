@@ -1,0 +1,4 @@
+include Exception
+
+class OutOfMemoryException : Exception {
+}

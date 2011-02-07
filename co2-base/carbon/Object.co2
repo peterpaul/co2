@@ -8,3 +8,31 @@
 		char * name;
 	}
 }
+
+["string.h"] {
+	int strlen (char[] str);
+	char *strcpy(char *dest, char *src);
+	char *strncpy(char *dest, char *src, int n);
+	char *strstr(char *haystack, char *needle);
+	char *strdup(char *s);
+	char *strtok_r(char *str, char *delim, char **saveptr);
+}
+
+["stdlib.h"] {
+	void *malloc(int size);
+	void *calloc(int nmemb, int size);
+	void *realloc(void *ptr, int size);
+	void free(void *ptr);
+}
+
+["stdarg.h"] {
+	void va_copy(va_list dest, va_list src);
+	void va_end(va_list va);
+}
+
+["stdio.h"] {
+	typedef FILE = void;
+	int fprintf(FILE *stream, char *format, ...);
+	int snprintf(char *str, int size, char *format, ...);
+	int vsnprintf(char *str, int size, char *format, va_list ap);
+}

@@ -1,4 +1,22 @@
+include Array
 include List
 
-class ArrayList : List {
+class ArrayList : Array <List> {
+	unsigned length_;
+
+	unsigned length () {
+		return length_;
+	}
+
+	RefObject append(RefObject item) {
+		return item;
+	}
+
+	RefObject get(unsigned index) {
+		return super (index);
+	}
+
+	RefObject set(unsigned index, RefObject item) {
+		return super (index, item);
+	}
 }

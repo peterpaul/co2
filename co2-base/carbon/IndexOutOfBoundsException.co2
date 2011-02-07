@@ -1,0 +1,12 @@
+include Exception
+
+class IndexOutOfBoundsException : Exception
+{
+	unsigned index, bounds;
+
+	IndexOutOfBoundsException(unsigned index, unsigned bounds) {
+		super.withMessage (new String ("Cannot access index %d in array of size %d.", index, bounds));
+		self.index = index;
+		self.bounds = bounds;
+	}
+}
