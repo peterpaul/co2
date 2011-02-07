@@ -56,7 +56,7 @@ static void InterfaceDeclaration_is_compatible_with_class(void *_self, va_list *
 
 static struct ClassDeclaration *InterfaceDeclaration_get_super_class(struct ClassDeclaration *decl)
 {
-  struct Token *superclass = decl->superclass;
+  struct Token *superclass = O_CAST (decl->superclass, Token ());
   if (superclass && O_CALL (global_scope, exists, superclass))
     {
       struct Declaration * superdecl = O_CALL (global_scope, lookup, superclass);
