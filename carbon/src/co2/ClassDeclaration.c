@@ -109,7 +109,7 @@ O_IMPLEMENT (ClassDeclaration, bool, is_compatible,
   return self == other;
 }
 
-O_OBJECT (ClassDeclaration, Declaration);
+O_OBJECT (ClassDeclaration, ObjectTypeDeclaration);
 O_OBJECT_METHOD (ClassDeclaration, ctor);
 O_OBJECT_METHOD (ClassDeclaration, dtor);
 O_OBJECT_METHOD (ClassDeclaration, accept);

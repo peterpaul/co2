@@ -87,7 +87,7 @@ O_IMPLEMENT (InterfaceDeclaration, bool, is_compatible,
     }
 }
 
-O_OBJECT (InterfaceDeclaration, Declaration);
+O_OBJECT (InterfaceDeclaration, ObjectTypeDeclaration);
 O_OBJECT_METHOD (InterfaceDeclaration, ctor);
 O_OBJECT_METHOD (InterfaceDeclaration, dtor);
 O_OBJECT_METHOD (InterfaceDeclaration, accept);
