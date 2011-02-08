@@ -38,6 +38,7 @@ pass/global_scope.sh\
 pass/import.sh\
 pass/interface_decl.sh\
 pass/interface_implementation.sh\
+pass/interface_override.sh\
 pass/List.sh\
 pass/loops.sh\
 pass/Object.sh\

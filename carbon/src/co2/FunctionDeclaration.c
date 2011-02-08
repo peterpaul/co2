@@ -67,8 +67,14 @@ FunctionDeclaration_find_in_interface (void *_self, va_list * app)
 	O_CALL (global_scope, lookup_in_this_scope, self);
       if (o_is_of (_decl, InterfaceDeclaration ()))
 	{
-	  function_decl->interface_decl =
+	  struct InterfaceDeclaration * interface_decl =
 	    O_CAST (_decl, InterfaceDeclaration ());
+	  if (O_CALL (interface_decl->member_scope, exists,
+		      function_decl->name))
+	    {
+	      function_decl->interface_decl =
+		interface_decl;
+	    }
 	}
       else
 	{
