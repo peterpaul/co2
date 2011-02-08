@@ -20,11 +20,23 @@ class ArrayList : Array <List> {
 	}
 
 	RefObject append(RefObject item) {
-		ensure (length () + 1);
 		unsigned l = length ();
+		ensure (l + 1);
 		set (l, item);
 		length_ += 1;
 		return item;
+	}
+
+	List appendList(List list) {
+		unsigned len = length ();
+		unsigned listLen = list.length ();
+		ensure (len + listLen);
+		unsigned i;
+		for (i = 0; i < listLen; i += 1) {
+			RefObject item = list.get (i);
+			append (item);
+		}
+		return self;
 	}
 
 	RefObject get(unsigned index) {

@@ -13,7 +13,7 @@ class TestRefObject : RefObject {
 }
 
 RefObject create(int a) {
-	RefObject b = new TestRefObject(15);
+	RefObject b = new TestRefObject(a);
 	b.retain();
 	return b.autoRelease();
 }

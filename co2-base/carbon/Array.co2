@@ -12,12 +12,15 @@ class Array : RefObject {
 			throw new OutOfMemoryException ();
 		}
 		self.data = data;
+		self.size = size;
 	}
 
 	~Array () {
 		unsigned index;
 		for (index = 0; index < size; index += 1) {
-			data[index].release ();
+			if (data[index]) {
+				data[index].release ();
+			}
 		}
 	}
 
@@ -46,7 +49,9 @@ class Array : RefObject {
 		// TODO release or throw Exception?
 		if (size < self.size) {
 			for (index = size; index < self.size; index += 1) {
-				data[index].release ();
+				if (data[index]) {
+					data[index].release ();
+				}
 			}
 		}
 		// reallocate memory
