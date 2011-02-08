@@ -1,5 +1,7 @@
 include RefObject
 include ReleasePool
+include ArrayList
+include List
 
 class TestRefObject : RefObject {
 	int val;
@@ -18,6 +20,16 @@ RefObject create(int a) {
 
 int main() {
 	new ReleasePool ();
-	RefObject a = create (15);
+	List list = new ArrayList(15);
+	int i;
+	for (i = 0; i < 15; i += 1) {
+		list.set (i, create (i));
+	}
+
+	for (i = 0; i < 15; i += 1) {
+		TestRefObject obj = (TestRefObject) list.get (i);
+		printf ("%d\n", obj.val);
+	}
+	
 	delete current_release_pool;
 }

@@ -32,6 +32,7 @@
 
 ["stdio.h"] {
 	typedef FILE = void;
+	int printf(char *format, ...);
 	int fprintf(FILE *stream, char *format, ...);
 	int snprintf(char *str, int size, char *format, ...);
 	int vsnprintf(char *str, int size, char *format, va_list ap);
