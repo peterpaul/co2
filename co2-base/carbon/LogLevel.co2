@@ -1,0 +1,3 @@
+enum LogLevel {
+	FINEST, FINER, FINEST, INFO, WARNING, ERROR, FATAL
+}

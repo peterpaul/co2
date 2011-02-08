@@ -1,0 +1,5 @@
+include String
+
+class LogRecord : BaseObject {
+	String message;
+}

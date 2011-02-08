@@ -37,3 +37,6 @@
 	int snprintf(char *str, int size, char *format, ...);
 	int vsnprintf(char *str, int size, char *format, va_list ap);
 }
+
+class BaseObject : Object {
+}
