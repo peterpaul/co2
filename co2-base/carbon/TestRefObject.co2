@@ -20,15 +20,19 @@ RefObject create(int a) {
 
 int main() {
 	new ReleasePool ();
-	List list = new ArrayList(15);
-	int i;
-	for (i = 0; i < 15; i += 1) {
-		list.set (i, create (i));
-	}
+	try {
+		List list = new ArrayList(15);
+		int i;
+		for (i = 0; i < 15; i += 1) {
+			list.append (create (i));
+		}
 
-	for (i = 0; i < 15; i += 1) {
-		TestRefObject obj = (TestRefObject) list.get (i);
-		printf ("%d\n", obj.val);
+		for (i = 0; i < 15; i += 1) {
+			TestRefObject obj = (TestRefObject) list.get (i);
+			printf ("%d\n", obj.val);
+		}
+	} catch (IndexOutOfBoundsException e) {
+		printf ("IndexOutOfBoundsException: index: %d, bounds: %d\n", e.index, e.bounds);
 	}
 	
 	delete current_release_pool;

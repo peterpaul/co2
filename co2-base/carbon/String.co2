@@ -25,9 +25,9 @@ class String : RefObject {
 		max = size;
 
 		while (1) {
-			va_list ap;
-			va_copy (ap, ...);
-			n = vsnprintf(data, size, format, ap);
+			va_list ap2;
+			va_copy (ap2, ...);
+			n = vsnprintf(data, size, format, ap2);
 			if (n > -1) {
 				if (n < size) break;
 				else size = n + 1;
@@ -35,7 +35,7 @@ class String : RefObject {
 				size *= 2;
 			}
 			ensure (size);
-			va_end(ap);
+			va_end(ap2);
 		}
 		if (n > -1) {
 			length = n;

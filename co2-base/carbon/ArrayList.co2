@@ -4,11 +4,26 @@ include List
 class ArrayList : Array <List> {
 	unsigned length_;
 
+	ArrayList (int size) {
+		super (size);
+		length_ = 0;
+	}
+
+	void ensure (unsigned size) {
+		if (size > self.size) {
+			resize (size);
+		}
+	}
+
 	unsigned length () {
 		return length_;
 	}
 
 	RefObject append(RefObject item) {
+		ensure (length () + 1);
+		unsigned l = length ();
+		set (l, item);
+		length_ += 1;
 		return item;
 	}
 
@@ -19,4 +34,5 @@ class ArrayList : Array <List> {
 	RefObject set(unsigned index, RefObject item) {
 		return super (index, item);
 	}
+
 }

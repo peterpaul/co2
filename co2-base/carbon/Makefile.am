@@ -14,9 +14,9 @@ libco2_base_1_0_la_HEADERS = Array.h ArrayList.h Exception.h IndexOutOfBoundsExc
 libco2_base_1_0_la_CPPFLAGS = -I$(top_srcdir)/include
 
 bin_PROGRAMS = TestRefObject
-carbon_SOURCES = TestRefObject.c
-carbon_CPPFLAGS = -I$(top_srcdir)/include
-carbon_LDFLAGS = $(CO2_LIBS) -lco2-base-1.0
+TestRefObject_SOURCES = TestRefObject.c
+TestRefObject_CPPFLAGS = -I$(top_srcdir)/include
+TestRefObject_LDFLAGS = $(CO2_LIBS) -lco2-base-1.0
 
 distclean-local:
 	-rm -r ${bin_PROGRAMS}
