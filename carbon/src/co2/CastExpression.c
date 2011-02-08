@@ -39,9 +39,19 @@ O_IMPLEMENT(CastExpression, void, type_check, (void *_self))
   O_CALL (self->expression, type_check);
   if (!self->expression->type) return;
   O_CALL (self->cast_type, type_check);
+  
   if (o_is_of (self->cast_type, ObjectType ()) && o_is_of (self->expression->type, ObjectType()))
     {
-      O_CALL (self->cast_type, assert_compatible, self->expression->type);
+      if (!O_CALL (self->cast_type, is_compatible, self->expression->type)
+&& !O_CALL (self->expression->type, is_compatible, self->cast_type))
+	{
+	  struct Token *expr_token = O_CALL(self->expression->type, get_token);
+	  struct String *expr_string = O_CALL (self->expression->type, to_string);
+	  struct String *type_string = O_CALL (self->cast_type, to_string);
+	  warning (expr_token, "casting possibly incompatible types %s to %s\n", expr_string->data, type_string->data);
+	  O_CALL (expr_string, delete);
+	  O_CALL (type_string, delete);
+	}
     }
   else
     {
