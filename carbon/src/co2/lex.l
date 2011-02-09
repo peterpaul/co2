@@ -64,7 +64,7 @@ STRING_CONST	\"({CHAR_SYMBOL}|\')*\"
 "break"		return BREAK;
 "catch"		return CATCH;
 "char"		yylval.token = O_CALL_CLASS(Token(), new, yytext, CHAR, current_file, linenumber); return yylval.token->type;
-"class"		return CLASS;
+"class"		yylval.token = O_CALL_CLASS(Token(), new, yytext, CLASS, current_file, linenumber); return yylval.token->type;
 "continue"	return CONTINUE;
 "delete"	return DELETE;
 "do"		return DO;

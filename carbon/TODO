@@ -1,5 +1,5 @@
 Bug fixing:
-* add automatic casting between arithmetic types, object types and void *.
+* add automatic casting between arithmetic types, object types and void *. [DONE]
 
 Refactoring:
 * add type member to declaration [DONE]
@@ -12,9 +12,9 @@ Code quality:
 Functionality:
 * add way to include c-code in syntax. (C-declaration) [IN PROGRESS/DONE]
 * implement package keyword for bundling related classes
-* implement file inclusion (import)
-* know whether a tokenexpression is part of the current class
-* implement casts
+* implement file inclusion (include) [DONE]
+* know whether a tokenexpression is part of the current class [DONE]
+* implement casts [DONE]
 
 Language Features:
 * enum
@@ -25,7 +25,9 @@ Language Features:
 * private keyword
 * annotations
 * add missing c types (like double)
-* add structs
-* add typedefs
+* add structs [DONE]
+* add typedefs [DONE]
+* make one identifier type and use for types, identifiers and macros
+* retrieve the class
 
 * bash scripts for tests aren't really portable yet.

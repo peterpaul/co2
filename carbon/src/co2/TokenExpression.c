@@ -18,7 +18,7 @@ O_IMPLEMENT (TokenExpression, void *, ctor, (void *_self, va_list * app))
   struct TokenExpression *self = O_CAST (_self, TokenExpression ());
   self = O_SUPER->ctor (self, app);
   self->token = O_RETAIN_ARG (Token);
-  if (self->token->type == IDENTIFIER)
+  if (self->token->type == IDENTIFIER || self->token->type == CLASS)
     {
       self->scope = current_scope;
       if (self->scope && O_CALL (self->scope, exists, self->token))
@@ -77,6 +77,7 @@ O_IMPLEMENT (TokenExpression, void, type_check, (void *_self))
   struct TokenExpression *self = O_CAST (_self, TokenExpression ());
   switch (self->token->type)
     {
+    case CLASS:
     case IDENTIFIER:
       if (!self->decl || !self->check_global_scope)
 	{
