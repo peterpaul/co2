@@ -1,0 +1,43 @@
+include Object
+include String
+include RefObject
+
+Level finest, finer, fine, info, warning, error, fatal;
+int initialized = false;
+
+Level createPrivateLevel (int v, char * n)
+{
+	Level l = new Level.private (v, n);
+	return l.retain ();
+}
+
+class Level : RefObject {
+	String name;
+	int value;
+
+	Level () {
+		if (!initialized) {
+			initialized = true;
+			finest = createPrivateLevel (1, "finest");
+			finer = createPrivateLevel (2, "finer");
+			fine = createPrivateLevel (3, "fine");
+			info = createPrivateLevel (4, "info");
+			warning = createPrivateLevel (5, "warning");
+			error = createPrivateLevel (6, "error");
+			fatal = createPrivateLevel (7, "fatal");
+		}
+		name = null;
+		value = 0;
+	}
+
+	~Level () {
+		if (name) {
+			delete name;
+		}
+	}
+
+	Level.private (int v, char * n) {
+		name = new String ("%s", n);
+		value = v;
+	}
+}

@@ -1,7 +1,7 @@
 include Object
 include ReleasePool
 
-class RefObject : Object {
+class RefObject : BaseObject {
 	int refCount;
 
 	RefObject() {
@@ -33,7 +33,7 @@ class RefObject : Object {
 			delete self;
 			self = null;
 		}
-		return self;
+		return null;
 	}
 
 	RefObject autoRelease() {

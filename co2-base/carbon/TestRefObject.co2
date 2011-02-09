@@ -3,6 +3,8 @@ include ReleasePool
 include ArrayList
 include List
 
+include Level
+
 class TestRefObject : RefObject {
 	int val;
 
@@ -34,6 +36,8 @@ int main() {
 	} catch (IndexOutOfBoundsException e) {
 		printf ("IndexOutOfBoundsException: index: %d, bounds: %d\n", e.index, e.bounds);
 	}
+
+	new Level ();
 	
 	delete current_release_pool;
 }

@@ -1,12 +1,14 @@
 ["co2/Object.h"] {
 	class Object {
-		Class klass;
+		Class class;
 	}
 
 	class Class : Object {
 		int size;
 		char * name;
 	}
+
+	int true, false;
 }
 
 ["string.h"] {
@@ -38,5 +40,10 @@
 	int vsnprintf(char *str, int size, char *format, va_list ap);
 }
 
+include String
+
 class BaseObject : Object {
+	String toString () {
+		return new String ("%s", class.name);
+	}
 }
