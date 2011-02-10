@@ -20,6 +20,7 @@
 #include "co2/DeleteStatement.h"
 #include "co2/DoStatement.h"
 #include "co2/ExpressionStatement.h"
+#include "co2/FinallyStatement.h"
 #include "co2/ForEachStatement.h"
 #include "co2/ForStatement.h"
 #include "co2/IfStatement.h"
@@ -588,7 +589,8 @@ try_statement
 }
 |	TRY statement catch_statement_list FINALLY statement
 {
-  $$ = O_CALL_CLASS (TryStatement (), new, $2, $3, $5);
+  struct Statement * final = O_CALL_CLASS (FinallyStatement (), new, $5);
+  $$ = O_CALL_CLASS (TryStatement (), new, $2, $3, final);
 }
 ;
 

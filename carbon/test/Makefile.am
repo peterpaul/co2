@@ -53,6 +53,7 @@ pass/try_statement_finally.sh\
 pass/try_statement_nested_finally.sh\
 pass/try_statement_nested_return.sh\
 pass/try_statement_nested.sh\
+pass/try_statement_return_from_finally.sh\
 pass/try_statement_return.sh\
 pass/try_statement.sh\
 pass/typedef.sh\

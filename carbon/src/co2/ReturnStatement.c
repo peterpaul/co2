@@ -2,6 +2,7 @@
 #include "co2/FunctionType.h"
 #include "co2/TryStatement.h"
 #include "co2/CatchStatement.h"
+#include "co2/FinallyStatement.h"
 #include "co2/io.h"
 
 #define O_SUPER Statement()
@@ -50,7 +51,7 @@ O_IMPLEMENT (ReturnStatement, void, generate, (void *_self))
       fprintf (out, ";\n");
     }
 
-  if (self->try_context)
+  if (self->try_context && !self->finally_context)
     {
       fprintf (out, "ex_pop ();\n");
       if (self->try_context->finally_clause)
@@ -88,6 +89,7 @@ O_IMPLEMENT (ReturnStatement, void, type_check, (void *_self))
 
   self->try_context = O_BRANCH_CALL (current_context, find, TryStatement ());
   self->catch_context = O_BRANCH_CALL (current_context, find, CatchStatement ());
+  self->finally_context = O_BRANCH_CALL (current_context, find, FinallyStatement ());
 }
 
 O_OBJECT (ReturnStatement, Statement);
