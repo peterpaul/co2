@@ -51,10 +51,10 @@ O_IMPLEMENT (ReturnStatement, void, generate, (void *_self))
       fprintf (out, ";\n");
     }
 
-  if (self->try_context)
+  if (self->try_context && !self->finally_context)
     {
       fprintf (out, "ex_pop ();\n");
-      if (self->try_context->finally_clause && !self->finally_context)
+      if (self->try_context->finally_clause)
 	{
 	  fprintf (out, "do_finally;\n");
 	}
