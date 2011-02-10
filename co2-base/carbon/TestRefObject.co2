@@ -37,6 +37,7 @@ int mainImpl () {
 		}
 	} catch (IndexOutOfBoundsException e) {
 		printf ("IndexOutOfBoundsException: index: %d, bounds: %d\n", e.index, e.bounds);
+		delete e;
 	} finally {
 		((ArrayList) list).release ();
 	}
@@ -54,6 +55,7 @@ int main() {
 	} catch (Exception e) {
 		result = 1;
 		printf ("Caught Exception: \n", e.message.data);
+		delete e;
 	} finally {
 		return result;
 	}

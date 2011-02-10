@@ -1,5 +1,4 @@
 include Object
-include String
 
 class Exception : BaseObject {
 	String message;
@@ -16,12 +15,16 @@ class Exception : BaseObject {
 	}
 
 	Exception.withReason (Exception anException) {
-		message = null;
+		message = new String("");
 		reason = anException;
 	}
 
 	Exception.withMessageAndReason (String aMessage, Exception anException) {
 		message = aMessage;
 		reason = anException;
+	}
+
+	~Exception () {
+		delete message;
 	}
 }
