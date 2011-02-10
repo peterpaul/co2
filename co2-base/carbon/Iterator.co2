@@ -1,0 +1,6 @@
+include RefObject
+
+interface Iterator {
+	int hasNext ();
+	RefObject getNext ();
+}

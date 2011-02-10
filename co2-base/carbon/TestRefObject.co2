@@ -35,16 +35,18 @@ int mainImpl () {
 			TestRefObject obj = (TestRefObject) list.get (i);
 			printf ("%d\n", obj.val);
 		}
+
+		//new Level ();
+	
 	} catch (IndexOutOfBoundsException e) {
 		printf ("IndexOutOfBoundsException: index: %d, bounds: %d\n", e.index, e.bounds);
 		delete e;
+		return 1;
 	} finally {
 		((ArrayList) list).release ();
+		delete current_release_pool;
 	}
 
-	//new Level ();
-	
-	delete current_release_pool;
 	return 0;
 }
 
