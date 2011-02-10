@@ -1,0 +1,36 @@
+["stdio.h"] {
+	int printf (char *format, ...);
+}
+
+class Ex {
+	char * msg;
+
+	Ex (char * msg) {
+		self.msg = msg;
+	}
+}
+
+int fun (int in) {
+	printf ("in: %d\n", in);
+	try {
+		if (in %2 == 0)
+			throw new Ex ("Should display this");
+	} catch (Ex e) {
+		printf ("Caught Ex: %s\n", e.msg);
+		return in + 1;
+	} finally {
+		return in + 2;
+	}
+	printf ("FATAL: this should never display!\n");
+	return -1;
+}
+
+int main () {
+	try {
+		int out = fun (1);
+		printf ("out: %d\n", out);
+		throw new Ex ("Should not display");
+	} finally {
+		return 0;
+	}
+}

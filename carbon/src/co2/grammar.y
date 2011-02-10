@@ -599,10 +599,9 @@ catch_statement_list
 {
   O_CALL ($1, append, $2);
 }
-|	catch_statement
+|	/* empty */
 {
   $$ = O_CALL_CLASS (RefList (), new, 8, CatchStatement ());
-  O_CALL ($$, append, $1);
 }
 ;
 
