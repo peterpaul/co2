@@ -42,7 +42,7 @@ class Level : RefObject <Comparable> {
 		value = v;
 	}
 
-	int compare (BaseObject other) {
+	int comparee (BaseObject other) {
 		Level otherLevel = (Level) other;
 		return value - otherLevel.value;
 	}

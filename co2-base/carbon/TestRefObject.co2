@@ -20,7 +20,7 @@ RefObject create(int a) {
 	return b.autoRelease();
 }
 
-int main() {
+int mainImpl () {
 	new ReleasePool ();
 	try {
 		List list = new ArrayList(15);
@@ -40,4 +40,18 @@ int main() {
 	new Level ();
 	
 	delete current_release_pool;
+	return 0;
+}
+
+int main() {
+	int result = 0;
+	try {
+		result = mainImpl ();
+	} catch (Exception e) {
+		result = 1;
+		printf ("Caught Exception: \n", e.message.data);
+	//} finally {
+		//return result;
+	}
+	return result;
 }

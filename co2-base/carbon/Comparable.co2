@@ -1,5 +1,5 @@
 include Object
 
 interface Comparable {
-	int compare (BaseObject other);
+	int comparee (BaseObject other);
 }
