@@ -71,6 +71,10 @@ O_IMPLEMENT(CastExpression, void, type_check, (void *_self))
 O_IMPLEMENT(CastExpression, void, generate, (void *_self))
 {
   struct CastExpression *self = O_CAST(_self, CastExpression());
+  fprintf(out, "(");
+  fprintf(out, "(");
+  O_CALL(self->cast_type, generate);
+  fprintf(out, ") ");
   if (o_is_of(self->cast_type, ObjectType())) 
     {
       struct ObjectType * object_type = O_CAST(self->cast_type, ObjectType());
@@ -97,13 +101,9 @@ O_IMPLEMENT(CastExpression, void, generate, (void *_self))
     }
   else
     {
-      fprintf(out, "(");
-      fprintf(out, "(");
-      O_CALL(self->cast_type, generate);
-      fprintf(out, ") ");
       O_CALL(self->expression, generate);
-      fprintf(out, ")");
     }
+  fprintf(out, ")");
 }
 
 O_OBJECT(CastExpression, Expression);

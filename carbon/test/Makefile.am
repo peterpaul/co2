@@ -38,6 +38,7 @@ pass/fun_decl_vararg.sh\
 pass/fun_type.sh\
 pass/global_scope.sh\
 pass/import.sh\
+pass/interface_cast.sh\
 pass/interface_decl.sh\
 pass/interface_implementation.sh\
 pass/interface_override.sh\

@@ -1,0 +1,22 @@
+
+["stdio.h"] {
+	int printf (char *format, ...);
+}
+
+interface Foo {
+	int foobar ();
+}
+
+class Bar <Foo> {
+	int foobar () return 5;
+}
+
+int main() {
+	Foo foo = new Bar ();
+	Bar bar = new Bar ();
+
+	printf ("foobar = %d\n", ((Bar) foo).foobar());
+	printf ("barfoo = %d\n", ((Foo) bar).foobar());
+
+	return 0;
+}
