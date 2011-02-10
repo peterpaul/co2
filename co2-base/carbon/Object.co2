@@ -1,6 +1,12 @@
 ["co2/Object.h"] {
 	class Object {
 		Class class;
+
+		Object () {
+		}
+
+		~Object () {
+		}
 	}
 
 	class Class : Object {

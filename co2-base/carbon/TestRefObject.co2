@@ -22,8 +22,10 @@ RefObject create(int a) {
 
 int mainImpl () {
 	new ReleasePool ();
+	List list;
 	try {
-		List list = new ArrayList(15);
+		list = new ArrayList(15);
+		((ArrayList) list).retain ();
 		int i;
 		for (i = 0; i < 15; i += 1) {
 			list.append (create (i));
@@ -35,9 +37,11 @@ int mainImpl () {
 		}
 	} catch (IndexOutOfBoundsException e) {
 		printf ("IndexOutOfBoundsException: index: %d, bounds: %d\n", e.index, e.bounds);
+	} finally {
+		((ArrayList) list).release ();
 	}
 
-	new Level ();
+	//new Level ();
 	
 	delete current_release_pool;
 	return 0;
@@ -50,8 +54,7 @@ int main() {
 	} catch (Exception e) {
 		result = 1;
 		printf ("Caught Exception: \n", e.message.data);
-	//} finally {
-		//return result;
+	} finally {
+		return result;
 	}
-	return result;
 }

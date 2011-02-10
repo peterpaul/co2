@@ -1,28 +1,26 @@
-include RefObject
+include Object
 include String
 
-class Exception : RefObject {
+class Exception : BaseObject {
 	String message;
 	Exception reason;
 
 	Exception () {
 		message = new String("");
+		reason = null;
 	}
 
-	Exception.withMessage(String aMessage) {
-		super ();
+	Exception.withMessage (String aMessage) {
 		message = aMessage;
 		reason = null;
 	}
 
-	Exception.withReason(Exception anException) {
-		super ();
+	Exception.withReason (Exception anException) {
 		message = null;
 		reason = anException;
 	}
 
-	Exception.withMessageAndReason(String aMessage, Exception anException) {
-		super ();
+	Exception.withMessageAndReason (String aMessage, Exception anException) {
 		message = aMessage;
 		reason = anException;
 	}
