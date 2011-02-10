@@ -1,17 +1,18 @@
 include Object
 include String
 include RefObject
+include Comparable
 
-Level finest, finer, fine, info, warning, error, fatal;
 int initialized = false;
 
 Level createPrivateLevel (int v, char * n)
 {
 	Level l = new Level.private (v, n);
-	return l.retain ();
+//	l.retain ();
+	return l;
 }
 
-class Level : RefObject {
+class Level : RefObject <Comparable> {
 	String name;
 	int value;
 
@@ -40,4 +41,11 @@ class Level : RefObject {
 		name = new String ("%s", n);
 		value = v;
 	}
+
+	int compare (BaseObject other) {
+		Level otherLevel = (Level) other;
+		return value - otherLevel.value;
+	}
 }
+
+Level finest, finer, fine, info, warning, error, fatal;
