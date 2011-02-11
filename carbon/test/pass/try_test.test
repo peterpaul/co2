@@ -14,9 +14,9 @@ int fun (int in) {
 	printf ("in: %d\n", in);
 	try {
 		if (in %2 == 0)
-			throw new Ex ("Should display this");
+			throw new Ex ("Should display in fun");
 	} catch (Ex e) {
-		printf ("Caught Ex: %s\n", e.msg);
+		printf ("fun caught Ex: %s\n", e.msg);
 		return in + 1;
 	} finally {
 		return in + 2;
@@ -25,12 +25,23 @@ int fun (int in) {
 	return -1;
 }
 
-int main () {
+int loop (int val) {
 	try {
-		int out = fun (1);
+		int out = fun (val);
 		printf ("out: %d\n", out);
-		throw new Ex ("Should not display");
+		throw new Ex ("Should display in main");
+	} catch (Ex e) {
+		printf ("main caught Ex: %s\n", e.msg);
 	} finally {
 		return 0;
 	}
+}
+
+int main () {
+	printf ("---\n");
+	loop (0);
+	printf ("---\n");
+	loop (1);
+	printf ("---\n");
+	return 0;
 }

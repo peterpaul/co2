@@ -32,6 +32,7 @@ O_IMPLEMENT(ThrowStatement, void, type_check, (void *_self))
   struct ThrowStatement *self = O_CAST(_self, ThrowStatement());
   self->catch_context = O_BRANCH_CALL (current_context, find, CatchStatement ());
   self->try_context = O_BRANCH_CALL (current_context, find, TryStatement ());
+  self->finally_context = O_BRANCH_CALL (current_context, find, FinallyStatement ());
   O_CALL (self->expr, type_check);
 }
 
@@ -41,10 +42,14 @@ O_IMPLEMENT(ThrowStatement, void, generate, (void *_self))
   if (self->catch_context)
     {
       fprintf (out, "ex_pop ();\n");
-      if (self->try_context->finally_clause)
+      if (self->try_context->finally_clause && !self->finally_context)
 	{
 	  fprintf (out, "do_finally;\n");
 	}
+    }
+  if (self->finally_context)
+    {
+      fprintf (out, "ex_pop ();\n");
     }
   fprintf (out, "throw (1, ");
   O_CALL (self->expr, generate);
