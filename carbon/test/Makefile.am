@@ -58,6 +58,7 @@ pass/try_statement_return_from_finally.sh\
 pass/try_statement_return.sh\
 pass/try_statement.sh\
 pass/try_test.sh\
+pass/try_test_throw.sh\
 pass/typedef.sh\
 pass/va_arg.sh\
 pass/var_decl.sh\
