@@ -212,6 +212,13 @@ O_IMPLEMENT (BinaryExpression, void, set_scope, (void *_self, void *_scope))
   O_CALL (self->operand[0], set_scope, _scope);
 }
 
+O_IMPLEMENT(BinaryExpression, struct Token *, get_token, (void *_self))
+{
+  struct BinaryExpression *self = O_CAST (_self, BinaryExpression ());
+  return O_CALL (self->operand[1], get_token);
+}
+
+
 O_OBJECT (BinaryExpression, Expression);
 O_OBJECT_METHOD (BinaryExpression, ctor);
 O_OBJECT_METHOD (BinaryExpression, dtor);
@@ -219,4 +226,5 @@ O_OBJECT_METHOD (BinaryExpression, accept);
 O_OBJECT_METHOD (BinaryExpression, generate);
 O_OBJECT_METHOD (BinaryExpression, type_check);
 O_OBJECT_METHOD (BinaryExpression, set_scope);
+O_OBJECT_METHOD (BinaryExpression, get_token);
 O_END_OBJECT
