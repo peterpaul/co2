@@ -33,7 +33,7 @@ class RefObject : BaseObject {
 			delete self;
 			self = null;
 		}
-		return null;
+		return self;
 	}
 
 	RefObject autoRelease() {

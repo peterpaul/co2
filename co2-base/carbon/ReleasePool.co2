@@ -1,7 +1,8 @@
+include Object
 include ReleasePoolItem
 include Exception
 
-int releasePoolHashSize = 1223;
+unsigned releasePoolHashSize = 1223;
 
 class ReleasePool {
 	ReleasePool parent;
@@ -14,7 +15,7 @@ class ReleasePool {
 	}
 
 	~ReleasePool() {
-		int i;
+		unsigned i;
 		for (i = 0; i < releasePoolHashSize; i += 1) {
 			ReleasePoolItem list = hashmap[i];
 			hashmap[i] = null;
@@ -28,7 +29,7 @@ class ReleasePool {
 	}
 
 	RefObject add(RefObject anItem) {
-		int index = (int) anItem % releasePoolHashSize;
+		unsigned index = (unsigned) anItem % releasePoolHashSize;
 		ReleasePoolItem item = new ReleasePoolItem (anItem);
 		if (hashmap[index] == null) {
 			hashmap[index] = item;
@@ -39,11 +40,11 @@ class ReleasePool {
 	}
 
 	RefObject remove(RefObject anItem) {
-		int index = (int) anItem % releasePoolHashSize;
+		unsigned index = (unsigned) anItem % releasePoolHashSize;
 		if (hashmap[index]) {
 			hashmap[index] = hashmap[index].remove(anItem);
-		} else {
-			throw new Exception();
+		//} else {
+		//	throw new Exception();
 		}
 		return anItem;
 	}

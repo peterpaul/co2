@@ -1,0 +1,10 @@
+include Logger
+include ReleasePool
+
+int main () {
+	new ReleasePool ();
+	Logger logger = new Logger ();
+	logger.log ("hello");
+	delete current_release_pool;
+	return 0;
+}

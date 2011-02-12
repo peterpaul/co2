@@ -1,6 +1,9 @@
 include RefObject
 
 class ReleasePoolItem {
+	ReleasePoolItem next;
+	RefObject item;
+
 	ReleasePoolItem(RefObject anObject) {
 		item = anObject;
 		next = null;
@@ -31,7 +34,4 @@ class ReleasePoolItem {
 		delete item;
 		delete self;
 	}
-
-	ReleasePoolItem next;
-	RefObject item;
 }

@@ -1,0 +1,16 @@
+include LogHandler
+include LogFormatter
+
+class ConsoleHandler : BaseObject <LogHandler> {
+	LogFormatter formatter;
+
+	ConsoleHandler (LogFormatter f) {
+		super ();
+		formatter = f;
+	}
+
+	void publish (LogRecord record) {
+		String message = formatter.format (record);
+		printf ("%s\n", message.data);
+	}
+}

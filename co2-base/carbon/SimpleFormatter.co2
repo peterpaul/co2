@@ -1,0 +1,12 @@
+include LogFormatter
+
+class SimpleFormatter : BaseObject <LogFormatter> {
+	SimpleFormatter () {
+		super ();
+	}
+
+	String format (LogRecord record) {
+		return record.message;
+	}
+
+}

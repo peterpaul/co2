@@ -1,5 +1,21 @@
 include Object
+include LogHandler
+include ConsoleHandler
+include SimpleFormatter
+include LogRecord
 
 class Logger : BaseObject {
+	LogHandler handler;
 
+	Logger () {
+		super ();
+		LogFormatter formatter = new SimpleFormatter ();
+		handler = new ConsoleHandler (formatter);
+	}
+
+	void log(char *fmt, ...) {
+		String message = new String ("%s", fmt);
+		LogRecord record = new LogRecord (message);
+		handler.publish (record);
+	}
 }

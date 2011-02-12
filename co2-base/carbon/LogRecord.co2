@@ -2,4 +2,9 @@ include String
 
 class LogRecord : BaseObject {
 	String message;
+
+	LogRecord (String m) {
+		super ();
+		message = m;
+	}
 }
