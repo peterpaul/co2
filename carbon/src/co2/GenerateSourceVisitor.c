@@ -254,6 +254,12 @@ O_IMPLEMENT_IF(GenerateSourceVisitor, void, visitDestructorDeclaration, (void *_
   struct DestructorDeclaration *self = O_CAST (_object, DestructorDeclaration ());
 
   struct ClassDeclaration *class_decl = O_CALL (current_context, find, ClassDeclaration ());
+  // don't generate for included classes
+  if (class_decl->include_file)
+    {
+      return;
+    }
+
   fprintf (out, "O_IMPLEMENT (");
   O_CALL (class_decl->name, generate);
   fprintf (out, ", void *");
