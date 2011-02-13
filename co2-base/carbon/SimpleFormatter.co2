@@ -1,4 +1,5 @@
 include LogFormatter
+include LogRecord
 
 class SimpleFormatter : BaseObject <LogFormatter> {
 	SimpleFormatter () {
@@ -6,7 +7,18 @@ class SimpleFormatter : BaseObject <LogFormatter> {
 	}
 
 	String format (LogRecord record) {
-		return record.message;
+		Tm tm;
+		char[] logTime = new char[50];
+		strftime(logTime, 50, "%d/%m/%Y %T", localtime_r (&record.time.tv_sec, &tm));
+		String result = new String ("%s.%.3d: %s: %s", 
+			logTime, 
+			record.time.tv_usec / 1000, 
+			record.level.name.data,
+			record.message.data);
+		try {
+			return result;
+		} finally {
+			delete logTime;
+		}
 	}
-
 }

@@ -1,0 +1,35 @@
+include Iterator
+include Array
+
+class ArrayIterator : BaseObject <Iterator> {
+	Array array;
+	unsigned index;
+	
+	ArrayIterator (Array a) {
+		super ();
+		array = a;
+		index = 0;
+	}
+
+	void findNext () {
+		while (array.get (index) == null && index < array.size) {
+			index += 1;
+		}
+	}
+
+	int hasNext () {
+		findNext ();
+		return index < array.size;
+	}
+
+	RefObject getNext () {
+		if (hasNext ()) {
+			try {
+				return array.get (index);
+			} finally {
+				index += 1;
+			}
+		}
+		return null;
+	}
+}

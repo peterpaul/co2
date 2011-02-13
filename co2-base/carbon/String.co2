@@ -44,6 +44,32 @@ class String : RefObject {
 		}
 	}
 
+	String.varArg (char[] format, va_list* args) {
+		super ();
+		int n, size = strlen (format) + 1;
+		data = malloc (size);
+		max = size;
+
+		while (1) {
+			va_list ap2;
+			va_copy (ap2, *args);
+			n = vsnprintf(data, size, format, ap2);
+			if (n > -1) {
+				if (n < size) break;
+				else size = n + 1;
+			} else {
+				size *= 2;
+			}
+			ensure (size);
+			va_end(ap2);
+		}
+		if (n > -1) {
+			length = n;
+		} else {
+			length = strlen (data);
+		}
+	}
+
 	~String() {
 		free (data);
 		data = null;

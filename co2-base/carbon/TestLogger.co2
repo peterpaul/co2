@@ -4,7 +4,9 @@ include ReleasePool
 int main () {
 	new ReleasePool ();
 	Logger logger = new Logger ();
-	logger.log ("hello");
+	logger.log (finest, "hello %s", "world");
+	logger.log (finest, "hello %s", "Peterpaul");
+	logger.log (finest, "hello %s", "Simone");
 	delete current_release_pool;
 	return 0;
 }

@@ -6,16 +6,22 @@ include LogRecord
 
 class Logger : BaseObject {
 	LogHandler handler;
+	Level level;
 
 	Logger () {
 		super ();
 		LogFormatter formatter = new SimpleFormatter ();
 		handler = new ConsoleHandler (formatter);
+		/* Initialize Level constants */
+		if (finest == null) {
+			Level l = new Level ();
+			delete l;
+		}
 	}
 
-	void log(char *fmt, ...) {
-		String message = new String ("%s", fmt);
-		LogRecord record = new LogRecord (message);
+	void log(Level l, char *fmt, ...) {
+		String message = new String.varArg (fmt, &...);
+		LogRecord record = new LogRecord (l, message);
 		handler.publish (record);
 	}
 }

@@ -4,7 +4,7 @@ include Exception
 
 unsigned releasePoolHashSize = 1223;
 
-class ReleasePool {
+class ReleasePool : BaseObject {
 	ReleasePool parent;
 	ReleasePoolItem[] hashmap;
 

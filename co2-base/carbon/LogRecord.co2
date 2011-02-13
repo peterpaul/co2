@@ -1,10 +1,44 @@
 include String
+include Level
+
+["sys/time.h"] {
+	struct timeval {
+		int tv_sec;	/* seconds */
+		int tv_usec;	/* microseconds */
+	}
+}
+typedef Timeval = struct timeval;
+
+["time.h"] {
+	struct tm {
+		int tm_sec;	/* seconds */
+		int tm_min;	/* minutes */
+		int tm_hour;	/* hours */
+		int tm_mday;	/* day of the month */
+		int tm_mon;	/* month */
+		int tm_year;	/* year */
+		int tm_wday;	/* day of the week */
+		int tm_yday;	/* day in the year */
+		int tm_isdst;	/* daylight saving time */
+	}
+
+	int gettimeofday(Timeval *tv, void *tz);
+	int strftime(char *s, int max, char *format, Tm *tm);
+	Tm *localtime_r(int *timep, Tm *result);
+	void tzset ();
+}
+typedef Tm = struct tm;
 
 class LogRecord : BaseObject {
 	String message;
+	Timeval time;
+	Level level;
 
-	LogRecord (String m) {
+	LogRecord (Level l, String m) {
 		super ();
+		tzset ();
+		level = l;
 		message = m;
+		gettimeofday(&time, null);
 	}
 }

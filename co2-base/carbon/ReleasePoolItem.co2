@@ -1,6 +1,6 @@
 include RefObject
 
-class ReleasePoolItem {
+class ReleasePoolItem : BaseObject {
 	ReleasePoolItem next;
 	RefObject item;
 
