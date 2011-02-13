@@ -1,18 +1,24 @@
-include Iterator
+include RefObject
 include Array
+include Iterator
 
 class ArrayIterator : BaseObject <Iterator> {
 	Array array;
 	unsigned index;
 	
 	ArrayIterator (Array a) {
-		super ();
+		// super ();
+		// array = a.retain ();
 		array = a;
 		index = 0;
 	}
 
+	~ArrayIterator () {
+		array = null;
+	}
+
 	void findNext () {
-		while (array.get (index) == null && index < array.size) {
+		while (index < array.size && array.get (index) == null) {
 			index += 1;
 		}
 	}

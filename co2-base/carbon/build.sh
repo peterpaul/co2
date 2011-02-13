@@ -1,11 +1,9 @@
 #!/bin/bash
 set -x
 
-LIBSOURCES="Array.c ArrayList.c Exception.c IndexOutOfBoundsException.c\
-	Iterator.c List.c ListIterator.c Object.c OutOfMemoryException.c\
-	RefObject.c ReleasePool.c ReleasePoolItem.c Singleton.c String.c\
+LIBSOURCES="Array.c ArrayList.c Exception.c IndexOutOfBoundsException.c Iterator.c List.c ListIterator.c Object.c OutOfMemoryException.c RefObject.c ReleasePool.c ReleasePoolItem.c Singleton.c String.c\
 	Level.c Logger.c LogFormatter.c LogHandler.c LogRecord.c\
-	Comparable.c ConsoleHandler.c SimpleFormatter.c"
+	Comparable.c ConsoleHandler.c SimpleFormatter.c ArrayIterator.c Iterable.c"
 
 if [[ ($# > 0) && ("$1" == "clean") ]]
 then

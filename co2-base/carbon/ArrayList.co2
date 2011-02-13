@@ -1,7 +1,9 @@
 include Array
 include List
+include Iterable
+include ArrayIterator
 
-class ArrayList : Array <List> {
+class ArrayList : Array <List, Iterable> {
 	unsigned length_;
 
 	ArrayList (int size) {
@@ -47,4 +49,7 @@ class ArrayList : Array <List> {
 		return super (index, item);
 	}
 
+	Iterator iterator () {
+		return new ArrayIterator (self);
+	}
 }

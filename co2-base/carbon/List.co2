@@ -1,4 +1,5 @@
 include RefObject
+include Iterator
 
 interface List {
 	unsigned length ();
@@ -6,4 +7,6 @@ interface List {
 	RefObject set (unsigned index, RefObject item);
 	RefObject append (RefObject item);
 	List appendList (List list);
+
+	Iterator iterator ();
 }

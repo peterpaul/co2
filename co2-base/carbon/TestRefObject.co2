@@ -2,8 +2,11 @@ include RefObject
 include ReleasePool
 include ArrayList
 include List
+include Iterator
 
-include Level
+["stdlib.h"] {
+	int random();
+}
 
 class TestRefObject : RefObject {
 	int val;
@@ -34,10 +37,19 @@ int mainImpl () {
 		for (i = 0; i < 15; i += 1) {
 			TestRefObject obj = (TestRefObject) list.get (i);
 			printf ("%d\n", obj.val);
+			if (random () % 2 == 0) {
+				list.set (i, null);
+			}
 		}
 
-		//new Level ();
-	
+		Iterator it = list.iterator ();
+		while (it.hasNext ()) {
+			TestRefObject obj = (TestRefObject) it.getNext ();
+			printf ("--- %d\n", obj.val);
+		}
+		delete it;
+
+
 	} catch (IndexOutOfBoundsException e) {
 		printf ("IndexOutOfBoundsException: index: %d, bounds: %d\n", e.index, e.bounds);
 		delete e;
