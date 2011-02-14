@@ -48,7 +48,7 @@ libcarbon_1_0_la_HEADERS = co2/ArgumentDeclaration.h co2/ArrayType.h co2/BaseCom
 		co2/UnaryExpression.h\
 		co2/VarArgExpression.h co2/VariableDeclaration.h co2/WhileStatement.h
 
-libcarbon_1_0_la_CPPFLAGS = -I$(top_srcdir)/include
+libcarbon_1_0_la_CPPFLAGS = -I$(top_srcdir)/include -DO_DEBUG
 
 grammar.h: grammar.c
 

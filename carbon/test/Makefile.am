@@ -41,6 +41,7 @@ pass/import.sh\
 pass/interface_cast.sh\
 pass/interface_decl.sh\
 pass/interface_implementation.sh\
+pass/interface_multiple.sh\
 pass/interface_override.sh\
 pass/List.sh\
 pass/loops.sh\

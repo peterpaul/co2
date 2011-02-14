@@ -1,0 +1,64 @@
+["stdio.h"] {
+	int printf(char *format, ...);
+}
+
+interface A {
+	int a();
+}
+
+interface B {
+	int b();
+}
+
+interface C <A,B> {
+	int c();
+}
+
+interface D {
+	int d();
+}
+
+interface E <C,D> {
+	int e();
+}
+
+class Foo <E> {
+	int a() { printf ("a()\n"); return 1; }
+	int b() { printf ("b()\n"); return 2; }
+	int c() { printf ("c()\n"); return 3; }
+	int d() { printf ("d()\n"); return 4; }
+	int e() { printf ("e()\n"); return 5; }
+}
+
+int main() {
+	Foo bar = new Foo ();
+	A barA = (A) bar;
+	B barB = (B) bar;
+	C barC = (C) bar;
+	D barD = (D) bar;
+	E barE = (E) bar;
+
+	bar.a();
+	bar.b();
+	bar.c();
+	bar.d();
+	bar.e();
+
+	barA.a();
+
+	barB.b();
+
+	barC.a();
+	barC.b();
+	barC.c();
+
+	barD.d();
+
+	barE.a();
+	barE.b();
+	barE.c();
+	barE.d();
+	barE.e();
+
+	return 0;
+}

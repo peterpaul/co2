@@ -116,6 +116,8 @@ ClassDeclaration_generate_method_implementation_2 (void *_interface_name,
 	  ClassDeclaration_generate_interface_method_registration,
 	  implementation_name);
   fprintf (out, "O_OBJECT_IF_END\n");
+  
+  O_BRANCH_CALL (interface_decl->interfaces, map_args, ClassDeclaration_generate_method_implementation_2, implementation_name);
 }
 
 #define O_SUPER BaseCompileObjectVisitor()
@@ -176,11 +178,8 @@ O_IMPLEMENT_IF(GenerateSourceVisitor, void, visitClassDeclaration, (void *_self,
   O_CALL (methods, map_args,
 	  ObjectTypeDeclaration_generate_method_registration_2, self);
 
-  if (self->interfaces)
-    {
-      O_CALL (self->interfaces, map_args,
-	      ClassDeclaration_generate_method_implementation_2, self->name);
-    }
+  O_BRANCH_CALL (self->interfaces, map_args,
+		 ClassDeclaration_generate_method_implementation_2, self->name);
 
   fprintf (out, "O_END_OBJECT\n\n");
 

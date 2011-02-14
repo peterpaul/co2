@@ -35,10 +35,28 @@ O_IMPLEMENT (InterfaceDeclaration, void, accept, (void *_self, struct BaseCompil
   O_BRANCH_CALL (current_context, remove_last);
 }
 
+static void InterfaceDeclaration_add_member_to_scope(void *_decl, va_list *app)
+{
+  struct Declaration *decl = O_CAST(_decl, Declaration ());
+  struct InterfaceDeclaration *self = O_GET_ARG (InterfaceDeclaration);
+  O_CALL (self->member_scope, declare, decl);
+  O_CALL (self->members, append, decl);
+}
+
+static void InterfaceDeclaration_add_to_scope(void *_token, va_list *app)
+{
+  struct Token *token = O_CAST(_token, Token ());
+  struct InterfaceDeclaration *interface = O_CAST(O_CALL (global_scope, lookup, token), InterfaceDeclaration ());
+  struct InterfaceDeclaration *self = O_GET_ARG (InterfaceDeclaration);
+  O_CALL (interface->members, map_args, InterfaceDeclaration_add_member_to_scope, self);
+}
+
 O_IMPLEMENT (InterfaceDeclaration, void, type_check, (void *_self))
 {
   struct InterfaceDeclaration *self = O_CAST (_self, InterfaceDeclaration ());
   O_BRANCH_CALL (current_context, add, self);
+  // Add all methods of super interfaces to this scope.
+  O_BRANCH_CALL (self->interfaces, map_args, InterfaceDeclaration_add_to_scope, self);
   O_CALL (self->members, map, Declaration_list_type_check);
   O_BRANCH_CALL (current_context, remove_last);
 }
@@ -56,7 +74,7 @@ static void InterfaceDeclaration_is_compatible_with_class(void *_self, va_list *
 
 static struct ClassDeclaration *InterfaceDeclaration_get_super_class(struct ClassDeclaration *decl)
 {
-  struct Token *superclass = O_CAST (decl->superclass, Token ());
+  struct Token *superclass = O_BRANCH_CAST (decl->superclass, Token ());
   if (superclass && O_CALL (global_scope, exists, superclass))
     {
       struct Declaration * superdecl = O_CALL (global_scope, lookup, superclass);
