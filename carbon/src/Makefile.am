@@ -59,3 +59,6 @@ carbon_LDFLAGS = $(CO2_LIBS) -lcarbon-1.0
 
 distclean-local:
 	-rm -r ${bin_PROGRAMS}
+
+clean-local:
+	-rm grammar.c grammar.h lex.c

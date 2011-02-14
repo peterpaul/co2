@@ -1,6 +1,7 @@
 #include "co2/ThrowStatement.h"
 #include "co2/TryStatement.h"
 #include "co2/CatchStatement.h"
+#include "co2/FinallyStatement.h"
 #include "co2/io.h"
 
 #define O_SUPER Statement()
