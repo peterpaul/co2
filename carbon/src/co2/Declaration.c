@@ -14,13 +14,6 @@ Declaration_list_set_include_header (void *_decl, va_list * app)
   O_CALL (decl, set_include_file, header_file);
 }
 
-void
-Declaration_list_type_check (void *_decl)
-{
-  struct Declaration *decl = O_CAST (_decl, Declaration ());
-  O_CALL (decl, type_check);
-}
-
 int
 Declaration_new_member_filter (void *_member, va_list * app)
 {

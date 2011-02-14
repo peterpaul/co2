@@ -57,7 +57,7 @@ O_IMPLEMENT (InterfaceDeclaration, void, type_check, (void *_self))
   O_BRANCH_CALL (current_context, add, self);
   // Add all methods of super interfaces to this scope.
   O_BRANCH_CALL (self->interfaces, map_args, InterfaceDeclaration_add_to_scope, self);
-  O_CALL (self->members, map, Declaration_list_type_check);
+  O_CALL (self->members, map, CompileObject_type_check);
   O_BRANCH_CALL (current_context, remove_last);
 }
 

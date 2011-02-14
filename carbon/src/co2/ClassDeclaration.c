@@ -91,7 +91,7 @@ O_IMPLEMENT (ClassDeclaration, void, type_check, (void *_self))
    * 2. foreach interface, methods already exists in other interface (including interfaces from superclasses), if so: fail
    * 3. class (including superclasses) implements all methods of all interfaces, if not: fail
    */
-  O_CALL (self->members, map, Declaration_list_type_check);
+  O_CALL (self->members, map, CompileObject_type_check);
   O_BRANCH_CALL (current_context, remove_last);
 }
 

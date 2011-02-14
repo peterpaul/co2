@@ -18,7 +18,7 @@ struct Hash * get_hash_map ()
 }
 
 static void
-type_check (void *_object)
+File_type_check (void *_object)
 {
   struct CompileObject *object = O_CAST (_object, CompileObject ());
   if (o_is_of (object, Declaration ()))
@@ -38,13 +38,6 @@ type_check (void *_object)
 static void
 optimize (void *_object)
 {
-}
-
-static void
-generate (void *_object)
-{
-  struct CompileObject *object = O_CAST (_object, CompileObject ());
-  O_CALL (object, generate);
 }
 
 O_IMPLEMENT (File, void *, ctor, (void *_self, va_list * app))
@@ -82,8 +75,8 @@ O_IMPLEMENT (File, void, accept, (void *_self, struct BaseCompileObjectVisitor *
 O_IMPLEMENT (File, void, type_check, (void *_self))
 {
   struct File *self = O_CAST (_self, File ());
-  O_CALL (self->file_dependencies, map, type_check);
-  O_CALL (self->declarations, map, type_check);
+  O_CALL (self->file_dependencies, map, File_type_check);
+  O_CALL (self->declarations, map, File_type_check);
 }
 
 O_IMPLEMENT (File, void, optimize, (void *_self))
@@ -116,8 +109,8 @@ O_IMPLEMENT (File, void, generate, (void *_self))
     O_CALL (self->declarations, filter, File_declaration_filter);
   O_CALL (declarations, retain);
 
-  O_CALL (definitions, map, generate);
-  O_CALL (declarations, map, generate);
+  O_CALL (definitions, map, CompileObject_generate);
+  O_CALL (declarations, map, CompileObject_generate);
 
   O_CALL (definitions, release);
   O_CALL (declarations, release);

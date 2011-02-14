@@ -15,7 +15,6 @@
 int new_constructor_filter (void *_constructor);
 void generate_superclass (struct ClassDeclaration *self);
 void FunctionDeclaration_generate_formal_arg (void *_decl, va_list * ap);
-void Declaration_list_generate (void *_self);
 
 static void
 ClassDeclaration_generate_constructor_registration (void *_constructor_decl,
@@ -319,7 +318,7 @@ O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitStructDeclaration, (void *_self
   fprintf (out, "struct ");
   O_CALL (self->name, generate);
   fprintf (out, " {\n");
-  O_CALL (self->members, map, Declaration_list_generate);
+  O_CALL (self->members, map, CompileObject_generate);
   fprintf (out, "};\n\n");
 }
 

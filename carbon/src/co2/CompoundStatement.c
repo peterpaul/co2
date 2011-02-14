@@ -26,26 +26,12 @@ O_IMPLEMENT (CompoundStatement, void, accept, (void *_self, struct BaseCompileOb
   O_CALL (visitor, visit, self);
 }
 
-void
-CompoundStatement_generate_body (void *_item)
-{
-  struct CompileObject *item = O_CAST (_item, CompileObject ());
-  O_CALL (item, generate);
-}
-
 O_IMPLEMENT (CompoundStatement, void, generate, (void *_self))
 {
   struct CompoundStatement *self = O_CAST (_self, CompoundStatement ());
   fprintf (out, "{\n");
-  O_CALL (self->body, map, CompoundStatement_generate_body);
+  O_CALL (self->body, map, CompileObject_generate);
   fprintf (out, "}\n");
-}
-
-void
-CompoundStatement_type_check_body (void *_item)
-{
-  struct CompileObject *item = O_CAST (_item, CompileObject ());
-  O_CALL (item, type_check);
 }
 
 O_IMPLEMENT (CompoundStatement, void, type_check, (void *_self))
@@ -55,8 +41,8 @@ O_IMPLEMENT (CompoundStatement, void, type_check, (void *_self))
     O_CALL (self->body, filter_args, type_filter, Declaration ());
   struct RefList *expressions =
     O_CALL (self->body, filter_args, not_type_filter, Declaration ());
-  O_CALL (declarations, map, CompoundStatement_type_check_body);
-  O_CALL (expressions, map, CompoundStatement_type_check_body);
+  O_CALL (declarations, map, CompileObject_type_check);
+  O_CALL (expressions, map, CompileObject_type_check);
 }
 
 O_OBJECT (CompoundStatement, Statement);
