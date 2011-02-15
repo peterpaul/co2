@@ -9,6 +9,9 @@
 #include "co2/FunctionDeclaration.h"
 #include "co2/io.h"
 
+static int TypeDeclaration_compare (const void *_decl1, const void *_decl2);
+static bool InterfaceDeclaration_1_depends_on_2 (const struct InterfaceDeclaration * decl1, const struct InterfaceDeclaration * decl2);
+
 #define O_SUPER CompileObject()
 
 struct Hash * file_hash_map = NULL;
@@ -93,52 +96,99 @@ static void Token_equals_callback (const void *_self, va_list *app)
     }
 }
 
-int InterfaceDeclaration_compare_Interface (const struct InterfaceDeclaration * decl1, const void *_decl2)
+static void Interface_depends_on (const void *_self, va_list *app)
+{
+  struct Token *self = O_CAST (_self, Token ());
+  struct InterfaceDeclaration *decl2 = O_GET_ARG (InterfaceDeclaration);
+  bool *depends = va_arg (*app, bool *);
+  if (Token_equals (self, decl2->name))
+    {
+      *depends = true;
+    }
+  else
+    {
+      if (O_CALL (global_scope, exists, self))
+	{
+	  struct Declaration *super_decl = O_BRANCH_CALL (global_scope, lookup, self);
+	  if (o_is_of (super_decl, InterfaceDeclaration ()))
+	    {
+	      if (InterfaceDeclaration_1_depends_on_2 ((struct InterfaceDeclaration *) super_decl, decl2))
+		{
+		  *depends = true;
+		}
+	    }
+	}
+    }
+}
+
+static bool InterfaceDeclaration_1_depends_on_2 (const struct InterfaceDeclaration * decl1, const struct InterfaceDeclaration * decl2)
+{
+  bool depends = false;
+  if (decl1->interfaces)
+    {
+      O_CALL (decl1->interfaces, map_args, Interface_depends_on, decl2, &depends);
+    }
+  return depends;
+}
+
+static int InterfaceDeclaration_compare_Interface (const struct InterfaceDeclaration * decl1, const void *_decl2)
 {
   const struct InterfaceDeclaration * decl2 = O_CAST (_decl2, InterfaceDeclaration ());
-  bool depends = false;
-  // TODO also check super interfaces
-  O_BRANCH_CALL (decl1->interfaces, map_args, Token_equals_callback, decl2->name, &depends);
-  if (depends)
-    {
-      fprintf (stderr, "%s depends on %s\n", decl1->name->name->data, decl2->name->name->data);
-      return 1;
-    }
-  O_BRANCH_CALL (decl2->interfaces, map_args, Token_equals_callback, decl1->name, &depends);
-  if (depends)
-    {
-      fprintf (stderr, "%s depends on %s\n", decl2->name->name->data, decl1->name->name->data);
-      return -1;
-    }
-}
-
-int InterfaceDeclaration_compare_Class (const struct InterfaceDeclaration * decl1, const void *_decl2)
-{
-  const struct ClassDeclaration * decl2 = O_CAST (_decl2, ClassDeclaration ());
-  bool depends = false;
-  O_BRANCH_CALL (decl2->interfaces, map_args, Token_equals_callback, decl1->name, &depends);
-  if (depends)
-    {
-      fprintf (stderr, "%s depends on %s\n", decl2->name->name->data, decl1->name->name->data);
-      return -1;
-    }
-}
-
-int ClassDeclaration_compare_Class (const struct ClassDeclaration * decl1, const void *_decl2)
-{
-  const struct ClassDeclaration * decl2 = O_CAST (_decl2, ClassDeclaration ());
-  if (decl2->superclass && Token_equals (decl1->name, decl2->superclass))
-    {
-      return -1;
-    }
-  if (decl1->superclass && Token_equals (decl1->superclass, decl2->name))
+  if (InterfaceDeclaration_1_depends_on_2 (decl1, decl2))
     {
       return 1;
+    }
+  if (InterfaceDeclaration_1_depends_on_2 (decl2, decl1))
+    {
+      return -1;
     }
   return 0;
 }
 
-int InterfaceDeclaration_compare (const void *_decl1, const void *_decl2)
+static int InterfaceDeclaration_compare_Class (const struct InterfaceDeclaration * decl1, const void *_decl2)
+{
+  const struct ClassDeclaration * decl2 = O_CAST (_decl2, ClassDeclaration ());
+  bool depends = false;
+  O_BRANCH_CALL (decl2->interfaces, map_args, Token_equals_callback, decl1->name, &depends);
+  if (depends)
+    {
+      fprintf (stderr, "%s depends on %s\n", decl2->name->name->data, decl1->name->name->data);
+      return -1;
+    }
+}
+
+static bool ClassDeclaration_1_depends_on_2 (const struct ClassDeclaration * decl1, const struct ClassDeclaration * decl2)
+{
+  if (decl1->superclass)
+    {
+      if (Token_equals (decl1->superclass, decl2->name))
+	{
+	  return true;
+	}
+      if (O_CALL (global_scope, exists, decl1->superclass))
+	{
+	  struct Declaration *super_decl = O_BRANCH_CALL (global_scope, lookup, decl1->superclass);
+	  if (o_is_of (super_decl, ClassDeclaration ()))
+	    {
+	      return ClassDeclaration_1_depends_on_2 ((struct ClassDeclaration *) super_decl, decl2);
+	    }
+	}
+    }
+  return false;
+}
+
+static int ClassDeclaration_compare_Class (const struct ClassDeclaration * decl1, const void *_decl2)
+{
+  const struct ClassDeclaration * decl2 = O_CAST (_decl2, ClassDeclaration ());
+  int result = ClassDeclaration_1_depends_on_2 (decl1, decl2);
+  if (result == 0)
+    {
+      result = -ClassDeclaration_1_depends_on_2 (decl2, decl1);
+    }
+  return result;
+}
+
+static int InterfaceDeclaration_compare (const void *_decl1, const void *_decl2)
 {
   const struct InterfaceDeclaration * decl1 = O_CAST (_decl1, InterfaceDeclaration ());
   if (o_is_of (_decl2, InterfaceDeclaration ()))
@@ -164,7 +214,7 @@ int InterfaceDeclaration_compare (const void *_decl1, const void *_decl2)
   return -1;
 }
 
-int ClassDeclaration_compare (const void *_decl1, const void *_decl2)
+static int ClassDeclaration_compare (const void *_decl1, const void *_decl2)
 {
   const struct ClassDeclaration * decl1 = O_CAST (_decl1, ClassDeclaration ());
   if (o_is_of (_decl2, InterfaceDeclaration ()))
@@ -190,7 +240,7 @@ int ClassDeclaration_compare (const void *_decl1, const void *_decl2)
   return -1;
 }
 
-int FunctionDeclaration_compare (const void *_decl1, const void *_decl2)
+static int FunctionDeclaration_compare (const void *_decl1, const void *_decl2)
 {
   const struct FunctionDeclaration * decl1 = O_CAST (_decl1, FunctionDeclaration ());
   if (strcmp (decl1->name->name->data, "main") == 0)
@@ -208,7 +258,7 @@ int FunctionDeclaration_compare (const void *_decl1, const void *_decl2)
   return 0;
 }
 
-int Declaration_compare (const void *_decl1, const void *_decl2)
+static int Declaration_compare (const void *_decl1, const void *_decl2)
 {
   const struct Declaration * decl1 = O_CAST (_decl1, Declaration ());
   if (o_is_of (decl1, InterfaceDeclaration ()))
@@ -230,7 +280,7 @@ int Declaration_compare (const void *_decl1, const void *_decl2)
   return 0;
 }
 
-int TypeDeclaration_compare (const void *_decl1, const void *_decl2)
+static int TypeDeclaration_compare (const void *_decl1, const void *_decl2)
 {
   const struct TypeDeclaration * decl1 = O_CAST (_decl1, TypeDeclaration ());
   if (o_is_of (decl1->type, ObjectType ()))
@@ -244,7 +294,7 @@ int TypeDeclaration_compare (const void *_decl1, const void *_decl2)
   return 0;
 }
 
-int Declaration_compare_callback (const void *_decl1, const void *_decl2)
+static int Declaration_compare_callback (const void *_decl1, const void *_decl2)
 {
   const void *decl1 = *(const void **)_decl1;
   const void *decl2 = *(const void **)_decl2;
