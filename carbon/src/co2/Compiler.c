@@ -98,6 +98,9 @@ int mainImpl(const char * output_file)
       return 1;
     }
 
+  // sort members
+  O_CALL (main_file, sort);
+
   /* code generation */
   if (output_file)
     {
