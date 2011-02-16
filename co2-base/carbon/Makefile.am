@@ -11,6 +11,7 @@ ArrayList.co2\
 Collection.co2\
 Comparable.co2\
 ConsoleHandler.co2\
+Enum.co2\
 Exception.co2\
 Hash.co2\
 IndexOutOfBoundsException.co2\
@@ -39,6 +40,7 @@ ArrayList.c\
 Collection.c\
 Comparable.c\
 ConsoleHandler.c\
+Enum.c\
 Exception.c\
 Hash.c\
 IndexOutOfBoundsException.c\
@@ -67,6 +69,7 @@ ArrayList.h\
 Collection.h\
 Comparable.h\
 ConsoleHandler.h\
+Enum.h\
 Exception.h\
 Hash.h\
 IndexOutOfBoundsException.h\

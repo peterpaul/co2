@@ -1,0 +1,27 @@
+include String
+include RefObject
+include Comparable
+
+class Enum : RefObject <Comparable> {
+	String name;
+	int value;
+
+	Enum.private (int v, char * n) {
+		super ();
+		name = new String ("%s", n);
+		name.retain ();
+		value = v;
+	}
+
+	~Enum () {
+		if (name) {
+			name.release ();
+			name = null;
+		}
+	}
+
+	int comparee (BaseObject other) {
+		Enum otherEnum = (Enum) other;
+		return value - otherEnum.value;
+	}
+}

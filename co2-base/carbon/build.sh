@@ -7,6 +7,7 @@ ArrayList.c
 Collection.c
 Comparable.c
 ConsoleHandler.c
+Enum.c
 Exception.c
 Hash.c
 IndexOutOfBoundsException.c
