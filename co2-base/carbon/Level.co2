@@ -8,7 +8,7 @@ int initialized = false;
 Level createPrivateLevel (int v, char * n)
 {
 	Level l = new Level.private (v, n);
-//	l.retain ();
+	l.retain ();
 	return l;
 }
 
@@ -17,6 +17,7 @@ class Level : RefObject <Comparable> {
 	int value;
 
 	Level () {
+		super ();
 		if (!initialized) {
 			initialized = true;
 			finest = createPrivateLevel (1, "finest");
@@ -33,12 +34,15 @@ class Level : RefObject <Comparable> {
 
 	~Level () {
 		if (name) {
-			delete name;
+			name.release ();
+			name = null;
 		}
 	}
 
 	Level.private (int v, char * n) {
+		super ();
 		name = new String ("%s", n);
+		name.retain ();
 		value = v;
 	}
 
