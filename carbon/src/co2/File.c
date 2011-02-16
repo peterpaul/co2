@@ -7,8 +7,10 @@
 #include "co2/ObjectType.h"
 #include "co2/TypeDeclaration.h"
 #include "co2/FunctionDeclaration.h"
+#include "co2/VariableDeclaration.h"
 #include "co2/io.h"
 
+static int Declaration_compare (const void *_decl1, const void *_decl2);
 static int TypeDeclaration_compare (const void *_decl1, const void *_decl2);
 static bool InterfaceDeclaration_1_depends_on_2 (const struct InterfaceDeclaration * decl1, const struct InterfaceDeclaration * decl2);
 
@@ -240,22 +242,26 @@ static int ClassDeclaration_compare (const void *_decl1, const void *_decl2)
   return -1;
 }
 
-static int FunctionDeclaration_compare (const void *_decl1, const void *_decl2)
+static int SimpleDeclaration_compare (const void *_decl1, const void *_decl2)
 {
-  const struct FunctionDeclaration * decl1 = O_CAST (_decl1, FunctionDeclaration ());
+  const struct Declaration * decl1 = O_CAST (_decl1, Declaration ());
   if (strcmp (decl1->name->name->data, "main") == 0)
     {
       return 1;
     }
-  if (o_is_of (_decl2, FunctionDeclaration ()))
+  if (o_is_of (_decl2, Declaration ()))
     {
-      const struct FunctionDeclaration * decl2 = O_CAST (_decl2, FunctionDeclaration ());
+      const struct Declaration * decl2 = O_CAST (_decl2, Declaration ());
       if (strcmp (decl2->name->name->data, "main") == 0)
 	{
 	  return -1;
 	}
+      else
+	{
+	  return strcmp (decl1->name->name->data, decl2->name->name->data);
+	}
     }
-  return 0;
+  return -Declaration_compare (_decl2, _decl1);
 }
 
 static int Declaration_compare (const void *_decl1, const void *_decl2)
@@ -275,7 +281,11 @@ static int Declaration_compare (const void *_decl1, const void *_decl2)
     }
   else if (o_is_of (decl1, FunctionDeclaration ()))
     {
-      return FunctionDeclaration_compare (decl1, _decl2);
+      return SimpleDeclaration_compare (decl1, _decl2);
+    }
+  else if (o_is_of (decl1, VariableDeclaration ()))
+    {
+      return SimpleDeclaration_compare (decl1, _decl2);
     }
   return 0;
 }
