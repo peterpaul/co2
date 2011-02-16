@@ -1,0 +1,4 @@
+include Iterable
+
+interface Collection <Iterable> {
+}

@@ -1,0 +1,18 @@
+include RefObject
+
+class KeyValuePair : RefObject {
+	RefObject key, value;
+
+	KeyValuePair (RefObject k, RefObject v) {
+		super ();
+		key = k.retain ();
+		value = v.retain ();
+	}
+
+	~KeyValuePair () {
+		key.release ();
+		value.release ();
+	}
+}
+
+interface Map

@@ -154,7 +154,7 @@ class String : RefObject {
 		do {
 			token = strtok_r (str, delim, &saveptr);
 			if (token == null) break;
-			list.append (new String ("%s", token));
+			list.add (new String ("%s", token));
 		} while ((str = null));
 		delete data_bak;
 		return list;

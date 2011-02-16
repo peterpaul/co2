@@ -1,12 +1,10 @@
 include RefObject
-include Iterator
+include Collection
 
-interface List {
+interface List <Collection> {
 	unsigned length ();
 	RefObject get (unsigned index);
 	RefObject set (unsigned index, RefObject item);
-	RefObject append (RefObject item);
-	List appendList (List list);
-
-	Iterator iterator ();
+	RefObject add (RefObject item);
+	List addAll (List list);
 }
