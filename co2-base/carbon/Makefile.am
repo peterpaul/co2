@@ -30,9 +30,7 @@ ReleasePool.co2\
 ReleasePoolItem.co2\
 SimpleFormatter.co2\
 Singleton.co2\
-String.co2\
-TestLogger.co2\
-TestRefObject.co2
+String.co2
 
 libco2_base_1_0_la_SOURCES = \
 Array.c\
@@ -60,9 +58,7 @@ ReleasePool.c\
 ReleasePoolItem.c\
 SimpleFormatter.c\
 Singleton.c\
-String.c\
-TestLogger.c\
-TestRefObject.c
+String.c
 
 libco2_base_1_0_la_HEADERS = \
 Array.h\
@@ -90,9 +86,7 @@ ReleasePool.h\
 ReleasePoolItem.h\
 SimpleFormatter.h\
 Singleton.h\
-String.h\
-TestLogger.h\
-TestRefObject.h
+String.h
 
 %.c: %.co2
 	carbon $< $@

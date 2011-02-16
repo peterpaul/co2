@@ -14,5 +14,3 @@ class KeyValuePair : RefObject {
 		value.release ();
 	}
 }
-
-interface Map
