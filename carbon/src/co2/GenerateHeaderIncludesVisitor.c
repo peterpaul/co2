@@ -71,10 +71,7 @@ O_IMPLEMENT_IF(GenerateHeaderIncludesVisitor, void, visitClassDeclaration, (void
 	  O_CALL (visitor->map, set, filename->data, filename);
 	}
     }
-  if (self->interfaces)
-    {
-      O_CALL (self->interfaces, map_args, handle_interface, visitor);
-    }
+  O_BRANCH_CALL (self->interfaces, map_args, handle_interface, visitor);
 }
 
 O_IMPLEMENT_IF(GenerateHeaderIncludesVisitor, void, visitConstructorDeclaration, (void *_self, void *_object), (_self, _object))
@@ -106,6 +103,7 @@ O_IMPLEMENT_IF(GenerateHeaderIncludesVisitor, void, visitInterfaceDeclaration, (
 {
   struct GenerateHeaderIncludesVisitor *visitor = O_CAST(_self, GenerateHeaderIncludesVisitor());
   struct InterfaceDeclaration *self = O_CAST (_object, InterfaceDeclaration ());
+  O_BRANCH_CALL (self->interfaces, map_args, handle_interface, visitor);
 }
 
 O_IMPLEMENT_IF(GenerateHeaderIncludesVisitor, void, visitMacroDeclaration, (void *_self, void *_object), (_self, _object)) {}
