@@ -207,6 +207,10 @@ static int InterfaceDeclaration_compare (const void *_decl1, const void *_decl2)
       if (o_is_of (decl2->type, ObjectType ()))
 	{
 	  const struct ObjectType * type = O_CAST (decl2->type, ObjectType ());
+	  if (!type->decl)
+	    {
+	      O_CALL (type, type_check);
+	    }
 	  if (type->decl)
 	    {
 	      return InterfaceDeclaration_compare (decl1, type->decl);
@@ -233,6 +237,10 @@ static int ClassDeclaration_compare (const void *_decl1, const void *_decl2)
       if (o_is_of (decl2->type, ObjectType ()))
 	{
 	  const struct ObjectType * type = O_CAST (decl2->type, ObjectType ());
+	  if (!type->decl)
+	    {
+	      O_CALL (type, type_check);
+	    }
 	  if (type->decl)
 	    {
 	      return ClassDeclaration_compare (decl1, type->decl);
@@ -296,6 +304,10 @@ static int TypeDeclaration_compare (const void *_decl1, const void *_decl2)
   if (o_is_of (decl1->type, ObjectType ()))
     {
       const struct ObjectType * type = O_CAST (decl1->type, ObjectType ());
+      if (!type->decl)
+	{
+	  O_CALL (type, type_check);
+	}
       if (type->decl)
 	{
 	  return Declaration_compare (type->decl, _decl2);
