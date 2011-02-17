@@ -17,11 +17,11 @@ write_error_message (const struct Token *token, const char *type,  const char *m
   int result = 0;
   if (token)
     {
-      result += fprintf (stderr, "%s:%d:%s: ", token->file->name->data, token->line, type);
+      result += fprintf (stderr, "%s:%d:%s: ", token->file->absolute_path->data, token->line, type);
     }
-  else if (current_file->name != NULL)
+  else if (current_file->absolute_path != NULL)
     {
-      result += fprintf (stderr, "%s:0:%s: ", current_file->name->data, type);
+      result += fprintf (stderr, "%s:0:%s: ", current_file->absolute_path->data, type);
     }
   else
     {
