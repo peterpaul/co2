@@ -68,8 +68,4 @@ class Array : RefObject {
 		}
 		self.size = size;
 	}
-
-	unsigned length () {
-		return size;
-	}
 }

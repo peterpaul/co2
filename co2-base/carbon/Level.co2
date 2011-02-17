@@ -2,13 +2,6 @@ include Enum
 
 int initialized = false;
 
-Level createPrivateLevel (int v, char * n)
-{
-	Level l = new Level.private (v, n);
-	l.retain ();
-	return l;
-}
-
 class Level : Enum {
 	Level () {
 		super ();
@@ -29,6 +22,13 @@ class Level : Enum {
 	Level.private (int v, char * n) {
 		super.private (v, n);
 	}
+}
+
+Level createPrivateLevel (int v, char * n)
+{
+	Level l = new Level.private (v, n);
+	l.retain ();
+	return l;
 }
 
 Level finest, finer, fine, info, warning, error, fatal;

@@ -1,0 +1,27 @@
+include KeyValuePair
+include HashMap
+include ArrayIterator
+
+class HashMapIterator : BaseObject <Iterator> {
+	Iterator arrayIterator;
+
+	HashMapIterator (HashMap map) {
+		super ();
+		arrayIterator = new ArrayIterator (map.map);
+	}
+
+	~HashMapIterator () {
+		delete arrayIterator;
+	}
+
+	int hasNext () {
+		return arrayIterator.hasNext ();
+	}
+
+	RefObject getNext () {
+		KeyValuePair kvp = (KeyValuePair) arrayIterator.getNext ();
+		return kvp.value;
+	}
+
+}
+

@@ -9,10 +9,12 @@ Comparable.c
 ConsoleHandler.c
 Enum.c
 Exception.c
-Hash.c
+HashMap.c
+HashMapIterator.c
 IndexOutOfBoundsException.c
 Iterable.c
 Iterator.c
+KeyValuePair.c
 Level.c
 List.c
 ListIterator.c
@@ -20,6 +22,7 @@ LogFormatter.c
 Logger.c
 LogHandler.c
 LogRecord.c
+Map.c
 Object.c
 OutOfMemoryException.c
 RefObject.c

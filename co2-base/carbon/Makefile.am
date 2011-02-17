@@ -13,10 +13,12 @@ Comparable.co2\
 ConsoleHandler.co2\
 Enum.co2\
 Exception.co2\
-Hash.co2\
+HashMap.co2\
+HashMapIterator.co2\
 IndexOutOfBoundsException.co2\
 Iterable.co2\
 Iterator.co2\
+KeyValuePair.co2\
 Level.co2\
 List.co2\
 ListIterator.co2\
@@ -24,6 +26,7 @@ LogFormatter.co2\
 Logger.co2\
 LogHandler.co2\
 LogRecord.co2\
+Map.co2\
 Object.co2\
 OutOfMemoryException.co2\
 RefObject.co2\
@@ -42,10 +45,12 @@ Comparable.c\
 ConsoleHandler.c\
 Enum.c\
 Exception.c\
-Hash.c\
+HashMap.c\
+HashMapIterator.c\
 IndexOutOfBoundsException.c\
 Iterable.c\
 Iterator.c\
+KeyValuePair.c\
 Level.c\
 List.c\
 ListIterator.c\
@@ -53,6 +58,7 @@ LogFormatter.c\
 Logger.c\
 LogHandler.c\
 LogRecord.c\
+Map.c\
 Object.c\
 OutOfMemoryException.c\
 RefObject.c\
@@ -71,10 +77,12 @@ Comparable.h\
 ConsoleHandler.h\
 Enum.h\
 Exception.h\
-Hash.h\
+HashMap.h\
+HashMapIterator.h\
 IndexOutOfBoundsException.h\
 Iterable.h\
 Iterator.h\
+KeyValuePair.h\
 Level.h\
 List.h\
 ListIterator.h\
@@ -82,6 +90,7 @@ LogFormatter.h\
 Logger.h\
 LogHandler.h\
 LogRecord.h\
+Map.h\
 Object.h\
 OutOfMemoryException.h\
 RefObject.h\

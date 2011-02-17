@@ -1,0 +1,78 @@
+include Map
+include RefObject
+include Array
+include HashMapIterator
+
+class HashMap : RefObject <Map> {
+	Array map;
+	unsigned size;
+
+	HashMap (unsigned size) {
+		super ();
+		map = new Array (size);
+		map.retain ();
+		size = 0;
+	}
+
+	~HashMap () {
+		map.release ();
+	}
+
+	unsigned nextIndex (unsigned index) {
+		return (index + 1) % map.size;
+
+	}
+
+	unsigned getIndexFor (RefObject key) {
+		unsigned index = key.hashCode ();
+		KeyValuePair kvp;
+		while ((kvp = (KeyValuePair) map.get (index))) {
+			if (kvp.key.equals (key)) {
+				return index;
+			}
+			index = nextIndex (index);
+		}
+		return index;
+	}
+
+	RefObject get (RefObject key) {
+		unsigned index = getIndexFor (key);
+		return map.get (index);
+	}
+
+	RefObject put (RefObject key, RefObject value) {
+		unsigned index = getIndexFor (key);
+		KeyValuePair kvp = (KeyValuePair) map.get (index);
+		if (kvp) {
+			value.retain ();
+			kvp.value.release ();
+			kvp.value = value;
+		} else {
+			kvp = new KeyValuePair (key, value);
+			map.set (index, kvp);
+		}
+		size += 1;
+		return value;
+	}
+
+	RefObject remove (RefObject key) {
+		size -= 1;
+		unsigned index = getIndexFor (key);
+		KeyValuePair kvp = (KeyValuePair) map.get (index);
+		if (kvp) {
+			RefObject result = kvp.value.retain ();
+			map.set (index, null);
+			return result.autoRelease ();
+		} else {
+			return null;
+		}		
+	}
+
+	unsigned length () {
+		return size;		
+	}
+
+	Iterator iterator () {
+		return new HashMapIterator (self);
+	}
+}

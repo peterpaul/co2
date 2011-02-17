@@ -52,4 +52,12 @@ class BaseObject : Object {
 	String toString () {
 		return new String ("%s", class.name);
 	}
+
+	int hashCode () {
+		return (int) self;
+	}
+
+	int equals (BaseObject other) {
+		return self == other;
+	}
 }
