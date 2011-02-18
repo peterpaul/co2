@@ -2,6 +2,7 @@
 #include "co2/FunctionType.h"
 #include "co2/TryStatement.h"
 #include "co2/CatchStatement.h"
+#include "co2/FinallyStatement.h"
 #include "co2/io.h"
 
 #define O_SUPER Statement()
@@ -31,6 +32,15 @@ O_IMPLEMENT (ReturnStatement, void, accept, (void *_self, struct BaseCompileObje
 O_IMPLEMENT (ReturnStatement, void, generate, (void *_self))
 {
   struct ReturnStatement *self = O_CAST (_self, ReturnStatement ());
+  struct FunctionType *function_type = o_cast (self->function_context->type, FunctionType ());
+
+  if (!self->try_context && !function_type->has_var_args)
+    {
+      fprintf (out, "return ");
+      O_BRANCH_CALL (self->expr, generate);
+      fprintf (out, ";\n");
+      return;
+    }
 
   fprintf (out, "{\n");
   if (self->expr)
@@ -44,13 +54,12 @@ O_IMPLEMENT (ReturnStatement, void, generate, (void *_self))
   if (self->try_context)
     {
       fprintf (out, "ex_pop ();\n");
-      if (self->try_context->finally_clause)
+      if (self->try_context->finally_clause && !self->finally_context)
 	{
 	  fprintf (out, "do_finally;\n");
 	}
     }
 
-  struct FunctionType *function_type = o_cast (self->function_context->type, FunctionType ());
   if (function_type->has_var_args)
     {
       fprintf (out, "va_end (ap);\n");
@@ -80,6 +89,7 @@ O_IMPLEMENT (ReturnStatement, void, type_check, (void *_self))
 
   self->try_context = O_BRANCH_CALL (current_context, find, TryStatement ());
   self->catch_context = O_BRANCH_CALL (current_context, find, CatchStatement ());
+  self->finally_context = O_BRANCH_CALL (current_context, find, FinallyStatement ());
 }
 
 O_OBJECT (ReturnStatement, Statement);

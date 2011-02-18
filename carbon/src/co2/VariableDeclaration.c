@@ -65,9 +65,12 @@ O_IMPLEMENT (VariableDeclaration, void, type_check, (void *_self))
     {
       struct Declaration *first_decl =
 	O_CALL (self->scope->parent, lookup, self->name);
-      error (self->name, "'%s' already declared at %s:%d\n",
-	     self->name->name->data, first_decl->name->file->name->data,
-	     first_decl->name->line);
+      if (self->scope->type == first_decl->scope->type && first_decl->scope->type == CLASS_SCOPE)
+	{
+	  error (self->name, "'%s' already declared at %s:%d\n",
+		 self->name->name->data, first_decl->name->file->name->data,
+		 first_decl->name->line);
+	}
     }
   O_BRANCH_CALL (current_context, remove_last);
 }

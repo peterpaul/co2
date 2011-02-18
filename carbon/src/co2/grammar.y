@@ -20,6 +20,7 @@
 #include "co2/DeleteStatement.h"
 #include "co2/DoStatement.h"
 #include "co2/ExpressionStatement.h"
+#include "co2/FinallyStatement.h"
 #include "co2/ForEachStatement.h"
 #include "co2/ForStatement.h"
 #include "co2/IfStatement.h"
@@ -364,6 +365,11 @@ variable_declaration_id
   $$ = O_CALL_CLASS(VariableDeclaration(), new, $1, NULL);
   O_CALL(current_scope, declare, $$);
 }
+|	CLASS
+{
+  $$ = O_CALL_CLASS(VariableDeclaration(), new, $1, NULL);
+  O_CALL(current_scope, declare, $$);
+}
 |	IDENTIFIER '=' expression
 {
   $$ = O_CALL_CLASS(VariableDeclaration(), new, $1, $3);
@@ -487,18 +493,22 @@ class_declaration
 class_header
 :	CLASS TYPE_IDENTIFIER ':' TYPE_IDENTIFIER '<' interface_list '>'
 {
+  O_CALL ($1, delete);
   $$ = O_CALL_CLASS(ClassDeclaration(), new, $2, $4, $6);
 }
 |	CLASS TYPE_IDENTIFIER ':' TYPE_IDENTIFIER
 {
+  O_CALL ($1, delete);
   $$ = O_CALL_CLASS(ClassDeclaration(), new, $2, $4, NULL);
 }
 |	CLASS TYPE_IDENTIFIER '<' interface_list '>'
 {
+  O_CALL ($1, delete);
   $$ = O_CALL_CLASS(ClassDeclaration(), new, $2, NULL, $4);
 }
 |	CLASS TYPE_IDENTIFIER
 {
+  O_CALL ($1, delete);
   $$ = O_CALL_CLASS(ClassDeclaration(), new, $2, NULL, NULL);
 }
 ;
@@ -579,7 +589,8 @@ try_statement
 }
 |	TRY statement catch_statement_list FINALLY statement
 {
-  $$ = O_CALL_CLASS (TryStatement (), new, $2, $3, $5);
+  struct Statement * final = O_CALL_CLASS (FinallyStatement (), new, $5);
+  $$ = O_CALL_CLASS (TryStatement (), new, $2, $3, final);
 }
 ;
 
@@ -588,10 +599,9 @@ catch_statement_list
 {
   O_CALL ($1, append, $2);
 }
-|	catch_statement
+|	/* empty */
 {
   $$ = O_CALL_CLASS (RefList (), new, 8, CatchStatement ());
-  O_CALL ($$, append, $1);
 }
 ;
 
@@ -798,6 +808,7 @@ type_list
 expression
 :	constant
 |	IDENTIFIER { $$ = O_CALL_CLASS(TokenExpression(), new, $1); }
+|	CLASS { $$ = O_CALL_CLASS(TokenExpression(), new, $1); }
 |	SELF { $$ = O_CALL_CLASS(TokenExpression(), new, $1); }
 |	VA_ARG { $$ = O_CALL_CLASS(TokenExpression(), new, $1); }
 |	expression '(' opt_actual_argument_list ')' { $$ = O_CALL_CLASS(FunctionCallExpression(), new, $1, $3); }

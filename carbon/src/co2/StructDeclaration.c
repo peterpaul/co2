@@ -34,7 +34,7 @@ O_IMPLEMENT (StructDeclaration, void, type_check, (void *_self))
 {
   struct StructDeclaration *self = O_CAST (_self, StructDeclaration ());
   O_BRANCH_CALL (current_context, add, self);
-  O_CALL (self->members, map, Declaration_list_type_check);
+  O_CALL (self->members, map, CompileObject_type_check);
   O_BRANCH_CALL (current_context, remove_last);
 }
 
@@ -54,12 +54,6 @@ O_IMPLEMENT (StructDeclaration, bool, is_compatible,
       other = o_cast (_other, StructDeclaration ());
     }
       return self == other;
-}
-
-void Declaration_list_generate (void *_self)
-{
-  struct Declaration * self = O_CAST (_self, Declaration ());
-  O_CALL (self, generate);
 }
 
 O_OBJECT(StructDeclaration, ObjectTypeDeclaration);

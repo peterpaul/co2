@@ -13,7 +13,8 @@
   struct Expression *expr;				\
   struct FunctionDeclaration *function_context;		\
   struct TryStatement *try_context;			\
-  struct CatchStatement *catch_context
+  struct CatchStatement *catch_context;			\
+  struct FinallyStatement *finally_context
 
 O_CLASS (ReturnStatement, Statement);
 

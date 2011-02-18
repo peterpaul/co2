@@ -11,7 +11,8 @@
   Statement_Attr;					\
   struct Expression * expr;				\
   struct CatchStatement * catch_context;		\
-  struct TryStatement * try_context
+  struct TryStatement * try_context;			\
+  struct FinallyStatement *finally_context
 
 O_CLASS(ThrowStatement, Statement);
 

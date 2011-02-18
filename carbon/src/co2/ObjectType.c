@@ -76,6 +76,14 @@ O_IMPLEMENT (ObjectType, bool, is_compatible, (void *_self, void *_other))
       if (o_is_of (_other, ObjectType ()))
 	{
 	  struct ObjectType *other = O_CAST (_other, ObjectType ());
+	  if (!self->decl)
+	    {
+	      O_CALL (self, type_check);
+	    }
+	  if (!other->decl)
+	    {
+	      O_CALL (other, type_check);
+	    }
 	  return O_CALL(self->decl, is_compatible, other->decl);
 	}
       else

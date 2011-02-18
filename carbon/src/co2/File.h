@@ -4,8 +4,11 @@
 #include "co2/CompileObject.h"
 #include "co2/Hash.h"
 
+O_METHOD_DEF (File, void, sort, (void *_self));
+
 #define FileClass_Attr				\
-  CompileObjectClass_Attr
+  CompileObjectClass_Attr;			\
+  O_METHOD (File, sort)
 
 #define File_Attr				\
   CompileObject_Attr;				\

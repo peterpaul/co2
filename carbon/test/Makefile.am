@@ -22,6 +22,8 @@ pass/class_decl_constructor_parameters.sh\
 pass/class_decl_constructor.sh\
 pass/class_decl_constructor_vararg.sh\
 pass/class_decl_destructor.sh\
+pass/class_decl_get_class.sh\
+pass/class_decl_inheritance.sh\
 pass/class_decl_names.sh\
 pass/class_decl_object_vars.sh\
 pass/class_decl_self.sh\
@@ -36,8 +38,11 @@ pass/fun_decl_vararg.sh\
 pass/fun_type.sh\
 pass/global_scope.sh\
 pass/import.sh\
+pass/interface_cast.sh\
 pass/interface_decl.sh\
 pass/interface_implementation.sh\
+pass/interface_multiple.sh\
+pass/interface_override.sh\
 pass/List.sh\
 pass/loops.sh\
 pass/Object.sh\
@@ -50,8 +55,11 @@ pass/try_statement_finally.sh\
 pass/try_statement_nested_finally.sh\
 pass/try_statement_nested_return.sh\
 pass/try_statement_nested.sh\
+pass/try_statement_return_from_finally.sh\
 pass/try_statement_return.sh\
 pass/try_statement.sh\
+pass/try_test.sh\
+pass/try_test_throw.sh\
 pass/typedef.sh\
 pass/va_arg.sh\
 pass/var_decl.sh\

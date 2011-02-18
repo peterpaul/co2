@@ -1,0 +1,26 @@
+["co2/Object.h"] {
+	class Class {
+		char * name;
+	}
+
+	class Object {
+		Class class;
+	}
+}
+
+["stdio.h"] {
+	int printf(char *format, ...);
+}
+
+class MyObject : Object {
+	void print () {
+		printf ("class.name = %s\n", class.name);
+	}
+}
+
+int main() {
+	MyObject o = new MyObject ();
+	o.print ();
+	printf ("o.class.name = %s\n", o.class.name);
+	return 0;
+}

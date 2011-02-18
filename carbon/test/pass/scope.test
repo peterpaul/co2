@@ -10,6 +10,16 @@ class A
 	{
 		return a + b;
 	}
+	int foo(int b)
+	{
+		int a = b;
+		self.a = a;
+	}
+	int bar()
+	{
+		a = 5;
+		int a = 6;
+	}
 }
 
 class B:A

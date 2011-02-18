@@ -34,18 +34,12 @@ O_IMPLEMENT (TryStatement, void, accept, (void *_self, struct BaseCompileObjectV
   O_CALL (visitor, visit, self);
 }
 
-static void TryStatement_type_check_catch(void *_self)
-{
-  struct CatchStatement *self = O_CAST (_self, CatchStatement ());
-  O_CALL (self, type_check);
-}
-
 O_IMPLEMENT(TryStatement, void, type_check, (void *_self))
 {
   struct TryStatement *self = O_CAST(_self, TryStatement());
   O_BRANCH_CALL (current_context, add, self);
   O_CALL (self->try_clause, type_check);
-  O_CALL (self->catch_clause, map, TryStatement_type_check_catch);
+  O_CALL (self->catch_clause, map, CompileObject_type_check);
   O_BRANCH_CALL (self->finally_clause, type_check);
   O_BRANCH_CALL (current_context, remove_last);
 }

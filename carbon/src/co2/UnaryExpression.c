@@ -2,6 +2,8 @@
 #include "co2/Token.h"
 #include "co2/io.h"
 #include "co2/ArrayType.h"
+#include "co2/PrimitiveType.h"
+#include "grammar.h"
 
 #define O_SUPER Expression()
 
@@ -50,6 +52,14 @@ O_IMPLEMENT (UnaryExpression, void, type_check, (void *_self))
 	{
 	  error (O_CALL (self->operand->type, get_token), "Cannot dereference %c type.\n", self->operand->type->class->name);
 	}
+      break;
+    case '!':
+      {
+	struct Token * int_token = O_CALL_CLASS(Token (), new_ctor, _Token_ctor_from_token, self->operator, "int", INT);
+	struct Type * int_type = O_CALL_CLASS(PrimitiveType(), new, int_token);
+	self->type = O_CALL (int_type, retain);
+	O_BRANCH_CALL (self->operand->type, assume_compatible, int_type);
+      }
       break;
     default:
       self->type = O_CALL(self->operand->type, retain);

@@ -1,0 +1,10 @@
+---
+in: 0
+fun caught Ex: Should display in fun
+out: 2
+main caught Ex: Should display in main
+---
+in: 1
+out: 3
+main caught Ex: Should display in main
+---

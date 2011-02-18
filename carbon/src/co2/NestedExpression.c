@@ -1,4 +1,5 @@
 #include "co2/NestedExpression.h"
+#include "co2/Type.h"
 #include "co2/io.h"
 
 #define O_SUPER Expression()
@@ -29,6 +30,7 @@ O_IMPLEMENT (NestedExpression, void, type_check, (void *_self))
 {
   struct NestedExpression *self = O_CAST (_self, NestedExpression ());
   O_CALL (self->expr, type_check);
+  self->type = O_CALL (self->expr->type, retain);
 }
 
 O_IMPLEMENT (NestedExpression, void, generate, (void *_self))

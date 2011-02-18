@@ -209,17 +209,11 @@ O_IMPLEMENT (FunctionType, struct Token *, get_token, (void *_self))
   return O_CALL (self->return_type, get_token);
 }
 
-static void type_check(void *_type)
-{
-  struct Type * type = O_CAST (_type, Type ());
-  O_CALL (type, type_check);
-}
-
 O_IMPLEMENT (FunctionType, void, type_check, (void *_self))
 {
   struct FunctionType *self = O_CAST (_self, FunctionType ());
   O_CALL (self->return_type, type_check);
-  O_CALL (self->parameters, map, type_check);
+  O_CALL (self->parameters, map, CompileObject_type_check);
 }
 
 O_OBJECT (FunctionType, Type);

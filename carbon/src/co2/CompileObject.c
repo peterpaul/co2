@@ -29,6 +29,20 @@ not_type_filter (void *_member, va_list * app)
 }
 
 void
+CompileObject_type_check (void *_object)
+{
+  struct CompileObject *object = O_CAST (_object, CompileObject ());
+  O_CALL (object, type_check);
+}
+
+void
+CompileObject_generate (void *_object)
+{
+  struct CompileObject *object = O_CAST (_object, CompileObject ());
+  O_CALL (object, generate);
+}
+
+void
 accept (void *_object, va_list *app)
 {
   struct CompileObject *object = O_CAST (_object, CompileObject ());

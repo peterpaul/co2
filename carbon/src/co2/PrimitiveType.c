@@ -1,5 +1,6 @@
 #include "co2/PrimitiveType.h"
 #include "co2/Token.h"
+#include "co2/ObjectType.h"
 #include "grammar.h"
 #include "co2/io.h"
 
@@ -43,6 +44,11 @@ O_IMPLEMENT (PrimitiveType, bool, is_compatible, (void *_self, void *_other))
   struct PrimitiveType *self = O_CAST (_self, PrimitiveType ());
   if (O_SUPER->is_compatible (self, _other))
     {
+      if (o_is_of(_other, ObjectType ()))
+	{
+	  struct ObjectType *other = O_CAST (_other, ObjectType ());
+	  return O_CALL (other, is_compatible, self);
+	}
       struct PrimitiveType *other = O_CAST (_other, PrimitiveType ());
       struct Token *name_self = O_CALL (self, get_token);
       struct Token *name_other = O_CALL (other, get_token);

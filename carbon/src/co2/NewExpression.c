@@ -97,13 +97,6 @@ O_IMPLEMENT (NewExpression, void, generate, (void *_self))
 }
 
 void
-NewExpression_type_check_object (void *_item)
-{
-  struct CompileObject *item = O_CAST (_item, CompileObject ());
-  O_CALL (item, type_check);
-}
-
-void
 NewExpression_type_check_arguments (struct TokenExpression *ctor_token,
 				    struct RefList *actual_arguments)
 {
@@ -191,7 +184,7 @@ O_IMPLEMENT (NewExpression, void, type_check, (void *_self))
 	  else
 	    {
 	      /* accept empty constructor */
-	      O_CALL (self->ctor_arguments, map, Declaration_list_type_check);
+	      O_CALL (self->ctor_arguments, map, CompileObject_type_check);
 	    }
 	}
       self->type = O_CALL (self->new_type, retain);

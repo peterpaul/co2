@@ -27,5 +27,7 @@ O_CLASS (CompileObject, RefObject);
 int type_filter (void *_member, va_list * app);
 int not_type_filter (void *_member, va_list * app);
 void accept (void *_object, va_list *app);
+void CompileObject_type_check (void *_object);
+void CompileObject_generate (void *_object);
 
 #endif /* CompileObject_H */

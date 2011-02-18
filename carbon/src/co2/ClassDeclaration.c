@@ -91,7 +91,7 @@ O_IMPLEMENT (ClassDeclaration, void, type_check, (void *_self))
    * 2. foreach interface, methods already exists in other interface (including interfaces from superclasses), if so: fail
    * 3. class (including superclasses) implements all methods of all interfaces, if not: fail
    */
-  O_CALL (self->members, map, Declaration_list_type_check);
+  O_CALL (self->members, map, CompileObject_type_check);
   O_BRANCH_CALL (current_context, remove_last);
 }
 
@@ -99,14 +99,26 @@ O_IMPLEMENT (ClassDeclaration, bool, is_compatible,
 	     (void *_self, void *_other))
 {
   struct ClassDeclaration *self = O_CAST (_self, ClassDeclaration ());
-  struct ClassDeclaration *other = o_cast (_other, ClassDeclaration ());
-  while (other && other->superclass && self != other)
+  if (o_is_of (_other, ClassDeclaration ()))
     {
-      other =
-	(struct ClassDeclaration *) O_CALL (global_scope, lookup,
-					    other->superclass);
+      struct ClassDeclaration *other = O_CAST (_other, ClassDeclaration ());
+      while (other && other->superclass && self != other)
+	{
+	  other =
+	    (struct ClassDeclaration *) O_CALL (global_scope, lookup,
+						other->superclass);
+	}
+      return self == other;
     }
-  return self == other;
+  else if (o_is_of (_other, InterfaceDeclaration ()))
+    {
+      struct InterfaceDeclaration *other = O_CAST (_other, InterfaceDeclaration ());
+      return O_CALL (other, is_compatible, self);
+    }
+  else
+    {
+      return false;
+    }
 }
 
 O_OBJECT (ClassDeclaration, ObjectTypeDeclaration);

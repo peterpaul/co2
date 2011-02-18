@@ -12,6 +12,25 @@
 
 #define O_SUPER Expression()
 
+static bool is_condition (struct BinaryExpression *self)
+{
+  switch (self->operator->type)
+    {
+    case '>':
+    case '<':
+    case EQ:
+    case NEQ:
+    case AND:
+    case OR:
+    case XOR:
+    case LEQ:
+    case GEQ:
+      return true;
+    default:
+      return false;
+    }
+}
+
 O_IMPLEMENT (BinaryExpression, void *, ctor, (void *_self, va_list * app))
 {
   struct BinaryExpression *self = O_CAST (_self, BinaryExpression ());
@@ -196,7 +215,15 @@ O_IMPLEMENT (BinaryExpression, void, type_check, (void *_self))
     default:
       O_CALL (self->operand[0], type_check);
       O_CALL (self->operand[1], type_check);
-      if (self->operand[1]->type)
+      if (is_condition (self))
+	{
+	  struct Token * int_token = O_CALL_CLASS(Token (), new_ctor, _Token_ctor_from_token, self->operator, "int", INT);
+	  struct Type * int_type = O_CALL_CLASS(PrimitiveType(), new, int_token);
+	  self->type = O_CALL (int_type, retain);
+	  O_BRANCH_CALL (self->operand[0]->type, assume_compatible, int_type);
+	  O_BRANCH_CALL (self->operand[1]->type, assume_compatible, int_type);
+	}
+      else if (self->operand[1]->type)
 	{
 	  O_BRANCH_CALL (self->operand[0]->type, assert_compatible,
 			 self->operand[1]->type);
@@ -212,6 +239,13 @@ O_IMPLEMENT (BinaryExpression, void, set_scope, (void *_self, void *_scope))
   O_CALL (self->operand[0], set_scope, _scope);
 }
 
+O_IMPLEMENT(BinaryExpression, struct Token *, get_token, (void *_self))
+{
+  struct BinaryExpression *self = O_CAST (_self, BinaryExpression ());
+  return O_CALL (self->operand[1], get_token);
+}
+
+
 O_OBJECT (BinaryExpression, Expression);
 O_OBJECT_METHOD (BinaryExpression, ctor);
 O_OBJECT_METHOD (BinaryExpression, dtor);
@@ -219,4 +253,5 @@ O_OBJECT_METHOD (BinaryExpression, accept);
 O_OBJECT_METHOD (BinaryExpression, generate);
 O_OBJECT_METHOD (BinaryExpression, type_check);
 O_OBJECT_METHOD (BinaryExpression, set_scope);
+O_OBJECT_METHOD (BinaryExpression, get_token);
 O_END_OBJECT

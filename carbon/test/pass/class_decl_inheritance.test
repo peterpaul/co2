@@ -1,0 +1,20 @@
+include InheritB
+include InheritA
+
+["stdio.h"] {
+int printf(char *format, ...);
+}
+
+class InheritC : InheritB {
+	int baz () {
+		return foo () + bar ();
+	}
+}
+
+int main () {
+	InheritC c = new InheritC ();
+	printf ("%d\n", c.foo ());
+	printf ("%d\n", c.bar ());
+	printf ("%d\n", c.baz ());
+	return 0;
+}

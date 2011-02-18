@@ -76,6 +76,9 @@ int mainImpl(const char * output_file)
       return 1;
     }
 
+  // sort members
+  O_CALL (main_file, sort);
+
   // struct BaseCompileObjectVisitor * visitor = O_CALL_CLASS (HelloWorldVisitor (), new);
   // O_CALL (main_file, accept, visitor);
 

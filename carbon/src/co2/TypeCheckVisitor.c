@@ -192,9 +192,12 @@ O_IMPLEMENT_IF(TypeCheckVisitor, void, visitVariableDeclaration, (void *_self, v
     {
       struct Declaration *first_decl =
 	O_CALL (self->scope->parent, lookup, self->name);
-      error (self->name, "'%s' already declared at %s:%d\n",
-	     self->name->name->data, first_decl->name->file->name->data,
-	     first_decl->name->line);
+      if (self->scope->type == first_decl->scope->type && first_decl->scope->type == CLASS_SCOPE)
+	{
+	  error (self->name, "'%s' already declared at %s:%d\n",
+		 self->name->name->data, first_decl->name->file->name->data,
+		 first_decl->name->line);
+	}
     }
 }
 

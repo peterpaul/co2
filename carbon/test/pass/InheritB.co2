@@ -1,0 +1,7 @@
+include InheritA
+
+class InheritB : InheritA {
+	int bar () {
+		return 13;
+	}
+}
