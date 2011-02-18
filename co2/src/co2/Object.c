@@ -26,7 +26,7 @@ void *o_cast(const void *_object, const void *_class)
 	while (myClass != class && myClass != o)
 		myClass = myClass->super;
 	assertTrue(myClass == class, "Could not cast %s to %s.", 
-		   object->class->name, class->name);
+		   object->class->class_name, class->class_name);
 	return (void *) _object;
 }
 
@@ -35,14 +35,14 @@ void *o_cast_interface(const void *_object, const void *_interface)
   const struct Object *object = O_IS_OBJECT(_object);
   const struct Class *interface = O_IS_CLASS(_interface);
   assertTrue(o_implements(object, interface), "Could not cast %s to %s.", 
-	     object->class->name, interface->name);
+	     object->class->class_name, interface->class_name);
   return (void *) _object;
 }
 
 void *o_alloc(const void *_class)
 {
 	const struct Class *class = O_IS_CLASS(_class);
-	struct Object *self = calloc(1, class->size);
+	struct Object *self = calloc(1, class->object_size);
 	assertTrue(self, "Calloc failed.");
 	self->class = (struct Class *) class;
 	return self;
@@ -111,8 +111,8 @@ void *o_get_interface(void *_self, void *_interface)
 	if (!IF) {
 		IF = o_get_interface_of_class(Object (), interface);
 	}
-	assertTrue(IF, "%s at %p does not implement %s.", self->class->name,
-		   self, interface->class->name);
+	assertTrue(IF, "%s at %p does not implement %s.", self->class->class_name,
+		   self, interface->class->class_name);
 	return IF;
 }
 
@@ -148,7 +148,7 @@ O_IMPLEMENT(Object, void *, dtor, (void *_self))
 {
 	struct Object *self = o_cast(_self, Object());
 #ifdef O_DEBUG
-	memset (self, 0, self->class->size);
+	memset (self, 0, self->class->object_size);
 #else
 	self->class = NULL;
 #endif
@@ -232,10 +232,10 @@ O_IMPLEMENT(Class, void *, ctor, (void *_self, va_list * argp))
 	size_t size = va_arg(*argp, size_t);
 	const char *name = va_arg(*argp, char *);
 	struct Class *super = o_cast(va_arg(*argp, void *), Class());
-	memcpy(self, super, super->class->size);
+	memcpy(self, super, super->class->object_size);
 	self->class = class;
-	self->size = size;
-	self->name = name;
+	self->object_size = size;
+	self->class_name = name;
 	self->super = (struct ObjectClass *) super;
 	self->interface_list = NULL;
 	o_add_class(self);
@@ -270,9 +270,9 @@ struct Class *Object()
 	if (self == NULL) {
 		self = &_self;
 		_self.class = Class();
-		_self.magic = O_MAGIC;
-		_self.size = sizeof(struct Object);
-		_self.name = "Object";
+		_self._magic = O_MAGIC;
+		_self.object_size = sizeof(struct Object);
+		_self.class_name = "Object";
 		_self.super = self;
 		_self.interface_list = NULL;
 		o_add_class(self);
@@ -294,9 +294,9 @@ struct Class *Class()
 	if (self == NULL) {
 		self = &_self;
 		_self.class = self;
-		_self.magic = O_MAGIC;
-		_self.size = sizeof(struct Class);
-		_self.name = "Class";
+		_self._magic = O_MAGIC;
+		_self.object_size = sizeof(struct Class);
+		_self.class_name = "Class";
 		_self.super = Object();
 		_self.interface_list = NULL;
 		o_add_class(self);
@@ -340,7 +340,7 @@ static struct ClassHashmapTuple *o_find_class_hashmap_tuple(struct
 							    *head, const char
 							    *class_name)
 {
-	while (head != NULL && strcmp(class_name, head->class->name) != 0) {
+	while (head != NULL && strcmp(class_name, head->class->class_name) != 0) {
 		head = head->next;
 	}
 	return head;
@@ -364,7 +364,7 @@ void o_add_class(void *_class)
 	struct ObjectClass *class = O_IS_CLASS(_class);
 
 	unsigned long index =
-	    hash_function((unsigned char *) class->name) % CLASS_HASHMAP_SIZE;
+	    hash_function((unsigned char *) class->class_name) % CLASS_HASHMAP_SIZE;
 
 	class_hashmap[index] =
 	    o_new_class_hashmap_tuple(class_hashmap[index], class);
@@ -387,7 +387,7 @@ void o_print_classes(FILE * fp)
 
 	for (i = 0; i < CLASS_HASHMAP_SIZE; i++) {
 		if (class_hashmap[i]) {
-			fprintf(fp, "%s\n", class_hashmap[i]->class->name);
+			fprintf(fp, "%s\n", class_hashmap[i]->class->class_name);
 		}
 	}
 }

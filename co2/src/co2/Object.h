@@ -56,7 +56,7 @@
 
 #define O_ASSERT_CLASS(x)						\
 	(assertTrue(x,"O_ASSERT_CLASS: Expected non NULL pointer"),	\
-	 assertTrue(((struct Class *)(x))->magic == O_MAGIC, "O_ASSERT_CLASS: Expected O_MAGIC"))
+	 assertTrue(((struct Class *)(x))->_magic == O_MAGIC, "O_ASSERT_CLASS: Expected O_MAGIC"))
 
 #define O_IS_CLASS(x)				\
 	(O_ASSERT_CLASS(x),			\
@@ -107,14 +107,14 @@
 	({typeof(o) _tmp = o;						\
 		assertTrue(_tmp->class->msg,				\
 			   "runtime error: %s at %p doesn't respond to %s.", \
-			   _tmp->class->name, (void *)_tmp, __STRING(msg)); \
+			   _tmp->class->class_name, (void *)_tmp, __STRING(msg)); \
 		_tmp->class->msg(_tmp,##__VA_ARGS__);})
 
 #define O_CALL_CLASS(o,msg,...)						\
 	({typeof(o) _tmp = o;						\
 		assertTrue(_tmp->msg,					\
 			   "runtime error: %s at %p doesn't respond to %s.", \
-			   _tmp->name, (void *)_tmp, __STRING(msg));	\
+			   _tmp->class_name, (void *)_tmp, __STRING(msg));	\
 		_tmp->msg(_tmp,##__VA_ARGS__);})
 
 #ifdef O_DEBUG
@@ -139,7 +139,7 @@
   ({typeof(o) _tmp = o;							\
     assertTrue(_tmp == (typeof(_tmp))0 || _tmp->class->msg,		\
 	       "runtime error: %s at %p doesn't respond to %s.",	\
-	       _tmp->class->name, (void *)_tmp, __STRING(msg));		\
+	       _tmp->class->class_name, (void *)_tmp, __STRING(msg));		\
     _tmp ? _tmp->class->msg(_tmp,##__VA_ARGS__) : (typeof(_tmp->class->msg(_tmp,##__VA_ARGS__)))0;})
   
 
@@ -174,9 +174,9 @@ O_METHOD_DEF(Object, void *, delete, (void *_self));
 
 /* ObjectClass definition */
 #define ObjectClass_Attr			\
-	long magic;				\
-	size_t size;				\
-	const char * name;			\
+	long _magic;				\
+	size_t object_size;			\
+	const char * class_name;		\
 	void * interface_list;			\
 	O_METHOD(Object, new);			\
 	O_METHOD(Object, new_ctor);		\
