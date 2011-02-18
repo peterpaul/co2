@@ -160,4 +160,11 @@ class String : RefObject {
 		return list;
 	}
 
+	unsigned hashCode () {
+		return hash_function (data);
+	}
+
+	int equals (BaseObject other) {
+		return strcmp (data, ((String )other).data) == 0;
+	}
 }

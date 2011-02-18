@@ -13,7 +13,7 @@ void *Singleton_new(void *_self, ...)
 {
 	struct SingletonClass *self = o_cast(_self, SingletonClass());
 	if (!self->singleton) {
-		struct Singleton *object = calloc(1, self->size);
+		struct Singleton *object = calloc(1, self->object_size);
 		self->singleton = object;
 		va_list ap;
 		object->class = self;

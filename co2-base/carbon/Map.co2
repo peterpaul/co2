@@ -2,8 +2,8 @@ include RefObject
 include Collection
 
 interface Map <Collection> {
+	unsigned size ();
 	RefObject get (RefObject key);
 	RefObject put (RefObject key, RefObject value);
 	RefObject remove (RefObject key);
-	unsigned length ();
 }

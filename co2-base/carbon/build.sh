@@ -40,6 +40,7 @@ then
 else
     make -k
     make -k
-    gcc -O0 -g3 -I/home/peterpaul/local/co2-0.0.1/include/co2-1.0 -L/home/peterpaul/local/co2-0.0.1/lib -lco2-1.0 $LIBSOURCES TestLogger.c -o TestLogger.bin
-    gcc -O0 -g3 -I/home/peterpaul/local/co2-0.0.1/include/co2-1.0 -L/home/peterpaul/local/co2-0.0.1/lib -lco2-1.0 $LIBSOURCES TestRefObject.c -o TestRefObject.bin
+    gcc -O0 -g3 -I/home/peterpaul/local/co2-0.0.2/include/co2-1.0 -L/home/peterpaul/local/co2-0.0.2/lib -lco2-1.0 $LIBSOURCES TestLogger.c -o TestLogger.bin
+    gcc -O0 -g3 -I/home/peterpaul/local/co2-0.0.2/include/co2-1.0 -L/home/peterpaul/local/co2-0.0.2/lib -lco2-1.0 $LIBSOURCES TestRefObject.c -o TestRefObject.bin
+    gcc -O0 -g3 -I/home/peterpaul/local/co2-0.0.2/include/co2-1.0 -L/home/peterpaul/local/co2-0.0.2/lib -lco2-1.0 $LIBSOURCES TestMap.c -o TestMap.bin
 fi

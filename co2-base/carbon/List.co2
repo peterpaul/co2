@@ -2,7 +2,7 @@ include RefObject
 include Collection
 
 interface List <Collection> {
-	unsigned length ();
+	unsigned size ();
 	RefObject get (unsigned index);
 	RefObject set (unsigned index, RefObject item);
 	RefObject add (RefObject item);

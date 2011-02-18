@@ -32,7 +32,7 @@
   ({typeof(o) _tmp = o;							\
     struct interface * _if = o_get_interface(_tmp, interface());	\
     assertTrue(_if->msg,"runtime error: %s at %p doesn't respond to %s.", \
-	       _tmp->class->name, (void *)_tmp, __STRING(msg));		\
+	       _tmp->class->class_name, (void *)_tmp, __STRING(msg));		\
     _if->msg(_tmp,##__VA_ARGS__);})
 
 /*
@@ -45,7 +45,7 @@
       _if_class = _if_class->super;					\
     } while ((!_if || !_if->msg) && _if_class != Object ());		\
     assertTrue(_if && _if->msg,"runtime error: %s at %p doesn't respond to %s.", \
-	       _tmp->class->name, (void *)_tmp, __STRING(msg));		\
+	       _tmp->class->class_name, (void *)_tmp, __STRING(msg));		\
     _if->msg(_tmp,##__VA_ARGS__);})
 */
 

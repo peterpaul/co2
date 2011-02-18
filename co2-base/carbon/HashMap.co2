@@ -5,13 +5,13 @@ include HashMapIterator
 
 class HashMap : RefObject <Map> {
 	Array map;
-	unsigned size;
+	unsigned length;
 
 	HashMap (unsigned size) {
 		super ();
 		map = new Array (size);
 		map.retain ();
-		size = 0;
+		length = 0;
 	}
 
 	~HashMap () {
@@ -24,7 +24,7 @@ class HashMap : RefObject <Map> {
 	}
 
 	unsigned getIndexFor (RefObject key) {
-		unsigned index = key.hashCode ();
+		unsigned index = key.hashCode () % map.size;
 		KeyValuePair kvp;
 		while ((kvp = (KeyValuePair) map.get (index))) {
 			if (kvp.key.equals (key)) {
@@ -44,19 +44,17 @@ class HashMap : RefObject <Map> {
 		unsigned index = getIndexFor (key);
 		KeyValuePair kvp = (KeyValuePair) map.get (index);
 		if (kvp) {
-			value.retain ();
-			kvp.value.release ();
-			kvp.value = value;
-		} else {
-			kvp = new KeyValuePair (key, value);
-			map.set (index, kvp);
+			kvp.release ();
+			length -= 1;
 		}
-		size += 1;
+		kvp = new KeyValuePair (key, value);
+		map.set (index, kvp);
+		length += 1;
 		return value;
 	}
 
 	RefObject remove (RefObject key) {
-		size -= 1;
+		length -= 1;
 		unsigned index = getIndexFor (key);
 		KeyValuePair kvp = (KeyValuePair) map.get (index);
 		if (kvp) {
@@ -68,8 +66,8 @@ class HashMap : RefObject <Map> {
 		}		
 	}
 
-	unsigned length () {
-		return size;		
+	unsigned size () {
+		return length;		
 	}
 
 	Iterator iterator () {

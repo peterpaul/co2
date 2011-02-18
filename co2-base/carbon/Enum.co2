@@ -20,7 +20,7 @@ class Enum : RefObject <Comparable> {
 		}
 	}
 
-	int comparee (BaseObject other) {
+	int compare (BaseObject other) {
 		Enum otherEnum = (Enum) other;
 		return value - otherEnum.value;
 	}

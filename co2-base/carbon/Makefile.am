@@ -105,7 +105,8 @@ String.h
 
 libco2_base_1_0_la_CPPFLAGS = -I$(top_srcdir)/include -O0 -g3
 
-bin_PROGRAMS = TestRefObject TestLogger
+bin_PROGRAMS = TestRefObject TestLogger TestMap
+
 TestRefObject_SOURCES = TestRefObject.c
 TestRefObject_CPPFLAGS = -I$(top_srcdir)/include
 TestRefObject_LDFLAGS = $(CO2_LIBS) -lco2-base-1.0
@@ -113,6 +114,10 @@ TestRefObject_LDFLAGS = $(CO2_LIBS) -lco2-base-1.0
 TestLogger_SOURCES = TestLogger.c
 TestLogger_CPPFLAGS = -I$(top_srcdir)/include
 TestLogger_LDFLAGS = $(CO2_LIBS) -lco2-base-1.0
+
+TestMap_SOURCES = TestMap.c
+TestMap_CPPFLAGS = -I$(top_srcdir)/include
+TestMap_LDFLAGS = $(CO2_LIBS) -lco2-base-1.0
 
 distclean-local:
 	-rm -r ${bin_PROGRAMS}

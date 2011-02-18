@@ -10,11 +10,15 @@
 	}
 
 	class Class : Object {
-		int size;
-		char * name;
+		int object_size;
+		char * class_name;
 	}
 
 	int true, false;
+}
+
+["co2/utils.h"] {
+	unsigned hash_function(char *str);
 }
 
 ["string.h"] {
@@ -24,6 +28,7 @@
 	char *strstr(char *haystack, char *needle);
 	char *strdup(char *s);
 	char *strtok_r(char *str, char *delim, char **saveptr);
+	int strcmp(char *s1, char *s2);
 }
 
 ["stdlib.h"] {
@@ -31,6 +36,7 @@
 	void *calloc(int nmemb, int size);
 	void *realloc(void *ptr, int size);
 	void free(void *ptr);
+	int random();
 }
 
 ["stdarg.h"] {
@@ -44,17 +50,18 @@
 	int fprintf(FILE *stream, char *format, ...);
 	int snprintf(char *str, int size, char *format, ...);
 	int vsnprintf(char *str, int size, char *format, va_list ap);
+	FILE *stdout, stderr;
 }
 
 include String
 
 class BaseObject : Object {
 	String toString () {
-		return new String ("%s", class.name);
+		return new String ("%s", class.class_name);
 	}
 
-	int hashCode () {
-		return (int) self;
+	unsigned hashCode () {
+		return (unsigned) self;
 	}
 
 	int equals (BaseObject other) {

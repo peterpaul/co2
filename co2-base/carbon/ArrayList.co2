@@ -4,11 +4,11 @@ include Iterable
 include ArrayIterator
 
 class ArrayList : Array <List> {
-	unsigned length_;
+	unsigned length;
 
 	ArrayList (int size) {
 		super (size);
-		length_ = 0;
+		length = 0;
 	}
 
 	void ensure (unsigned size) {
@@ -17,21 +17,20 @@ class ArrayList : Array <List> {
 		}
 	}
 
-	unsigned length () {
-		return length_;
+	unsigned size () {
+		return length;
 	}
 
 	RefObject add(RefObject item) {
-		unsigned l = length ();
-		ensure (l + 1);
-		set (l, item);
-		length_ += 1;
+		ensure (length + 1);
+		set (length, item);
+		length += 1;
 		return item;
 	}
 
 	List addAll(List list) {
-		unsigned len = length ();
-		unsigned listLen = list.length ();
+		unsigned len = size ();
+		unsigned listLen = list.size ();
 		ensure (len + listLen);
 		unsigned i;
 		for (i = 0; i < listLen; i += 1) {

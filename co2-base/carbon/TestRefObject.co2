@@ -4,10 +4,6 @@ include ArrayList
 include List
 include Iterator
 
-["stdlib.h"] {
-	int random();
-}
-
 class TestRefObject : RefObject {
 	int val;
 
@@ -68,7 +64,7 @@ int main() {
 		result = mainImpl ();
 	} catch (Exception e) {
 		result = 1;
-		printf ("Caught Exception: \n", e.message.data);
+		printf ("Caught %s: %s\n", e.class.class_name, e.message.data);
 		delete e;
 	} finally {
 		return result;
