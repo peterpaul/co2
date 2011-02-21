@@ -4,30 +4,30 @@ include Array
 include HashMapIterator
 
 class HashMap : RefObject <Map> {
-	Array map;
+	Array entries;
 	unsigned length;
 
 	HashMap (unsigned size) {
 		super ();
-		map = new Array (size);
-		map.retain ();
+		entries = new Array (size);
+		entries.retain ();
 		length = 0;
 	}
 
 	~HashMap () {
-		map.release ();
+		entries.release ();
 	}
 
 	unsigned nextIndex (unsigned index) {
-		return (index + 1) % map.size;
+		return (index + 1) % entries.size;
 
 	}
 
 	unsigned getIndexFor (RefObject key) {
-		unsigned index = key.hashCode () % map.size;
-		KeyValuePair kvp;
-		while ((kvp = (KeyValuePair) map.get (index))) {
-			if (kvp.key.equals (key)) {
+		unsigned index = key.hashCode () % entries.size;
+		KeyValuePair entry;
+		while ((entry = (KeyValuePair) entries.get (index))) {
+			if (entry.key.equals (key)) {
 				return index;
 			}
 			index = nextIndex (index);
@@ -37,18 +37,19 @@ class HashMap : RefObject <Map> {
 
 	RefObject get (RefObject key) {
 		unsigned index = getIndexFor (key);
-		return map.get (index);
+		KeyValuePair entry = (KeyValuePair) entries.get (index);
+		return entry.value;
 	}
 
 	RefObject put (RefObject key, RefObject value) {
 		unsigned index = getIndexFor (key);
-		KeyValuePair kvp = (KeyValuePair) map.get (index);
-		if (kvp) {
-			kvp.release ();
+		KeyValuePair entry = (KeyValuePair) entries.get (index);
+		if (entry) {
+			entry.release ();
 			length -= 1;
 		}
-		kvp = new KeyValuePair (key, value);
-		map.set (index, kvp);
+		entry = new KeyValuePair (key, value);
+		entries.set (index, entry);
 		length += 1;
 		return value;
 	}
@@ -56,10 +57,10 @@ class HashMap : RefObject <Map> {
 	RefObject remove (RefObject key) {
 		length -= 1;
 		unsigned index = getIndexFor (key);
-		KeyValuePair kvp = (KeyValuePair) map.get (index);
-		if (kvp) {
-			RefObject result = kvp.value.retain ();
-			map.set (index, null);
+		KeyValuePair entry = (KeyValuePair) entries.get (index);
+		if (entry) {
+			RefObject result = entry.value.retain ();
+			entries.set (index, null);
 			return result.autoRelease ();
 		} else {
 			return null;

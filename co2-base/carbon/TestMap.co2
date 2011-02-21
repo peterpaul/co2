@@ -19,6 +19,13 @@ int mainImpl () {
 		printf ("%s\n", obj.data);
 	}
 	delete it;
+
+	for (i = 0; i < 10; i += 1) {
+		String key = new String ("%d", i);
+		String val = (String) map.get (key);
+		printf ("%s: %s\n", key.data, val.data);
+	}
+
 	return 0;
 }
 

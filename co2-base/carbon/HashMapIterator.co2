@@ -7,7 +7,7 @@ class HashMapIterator : BaseObject <Iterator> {
 
 	HashMapIterator (HashMap map) {
 		super ();
-		arrayIterator = new ArrayIterator (map.map);
+		arrayIterator = new ArrayIterator (map.entries);
 	}
 
 	~HashMapIterator () {
@@ -19,8 +19,8 @@ class HashMapIterator : BaseObject <Iterator> {
 	}
 
 	RefObject getNext () {
-		KeyValuePair kvp = (KeyValuePair) arrayIterator.getNext ();
-		return kvp.value;
+		KeyValuePair entry = (KeyValuePair) arrayIterator.getNext ();
+		return entry.value;
 	}
 
 }
