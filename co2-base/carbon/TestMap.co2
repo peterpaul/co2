@@ -1,0 +1,38 @@
+include RefObject
+include ReleasePool
+include Map
+include HashMap
+include Iterator
+
+int mainImpl () {
+	Map map = new HashMap (15);
+	int i;
+	for (i = 0; i < 10; i += 1) {
+		String key = new String ("%d", i);
+		String val = new String ("%d", random ());
+		map.put (key, val);
+	}
+
+	Iterator it = map.iterator ();
+	while (it.hasNext ()) {
+		String obj = (String) it.getNext ();
+		printf ("%s\n", obj.data);
+	}
+	delete it;
+	return 0;
+}
+
+int main() {
+	int result = 0;
+	new ReleasePool ();
+	try {
+		result = mainImpl ();
+	} catch (Exception e) {
+		result = 1;
+		printf ("Caught %s: %s\n", e.class.class_name, e.message.data);
+		delete e;
+	} finally {
+		delete current_release_pool;
+		return result;
+	}
+}
