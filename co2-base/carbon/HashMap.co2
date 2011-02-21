@@ -38,7 +38,7 @@ class HashMap : RefObject <Map> {
 	RefObject get (RefObject key) {
 		unsigned index = getIndexFor (key);
 		KeyValuePair entry = (KeyValuePair) entries.get (index);
-		return entry.value;
+		return entry ? entry.value : null;
 	}
 
 	RefObject put (RefObject key, RefObject value) {

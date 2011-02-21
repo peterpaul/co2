@@ -15,6 +15,7 @@ Enum.co2\
 Exception.co2\
 HashMap.co2\
 HashMapIterator.co2\
+HashSet.co2\
 IndexOutOfBoundsException.co2\
 Iterable.co2\
 Iterator.co2\
@@ -32,6 +33,7 @@ OutOfMemoryException.co2\
 RefObject.co2\
 ReleasePool.co2\
 ReleasePoolItem.co2\
+Set.co2\
 SimpleFormatter.co2\
 Singleton.co2\
 String.co2
@@ -47,6 +49,7 @@ Enum.c\
 Exception.c\
 HashMap.c\
 HashMapIterator.c\
+HashSet.c\
 IndexOutOfBoundsException.c\
 Iterable.c\
 Iterator.c\
@@ -64,6 +67,7 @@ OutOfMemoryException.c\
 RefObject.c\
 ReleasePool.c\
 ReleasePoolItem.c\
+Set.c\
 SimpleFormatter.c\
 Singleton.c\
 String.c
@@ -79,6 +83,7 @@ Enum.h\
 Exception.h\
 HashMap.h\
 HashMapIterator.h\
+HashSet.h\
 IndexOutOfBoundsException.h\
 Iterable.h\
 Iterator.h\
@@ -96,6 +101,7 @@ OutOfMemoryException.h\
 RefObject.h\
 ReleasePool.h\
 ReleasePoolItem.h\
+Set.h\
 SimpleFormatter.h\
 Singleton.h\
 String.h
@@ -105,7 +111,7 @@ String.h
 
 libco2_base_1_0_la_CPPFLAGS = -I$(top_srcdir)/include -O0 -g3
 
-bin_PROGRAMS = TestRefObject TestLogger TestMap
+bin_PROGRAMS = TestRefObject TestLogger TestMap TestSet
 
 TestRefObject_SOURCES = TestRefObject.c
 TestRefObject_CPPFLAGS = -I$(top_srcdir)/include
@@ -118,6 +124,10 @@ TestLogger_LDFLAGS = $(CO2_LIBS) -lco2-base-1.0
 TestMap_SOURCES = TestMap.c
 TestMap_CPPFLAGS = -I$(top_srcdir)/include
 TestMap_LDFLAGS = $(CO2_LIBS) -lco2-base-1.0
+
+TestSet_SOURCES = TestSet.c
+TestSet_CPPFLAGS = -I$(top_srcdir)/include
+TestSet_LDFLAGS = $(CO2_LIBS) -lco2-base-1.0
 
 distclean-local:
 	-rm -r ${bin_PROGRAMS}

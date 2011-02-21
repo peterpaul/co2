@@ -1,0 +1,31 @@
+include Set
+include HashMap
+
+class HashSet : RefObject <Set> {
+	HashMap map;
+
+	HashSet (unsigned size) {
+		super ();
+		map = new HashMap (size);
+	}
+
+	unsigned size () {
+		return map.size ();
+	}
+
+	int contains (RefObject item) {
+		return map.get (item) != null;
+	}
+
+	RefObject add (RefObject item) {
+		return map.put (item, item);
+	}
+
+	RefObject remove (RefObject item) {
+		return map.remove (item);
+	}
+
+	Iterator iterator () {
+		return map.iterator ();
+	}
+}

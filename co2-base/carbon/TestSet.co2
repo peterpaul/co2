@@ -1,0 +1,44 @@
+include RefObject
+include ReleasePool
+include Set
+include HashSet
+include Iterator
+
+int mainImpl () {
+	Set set = new HashSet (15);
+	int i;
+	for (i = 0; i < 10; i += 1) {
+		String item = new String ("%d", i);
+		set.add (item);
+	}
+
+	Iterator it = set.iterator ();
+	while (it.hasNext ()) {
+		String obj = (String) it.getNext ();
+		printf ("%s\n", obj.data);
+	}
+	delete it;
+
+	for (i = 0; i < 15; i += 1) {
+		String item = new String ("%d", i);
+		int c = set.contains (item);
+		printf ("%d: %d\n", i, c);
+	}
+
+	return 0;
+}
+
+int main() {
+	int result = 0;
+	new ReleasePool ();
+	try {
+		result = mainImpl ();
+	} catch (Exception e) {
+		result = 1;
+		printf ("Caught %s: %s\n", e.class.class_name, e.message.data);
+		delete e;
+	} finally {
+		delete current_release_pool;
+		return result;
+	}
+}

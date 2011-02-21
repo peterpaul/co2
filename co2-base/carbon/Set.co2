@@ -1,0 +1,9 @@
+include RefObject
+include Collection
+
+interface Set <Collection> {
+	unsigned size ();
+	int contains (RefObject item);
+	RefObject add (RefObject item);
+	RefObject remove (RefObject item);
+}
