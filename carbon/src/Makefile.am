@@ -9,7 +9,7 @@ libcarbon_1_0_la_SOURCES =  co2/grammar.y co2/lex.l co2/ArgumentDeclaration.c co
 		co2/BinaryExpression.c\
 		co2/CastExpression.c co2/CatchStatement.c co2/ClassDeclaration.c\
 		co2/CompileObject.c co2/CompileObjectVisitor.c\
-		co2/CompoundStatement.c\
+		co2/CompoundStatement.c co2/ConditionalExpression.c\
 		co2/ConstructorDeclaration.c co2/Context.c co2/ContinueStatement.c co2/Declaration.c co2/DeleteStatement.c\
 		co2/DestructorDeclaration.c co2/DoStatement.c co2/error.c co2/Expression.c\
 		co2/ExpressionStatement.c co2/FinallyStatement.c co2/GenerateHeaderIncludesVisitor.c co2/GenerateHeaderVisitor.c\
@@ -30,7 +30,7 @@ libcarbon_1_0_la_HEADERS = co2/ArgumentDeclaration.h co2/ArrayType.h co2/BaseCom
 		co2/BinaryExpression.h\
 		co2/CastExpression.h co2/CatchStatement.h co2/ClassDeclaration.h\
 		co2/CompileObject.h co2/CompileObjectVisitor.h co2/Compiler.h\
-		co2/CompoundStatement.h\
+		co2/CompoundStatement.h co2/ConditionalExpression.h\
 		co2/ConstructorDeclaration.h co2/Context.h co2/ContinueStatement.h co2/Declaration.h co2/DeleteStatement.h\
 		co2/DestructorDeclaration.h co2/DoStatement.h co2/error.h co2/Expression.h\
 		co2/ExpressionStatement.h co2/FinallyStatement.h co2/GenerateHeaderIncludesVisitor.h co2/GenerateHeaderVisitor.h\

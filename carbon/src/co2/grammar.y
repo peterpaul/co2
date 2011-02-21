@@ -21,7 +21,7 @@
 #include "co2/DoStatement.h"
 #include "co2/ExpressionStatement.h"
 #include "co2/FinallyStatement.h"
-#include "co2/ForEachStatement.h"
+  /* #include "co2/ForEachStatement.h" */
 #include "co2/ForStatement.h"
 #include "co2/IfStatement.h"
 #include "co2/ReturnStatement.h"
@@ -32,6 +32,7 @@
   /* Expressions */
 #include "co2/BinaryExpression.h"
 #include "co2/CastExpression.h"
+#include "co2/ConditionalExpression.h"
 #include "co2/Expression.h"
 #include "co2/FunctionCallExpression.h"
 #include "co2/NestedExpression.h"
@@ -91,7 +92,7 @@
 %token <token> FLOAT
 %token <token> FLOAT_CONSTANT
 %token <token> FOR
-%token <token> FOREACH
+ /* %token <token> FOREACH */
 %token <token> GET_VA_ARG
 %token <token> IDENTIFIER
 %token <token> IF
@@ -161,7 +162,7 @@
 %type	<statement>	delete_statement
 %type	<statement>	do_statement
 %type	<statement>	expression_statement
-%type	<statement>	foreach_statement
+ /* %type	<statement>	foreach_statement */
 %type	<statement>	for_statement
 %type	<statement>	if_statement
 %type	<statement>	return_statement
@@ -205,6 +206,7 @@
 %right		<token>	'!' UNARY_MINUS UNARY_PLUS ADDRESS_OF DEREFERENCE
  /* Solve shift-reduce conflict for casts */
 %right	CASTX
+%left		<token> ':' '?'
 %left		<token>	'(' '[' '.'
 
 %start input
@@ -532,7 +534,7 @@ statement
 |	do_statement
 |	while_statement
 |	for_statement
-|	foreach_statement
+	/* |	foreach_statement */
 |	return_statement
 |	delete_statement
 |	try_statement
@@ -660,13 +662,6 @@ for_statement
 :	FOR '(' expression ';' expression ';' expression ')' statement
 {
   $$ = O_CALL_CLASS(ForStatement(), new, $3, $5, $7, $9);
-}
-;
-
-foreach_statement
-:	FOREACH '(' IDENTIFIER ':' expression ')' statement
-{
-  $$ = O_CALL_CLASS(ForEachStatement(), new, $3, $5, $7);
 }
 ;
 
@@ -865,6 +860,7 @@ expression
 |	GET_VA_ARG '(' expression ',' type ')' { $$ = O_CALL_CLASS(VarArgExpression(), new, $5, $3); }
 |	SIZEOF '(' type ')' { $$ = O_CALL_CLASS(SizeExpression(), new, $3); }
 |	'(' type ')' expression %prec CASTX { $$ = O_CALL_CLASS(CastExpression(), new, $2, $4); }
+|	expression '?' expression ':' expression { $$ = O_CALL_CLASS(ConditionalExpression (), new, $1, $3, $5); }
 ;
 
 constant
