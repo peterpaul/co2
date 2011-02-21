@@ -73,7 +73,7 @@ O_IMPLEMENT (Scope, struct Declaration *, lookup,
   return result;
 }
 
-O_IMPLEMENT (Scope, struct Declaration *, lookup_type_in_this_scope,
+O_IMPLEMENT (Scope, struct Declaration *, find_type_in_this_scope,
 	     (void *_self, struct Token * token, void *_type))
 {
   struct Scope *self = O_CAST (_self, Scope ());
@@ -89,22 +89,18 @@ O_IMPLEMENT (Scope, struct Declaration *, lookup_type_in_this_scope,
     }
 }
 
-O_IMPLEMENT (Scope, struct Declaration *, lookup_type,
+O_IMPLEMENT (Scope, struct Declaration *, find_type,
 	     (void *_self, struct Token * token, void *_type))
 {
   struct Scope *self = O_CAST (_self, Scope ());
   struct Class *type = O_IS_CLASS (_type);
   struct Declaration *result =
-    O_CALL (self, lookup_type_in_this_scope, token, type);
+    O_CALL (self, find_type_in_this_scope, token, type);
   if (result == NULL)
     {
-      if (self->parent == NULL)
+      if (self->parent != NULL)
 	{
-	  O_CALL (self, error_not_found, token);
-	}
-      else
-	{
-	  result = O_CALL (self->parent, lookup_type, token, type);
+	  result = O_CALL (self->parent, find_type, token, type);
 	}
     }
   return result;
@@ -144,8 +140,8 @@ O_OBJECT_METHOD (Scope, error_already_declared);
 O_OBJECT_METHOD (Scope, error_not_found);
 O_OBJECT_METHOD (Scope, lookup_in_this_scope);
 O_OBJECT_METHOD (Scope, lookup);
-O_OBJECT_METHOD (Scope, lookup_type_in_this_scope);
-O_OBJECT_METHOD (Scope, lookup_type);
+O_OBJECT_METHOD (Scope, find_type_in_this_scope);
+O_OBJECT_METHOD (Scope, find_type);
 O_OBJECT_METHOD (Scope, exists_in_this_scope);
 O_OBJECT_METHOD (Scope, exists);
 O_END_OBJECT

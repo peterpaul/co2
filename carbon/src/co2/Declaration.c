@@ -20,7 +20,7 @@ Declaration_new_member_filter (void *_member, va_list * app)
   struct Declaration *member = O_CAST (_member, Declaration ());
   struct Class *_type = va_arg (*app, struct Class *);
   struct Class *type = O_IS_CLASS (_type);
-  return O_BRANCH_CALL (member->scope->parent, lookup_type_in_this_scope,
+  return O_BRANCH_CALL (member->scope->parent, find_type,
 			member->name, type) == NULL;
 }
 

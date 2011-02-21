@@ -36,20 +36,6 @@ O_IMPLEMENT (ObjectTypeDeclaration, void *, dtor, (void *_self))
   return O_SUPER->dtor (self);
 }
 
-int
-ObjectTypeDeclaration_new_constructor_filter (void *_constructor)
-{
-  struct ConstructorDeclaration *constructor =
-    O_CAST (_constructor, ConstructorDeclaration ());
-  if (strcmp (constructor->name->name->data, "ctor") != 0)
-    {
-      return O_BRANCH_CALL (constructor->scope->parent,
-			    lookup_type_in_this_scope, constructor->name,
-			    ConstructorDeclaration ()) == NULL;
-    }
-  return false;
-}
-
 void
 ObjectTypeDeclaration_generate_constructor_arguments (void *_arg)
 {

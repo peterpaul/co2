@@ -52,7 +52,7 @@ new_constructor_filter (void *_constructor)
   if (strcmp (constructor->name->name->data, "ctor") != 0)
     {
       return O_BRANCH_CALL (constructor->scope->parent,
-			    lookup_type_in_this_scope, constructor->name,
+			    find_type, constructor->name,
 			    ConstructorDeclaration ()) == NULL;
     }
   return false;

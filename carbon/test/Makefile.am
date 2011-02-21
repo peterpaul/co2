@@ -23,6 +23,7 @@ pass/class_decl_constructor.sh\
 pass/class_decl_constructor_vararg.sh\
 pass/class_decl_destructor.sh\
 pass/class_decl_get_class.sh\
+pass/class_decl_inheritance_deep.sh\
 pass/class_decl_inheritance.sh\
 pass/class_decl_names.sh\
 pass/class_decl_object_vars.sh\

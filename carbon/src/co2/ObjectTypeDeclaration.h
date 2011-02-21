@@ -17,7 +17,6 @@ O_METHOD_DEF (ObjectTypeDeclaration, bool, is_compatible,
 
 O_CLASS (ObjectTypeDeclaration, Declaration);
 
-int ObjectTypeDeclaration_new_constructor_filter (void *_constructor);
 void ObjectTypeDeclaration_generate_constructor_arguments (void *_arg);
 void ObjectTypeDeclaration_generate_method_arguments (void *_arg);
 void ObjectTypeDeclaration_generate_method_argument_names (void *_arg);
