@@ -1,5 +1,6 @@
 #include "co2/ConditionalExpression.h"
-#include "co2/Type.h"
+#include "co2/ObjectType.h"
+#include "co2/ClassDeclaration.h"
 #include "co2/io.h"
 
 #define O_SUPER Expression()
@@ -41,6 +42,26 @@ O_IMPLEMENT(ConditionalExpression, void, type_check, (void *_self))
     }
   else
     {
+      if (o_is_of (self->then_expr->type, ObjectType ())
+	  && o_is_of (self->else_expr->type, ObjectType ()))
+	{
+	  struct ObjectType * then_type = O_CAST (self->then_expr->type, ObjectType ());
+	  struct ObjectType * else_type = O_CAST (self->else_expr->type, ObjectType ());
+	  if (o_is_of (then_type->decl, ClassDeclaration ())
+	      && o_is_of (else_type->decl, ClassDeclaration ()))
+	    {
+	      struct ClassDeclaration * then_decl = O_CAST (then_type->decl, ClassDeclaration ());
+	      struct ClassDeclaration * else_decl = O_CAST (else_type->decl, ClassDeclaration ());
+	      struct ClassDeclaration * result = O_CALL (then_decl, find_common_base, else_decl);
+	      if (result)
+		{
+		  self->type = O_CALL_CLASS (ObjectType (), new, result->name, result);
+		  O_CALL (self->type, retain);
+		  return;
+		}
+	    }
+	}
+      // check whether objecttype, and if so find common base
       O_CALL (self->then_expr->type, assert_compatible, self->else_expr->type);
       O_CALL (self->else_expr->type, assert_compatible, self->then_expr->type);
     }

@@ -121,10 +121,35 @@ O_IMPLEMENT (ClassDeclaration, bool, is_compatible,
     }
 }
 
+O_IMPLEMENT (ClassDeclaration, void *, find_common_base, (void *_self, void *_other))
+{
+  struct ClassDeclaration *self = O_CAST (_self, ClassDeclaration ());
+  struct ClassDeclaration *other = O_CAST (_self, ClassDeclaration ());
+
+  // TODO find common base for interfaces
+
+  while (self && !O_CALL (self, is_compatible, _other))
+    {
+      if (self->superclass)
+	{
+	  self =
+	    (struct ClassDeclaration *) O_CALL (global_scope, lookup,
+						self->superclass);
+	}
+      else
+	{
+	  self = NULL;
+	}
+    }
+
+  return self;
+}
+
 O_OBJECT (ClassDeclaration, ObjectTypeDeclaration);
 O_OBJECT_METHOD (ClassDeclaration, ctor);
 O_OBJECT_METHOD (ClassDeclaration, dtor);
 O_OBJECT_METHOD (ClassDeclaration, accept);
 O_OBJECT_METHOD (ClassDeclaration, type_check);
 O_OBJECT_METHOD (ClassDeclaration, is_compatible);
+O_OBJECT_METHOD (ClassDeclaration, find_common_base);
 O_END_OBJECT
