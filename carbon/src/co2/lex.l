@@ -77,6 +77,7 @@ STRING_CONST	\"({CHAR_SYMBOL}|\')*\"
 "import"	return IMPORT;
 "int"		yylval.token = O_CALL_CLASS(Token(), new, yytext, INT, current_file, linenumber); return yylval.token->type;
 "interface"	return INTERFACE;
+"is_of"		return IS_OF;
 "new"		return NEW;
 "null"		yylval.token = O_CALL_CLASS(Token(), new, yytext, _NULL, current_file, linenumber); return yylval.token->type;
 "package"	return PACKAGE;

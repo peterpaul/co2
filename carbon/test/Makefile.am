@@ -23,7 +23,6 @@ pass/class_decl_constructor.sh\
 pass/class_decl_constructor_vararg.sh\
 pass/class_decl_destructor.sh\
 pass/class_decl_get_class.sh\
-pass/class_decl_inheritance_deep.sh\
 pass/class_decl_inheritance.sh\
 pass/class_decl_names.sh\
 pass/class_decl_object_vars.sh\
@@ -31,6 +30,7 @@ pass/class_decl_self.sh\
 pass/class_decl_super.sh\
 pass/class_decl.sh\
 pass/class_intergrated.sh\
+pass/class_is_of.sh\
 pass/dependencies.sh\
 pass/external_definition.sh\
 pass/function_call.sh\

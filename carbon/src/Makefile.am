@@ -18,6 +18,7 @@ libcarbon_1_0_la_SOURCES =  co2/grammar.y co2/lex.l co2/ArgumentDeclaration.c co
 		co2/FunctionType.c co2/FunctionDeclaration.c co2/FunctionCallExpression.c\
 		co2/Hash.c co2/HelloWorldVisitor.c\
 		co2/IfStatement.c co2/IncludeStack.c co2/InterfaceDeclaration.c co2/io.c\
+		co2/IsOfExpression.c\
 		co2/MacroDeclaration.c co2/NewExpression.c co2/NestedExpression.c\
 		co2/NullExpression.c co2/ObjectType.c co2/ObjectTypeDeclaration.c co2/Path.c\
 		co2/PrimitiveType.c co2/RefList.c co2/ReturnStatement.c co2/Scope.c\
@@ -39,6 +40,7 @@ libcarbon_1_0_la_HEADERS = co2/ArgumentDeclaration.h co2/ArrayType.h co2/BaseCom
 		co2/FunctionType.h co2/FunctionDeclaration.h co2/FunctionCallExpression.h\
 		co2/Hash.h co2/HelloWorldVisitor.h\
 		co2/IfStatement.h co2/IncludeStack.h co2/InterfaceDeclaration.h co2/io.h\
+		co2/IsOfExpression.h\
 		co2/MacroDeclaration.h co2/NewExpression.h co2/NestedExpression.h\
 		co2/NullExpression.h co2/ObjectType.h co2/ObjectTypeDeclaration.h co2/Path.h\
 		co2/PrimitiveType.h co2/RefList.h co2/ReturnStatement.h co2/Scope.h\

@@ -1,0 +1,2 @@
+a is_of B, expected: 0, actual: 0
+b is_of A: expected: 1, actual: 1

@@ -35,6 +35,7 @@
 #include "co2/ConditionalExpression.h"
 #include "co2/Expression.h"
 #include "co2/FunctionCallExpression.h"
+#include "co2/IsOfExpression.h"
 #include "co2/NestedExpression.h"
 #include "co2/NewExpression.h"
 #include "co2/NullExpression.h"
@@ -197,7 +198,7 @@
 %right		<token>	'=' INCREASE DECREASE MULTIPLY DIVIDE POWER REMINDER AND_IS OR_IS XOR_IS
 %left		<token>	OR '|' 
 %left		<token>	AND '&'
-%left		<token>	EQ NEQ
+%left		<token>	EQ NEQ IS_OF
 %nonassoc	<token>	'<' LEQ '>' GEQ
 %left		<token> XOR '#'
 %left		<token>	SHIFTL SHIFTR
@@ -861,6 +862,7 @@ expression
 |	SIZEOF '(' type ')' { $$ = O_CALL_CLASS(SizeExpression(), new, $3); }
 |	'(' type ')' expression %prec CASTX { $$ = O_CALL_CLASS(CastExpression(), new, $2, $4); }
 |	expression '?' expression ':' expression { $$ = O_CALL_CLASS(ConditionalExpression (), new, $1, $3, $5); }
+|	expression IS_OF TYPE_IDENTIFIER { $$ = O_CALL_CLASS(IsOfExpression (), new, $1, $3); }
 ;
 
 constant
