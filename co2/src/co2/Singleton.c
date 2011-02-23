@@ -9,7 +9,7 @@
 
 #define O_SUPER Object()
 
-void *Singleton_new(void *_self, ...)
+O_IMPLEMENT (Singleton, void *, new, (void *_self, ...))
 {
 	struct SingletonClass *self = o_cast(_self, SingletonClass());
 	if (!self->singleton) {
@@ -25,14 +25,21 @@ void *Singleton_new(void *_self, ...)
 	return self->singleton;
 }
 
-void *Singleton_delete(void *_self)
+O_IMPLEMENT (Singleton, void *, delete, (void *_self))
 {
 	struct Singleton *self = o_cast(_self, Singleton());
 	self->class->singleton = NULL;
 	return O_SUPER->delete(self);
 }
 
+O_IMPLEMENT (Singleton, void *, instance, (void *_self))
+{
+	struct Singleton *self = o_cast(_self, Singleton());
+	return self->class->singleton;
+}
+
 O_OBJECT(Singleton, Object);
-self->new = Singleton_new;
-self->delete = Singleton_delete;
+O_OBJECT_METHOD(Singleton, new);
+O_OBJECT_METHOD(Singleton, delete);
+O_OBJECT_METHOD(Singleton, instance);
 O_OBJECT_END

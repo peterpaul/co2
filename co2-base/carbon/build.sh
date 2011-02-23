@@ -31,7 +31,6 @@ ReleasePool.c
 ReleasePoolItem.c
 Set.c
 SimpleFormatter.c
-Singleton.c
 String.c"
 
 if [[ ($# > 0) && ("$1" == "clean") ]]

@@ -21,6 +21,21 @@
 	unsigned hash_function(char *str);
 }
 
+["co2/Interface.h"] {
+	class Interface : Object {
+		char * name;
+		Interface next;
+	}
+}
+
+["co2/Singleton.h"] {
+	class Singleton : Object {
+		Object instance () {
+			return null;
+		}
+	}
+}
+
 ["string.h"] {
 	int strlen (char[] str);
 	char *strcpy(char *dest, char *src);

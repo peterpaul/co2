@@ -35,7 +35,6 @@ ReleasePool.co2\
 ReleasePoolItem.co2\
 Set.co2\
 SimpleFormatter.co2\
-Singleton.co2\
 String.co2
 
 libco2_base_1_0_la_SOURCES = \
@@ -69,7 +68,6 @@ ReleasePool.c\
 ReleasePoolItem.c\
 Set.c\
 SimpleFormatter.c\
-Singleton.c\
 String.c
 
 libco2_base_1_0_la_HEADERS = \
@@ -103,7 +101,6 @@ ReleasePool.h\
 ReleasePoolItem.h\
 Set.h\
 SimpleFormatter.h\
-Singleton.h\
 String.h
 
 %.c: %.co2
