@@ -30,7 +30,9 @@ pass/class_decl_self.sh\
 pass/class_decl_super.sh\
 pass/class_decl.sh\
 pass/class_intergrated.sh\
+pass/class_is_of.sh\
 pass/dependencies.sh\
+pass/expr_conditional_expr.sh\
 pass/external_definition.sh\
 pass/function_call.sh\
 pass/fun_decl.sh\
