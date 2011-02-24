@@ -54,7 +54,7 @@ O_IMPLEMENT(ThrowStatement, void, generate, (void *_self))
     }
   fprintf (out, "throw (1, ");
   O_CALL (self->expr, generate);
-  fprintf (out, ");\n");
+  fprintf (out, ", __FILE__, __LINE__, __PRETTY_FUNCTION__);\n");
 }
 
 O_OBJECT(ThrowStatement, Statement);
