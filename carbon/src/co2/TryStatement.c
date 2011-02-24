@@ -85,7 +85,7 @@ O_IMPLEMENT(TryStatement, void, generate, (void *_self))
     {
       fprintf (out, "finally {\n");
       O_CALL (self->finally_clause, generate);
-      fprintf (out, "throw (1, NULL);\n");
+      fprintf (out, "throw (1, NULL, NULL, 0, NULL);\n");
       fprintf (out, "}\n");
       fprintf (out, "end_try_finally;\n");
     }

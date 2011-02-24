@@ -20,9 +20,12 @@ ex_pop ()
 }
 
 void
-throw (int id, void *data)
+throw (int id, const void *data, const char *file, int line, const char *function)
 {
   ex_stack->ex_val = id;
   ex_stack->ex_data = data;
+  ex_stack->ex_file = file;
+  ex_stack->ex_line = line;
+  ex_stack->ex_function = function;
   longjmp (ex_stack->ex_buf, id);
 }

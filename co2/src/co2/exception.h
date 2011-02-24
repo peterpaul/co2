@@ -8,14 +8,17 @@ struct ex_stack
   struct ex_stack *previous;
   jmp_buf ex_buf;
   int ex_val;
-  void *ex_data;
+  const void *ex_data;
+  const char *ex_file;
+  int ex_line;
+  const char *ex_function;
 };
 
 extern struct ex_stack *ex_stack;
 
 void ex_push ();
 void ex_pop ();
-void throw (int id, void *data);
+void throw (int id, const void *data, const char *file, int line, const char *function);
 
 #define try					\
   ex_push ();					\
@@ -33,20 +36,20 @@ void throw (int id, void *data);
     goto ex_finally;				\
   else						\
     ex_pop ()
-#define end_try						\
-  else							\
-    {							\
-      struct ex_stack ex_backup = *ex_stack;		\
-      ex_pop ();					\
-      throw (ex_backup.ex_val, ex_backup.ex_data);	\
+#define end_try								\
+  else									\
+    {									\
+      struct ex_stack ex_backup = *ex_stack;				\
+      ex_pop ();							\
+      throw (ex_backup.ex_val, ex_backup.ex_data, NULL, 0, NULL);	\
     }
-#define end_try_finally					\
-  else							\
-    {							\
-      struct ex_stack ex_backup = *ex_stack;		\
-      ex_pop ();					\
-      do_finally;					\
-      throw (ex_backup.ex_val, ex_backup.ex_data);	\
+#define end_try_finally							\
+  else									\
+    {									\
+      struct ex_stack ex_backup = *ex_stack;				\
+      ex_pop ();							\
+      do_finally;							\
+      throw (ex_backup.ex_val, ex_backup.ex_data, NULL, 0, NULL);	\
     }
 
 #endif /* _EXCEPTION_H_ */
