@@ -37,7 +37,7 @@ AC_TYPE_SIZE_T
 # Checks for library functions.
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
-AC_CHECK_FUNCS([strdup strstr])
+AC_CHECK_FUNCS([gettimeofday localtime_r strdup strstr tzset])
 
 AC_CONFIG_FILES([Makefile
                  src/Makefile
