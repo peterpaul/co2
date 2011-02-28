@@ -49,6 +49,7 @@ pass/List.sh\
 pass/loops.sh\
 pass/Object.sh\
 pass/ray.sh\
+pass/scope_override.sh\
 pass/scope_simple.sh\
 pass/scope.sh\
 pass/size_expression.sh\

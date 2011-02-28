@@ -19,7 +19,7 @@ write_error_message (const struct Token *token, const char *type,  const char *m
     {
       result += fprintf (stderr, "%s:%d:%s: ", token->file->absolute_path->data, token->line, type);
     }
-  else if (current_file->absolute_path != NULL)
+  else if (current_file && current_file->absolute_path != NULL)
     {
       result += fprintf (stderr, "%s:0:%s: ", current_file->absolute_path->data, type);
     }

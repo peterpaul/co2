@@ -10,7 +10,7 @@ O_IMPLEMENT (Token, void *, ctor, (void *_self, va_list * app))
   self->name = O_CALL_CLASS (String (), new, "%s", va_arg (*app, char *));
   O_CALL (self->name, retain);
   self->type = va_arg (*app, int);
-  self->file = O_GET_ARG (File); // don't retain, this is a weak reference
+  self->file = O_BRANCH_GET_ARG (File); // don't retain, this is a weak reference
   self->line = va_arg (*app, int);
   return self;
 }
