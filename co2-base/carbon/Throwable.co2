@@ -1,0 +1,3 @@
+interface Throwable {
+	void setThrowContext (char * file, int line, char * function);
+}

@@ -1,31 +1,76 @@
 include Set
-include HashMap
+include RefObject
+include Array
+include HashSetIterator
 
 class HashSet : RefObject <Set> {
-	HashMap map;
+	Array entries;
+	unsigned length;
 
 	HashSet (unsigned size) {
 		super ();
-		map = new HashMap (size);
+		entries = new Array (size);
+		entries.retain ();
+		length = 0;
 	}
 
-	unsigned size () {
-		return map.size ();
+	~HashSet () {
+		entries.release ();
+	}
+
+	unsigned nextIndex (unsigned index) {
+		return (index + 1) % entries.size;
+
+	}
+
+	unsigned getIndexFor (RefObject item) {
+		unsigned index = item.hashCode () % entries.size;
+		RefObject entry;
+		while ((entry = entries.get (index))) {
+			if (entry.equals (item)) {
+				return index;
+			}
+			index = nextIndex (index);
+		}
+		return index;
 	}
 
 	int contains (RefObject item) {
-		return map.get (item) != null;
+		unsigned index = getIndexFor (item);
+		RefObject entry = (RefObject) entries.get (index);
+		return entry != null;
 	}
 
 	RefObject add (RefObject item) {
-		return map.put (item, item);
+		unsigned index = getIndexFor (item);
+		RefObject entry = (RefObject) entries.get (index);
+		if (entry) {
+			entry.release ();
+			length -= 1;
+		}
+		entries.set (index, item);
+		length += 1;
+		return item;
 	}
 
 	RefObject remove (RefObject item) {
-		return map.remove (item);
+		length -= 1;
+		unsigned index = getIndexFor (item);
+		RefObject entry = (RefObject) entries.get (index);
+		if (entry) {
+			RefObject result = entry.retain ();
+			entries.set (index, null);
+			return result.autoRelease ();
+		} else {
+			return null;
+		}		
+	}
+
+	unsigned size () {
+		return length;		
 	}
 
 	Iterator iterator () {
-		return map.iterator ();
+		return new HashSetIterator (self);
 	}
 }

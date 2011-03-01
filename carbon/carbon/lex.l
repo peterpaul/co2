@@ -1,13 +1,13 @@
 %{
-#include "co2/Compiler.h"
+#include "Compiler.h"
 #include "grammar.h"
-#include "co2/Token.h"
-#include "co2/RefList.h"
-#include "co2/IncludeStack.h"
-#include "co2/String.h"
-#include "co2/List.h"
-#include "co2/File.h"
-#include "co2/error.h"
+#include "Token.h"
+#include "RefList.h"
+#include "IncludeStack.h"
+#include "String.h"
+#include "List.h"
+#include "File.h"
+#include "error.h"
 #include <limits.h>
 #include <stdlib.h>
 #include <sys/types.h>

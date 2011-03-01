@@ -30,7 +30,7 @@ int mainImpl () {
 			list.add (create (i));
 		}
 
-		for (i = 0; i < 15; i += 1) {
+		for (i = 0; i < 17; i += 1) {
 			TestRefObject obj = (TestRefObject) list.get (i);
 			printf ("%d\n", obj.val);
 			if (random () % 2 == 0) {
@@ -47,7 +47,8 @@ int mainImpl () {
 
 
 	} catch (IndexOutOfBoundsException e) {
-		printf ("IndexOutOfBoundsException: index: %d, bounds: %d\n", e.index, e.bounds);
+		String message = e.toString ();
+		printf ("Caught Exception: %s\n%s", e.class.class_name, message.data);
 		delete e;
 		return 1;
 	} finally {
@@ -63,8 +64,8 @@ int main() {
 	try {
 		result = mainImpl ();
 	} catch (Exception e) {
-		result = 1;
-		printf ("Caught %s: %s\n", e.class.class_name, e.message.data);
+		String message = e.toString ();
+		printf ("Caught Exception: %s\n%s", e.class.class_name, message.data);
 		delete e;
 	} finally {
 		return result;

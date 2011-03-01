@@ -36,7 +36,8 @@ int main() {
 		result = mainImpl ();
 	} catch (Exception e) {
 		result = 1;
-		printf ("Caught %s: %s\n", e.class.class_name, e.message.data);
+		String message = e.toString ();
+		printf ("Caught Exception: %s\n%s", e.class.class_name, message.data);
 		delete e;
 	} finally {
 		delete current_release_pool;

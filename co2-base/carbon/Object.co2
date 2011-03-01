@@ -36,6 +36,16 @@
 	}
 }
 
+["co2/exception.h"] {
+	struct ExceptionStack {
+		ExceptionStack *previous;
+		char *ex_file;
+		int ex_line;
+		char *ex_function;
+	}
+	ExceptionStack *ex_stack;
+}
+
 ["string.h"] {
 	int strlen (char[] str);
 	char *strcpy(char *dest, char *src);
@@ -72,7 +82,11 @@ include String
 
 class BaseObject : Object {
 	String toString () {
-		return new String ("%s", class.class_name);
+		return new String ("%s at %p", class.class_name, self);
+	}
+
+	Class getClass () {
+		return class;
 	}
 
 	unsigned hashCode () {

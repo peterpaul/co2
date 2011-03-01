@@ -1,0 +1,26 @@
+include KeyValuePair
+include HashSet
+include ArrayIterator
+
+class HashSetIterator : BaseObject <Iterator> {
+	Iterator arrayIterator;
+
+	HashSetIterator (HashSet set) {
+		super ();
+		arrayIterator = new ArrayIterator (set.entries);
+	}
+
+	~HashSetIterator () {
+		delete arrayIterator;
+	}
+
+	int hasNext () {
+		return arrayIterator.hasNext ();
+	}
+
+	RefObject getNext () {
+		return arrayIterator.getNext ();
+	}
+
+}
+

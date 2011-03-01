@@ -16,6 +16,7 @@ Exception.co2\
 HashMap.co2\
 HashMapIterator.co2\
 HashSet.co2\
+HashSetIterator.co2\
 IndexOutOfBoundsException.co2\
 Iterable.co2\
 Iterator.co2\
@@ -35,7 +36,8 @@ ReleasePool.co2\
 ReleasePoolItem.co2\
 Set.co2\
 SimpleFormatter.co2\
-String.co2
+String.co2\
+Throwable.co2
 
 libco2_base_1_0_la_SOURCES = \
 Array.c\
@@ -49,6 +51,7 @@ Exception.c\
 HashMap.c\
 HashMapIterator.c\
 HashSet.c\
+HashSetIterator.c\
 IndexOutOfBoundsException.c\
 Iterable.c\
 Iterator.c\
@@ -68,7 +71,8 @@ ReleasePool.c\
 ReleasePoolItem.c\
 Set.c\
 SimpleFormatter.c\
-String.c
+String.c\
+Throwable.c
 
 libco2_base_1_0_la_HEADERS = \
 Array.h\
@@ -82,6 +86,7 @@ Exception.h\
 HashMap.h\
 HashMapIterator.h\
 HashSet.h\
+HashSetIterator.h\
 IndexOutOfBoundsException.h\
 Iterable.h\
 Iterator.h\
@@ -101,9 +106,11 @@ ReleasePool.h\
 ReleasePoolItem.h\
 Set.h\
 SimpleFormatter.h\
-String.h
+String.h\
+Throwable.h
 
 %.c: %.co2
+	-rm $@
 	carbon $< $@
 
 libco2_base_1_0_la_CPPFLAGS = -I$(top_srcdir)/include -O0 -g3

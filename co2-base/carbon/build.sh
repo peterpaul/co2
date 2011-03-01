@@ -12,6 +12,7 @@ Exception.c
 HashMap.c
 HashMapIterator.c
 HashSet.c
+HashSetIterator.c
 IndexOutOfBoundsException.c
 Iterable.c
 Iterator.c
@@ -31,7 +32,8 @@ ReleasePool.c
 ReleasePoolItem.c
 Set.c
 SimpleFormatter.c
-String.c"
+String.c
+Throwable.c"
 
 if [[ ($# > 0) && ("$1" == "clean") ]]
 then
@@ -41,6 +43,7 @@ then
 else
     make -k
     make -k
+    rm TestLogger.bin TestRefObject.bin TestMap.bin TestSet.bin
     gcc -O0 -g3 -I/home/peterpaul/local/co2-0.0.2/include/co2-1.0 -L/home/peterpaul/local/co2-0.0.2/lib -lco2-1.0 $LIBSOURCES TestLogger.c -o TestLogger.bin
     gcc -O0 -g3 -I/home/peterpaul/local/co2-0.0.2/include/co2-1.0 -L/home/peterpaul/local/co2-0.0.2/lib -lco2-1.0 $LIBSOURCES TestRefObject.c -o TestRefObject.bin
     gcc -O0 -g3 -I/home/peterpaul/local/co2-0.0.2/include/co2-1.0 -L/home/peterpaul/local/co2-0.0.2/lib -lco2-1.0 $LIBSOURCES TestMap.c -o TestMap.bin

@@ -1,8 +1,12 @@
 include Object
+include Throwable 
 
-class Exception : BaseObject {
+class Exception : BaseObject <Throwable> {
 	String message;
 	Exception reason;
+	String file;
+	int line;
+	String function;
 
 	Exception () {
 		message = new String("");
@@ -26,5 +30,40 @@ class Exception : BaseObject {
 
 	~Exception () {
 		delete message;
+		delete file;
+		delete function;
+	}
+
+	void setThrowContext (char * file, int line, char * function) {
+		self.file = new String ("%s", file);
+		self.line = line;
+		self.function = new String ("%s", function);
+	}
+
+	String toString () {
+		if (file == null) {
+			setThrowContext ((*ex_stack).ex_file, (*ex_stack).ex_line, (*ex_stack).ex_function);
+		}
+		String result = new String ("");
+		result.append (file);
+		result.append_str (":%d:", line);
+		result.append (function);
+		result.append_str (": ");
+		String super_string = super ();
+		result.append (super_string);
+		delete super_string;
+		result.append_str("\n");
+		if (message) {
+			result.append_str ("\t");
+			result.append (message);
+			result.append_str ("\n");
+		}
+		if (reason) {
+			result.append_str ("\tCaused by:\n");
+			String reason_str = reason.toString ();
+			result.append (reason_str);
+			delete reason_str;
+		}
+		return result;
 	}
 }
