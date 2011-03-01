@@ -246,6 +246,13 @@ declaration_list_content
 }
 |	variable_declaration_list
 |	definition_declaration
+|	function_header ';'
+{
+  O_CALL(current_scope, leave);
+  O_CALL(current_scope, declare, $1);
+  $$ = O_CALL_CLASS(RefList(), new, 8, Declaration()); 
+  O_CALL($$, append, $1); 
+}
 ;
 
 declaration

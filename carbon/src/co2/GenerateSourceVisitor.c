@@ -297,6 +297,11 @@ O_IMPLEMENT_IF(GenerateSourceVisitor, void, visitFunctionDeclaration, (void *_se
 	{
 	  return;
 	}
+      // don't generate for definitions
+      if (!self->body)
+	{
+	  return;
+	}
       struct FunctionType *method_type =
 	o_cast (self->type, FunctionType ());
       if (self->interface_decl)

@@ -212,6 +212,10 @@ ObjectTypeDeclaration_generate_method_registration_2 (void *_method_decl,
   struct ObjectTypeDeclaration *class_decl =
     O_CAST (va_arg (*app, struct ObjectTypeDeclaration *),
 	    ObjectTypeDeclaration ());
+  if (!method_decl->body)
+    {
+      return;
+    }
   fprintf (out, "O_OBJECT_METHOD (");
   O_CALL (class_decl->name, generate);
   fprintf (out, ", ");

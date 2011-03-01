@@ -18,6 +18,7 @@ TESTS=\
 pass/arithmetic_expressions.sh\
 pass/array.sh\
 pass/cast_expression.sh\
+pass/class_decl_abstract.sh\
 pass/class_decl_constructor_parameters.sh\
 pass/class_decl_constructor.sh\
 pass/class_decl_constructor_vararg.sh\
@@ -40,6 +41,7 @@ pass/fun_decl_vararg.sh\
 pass/fun_type.sh\
 pass/global_scope.sh\
 pass/import.sh\
+pass/include_subfolder.sh\
 pass/interface_cast.sh\
 pass/interface_decl.sh\
 pass/interface_implementation.sh\

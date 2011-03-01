@@ -27,12 +27,14 @@ function compile_library_test {
     local TEST=$1
 
     local BASENAME=`basename ${TEST} .test`
+    local DIRNAME=`dirname ${TEST}`
     local CO2=$( echo ${BASENAME} | grep ".co2" | wc -l )
     if [[ $CO2 == 1 ]]
     then
 	local BASENAME=`basename ${TEST} .co2`
     fi
-    local TARGETNAME=${TARGET}/pass/${BASENAME}
+    local TARGETNAME=${TARGET}/${DIRNAME}/${BASENAME}
+    mkdir -p ${TARGET}/${DIRNAME}
     # Compile the testcase
     echo "Command: ${COMPILER} ${TEST} ${TARGETNAME}.c" >> ${LOGFILE}
     ${COMPILER} ${TEST} ${TARGETNAME}.c >> ${LOGFILE} 2>&1
@@ -48,12 +50,13 @@ function compile_library_gcc {
     local TEST=$1
 
     local BASENAME=`basename ${TEST} .test`
+    local DIRNAME=`dirname ${TEST}`
     local CO2=$( echo ${BASENAME} | grep ".co2" | wc -l )
     if [[ $CO2 == 1 ]]
     then
 	local BASENAME=`basename ${TEST} .co2`
     fi
-    local TARGETNAME=${TARGET}/pass/${BASENAME}
+    local TARGETNAME=${TARGET}/${DIRNAME}/${BASENAME}
     # Compile the generated code with ${CC}
     pushd `dirname ${TARGETNAME}.bin` >> ${LOGFILE} 2>&1
     echo "Command: ${CC} -g3 -c ${TARGETNAME}.c -o `basename ${TARGETNAME}.o` ${CFLAGS}" >> ${LOGFILE}
@@ -74,12 +77,13 @@ function run_pass_test {
     local TEST=$1
 
     local BASENAME=`basename ${TEST} .test`
+    local DIRNAME=`dirname ${TEST}`
     local CO2=$( echo ${BASENAME} | grep ".co2" | wc -l )
     if [[ $CO2 == 1 ]]
     then
 	local BASENAME=`basename ${TEST} .co2`
     fi
-    local TARGETNAME=${TARGET}/pass/${BASENAME}
+    local TARGETNAME=${TARGET}/${DIRNAME}/${BASENAME}
     # Compile the generated code with ${CC}
     pushd `dirname ${TARGETNAME}.bin` >> ${LOGFILE} 2>&1
     echo "Command: ${LD} ${OBJECTS} -o `basename ${TARGETNAME}.bin` ${LDFLAGS} -lc -lm" >> ${LOGFILE}
