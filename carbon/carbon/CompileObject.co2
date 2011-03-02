@@ -1,0 +1,10 @@
+include co2/RefObject
+
+class CompileObject : RefObject {
+	void type_check ();
+	void optimize ();
+	void generate ();
+	Token get_token ();
+	void accept (BaseCompileObjectVisitor *visitor);
+}
+
