@@ -6,7 +6,7 @@ AC_INIT([co2-base], [0.0.1], [pp_kl_h@hotmail.com])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE
 AM_SILENT_RULES([yes])
-AC_CONFIG_SRCDIR([carbon/RefObject.co2])
+AC_CONFIG_SRCDIR([carbon/co2/RefObject.co2])
 AC_CONFIG_HEADERS([config.h])
 
 # Checks for programs.
@@ -41,6 +41,7 @@ AC_CHECK_FUNCS([gettimeofday localtime_r strdup strstr tzset])
 
 AC_CONFIG_FILES([Makefile
                  carbon/Makefile
+		 carbon/co2/Makefile
                  co2-base-1.0.pc])
 
 AC_OUTPUT
