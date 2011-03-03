@@ -36,6 +36,8 @@ pass/dependencies.sh\
 pass/expr_conditional_expr.sh\
 pass/external_definition.sh\
 pass/function_call.sh\
+pass/function_types_def.sh\
+pass/function_types.sh\
 pass/fun_decl.sh\
 pass/fun_decl_vararg.sh\
 pass/fun_type.sh\

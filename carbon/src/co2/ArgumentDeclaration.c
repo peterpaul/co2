@@ -1,6 +1,7 @@
 #include "co2/ArgumentDeclaration.h"
 #include "co2/Type.h"
 #include "co2/io.h"
+#include "co2/FunctionType.h"
 #include "grammar.h"
 
 #define O_SUPER Declaration()
@@ -35,6 +36,11 @@ O_IMPLEMENT (ArgumentDeclaration, void, generate, (void *_self))
   if (self->name->type == VA_ARG)
     {
       O_CALL (self->name, generate);
+    }
+  else if (o_is_of (self->type, FunctionType ()))
+    {
+      struct FunctionType * function_type = O_CAST (self->type, FunctionType ());
+      O_CALL (function_type, generate_named, self->name);
     }
   else
     {
