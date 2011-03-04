@@ -4,7 +4,7 @@ ACLOCAL_AMFLAGS = -I m4
 lib_LTLIBRARIES = libco2-base-1.0.la
 libco2_base_1_0_ladir=$(includedir)/co2-base-1.0/co2
 
-libco2_base_1_0_la_SOURCES = \
+libco2_base_1_0_la_CO2SOURCES=\
 co2/Array.co2\
 co2/ArrayIterator.co2\
 co2/ArrayList.co2\
@@ -37,7 +37,10 @@ co2/ReleasePoolItem.co2\
 co2/Set.co2\
 co2/SimpleFormatter.co2\
 co2/String.co2\
-co2/Throwable.co2\
+co2/Throwable.co2
+
+libco2_base_1_0_la_SOURCES=\
+$(libco2_base_1_0_la_CO2SOURCES)\
 co2/Array.c\
 co2/ArrayIterator.c\
 co2/ArrayList.c\
@@ -72,7 +75,8 @@ co2/SimpleFormatter.c\
 co2/String.c\
 co2/Throwable.c
 
-libco2_base_1_0_la_HEADERS = \
+libco2_base_1_0_la_HEADERS=\
+$(libco2_base_1_0_la_CO2SOURCES)\
 co2/Array.h\
 co2/ArrayIterator.h\
 co2/ArrayList.h\
