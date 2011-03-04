@@ -1,8 +1,8 @@
-include Object
-include LogHandler
-include ConsoleHandler
-include SimpleFormatter
-include LogRecord
+include co2/BaseObject
+include co2/LogHandler
+include co2/ConsoleHandler
+include co2/SimpleFormatter
+include co2/LogRecord
 
 class Logger : BaseObject {
 	LogHandler handler;

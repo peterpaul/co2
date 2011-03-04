@@ -1,8 +1,8 @@
-include RefObject
-include ReleasePool
-include ArrayList
-include List
-include Iterator
+include co2/RefObject
+include co2/ReleasePool
+include co2/ArrayList
+include co2/List
+include co2/Iterator
 
 class TestRefObject : RefObject {
 	int val;

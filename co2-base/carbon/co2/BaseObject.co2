@@ -78,7 +78,7 @@
 	FILE *stdout, stderr;
 }
 
-include String
+include co2/String
 
 class BaseObject : Object {
 	String toString () {

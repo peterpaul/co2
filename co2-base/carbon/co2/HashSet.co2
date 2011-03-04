@@ -1,7 +1,7 @@
-include Set
-include RefObject
-include Array
-include HashSetIterator
+include co2/Set
+include co2/RefObject
+include co2/Array
+include co2/HashSetIterator
 
 class HashSet : RefObject <Set> {
 	Array entries;

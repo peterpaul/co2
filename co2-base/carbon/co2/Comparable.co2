@@ -1,4 +1,4 @@
-include Object
+include co2/BaseObject
 
 interface Comparable {
 	int compare (BaseObject other);

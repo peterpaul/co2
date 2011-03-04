@@ -1,4 +1,4 @@
-include LogRecord
+include co2/LogRecord
 
 interface LogHandler {
 	void publish (LogRecord record);

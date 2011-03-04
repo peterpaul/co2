@@ -1,6 +1,6 @@
-include KeyValuePair
-include HashSet
-include ArrayIterator
+include co2/KeyValuePair
+include co2/HashSet
+include co2/ArrayIterator
 
 class HashSetIterator : BaseObject <Iterator> {
 	Iterator arrayIterator;

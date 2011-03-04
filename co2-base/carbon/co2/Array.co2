@@ -1,6 +1,6 @@
-include RefObject
-include OutOfMemoryException
-include IndexOutOfBoundsException
+include co2/RefObject
+include co2/OutOfMemoryException
+include co2/IndexOutOfBoundsException
 
 class Array : RefObject {
 	unsigned size;

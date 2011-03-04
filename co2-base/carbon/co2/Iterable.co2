@@ -1,4 +1,4 @@
-include Iterator
+include co2/Iterator
 
 interface Iterable {
 	Iterator iterator ();

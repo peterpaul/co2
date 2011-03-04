@@ -1,5 +1,5 @@
-include RefObject
-include Collection
+include co2/RefObject
+include co2/Collection
 
 interface List <Collection> {
 	unsigned size ();

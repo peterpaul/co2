@@ -1,5 +1,5 @@
-include Logger
-include ReleasePool
+include co2/Logger
+include co2/ReleasePool
 
 int main () {
 	new ReleasePool ();

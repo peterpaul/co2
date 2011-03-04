@@ -1,5 +1,5 @@
-include LogFormatter
-include LogRecord
+include co2/LogFormatter
+include co2/LogRecord
 
 class SimpleFormatter : BaseObject <LogFormatter> {
 	SimpleFormatter () {

@@ -1,7 +1,7 @@
-include Map
-include RefObject
-include Array
-include HashMapIterator
+include co2/Map
+include co2/RefObject
+include co2/Array
+include co2/HashMapIterator
 
 class HashMap : RefObject <Map> {
 	Array entries;

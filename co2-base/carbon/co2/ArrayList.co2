@@ -1,7 +1,7 @@
-include Array
-include List
-include Iterable
-include ArrayIterator
+include co2/Array
+include co2/List
+include co2/Iterable
+include co2/ArrayIterator
 
 class ArrayList : Array <List> {
 	unsigned length;

@@ -1,6 +1,6 @@
-include String
-include RefObject
-include Comparable
+include co2/String
+include co2/RefObject
+include co2/Comparable
 
 class Enum : RefObject <Comparable> {
 	String name;

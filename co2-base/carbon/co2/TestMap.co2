@@ -1,8 +1,8 @@
-include RefObject
-include ReleasePool
-include Map
-include HashMap
-include Iterator
+include co2/RefObject
+include co2/ReleasePool
+include co2/Map
+include co2/HashMap
+include co2/Iterator
 
 int mainImpl () {
 	Map map = new HashMap (15);

@@ -1,4 +1,4 @@
-include Iterable
+include co2/Iterable
 
 interface Collection <Iterable> {
 }

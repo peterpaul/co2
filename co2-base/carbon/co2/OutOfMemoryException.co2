@@ -1,4 +1,4 @@
-include Exception
+include co2/Exception
 
 class OutOfMemoryException : Exception {
 }

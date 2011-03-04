@@ -1,4 +1,4 @@
-include RefObject
+include co2/RefObject
 
 interface Iterator {
 	int hasNext ();

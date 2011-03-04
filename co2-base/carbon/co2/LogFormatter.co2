@@ -1,4 +1,4 @@
-include LogRecord
+include co2/LogRecord
 
 interface LogFormatter {
 	String format (LogRecord record);

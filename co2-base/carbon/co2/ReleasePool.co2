@@ -1,6 +1,6 @@
-include Object
-include ReleasePoolItem
-include Exception
+include co2/BaseObject
+include co2/ReleasePoolItem
+include co2/Exception
 
 unsigned releasePoolHashSize = 1223;
 
