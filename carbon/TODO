@@ -29,5 +29,6 @@ Language Features:
 * add typedefs [DONE]
 * make one identifier type and use for types, identifiers and macros
 * retrieve the class
+* abstract classes [DONE]
 
 * bash scripts for tests aren't really portable yet.

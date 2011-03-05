@@ -1,0 +1,38 @@
+["stdio.h"] int printf(char * format, ...);
+
+class Map {
+	int[] array;
+	Map () {
+		array = new int[10];
+	}
+
+	void set (int index, int value) {
+		array[index] = value;
+	}
+
+	void map (void (*)(int) callback) {
+		int i;
+		for (i = 0; i < 10; i += 1) {
+			callback (array[i]);
+		}
+	}
+}
+
+int sum;
+void sum_callback(int value) {
+	sum += value;
+}
+
+int main() {
+	Map map = new Map ();
+	int i;
+	for (i = 0; i < 10; i += 1) {
+		map.set (i, i);
+	}
+
+	sum = 0;
+	map.map (sum_callback);
+
+	printf ("sum = %d\n", sum);
+	return 0;
+}

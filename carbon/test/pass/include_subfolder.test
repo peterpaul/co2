@@ -1,0 +1,11 @@
+["stdlib.h"] {
+	int printf(char *format, ...);
+}
+
+include inc/Library
+
+int main() {
+	Library lib = new Library ();
+	printf ("%d\n", lib.lib ());
+	return 0;
+}

@@ -2,6 +2,7 @@
 #include "co2/Type.h"
 #include "co2/RefList.h"
 #include "co2/Expression.h"
+#include "co2/FunctionType.h"
 #include "co2/io.h"
 
 #define O_SUPER Declaration()
@@ -34,9 +35,17 @@ O_IMPLEMENT (VariableDeclaration, void, set_type,
 O_IMPLEMENT (VariableDeclaration, void, generate, (void *_self))
 {
   struct VariableDeclaration *self = O_CAST (_self, VariableDeclaration ());
-  O_CALL (self->type, generate);
-  fprintf (out, " ");
-  O_CALL (self->name, generate);
+  if (o_is_of (self->type, FunctionType ()))
+    {
+      struct FunctionType * function_type = O_CAST (self->type, FunctionType ());
+      O_CALL (function_type, generate_named, self->name);
+    }
+  else
+    {
+      O_CALL (self->type, generate);
+      fprintf (out, " ");
+      O_CALL (self->name, generate);
+    }
   if (self->expr)
     {
       fprintf (out, " = ");
