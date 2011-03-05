@@ -1,0 +1,5 @@
+include co2/RefObject
+include CompileObjectVisitor
+
+class BaseCompileObjectVisitor : RefObject <CompileObjectVisitor> {
+}
