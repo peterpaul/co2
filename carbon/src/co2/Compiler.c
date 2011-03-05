@@ -167,21 +167,71 @@ main (int argc, char **argv)
   create_release_pool ();
   const char *input_file = NULL;
   const char *output_file = NULL;
+  path = O_CALL_CLASS (RefList (), new, 8, String ());
 
-  /* io */
-  if (argc >= 2)
-    input_file = argv[1];
+  int arg = 1;
+  bool nextIsOption = false;
+  while (arg < argc)
+    {
+      if (argv[arg][0] == '-')
+	{
+	  if (strlen (argv[arg]) == 2 && argv[arg][1] == 'P')
+	    {
+	      nextIsOption = true;
+	    }
+	  else
+	    {
+	      error (NULL, "invalid option: %s\n", argv[arg]);
+	    }
+	}
+      else
+	{
+	  if (nextIsOption)
+	    {
+	      struct String *dir = O_CALL_CLASS (String (), new, "%s", argv[arg]);
+	      O_CALL (path, append, dir);
+	      nextIsOption = false;
+	    }
+	  else if (input_file == NULL)
+	    {
+	      input_file = argv[arg];
+	    }
+	  else if (output_file == NULL)
+	    {
+	      output_file = argv[arg];
+	    }
+	  else
+	    {
+	      error (NULL, "Too many arguments (%s)\n", argv[arg]);
+	    }
+	}
+      arg ++;
+    }
 
-  if (argc >= 3)
-    output_file = argv[2];
+  if (nextIsOption)
+    {
+      error (NULL, "-P takes one argument\n");
+    }
+
+  if (errors != 0)
+    {
+      return 1;
+    }
 
   file_path = O_CALL (analyze_file_name (input_file), retain);
   base_dir = O_CALL (determine_base_dir (file_path), retain);
 
-  path = O_CALL_CLASS (RefList (), new, 8, String ());
   O_CALL (path, append, base_dir);
 
-  main_file = try_search_path (O_CALL_CLASS (String (), new, "%s", input_file));
+  if (input_file)
+    {
+      main_file = try_search_path (O_CALL_CLASS (String (), new, "%s", input_file));
+    }
+  else
+    {
+      struct String *stdin_file = O_CALL_CLASS (String (), new, "<stdin>");
+      main_file = O_CALL_CLASS (File (), new, stdin_file, stdin_file);
+    }
   current_file = O_CALL (main_file, retain);
 
   int retval = mainImpl (output_file);

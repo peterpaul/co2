@@ -297,6 +297,11 @@ O_IMPLEMENT_IF(GenerateSourceVisitor, void, visitFunctionDeclaration, (void *_se
 	{
 	  return;
 	}
+      // don't generate for definitions
+      if (!self->body)
+	{
+	  return;
+	}
       struct FunctionType *method_type =
 	o_cast (self->type, FunctionType ());
       if (self->interface_decl)
@@ -457,9 +462,17 @@ O_IMPLEMENT_IF(GenerateSourceVisitor, void, visitVariableDeclaration, (void *_se
       return;
     }
 
-  O_CALL (self->type, generate);
-  fprintf (out, " ");
-  O_CALL (self->name, generate);
+  if (o_is_of (self->type, FunctionType ()))
+    {
+      struct FunctionType * function_type = O_CAST (self->type, FunctionType ());
+      O_CALL (function_type, generate_named, self->name);
+    }
+  else
+    {
+      O_CALL (self->type, generate);
+      fprintf (out, " ");
+      O_CALL (self->name, generate);
+    }
   if (self->expr)
     {
       fprintf (out, " = ");

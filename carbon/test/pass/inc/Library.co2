@@ -1,0 +1,5 @@
+class Library {
+	int lib () {
+		return 5;
+	}
+}

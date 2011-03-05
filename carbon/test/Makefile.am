@@ -18,6 +18,7 @@ TESTS=\
 pass/arithmetic_expressions.sh\
 pass/array.sh\
 pass/cast_expression.sh\
+pass/class_decl_abstract.sh\
 pass/class_decl_constructor_parameters.sh\
 pass/class_decl_constructor.sh\
 pass/class_decl_constructor_vararg.sh\
@@ -30,14 +31,19 @@ pass/class_decl_self.sh\
 pass/class_decl_super.sh\
 pass/class_decl.sh\
 pass/class_intergrated.sh\
+pass/class_is_of.sh\
 pass/dependencies.sh\
+pass/expr_conditional_expr.sh\
 pass/external_definition.sh\
 pass/function_call.sh\
+pass/function_types_def.sh\
+pass/function_types.sh\
 pass/fun_decl.sh\
 pass/fun_decl_vararg.sh\
 pass/fun_type.sh\
 pass/global_scope.sh\
 pass/import.sh\
+pass/include_subfolder.sh\
 pass/interface_cast.sh\
 pass/interface_decl.sh\
 pass/interface_implementation.sh\
@@ -47,6 +53,7 @@ pass/List.sh\
 pass/loops.sh\
 pass/Object.sh\
 pass/ray.sh\
+pass/scope_override.sh\
 pass/scope_simple.sh\
 pass/scope.sh\
 pass/size_expression.sh\

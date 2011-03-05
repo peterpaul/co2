@@ -146,6 +146,19 @@ O_IMPLEMENT (FunctionType, struct String *, to_string, (void *_self))
   return string;
 }
 
+O_IMPLEMENT (FunctionType, void, generate_named, (void *_self, struct Token *name))
+{
+  struct FunctionType *self = O_CAST (_self, FunctionType ());
+  bool first_arg = true;
+  O_CALL (self->return_type, generate);
+  fprintf (out, "(*");
+  O_CALL (name, generate);
+  fprintf (out, ")(");
+  O_CALL (self->parameters, map_args, FunctionType_generate_parameter,
+	  &first_arg);
+  fprintf (out, ")");
+}
+
 O_IMPLEMENT (FunctionType, void, generate, (void *_self))
 {
   struct FunctionType *self = O_CAST (_self, FunctionType ());
@@ -160,17 +173,8 @@ O_IMPLEMENT (FunctionType, void, generate, (void *_self))
       struct Token *token = O_CALL (self, get_token);
       self->generated_name = O_CALL (generator, create, token);
       O_CALL (self->generated_name, retain);
-      bool first_arg = true;
-      fprintf (out, "typedef ");
-      O_CALL (self->return_type, generate);
-      fprintf (out, "(*");
-      O_CALL (self->generated_name, generate);
-      fprintf (out, ")(");
-      O_CALL (self->parameters, map_args, FunctionType_generate_parameter,
-	      &first_arg);
-      fprintf (out, ");\n");
     }
-  O_CALL (self->generated_name, generate);
+  O_CALL (self, generate_named, self->generated_name);
 }
 
 #define SET_RESULT(x,p) (x = p ? x : p)
@@ -227,4 +231,5 @@ O_OBJECT_METHOD (FunctionType, get_token);
 O_OBJECT_METHOD (FunctionType, generate);
 O_OBJECT_METHOD (FunctionType, to_string);
 O_OBJECT_METHOD (FunctionType, type_check);
+O_OBJECT_METHOD (FunctionType, generate_named);
 O_END_OBJECT

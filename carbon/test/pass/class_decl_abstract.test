@@ -1,0 +1,19 @@
+["stdlib.h"] {
+	int printf(char *format, ...);
+}
+
+class Abstract {
+	int foo (int arg);
+}
+
+class Real : Abstract {
+	int foo (int arg) {
+		return arg + 2;
+	}
+}
+
+int main () {
+	Abstract bar = new Real ();
+	printf ("%d\n", bar.foo (5));
+	return 0;
+}

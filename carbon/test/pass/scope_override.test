@@ -1,0 +1,28 @@
+["stdlib.h"] {
+	int printf(char *format, ...);
+}
+
+int main () {
+	B bar = new B();
+	bar.foo = 5;
+	bar.output (5);
+	return 0;
+}
+
+class B : A {
+	int bar (int baz) {
+		return super(baz) + 5;
+	}
+
+	void output (int a) {
+		printf ("foo = %d, bar (%d) = %d\n", foo, a, bar (a));
+	}
+}
+
+class A {
+	int foo;
+	int bar (int baz) {
+		return foo + baz;
+	}
+}
+

@@ -10,6 +10,7 @@
 #include "co2/TypeDeclaration.h"
 #include "co2/FunctionType.h"
 #include "co2/ObjectType.h"
+#include "co2/Expression.h"
 #include "co2/io.h"
 
 int new_constructor_filter (void *_constructor);
@@ -327,9 +328,17 @@ O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitTypeDeclaration, (void *_self, 
   struct BaseCompileObjectVisitor *visitor = O_CAST(_self, BaseCompileObjectVisitor());
   struct TypeDeclaration *self = O_CAST(_object, TypeDeclaration());
   fprintf (out, "typedef ");
-  O_CALL (self->type, generate);
-  fprintf (out, " ");
-  O_CALL (self->name, generate);
+  if (o_is_of (self->type, FunctionType ()))
+    {
+      struct FunctionType * function_type = O_CAST (self->type, FunctionType ());
+      O_CALL (function_type, generate_named, self->name);
+    }
+  else
+    {
+      O_CALL (self->type, generate);
+      fprintf (out, " ");
+      O_CALL (self->name, generate);
+    }
   fprintf (out, ";\n");
 }
 
@@ -343,13 +352,18 @@ O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitVariableDeclaration, (void *_se
       // only generate global declarations
       return;
     }
-  if (!o_is_of (self->type, FunctionType ()))
+  fprintf (out, "extern ");
+  if (o_is_of (self->type, FunctionType ()))
     {
-      fprintf (out, "extern ");
+      struct FunctionType * function_type = O_CAST (self->type, FunctionType ());
+      O_CALL (function_type, generate_named, self->name);
     }
-  O_CALL (self->type, generate);
-  fprintf (out, " ");
-  O_CALL (self->name, generate);
+  else
+    {
+      O_CALL (self->type, generate);
+      fprintf (out, " ");
+      O_CALL (self->name, generate);
+    }
   fprintf (out, ";\n");
 }
 

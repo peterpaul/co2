@@ -1,0 +1,31 @@
+["stdio.h"] {
+	int printf(char *format, ...);
+}
+
+class A {
+	char *get_name () {
+		return "a";
+	}
+}
+
+class B : A {
+	char *get_name () {
+		return "b";
+	}
+}
+
+class C : A {
+	char *get_name () {
+		return "c";
+	}
+}
+
+int main () {
+	//
+	B b = new B ();
+	C c = new C ();
+	A a = b is_of B ? b : c;
+
+	printf ("a is of %s\n", a.get_name ());
+	return 0;
+}

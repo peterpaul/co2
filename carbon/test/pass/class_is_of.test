@@ -1,0 +1,19 @@
+["stdio.h"] {
+	int printf(char *format, ...);
+}
+
+class A {
+}
+
+class B : A {
+}
+
+int main() {
+	A a = new A();
+	B b = new B();
+
+	printf ("a is_of B, expected: 0, actual: %d\n", a is_of B);
+	printf ("b is_of A: expected: 1, actual: %d\n", b is_of A);
+
+	return 0;
+}
