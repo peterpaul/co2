@@ -1,4 +1,6 @@
 #!/bin/bash -u
+# Copyright (C) 2011 Peterpaul Taekele Klein Haneveld
+
 BASEDIR=`pwd`
 COMPILER=${BASEDIR}/../src/carbon
 
