@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/bin/bash -u
+# Copyright (C) 2011 Peterpaul Taekele Klein Haneveld
 
 pass_cases=$( for i in $( ls pass/*.test ); do echo $( basename $i ); done )
 fail_cases=$( for i in $( ls fail/*.test ); do echo $( basename $i ); done )
@@ -7,6 +8,7 @@ DEPENDENCIES=
 function generate_dependencies {
     local TESTCASE=$1
     local TYPE=$2
+
     local DEPS=$( grep -E "^include" ${TESTCASE} | sort -u | cut -d' ' -f2 )
     DEPENDENCIES=""
     for DEP in ${DEPS}
@@ -20,11 +22,8 @@ function generate_testcase {
     local NAME=$2
 
     local BASENAME=$( basename ${NAME} .test )
-
     local TARGET=${TYPE}/${BASENAME}.sh
-
-    GENERATE=$( grep ${TARGET} testdonotcreate | wc -l )
-
+    local GENERATE=$( grep ${TARGET} testdonotcreate | wc -l )
 
     if [[ ! -e ${TARGET} || ${GENERATE} != 1 ]];
     then
@@ -43,7 +42,7 @@ function generate_testcase {
 	chmod +x ${TARGET}
     fi
 
-    IGNORE=$( grep ${TARGET} testignore | wc -l )
+    local IGNORE=$( grep ${TARGET} testignore | wc -l )
     if [[ ${IGNORE} == 0 ]];
     then
 	echo '\'

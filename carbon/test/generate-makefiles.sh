@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/bin/bash -u
+# Copyright (C) 2011 Peterpaul Taekele Klein Haneveld
 
 pass_cases=$( for i in $( ls pass/*.test ); do echo $( basename $i ); done )
 fail_cases=$( for i in $( ls fail/*.test ); do echo $( basename $i ); done )

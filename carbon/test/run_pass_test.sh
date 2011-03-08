@@ -1,4 +1,6 @@
 #!/bin/bash -u
+# Copyright (C) 2011 Peterpaul Taekele Klein Haneveld
+
 LD=gcc
 
 BASEDIR=`pwd`
@@ -59,8 +61,8 @@ function compile_library_gcc {
     local TARGETNAME=${TARGET}/${DIRNAME}/${BASENAME}
     # Compile the generated code with ${CC}
     pushd `dirname ${TARGETNAME}.bin` >> ${LOGFILE} 2>&1
-    echo "Command: ${CC} -g3 -c ${TARGETNAME}.c -o `basename ${TARGETNAME}.o` ${CFLAGS}" >> ${LOGFILE}
-    ${CC} -g3 -c ${TARGETNAME}.c -o `basename ${TARGETNAME}.o` ${CFLAGS} >> ${LOGFILE} 2>&1
+    echo "Command: ${CC} -g3 -c ${TARGETNAME}.c -o ${TARGETNAME}.o ${CFLAGS}" >> ${LOGFILE}
+    ${CC} -g3 -c ${TARGETNAME}.c -o ${TARGETNAME}.o ${CFLAGS} >> ${LOGFILE} 2>&1
     local CC_STATUS=$?
     popd >> ${LOGFILE} 2>&1
     if [[ "${CC_STATUS}" != "0" ]]
@@ -68,7 +70,7 @@ function compile_library_gcc {
 	echo "ERROR: ${TEST} failed: CC error" >> ${LOGFILE}
 	return 1
     else
-	OBJECTS="${OBJECTS} $( basename ${TARGETNAME}.o )"
+	OBJECTS="${OBJECTS} ${TARGETNAME}.o"
     fi
     return 0
 }
@@ -86,8 +88,8 @@ function run_pass_test {
     local TARGETNAME=${TARGET}/${DIRNAME}/${BASENAME}
     # Compile the generated code with ${CC}
     pushd `dirname ${TARGETNAME}.bin` >> ${LOGFILE} 2>&1
-    echo "Command: ${LD} ${OBJECTS} -o `basename ${TARGETNAME}.bin` ${LDFLAGS} -lc -lm" >> ${LOGFILE}
-    ${LD} ${OBJECTS} -o `basename ${TARGETNAME}.bin` ${LDFLAGS} -lc -lm >> ${LOGFILE} 2>&1
+    echo "Command: ${LD} ${OBJECTS} -o ${TARGETNAME}.bin ${LDFLAGS} -lc -lm" >> ${LOGFILE}
+    ${LD} ${OBJECTS} -o ${TARGETNAME}.bin ${LDFLAGS} -lc -lm >> ${LOGFILE} 2>&1
     local LD_STATUS=$?
     popd >> ${LOGFILE} 2>&1
     if [[ "${LD_STATUS}" != "0" ]]
