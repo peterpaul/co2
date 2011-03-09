@@ -31,10 +31,13 @@ AC_HEADER_STDBOOL
 AC_TYPE_SIZE_T
 
 # Checks for library functions.
-AC_CHECK_FUNCS([memset])
+AC_FUNC_MALLOC
+AC_FUNC_REALLOC
+AC_CHECK_FUNCS([memmove memset strdup strstr])
 
 AC_CONFIG_FILES([Makefile
                  src/Makefile
+                 test/Makefile
                  co2-1.0.pc])
 
 AC_OUTPUT
