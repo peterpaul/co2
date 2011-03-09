@@ -16,13 +16,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-/*
- * Object.h
- *
- *  Created on: Oct 22, 2008
- *      Author: epetkle
- */
-
 #ifndef OBJECT_H_
 #define OBJECT_H_
 
