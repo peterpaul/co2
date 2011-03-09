@@ -16,13 +16,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-/*
- * Singleton.c
- *
- *  Created on: Oct 23, 2008
- *      Author: epetkle
- */
-
 #include "co2/Singleton.h"
 
 #define O_SUPER Object()
