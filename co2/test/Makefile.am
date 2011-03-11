@@ -29,7 +29,8 @@ co2/TestInterface.h
 libtest_a_CPPFLAGS=-I$(top_srcdir)/src
 
 noinst_PROGRAMS=TestObject TestIterator
-TESTS=TestObject TestIterator
+TESTS=TestObject 
+# TestIterator
 
 TestObject_SOURCES=co2/TestObject.c
 TestObject_CPPFLAGS=-I$(top_srcdir)/src

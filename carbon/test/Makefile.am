@@ -1,9 +1,9 @@
-EXTRA_DIST = pass fail generate-testcases.sh run_pass_test.sh run_fail_test.sh
-MAINTAINERCLEANFILES = Makefile.in
+EXTRA_DIST=pass fail generate-testcases.sh run_pass_test.sh run_fail_test.sh
+MAINTAINERCLEANFILES=Makefile.in
 
-targetdir = target
+targetdir=target
 
-TESTS_ENVIRONMENT = CC="$(CC)" CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" LD="$(LD)"
+TESTS_ENVIRONMENT=CC="$(CC)" CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" LD="$(LD)"
 
 distclean-local:
 	-rm -rf $(targetdir)
@@ -11,7 +11,7 @@ distclean-local:
 clean-local:
 	-rm -f ${TESTS}
 
-${TESTS}, Makefile.am: ./generate-testcases.sh
+${TESTS}, Makefile.am: ./generate-testcases.sh testignore testdonotcreate
 	./generate-testcases.sh
 
 TESTS=\
@@ -70,7 +70,6 @@ pass/try_test_throw.sh\
 pass/typedef.sh\
 pass/va_arg.sh\
 pass/var_decl.sh\
-fail/cast_expression.sh\
 fail/class_decl_constructor_arguments.sh\
 fail/class_decl_constructor_decl.sh\
 fail/class_decl_constructor_name.sh\

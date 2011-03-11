@@ -1,11 +1,11 @@
-MAINTAINERCLEANFILES = Makefile.in
-ACLOCAL_AMFLAGS = -I m4
+MAINTAINERCLEANFILES=Makefile.in
+ACLOCAL_AMFLAGS=-I m4
 
-AM_YFLAGS = -d
+AM_YFLAGS=-d
 
-lib_LTLIBRARIES = libcarbon-1.0.la
+lib_LTLIBRARIES=libcarbon-1.0.la
 libcarbon_1_0_ladir=$(includedir)/carbon-1.0/co2
-libcarbon_1_0_la_SOURCES =  co2/grammar.y co2/lex.l co2/ArgumentDeclaration.c co2/ArrayType.c co2/BaseCompileObjectVisitor.c co2/BreakStatement.c\
+libcarbon_1_0_la_SOURCES= co2/grammar.y co2/lex.l co2/ArgumentDeclaration.c co2/ArrayType.c co2/BaseCompileObjectVisitor.c co2/BreakStatement.c\
 		co2/BinaryExpression.c\
 		co2/CastExpression.c co2/CatchStatement.c co2/ClassDeclaration.c\
 		co2/CompileObject.c co2/CompileObjectVisitor.c\
@@ -27,7 +27,7 @@ libcarbon_1_0_la_SOURCES =  co2/grammar.y co2/lex.l co2/ArgumentDeclaration.c co
 		co2/TryStatement.c co2/Type.c co2/TypeCheckVisitor.c co2/TypeDeclaration.c\
 		co2/UnaryExpression.c\
 		co2/VarArgExpression.c co2/VariableDeclaration.c co2/WhileStatement.c
-libcarbon_1_0_la_HEADERS = co2/ArgumentDeclaration.h co2/ArrayType.h co2/BaseCompileObjectVisitor.h co2/BreakStatement.h\
+libcarbon_1_0_la_HEADERS=co2/ArgumentDeclaration.h co2/ArrayType.h co2/BaseCompileObjectVisitor.h co2/BreakStatement.h\
 		co2/BinaryExpression.h\
 		co2/CastExpression.h co2/CatchStatement.h co2/ClassDeclaration.h\
 		co2/CompileObject.h co2/CompileObjectVisitor.h co2/Compiler.h\
@@ -50,14 +50,14 @@ libcarbon_1_0_la_HEADERS = co2/ArgumentDeclaration.h co2/ArrayType.h co2/BaseCom
 		co2/UnaryExpression.h\
 		co2/VarArgExpression.h co2/VariableDeclaration.h co2/WhileStatement.h
 
-libcarbon_1_0_la_CPPFLAGS = -I$(top_srcdir)/include -DO_DEBUG
+libcarbon_1_0_la_CPPFLAGS=-DO_DEBUG
 
 grammar.h: grammar.c
 
-bin_PROGRAMS = carbon
-carbon_SOURCES = co2/Compiler.c
-carbon_CPPFLAGS = -I$(top_srcdir)/include
-carbon_LDFLAGS = $(CO2_LIBS) -lcarbon-1.0
+bin_PROGRAMS=carbon
+carbon_SOURCES=co2/Compiler.c
+carbon_LDADD=libcarbon-1.0.la
+carbon_LDFLAGS=$(CO2_LIBS)
 
 distclean-local:
 	-rm -r ${bin_PROGRAMS}
