@@ -114,7 +114,7 @@ O_IMPLEMENT(CastExpression, void, generate, (void *_self))
 	}
       else
 	{
-	  error (object_type->token, "Unhandled ObjectType: %s: %s", object_type->token->name->data, object_type->decl->name->name->data);
+	  O_CALL(self->expression, generate);
 	}
     }
   else
