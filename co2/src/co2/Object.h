@@ -114,30 +114,34 @@
 
 #define O_END_OBJECT O_OBJECT_END
 
+#ifdef O_DEBUG
+#define O_CAST(o,c)				\
+  o_cast(o,c)
+#define O_BRANCH_CAST(o,c)			\
+  o_branch_cast(o,c)
 #define O_CALL(o,msg,...)						\
 	({typeof(o) _tmp = o;						\
 		assertTrue(_tmp->class->msg,				\
 			   "runtime error: %s at %p doesn't respond to %s.", \
 			   _tmp->class->name, (void *)_tmp, __STRING(msg)); \
 		_tmp->class->msg(_tmp,##__VA_ARGS__);})
-
 #define O_CALL_CLASS(o,msg,...)						\
 	({typeof(o) _tmp = o;						\
 		assertTrue(_tmp->msg,					\
 			   "runtime error: %s at %p doesn't respond to %s.", \
 			   _tmp->name, (void *)_tmp, __STRING(msg));	\
 		_tmp->msg(_tmp,##__VA_ARGS__);})
-
-#ifdef O_DEBUG
-#define O_CAST(o,c)				\
-  o_cast(o,c)
-#define O_BRANCH_CAST(o,c)			\
-  o_branch_cast(o,c)
 #else
 #define O_CAST(o,c)				\
   (void *) o
 #define O_BRANCH_CAST(o,c)			\
   (void *) o
+#define O_CALL(o,msg,...)						\
+	({typeof(o) _tmp = o;						\
+		_tmp->class->msg(_tmp,##__VA_ARGS__);})
+#define O_CALL_CLASS(o,msg,...)						\
+	({typeof(o) _tmp = o;						\
+		_tmp->msg(_tmp,##__VA_ARGS__);})
 #endif
 
 #define O_GET_ARG(type)				\
