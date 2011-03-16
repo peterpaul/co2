@@ -1,5 +1,5 @@
 /*
- * libco2 Library for object oriented programming in C
+ * my-object Example project for libco2
  *
  * Copyright (C) 2011 Peterpaul Taekele Klein Haneveld
  *

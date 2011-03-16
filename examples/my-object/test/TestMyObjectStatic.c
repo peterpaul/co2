@@ -18,31 +18,13 @@
  */
 #include "MyObject.h"
 
-#define O_SUPER Object()
-
-void *MyObject_ctor(void *_self, va_list * argp)
+int main (int argc, char ** argv)
 {
-	struct MyObject *self = o_cast(_self, MyObject());
-	self = O_SUPER->ctor(self, argp);
-	self->value = va_arg(*argp, int);
-	return self;
+  struct MyObject _object;
+  struct MyObject *object = O_CALL_CLASS(MyObject(), init, &_object, 5);
+  printf("object.value = %d\n", object->value);
+  O_CALL(object, setValue, 13);
+  printf("object.value = %d\n", O_CALL(object, getValue));
+  O_CALL(object, dtor);
+  return 0;
 }
-
-int MyObject_getValue(void *_self)
-{
-	struct MyObject *self = o_cast(_self, MyObject());
-	return self->value;
-}
-
-int MyObject_setValue(void *_self, int value)
-{
-	struct MyObject *self = o_cast(_self, MyObject());
-	self->value = value;
-	return value;
-}
-
-O_OBJECT(MyObject, Object);
-self->ctor = MyObject_ctor;
-self->getValue = MyObject_getValue;
-self->setValue = MyObject_setValue;
-O_OBJECT_END
