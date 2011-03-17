@@ -24,15 +24,15 @@
 O_METHOD_DEF(MyObject, int, getValue, (void *_self));
 O_METHOD_DEF(MyObject, int, setValue, (void *_self, int value));
 
-#define MyObjectClass_Attr					\
-	ObjectClass_Attr;						\
-	O_METHOD(MyObject, getValue);			\
+#define MyObjectClass_Attr			\
+	ObjectClass_Attr;			\
+	O_METHOD(MyObject, getValue);		\
 	O_METHOD(MyObject, setValue)
 
-#define MyObject_Attr						\
-	Object_Attr;							\
+#define MyObject_Attr				\
+	Object_Attr;				\
 	int value
 
 O_CLASS(MyObject, Object);
 
-#endif				/* _MYOBJECT_H */
+#endif	/* _MYOBJECT_H */

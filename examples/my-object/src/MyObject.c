@@ -20,29 +20,25 @@
 
 #define O_SUPER Object()
 
-void *MyObject_ctor(void *_self, va_list * argp)
-{
-	struct MyObject *self = o_cast(_self, MyObject());
-	self = O_SUPER->ctor(self, argp);
+O_IMPLEMENT(MyObject, void *, ctor, (void *_self, va_list * argp)) {
+	struct MyObject *self = O_CAST(_self, MyObject());
 	self->value = va_arg(*argp, int);
 	return self;
 }
 
-int MyObject_getValue(void *_self)
-{
-	struct MyObject *self = o_cast(_self, MyObject());
+O_IMPLEMENT(MyObject, int, getValue, (void *_self)) {
+	struct MyObject *self = O_CAST(_self, MyObject());
 	return self->value;
 }
 
-int MyObject_setValue(void *_self, int value)
-{
-	struct MyObject *self = o_cast(_self, MyObject());
+O_IMPLEMENT(MyObject, int, setValue, (void *_self, int value)) {
+	struct MyObject *self = O_CAST(_self, MyObject());
 	self->value = value;
 	return value;
 }
 
 O_OBJECT(MyObject, Object);
-self->ctor = MyObject_ctor;
-self->getValue = MyObject_getValue;
-self->setValue = MyObject_setValue;
+O_OBJECT_METHOD(MyObject, ctor);
+O_OBJECT_METHOD(MyObject, getValue);
+O_OBJECT_METHOD(MyObject, setValue);
 O_OBJECT_END

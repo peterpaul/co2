@@ -20,11 +20,11 @@
 
 int main (int argc, char ** argv)
 {
-  struct MyObject _object;
-  struct MyObject *object = O_CALL_CLASS(MyObject(), init, &_object, 5);
-  printf("object.value = %d\n", object->value);
-  O_CALL(object, setValue, 13);
-  printf("object.value = %d\n", O_CALL(object, getValue));
-  O_CALL(object, dtor);
-  return 0;
+	struct MyObject _object;
+	struct MyObject *object = O_CALL_CLASS(MyObject(), init, &_object, 5);
+	printf("object.value = %d\n", object->value);
+	O_CALL(object, setValue, 13);
+	printf("object.value = %d\n", O_CALL(object, getValue));
+	O_CALL(object, dtor);
+	return 0;
 }
