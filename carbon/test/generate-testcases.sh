@@ -61,12 +61,12 @@ function generate_testcases {
 }
 
 function generate_makefile_am_header {
-    echo 'EXTRA_DIST = pass fail generate-testcases.sh run_pass_test.sh run_fail_test.sh'
-    echo 'MAINTAINERCLEANFILES = Makefile.in'
+    echo 'EXTRA_DIST=pass fail generate-testcases.sh run_pass_test.sh run_fail_test.sh'
+    echo 'MAINTAINERCLEANFILES=Makefile.in'
     echo
-    echo 'targetdir = target'
+    echo 'targetdir=target'
     echo
-    echo 'TESTS_ENVIRONMENT = CC="$(CC)" CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" LD="$(LD)"'
+    echo 'TESTS_ENVIRONMENT=CC="$(CC)" CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" LD="$(LD)"'
     echo
     echo 'distclean-local:'
     echo '	-rm -rf $(targetdir)'
@@ -74,7 +74,7 @@ function generate_makefile_am_header {
     echo 'clean-local:'
     echo '	-rm -f ${TESTS}'
     echo
-    echo '${TESTS}, Makefile.am: ./generate-testcases.sh'
+    echo '${TESTS}, Makefile.am: ./generate-testcases.sh testignore testdonotcreate'
     echo '	./generate-testcases.sh'
     echo
     echo -n 'TESTS='
