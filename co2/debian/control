@@ -6,7 +6,7 @@ Build-Depends: debhelper (>= 7.0.50~), autotools-dev
 Standards-Version: 3.9.1
 Homepage: http://www.kleinhaneveld.tk/co2
 Vcs-Git: git@gitorious.org:co2/co2.git
-Vcs-Browser: https://gitorious.org/co2/co2/trees/master
+Vcs-Browser: https://gitorious.org/co2/co2/trees/master/co2
 
 Package: co2
 Architecture: any
