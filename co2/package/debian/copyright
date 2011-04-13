@@ -1,5 +1,5 @@
 Format: http://dep.debian.net/deps/dep5
-Upstream-Name: co2
+Upstream-Name: libco2
 Source: http://www.kleinhaneveld.tk/co2/
 
 Files: *
@@ -26,6 +26,3 @@ License: LGPL-3.0
  .
  On Debian systems, the complete text of the GNU Lesser General
  Public License can be found in "/usr/share/common-licenses/LGPL-3".
-
-# Please also look if there are files or directories which have a
-# different copyright/license attached and list them here.

@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.67])
-AC_INIT([co2], [0.0.1], [pp_kl_h@hotmail.com])
+AC_INIT([libco2], [0.0.1], [pp_kl_h@hotmail.com])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE
 AM_SILENT_RULES([yes])
@@ -39,6 +39,6 @@ AC_CHECK_FUNCS([memmove memset strdup strstr])
 AC_CONFIG_FILES([Makefile
                  src/Makefile
                  test/Makefile
-                 co2-1.0.pc])
+                 libco2-1.0.pc])
 
 AC_OUTPUT
