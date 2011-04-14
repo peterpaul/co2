@@ -12,4 +12,7 @@ Package: libco2
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Small and fast object system for C.
- <insert long description, indented with spaces>
+  It is intended for C developers, that want to do Object Oriented Programming
+  (OOP) in C. It is possible to use it with or without dynamic memory allocation
+  (i.e. malloc() and friends).
+

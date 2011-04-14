@@ -8,5 +8,5 @@ Description: C Objects Too
 URL: localhost
 Version: @VERSION@
 Requires: 
-Cflags: -I${includedir}/libco2-1.0
-Libs: -L${libdir} -llibco2-1.0
+Cflags: -I${includedir}/co2-1.0
+Libs: -L${libdir} -lco2-1.0
