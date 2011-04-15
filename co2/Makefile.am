@@ -1,4 +1,5 @@
 MAINTAINERCLEANFILES = Makefile.in ${pkgconfig_DATA}
+
 ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = src test
@@ -13,3 +14,6 @@ deb-pkg:
 	- rm debian/README.Debian debian/*.ex debian/*.EX
 	- cp package/debian/* debian
 	debuild -us -uc
+
+distclean-local:
+	-rm -f doltcompile doltlibtool

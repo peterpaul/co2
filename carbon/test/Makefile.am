@@ -1,4 +1,4 @@
-EXTRA_DIST=pass fail generate-testcases.sh run_pass_test.sh run_fail_test.sh
+EXTRA_DIST=pass fail generate-testcases.sh run_pass_test.sh run_fail_test.sh testignore testdonotcreate
 MAINTAINERCLEANFILES=Makefile.in
 
 targetdir=target
