@@ -11,8 +11,11 @@ distclean-local:
 clean-local:
 	-rm -f ${TESTS}
 
-${TESTS}, Makefile.am: ./generate-testcases.sh testignore testdonotcreate
+${TESTS}: ./generate-testcases.sh testdonotcreate
 	./generate-testcases.sh
+
+Makefile.am: ./generate-makefile-am.sh testignore
+	./generate-makefile-am.sh
 
 TESTS=\
 pass/arithmetic_expressions.sh\
