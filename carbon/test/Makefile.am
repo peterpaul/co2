@@ -3,19 +3,21 @@ MAINTAINERCLEANFILES=Makefile.in
 
 targetdir=target
 
-TESTS_ENVIRONMENT=CC="$(CC)" CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" LD="$(LD)"
+TESTS_ENVIRONMENT=CC="$(CC)" CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" LD="$(LD)" SRCDIR="$(srcdir)"
 
 distclean-local:
 	-rm -rf $(targetdir)
 
 clean-local:
-	-rm -f ${TESTS}
+	-rm -f $(TESTS)
+	-cat $(srcdir)/testdonotcreate | xargs rm -f
+	-cat $(srcdir)/testignore | xargs rm -f
 
-${TESTS}: ./generate-testcases.sh testdonotcreate
-	./generate-testcases.sh
+$(TESTS): $(srcdir)/generate-testcases.sh $(srcdir)/testdonotcreate
+	$(srcdir)/generate-testcases.sh $(srcdir)
 
-Makefile.am: ./generate-makefile-am.sh testignore
-	./generate-makefile-am.sh
+Makefile.am: $(srcdir)/generate-makefile-am.sh $(srcdir)/testignore
+	$(srcdir)/generate-makefile-am.sh
 
 TESTS=\
 pass/arithmetic_expressions.sh\

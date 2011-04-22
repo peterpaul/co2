@@ -35,19 +35,21 @@ function generate_makefile_am_header {
     echo
     echo 'targetdir=target'
     echo
-    echo 'TESTS_ENVIRONMENT=CC="$(CC)" CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" LD="$(LD)"'
+    echo 'TESTS_ENVIRONMENT=CC="$(CC)" CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" LD="$(LD)" SRCDIR="$(srcdir)"'
     echo
     echo 'distclean-local:'
     echo '	-rm -rf $(targetdir)'
     echo
     echo 'clean-local:'
-    echo '	-rm -f ${TESTS}'
+    echo '	-rm -f $(TESTS)'
+    echo '	-cat $(srcdir)/testdonotcreate | xargs rm -f'
+    echo '	-cat $(srcdir)/testignore | xargs rm -f'
     echo
-    echo '${TESTS}: ./generate-testcases.sh testdonotcreate'
-    echo '	./generate-testcases.sh'
+    echo '$(TESTS): $(srcdir)/generate-testcases.sh $(srcdir)/testdonotcreate'
+    echo '	$(srcdir)/generate-testcases.sh $(srcdir)'
     echo
-    echo 'Makefile.am: ./generate-makefile-am.sh testignore'
-    echo '	./generate-makefile-am.sh'
+    echo 'Makefile.am: $(srcdir)/generate-makefile-am.sh $(srcdir)/testignore'
+    echo '	$(srcdir)/generate-makefile-am.sh'
     echo
     echo -n 'TESTS='
 }
