@@ -237,13 +237,17 @@ main (int argc, char **argv)
 		  version ();
 		  return 0;
 		}
+	      else
+		{
+		  error (NULL, "invalid option: %s\n", argv[arg]);
+		}
 	    }
-	  else if (strcmp (argv[arg], "--help"))
+	  else if (strcmp (argv[arg], "--help") == 0)
 	    {
 	      usage ();
 	      return 0;
 	    }
-	  else if (strcmp (argv[arg], "--version"))
+	  else if (strcmp (argv[arg], "--version") == 0)
 	    {
 	      version ();
 	      return 0;
