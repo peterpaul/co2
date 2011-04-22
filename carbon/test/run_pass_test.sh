@@ -3,11 +3,10 @@
 
 LD=gcc
 
-BASEDIR=`pwd`
+BASEDIR=$( pwd )
 COMPILER=${BASEDIR}/../src/carbon
 
-TESTDIR=${BASEDIR}
-TARGET=${TESTDIR}/target
+TARGET=${BASEDIR}/target
 
 LOGFILE=${TARGET}/${!#}.log
 if [[ -e ${LOGFILE} ]]
@@ -15,31 +14,41 @@ then
     rm -f ${LOGFILE}
 fi
 
+if [ "${SRCDIR-x}" == "x" ]; then
+    echo "SRCDIR not defined"
+    SRCDIR=.
+fi
+
 mkdir -p ${TARGET}/pass
-find pass -name "*.h" -exec cp -t ${TARGET}/pass {} \;
+find ${SRCDIR}/pass -name "*.h" -exec cp -u -t ${TARGET}/pass {} \;
 
 OBJECTS=
 
+echo "LOGFILE=${LOGFILE}" >> ${LOGFILE}
+echo "SRCDIR=${SRCDIR}" >> ${LOGFILE}
+echo "TARGET=${TARGET}" >> ${LOGFILE}
 echo "CC=${CC}" >> ${LOGFILE}
 echo "CFLAGS=${CFLAGS}" >> ${LOGFILE}
 echo "LDFLAGS=${LDFLAGS}" >> ${LOGFILE}
 echo "LD=${LD}" >> ${LOGFILE}
 
+CFLAGS="${CFLAGS} -Wall -I../${SRCDIR}/pass"
+
 function compile_library_test {
     local TEST=$1
 
-    local BASENAME=`basename ${TEST} .test`
-    local DIRNAME=`dirname ${TEST}`
+    local BASENAME=$( basename ${TEST} .test )
+    local DIRNAME=$( dirname ${TEST} )
     local CO2=$( echo ${BASENAME} | grep ".co2" | wc -l )
     if [[ $CO2 == 1 ]]
     then
-	local BASENAME=`basename ${TEST} .co2`
+	local BASENAME=$( basename ${TEST} .co2 )
     fi
     local TARGETNAME=${TARGET}/${DIRNAME}/${BASENAME}
     mkdir -p ${TARGET}/${DIRNAME}
     # Compile the testcase
-    echo "Command: ${COMPILER} ${TEST} ${TARGETNAME}.c" >> ${LOGFILE}
-    ${COMPILER} ${TEST} ${TARGETNAME}.c >> ${LOGFILE} 2>&1
+    echo "Command: ${COMPILER} ${SRCDIR}/${TEST} ${TARGETNAME}.c" >> ${LOGFILE}
+    ${COMPILER} ${SRCDIR}/${TEST} ${TARGETNAME}.c >> ${LOGFILE} 2>&1
     if [[ "$?" != "0" ]]
     then
 	echo "ERROR: ${TEST} failed: Compiler error" >> ${LOGFILE}
@@ -51,16 +60,16 @@ function compile_library_test {
 function compile_library_gcc {
     local TEST=$1
 
-    local BASENAME=`basename ${TEST} .test`
-    local DIRNAME=`dirname ${TEST}`
+    local BASENAME=$( basename ${TEST} .test )
+    local DIRNAME=$( dirname ${TEST} )
     local CO2=$( echo ${BASENAME} | grep ".co2" | wc -l )
     if [[ $CO2 == 1 ]]
     then
-	local BASENAME=`basename ${TEST} .co2`
+	local BASENAME=$( basename ${TEST} .co2 )
     fi
     local TARGETNAME=${TARGET}/${DIRNAME}/${BASENAME}
     # Compile the generated code with ${CC}
-    pushd `dirname ${TARGETNAME}.bin` >> ${LOGFILE} 2>&1
+    pushd $( dirname ${TARGETNAME}.bin ) >> ${LOGFILE} 2>&1
     echo "Command: ${CC} -g3 -c ${TARGETNAME}.c -o ${TARGETNAME}.o ${CFLAGS}" >> ${LOGFILE}
     ${CC} -g3 -c ${TARGETNAME}.c -o ${TARGETNAME}.o ${CFLAGS} >> ${LOGFILE} 2>&1
     local CC_STATUS=$?
@@ -78,16 +87,16 @@ function compile_library_gcc {
 function run_pass_test {
     local TEST=$1
 
-    local BASENAME=`basename ${TEST} .test`
-    local DIRNAME=`dirname ${TEST}`
+    local BASENAME=$( basename ${TEST} .test )
+    local DIRNAME=$( dirname ${TEST} )
     local CO2=$( echo ${BASENAME} | grep ".co2" | wc -l )
     if [[ $CO2 == 1 ]]
     then
-	local BASENAME=`basename ${TEST} .co2`
+	local BASENAME=$( basename ${TEST} .co2 )
     fi
     local TARGETNAME=${TARGET}/${DIRNAME}/${BASENAME}
     # Compile the generated code with ${CC}
-    pushd `dirname ${TARGETNAME}.bin` >> ${LOGFILE} 2>&1
+    pushd $( dirname ${TARGETNAME}.bin ) >> ${LOGFILE} 2>&1
     echo "Command: ${LD} ${OBJECTS} -o ${TARGETNAME}.bin ${LDFLAGS} -lc -lm" >> ${LOGFILE}
     ${LD} ${OBJECTS} -o ${TARGETNAME}.bin ${LDFLAGS} -lc -lm >> ${LOGFILE} 2>&1
     local LD_STATUS=$?
@@ -98,8 +107,8 @@ function run_pass_test {
 	return 1
     fi
     # When no input and output exists, create empty in/output.
-    local TESTINPUT=${TESTDIR}/pass/${BASENAME}.in
-    local TESTOUTPUT=${TESTDIR}/pass/${BASENAME}.out
+    local TESTINPUT=${SRCDIR}/pass/${BASENAME}.in
+    local TESTOUTPUT=${SRCDIR}/pass/${BASENAME}.out
     if [[ ! -f ${TESTINPUT} ]]; then touch ${TESTINPUT}; fi
     if [[ ! -f ${TESTOUTPUT} ]]; then touch ${TESTOUTPUT}; fi
     # Run program with input, and compare the output with the expected output.

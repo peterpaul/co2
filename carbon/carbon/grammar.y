@@ -123,7 +123,6 @@
 %token <token> MACRO_IDENTIFIER
 %token <token> NEW
 %token <token> _NULL
-%token <token> PACKAGE
 %token <token> RETURN
 %token <token> SELF
 %token <token> SIZEOF

@@ -1,8 +1,17 @@
 #!/bin/bash -u
 # Copyright (C) 2011 Peterpaul Taekele Klein Haneveld
 
-pass_cases=$( for i in $( ls pass/*.test ); do echo $( basename $i ); done )
-fail_cases=$( for i in $( ls fail/*.test ); do echo $( basename $i ); done )
+if [[ $# == 1 ]]; then
+    SRCDIR=$1
+fi
+
+if [ "${SRCDIR-x}" == "x" ]; then
+    echo "SRCDIR not defined"
+    SRCDIR=.
+fi
+
+pass_cases=$( for i in $( ls ${SRCDIR}/pass/*.test ); do echo $( basename $i ); done )
+fail_cases=$( for i in $( ls ${SRCDIR}/fail/*.test ); do echo $( basename $i ); done )
 
 DEPENDENCIES=
 function generate_dependencies {
@@ -23,7 +32,9 @@ function generate_testcase {
 
     local BASENAME=$( basename ${NAME} .test )
     local TARGET=${TYPE}/${BASENAME}.sh
-    local GENERATE=$( grep ${TARGET} testdonotcreate | wc -l )
+    local GENERATE=$( grep ${TARGET} ${SRCDIR}/testdonotcreate | wc -l )
+
+    mkdir -p ${TYPE}
 
     if [[ ! -e ${TARGET} || ${GENERATE} != 1 ]];
     then
@@ -32,21 +43,14 @@ function generate_testcase {
 
 	if [[ "${TYPE}" == "pass" ]];
 	then
-	    generate_dependencies ${TYPE}/${BASENAME}.test ${TYPE}
-	    echo "./run_pass_test.sh ${DEPENDENCIES} ${TYPE}/${BASENAME}.test" >> ${TARGET}
+	    generate_dependencies ${SRCDIR}/${TYPE}/${BASENAME}.test ${TYPE}
+	    echo "\${SRCDIR}/run_pass_test.sh ${DEPENDENCIES} ${TYPE}/${BASENAME}.test" >> ${TARGET}
 	else
-	    generate_dependencies ${TYPE}/${BASENAME}.test ${TYPE}
-	    echo "./run_fail_test.sh ${DEPENDENCIES} ${TYPE}/${BASENAME}.test" >> ${TARGET}
+	    generate_dependencies ${SRCDIR}/${TYPE}/${BASENAME}.test ${TYPE}
+	    echo "\${SRCDIR}/run_fail_test.sh ${DEPENDENCIES} ${TYPE}/${BASENAME}.test" >> ${TARGET}
 	fi
 
 	chmod +x ${TARGET}
-    fi
-
-    local IGNORE=$( grep ${TARGET} testignore | wc -l )
-    if [[ ${IGNORE} == 0 ]];
-    then
-	echo '\'
-	echo -n ${TARGET}
     fi
 }
 
@@ -60,27 +64,5 @@ function generate_testcases {
     done
 }
 
-function generate_makefile_am_header {
-    echo 'EXTRA_DIST=pass fail generate-testcases.sh run_pass_test.sh run_fail_test.sh'
-    echo 'MAINTAINERCLEANFILES=Makefile.in'
-    echo
-    echo 'targetdir=target'
-    echo
-    echo 'TESTS_ENVIRONMENT=CC="$(CC)" CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" LD="$(LD)"'
-    echo
-    echo 'distclean-local:'
-    echo '	-rm -rf $(targetdir)'
-    echo
-    echo 'clean-local:'
-    echo '	-rm -f ${TESTS}'
-    echo
-    echo '${TESTS}, Makefile.am: ./generate-testcases.sh testignore testdonotcreate'
-    echo '	./generate-testcases.sh'
-    echo
-    echo -n 'TESTS='
-}
-
-generate_makefile_am_header | tee Makefile.am
-
-generate_testcases pass "${pass_cases}" | tee -a Makefile.am
-generate_testcases fail "${fail_cases}" | tee -a Makefile.am
+generate_testcases pass "${pass_cases}"
+generate_testcases fail "${fail_cases}"

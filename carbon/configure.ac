@@ -7,7 +7,7 @@ AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE
 AM_SILENT_RULES([yes])
 AC_CONFIG_SRCDIR([src/co2/Compiler.c])
-AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_HEADERS([src/config.h])
 
 # Checks for programs.
 AC_PROG_CXX
@@ -26,7 +26,7 @@ AC_PROG_YACC
 
 # Checks for libraries.
 AC_CHECK_LIB([pthread], [pthread_create])
-PKG_CHECK_MODULES([CO2], [co2-1.0 >= 0.0.1],,AC_MSG_ERROR([required module missing]))
+PKG_CHECK_MODULES([CO2], [libco2-1.0 >= 0.0.1],,AC_MSG_ERROR([required module missing]))
 CFLAGS="$CFLAGS $CO2_CFLAGS"
 LDFLAGS="$LDFLAGS $CO2_LIBS"
 PKG_CHECK_MODULES([CO2BASE], [co2-base-1.0 >= 0.0.1],,AC_MSG_ERROR([required module missing]))

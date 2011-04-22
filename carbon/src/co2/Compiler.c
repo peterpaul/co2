@@ -30,6 +30,8 @@
 #include "co2/GenerateSourceVisitor.h"
 #include "co2/GenerateSourceIncludesVisitor.h"
 
+#include "config.h"
+
 static char * extract_name(const char * file)
 {
   const char * start = strrchr (file, '/');
@@ -179,6 +181,31 @@ int mainImpl(const char * output_file)
   return errors;
 }
 
+void
+version ()
+{
+  fprintf (stdout, "%s\n", PACKAGE_STRING);
+}
+
+void
+usage ()
+{
+  fprintf (stdout, "Compiler for the carbon programming language\n");
+  fprintf (stdout, "\n");
+  fprintf (stdout, "USAGE:\n");
+  fprintf (stdout, "    %s [OPTION]... [SOURCE_FILE} [C_OUTPUT_FILE]\n", PACKAGE);
+  fprintf (stdout, "\n");
+  fprintf (stdout, "ARGUMENTS:\n");
+  fprintf (stdout, "        SOURCE_FILE:    %s source file\n", PACKAGE);
+  fprintf (stdout, "        C_OUTPUT_FILE:  filename of c output\n");
+  fprintf (stdout, "\n");
+  fprintf (stdout, "OPTIONS:\n");
+  fprintf (stdout, "        -P INCLUDE_DIR: include directory to add to search path\n");
+  fprintf (stdout, "        -h,--help:      show this help\n");
+  fprintf (stdout, "        -V,--version:   show version\n");
+  fprintf (stdout, "\n");
+}
+
 int
 main (int argc, char **argv)
 {
@@ -193,9 +220,37 @@ main (int argc, char **argv)
     {
       if (argv[arg][0] == '-')
 	{
-	  if (strlen (argv[arg]) == 2 && argv[arg][1] == 'P')
+	  if (strlen (argv[arg]) == 2)
 	    {
-	      nextIsOption = true;
+	      // short options
+	      if (argv[arg][1] == 'P')
+		{
+		  nextIsOption = true;
+		}
+	      if (argv[arg][1] == 'h')
+		{
+		  usage ();
+		  return 0;
+		}
+	      if (argv[arg][1] == 'V')
+		{
+		  version ();
+		  return 0;
+		}
+	      else
+		{
+		  error (NULL, "invalid option: %s\n", argv[arg]);
+		}
+	    }
+	  else if (strcmp (argv[arg], "--help") == 0)
+	    {
+	      usage ();
+	      return 0;
+	    }
+	  else if (strcmp (argv[arg], "--version") == 0)
+	    {
+	      version ();
+	      return 0;
 	    }
 	  else
 	    {

@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 #ifndef OBJECT_H_
 #define OBJECT_H_
 
@@ -28,21 +29,79 @@
 #include "co2/utils.h"
 #include "co2/exception.h"
 
+/**
+ * @file Object.h
+ * Object.h contains the base declarations of the libco2 library.
+ *
+ * <ul>
+ * <li>macro definitions that aid the programmer to program with libco2</li>
+ * <li>method declarations for Object and Class</li>
+ * <li>definitions for Object and Class structures</li>
+ * <li>basic libco2 function declarations</li>
+ * </ul>
+ */
+
 /* Macros */
 #define O_STRING(x) #x
 
 #define O_MAGIC 0xCAFEBABE
 
+/**
+ * Declare a method field of a Class. The corresponding method needs to be defined
+ * using the @link O_METHOD_DEF macro. For example see the following code fragment:
+ *
+ * <pre>
+ * \#define MyObjectClass_Attr;         \
+ *       ObjectClass_Attr;             \
+ *       O_METHOD (MyObject, setValue)
+ * </pre>
+ *
+ * @param klass Class name
+ * @param name method name
+ */
 #define O_METHOD(klass,name)			\
 	klass##_##name##_##t name
 
 #define O_FUNCTION_DEF(klass,type,name,args)	\
 	type klass##_##name args
 
+/**
+ * Declare the prototype of a method. This will define a function type for the
+ * method, and a function for the actual implementation ({@link O_IMPLEMENT}). The
+ * method should accept an object reference as first argument. Convention is to use
+ * <code>void *_self</code>. For example see the following code fragment:
+ * 
+ * <pre>
+ * O_METHOD_DEF (MyObject, void, setValue, (void *_self, int value));
+ * </pre>
+ *
+ * @param klass Class name
+ * @param type method return type
+ * @param name method name
+ * @param args method arguments
+ */
 #define O_METHOD_DEF(klass,type,name,args)		\
 	typedef type (*klass##_##name##_##t) args;	\
         O_FUNCTION_DEF(_##klass, type, name, args)
 
+/**
+ * Define a method. After this macro, the actual implementation of a method should
+ * follow. For example see the following code fragment:
+ *
+ * <pre>
+ * O_IMPLEMENT (MyObject, void, setValue, (void *_self, int value)) {
+ *         struct MyObject *self = O_CAST(_self, MyObject());
+ *         self->value = value;
+ * }
+ * </pre>
+ *
+ * @NOTE the similarity with the @link O_METHOD_DEF macro.
+ *
+ * @param klass Class name
+ * @param type method return type
+ * @param name method name
+ * @param args method arguments
+ */
 #define O_IMPLEMENT(klass,type,name,args)	\
 	O_FUNCTION_DEF(_##klass,type,name,args)
 
@@ -61,6 +120,26 @@
 		name##_Attr;			\
 	}
 
+/**
+ * Declare a class. This depends on the macros: <code><i>&lt;klass&gt;</i>_Attr</code>
+ * and <code><i>&lt;klass&gt;</i>Class_Attr</code>. These macros should be defined as
+ * follows.
+ *
+ * <code>
+ * #define <i>&lt;klass&gt;</i>Class_Attr	\\<br>&nbsp;&nbsp;
+ * 	<i>&lt;supper&gt;</i>Class_Attr;	\\<br>&nbsp;&nbsp;
+ * 	O_METHOD (<i>&lt;klass&gt;</i>, ...);	\\<br>&nbsp;&nbsp;
+ * 	O_METHOD (<i>&lt;klass&gt;</i>, final_method)<br>
+ * <br>
+ * #define <i>&lt;klass&gt;</i>_Attr	\\<br>&nbsp;&nbsp;
+ * 	<i>&lt;supper&gt;</i>_Attr;	\\<br>&nbsp;&nbsp;
+ * 	...	\\<br>&nbsp;&nbsp;
+ * 	<i>&lt;type&gt;</i> final_attribute <br>
+ * </code>
+ *
+ * @param klass Class name
+ * @param supper Superclass name
+ */
 #define O_CLASS(klass,supper)			\
 	O_OBJECT_DEF(klass,klass##Class);	\
 	O_CLASS_DEF(klass##Class, supper)
@@ -69,10 +148,20 @@
 	(assertTrue(x,"O_ASSERT_CLASS: Expected non NULL pointer"),	\
 	 assertTrue(((struct Class *)(x))->_magic == O_MAGIC, "O_ASSERT_CLASS: Expected O_MAGIC"))
 
+/**
+ * Asserts x to be a Class.
+ *
+ * @param x Pointer
+ */
 #define O_IS_CLASS(x)				\
 	(O_ASSERT_CLASS(x),			\
 	 (x))
 
+/**
+ * Asserts x to be an Object
+ *
+ * @param x Pointer
+ */
 #define O_IS_OBJECT(x)							\
 	(assertTrue(x,"O_IS_OBJECT: Expected non NULL pointer"),	\
 	 O_ASSERT_CLASS(((struct Object *)(x))->class),			\

@@ -1,18 +1,23 @@
-EXTRA_DIST=pass fail generate-testcases.sh run_pass_test.sh run_fail_test.sh
+EXTRA_DIST=pass fail generate-testcases.sh run_pass_test.sh run_fail_test.sh testignore testdonotcreate
 MAINTAINERCLEANFILES=Makefile.in
 
 targetdir=target
 
-TESTS_ENVIRONMENT=CC="$(CC)" CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" LD="$(LD)"
+TESTS_ENVIRONMENT=CC="$(CC)" CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" LD="$(LD)" SRCDIR="$(srcdir)"
 
 distclean-local:
 	-rm -rf $(targetdir)
 
 clean-local:
-	-rm -f ${TESTS}
+	-rm -f $(TESTS)
+	-cat $(srcdir)/testdonotcreate | xargs rm -f
+	-cat $(srcdir)/testignore | xargs rm -f
 
-${TESTS}, Makefile.am: ./generate-testcases.sh testignore testdonotcreate
-	./generate-testcases.sh
+$(TESTS): $(srcdir)/generate-testcases.sh $(srcdir)/testdonotcreate
+	$(srcdir)/generate-testcases.sh $(srcdir)
+
+Makefile.am: $(srcdir)/generate-makefile-am.sh $(srcdir)/testignore
+	$(srcdir)/generate-makefile-am.sh
 
 TESTS=\
 pass/arithmetic_expressions.sh\
