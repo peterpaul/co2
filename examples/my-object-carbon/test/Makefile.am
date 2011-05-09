@@ -15,7 +15,7 @@ distclean-local:
 
 %.c: %.co2
 	-rm $@
-	carbon -P . -P $(top_srcdir) $< $@
+	carbon -P $(top_srcdir)/src $< $@
 
 %.h: %.c
 
