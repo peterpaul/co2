@@ -222,23 +222,18 @@ main (int argc, char **argv)
 	{
 	  if (strlen (argv[arg]) == 2)
 	    {
-	      // short options
-	      if (argv[arg][1] == 'P')
+	      switch (argv[arg][1])
 		{
+		case 'P':
 		  nextIsOption = true;
-		}
-	      if (argv[arg][1] == 'h')
-		{
+		  break;
+		case 'h':
 		  usage ();
 		  return 0;
-		}
-	      if (argv[arg][1] == 'V')
-		{
+		case 'V':
 		  version ();
 		  return 0;
-		}
-	      else
-		{
+		default:
 		  error (NULL, "invalid option: %s\n", argv[arg]);
 		}
 	    }
@@ -302,7 +297,7 @@ main (int argc, char **argv)
     }
   else
     {
-      struct String *stdin_file = O_CALL_CLASS (String (), new, "<stdin>");
+      struct String *stdin_file = O_CALL_CLASS (String (), new, "_stdin_");
       main_file = O_CALL_CLASS (File (), new, stdin_file, stdin_file);
     }
   current_file = O_CALL (main_file, retain);

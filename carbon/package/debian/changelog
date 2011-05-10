@@ -1,5 +1,6 @@
-carbon (0.0.1-1) unstable; urgency=low
+carbon (0.1.0-1) natty; urgency=low
 
+  [ Peterpaul Taekele Klein Haneveld ]
   * Initial release
 
- -- Peterpaul Taekele Klein Haneveld <pp.kleinhaneveld@gmail.com>  Tue, 12 Apr 2011 11:24:27 +0200
+ -- Peterpaul <peterpaul@hp-dm1>  Mon, 09 May 2011 20:43:09 +0200
