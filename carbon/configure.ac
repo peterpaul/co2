@@ -26,7 +26,7 @@ AC_PROG_YACC
 
 # Checks for libraries.
 AC_CHECK_LIB([pthread], [pthread_create])
-PKG_CHECK_MODULES([CO2], [libco2-1.0 >= 0.0.1],,AC_MSG_ERROR([required module missing]))
+PKG_CHECK_MODULES([CO2], [libco2-1.0 >= 0.1.0],,AC_MSG_ERROR([required module missing]))
 CFLAGS="$CFLAGS $CO2_CFLAGS"
 LDFLAGS="$LDFLAGS $CO2_LIBS"
 
