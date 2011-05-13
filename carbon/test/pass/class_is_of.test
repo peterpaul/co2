@@ -20,7 +20,13 @@
 	int printf(char *format, ...);
 }
 
-class A {
+["co2/Object.h"] {
+	class Object {
+		void *class;
+	}
+}
+
+class A : Object {
 }
 
 class B : A {
@@ -32,6 +38,9 @@ int main() {
 
 	printf ("a is_of B, expected: 0, actual: %d\n", a is_of B);
 	printf ("b is_of A: expected: 1, actual: %d\n", b is_of A);
+
+	printf ("a is_of b.class: expected: 0, actual: %d\n", a is_of b.class);
+	printf ("b is_of a.class: expected: 1, actual: %d\n", b is_of a.class);
 
 	return 0;
 }

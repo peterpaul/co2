@@ -886,7 +886,11 @@ expression
 |	SIZEOF '(' type ')' { $$ = O_CALL_CLASS(SizeExpression(), new, $3); }
 |	'(' type ')' expression %prec CASTX { $$ = O_CALL_CLASS(CastExpression(), new, $2, $4); }
 |	expression '?' expression ':' expression { $$ = O_CALL_CLASS(ConditionalExpression (), new, $1, $3, $5); }
-|	expression IS_OF TYPE_IDENTIFIER { $$ = O_CALL_CLASS(IsOfExpression (), new, $1, $3); }
+|	expression IS_OF TYPE_IDENTIFIER {
+  struct TokenExpression * expr = O_CALL_CLASS(TokenExpression(), new, $3);
+  $$ = O_CALL_CLASS(IsOfExpression (), new, $1, expr);
+}
+|	expression IS_OF expression { $$ = O_CALL_CLASS(IsOfExpression (), new, $1, $3); }
 ;
 
 constant

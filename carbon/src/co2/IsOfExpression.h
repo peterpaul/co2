@@ -27,7 +27,7 @@
 #define IsOfExpression_Attr			\
   Expression_Attr;				\
   struct Expression * expr_to_check;		\
-  struct Token * class_token
+  struct Expression * class_expr
 
 O_CLASS(IsOfExpression, Expression);
 
