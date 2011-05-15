@@ -2,7 +2,7 @@ Source: carbon
 Section: devel
 Priority: extra
 Maintainer: Peterpaul Taekele Klein Haneveld <pp.kleinhaneveld@gmail.com>
-Build-Depends: debhelper (>= 7.0.50~), autotools-dev, cdbs, bison, flex, libco2
+Build-Depends: debhelper (>= 7.0.50~), autotools-dev, cdbs, bison, flex, libco2 (>= 0.1.1)
 Standards-Version: 3.9.1
 Homepage: http://www.kleinhaneveld.tk/carbon
 Vcs-Git: git@gitorious.org:co2/co2.git
@@ -10,7 +10,7 @@ Vcs-Browser: https://gitorious.org/co2/co2/trees/master/carbon
 
 Package: carbon
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libco2
+Depends: ${shlibs:Depends}, ${misc:Depends}, libco2 (>= 0.1.1)
 Description: Programming language and compiler for libco2.
   Carbon is a compiled high level programming language that compiles to plain C.
   This means that compiled carbon programs do not need a Virtual Machine (VM) to

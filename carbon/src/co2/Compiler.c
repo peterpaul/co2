@@ -193,7 +193,7 @@ usage ()
   fprintf (stdout, "Compiler for the carbon programming language\n");
   fprintf (stdout, "\n");
   fprintf (stdout, "USAGE:\n");
-  fprintf (stdout, "    %s [OPTION]... [SOURCE_FILE} [C_OUTPUT_FILE]\n", PACKAGE);
+  fprintf (stdout, "    %s [OPTION]... [SOURCE_FILE] [C_OUTPUT_FILE]\n", PACKAGE);
   fprintf (stdout, "\n");
   fprintf (stdout, "ARGUMENTS:\n");
   fprintf (stdout, "        SOURCE_FILE:    %s source file\n", PACKAGE);
