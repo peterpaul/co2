@@ -1,1 +1,5 @@
+0.1.1:
+	* Add ConditionalBinaryExpression
+	* Allow expression for the class in IS_OF expression
+
 0.1.0: Initial release
