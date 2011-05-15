@@ -1,0 +1,153 @@
+/*
+ * carbon Compiler and programming language for libco2
+ *
+ * Copyright (C) 2011 Peterpaul Taekele Klein Haneveld
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+["stdio.h"] {
+	int printf (char *format, ...);
+}
+
+interface ITest {
+	Test getObject ();
+	int getInt ();
+	unsigned getUnsigned ();
+	float getFloat ();
+	double getDouble ();
+	char getChar ();
+	int[] getArray ();
+/*
+	va_list getVaList (...);
+*/
+	void getVoid ();
+}
+
+class Test <ITest> {
+	Test ao;
+	int ai;
+	unsigned au;
+	float af;
+	double ad;
+	char ac;
+	int[] aa;
+	
+	Test() {
+		ao = self;
+		ai = -5;
+		au = 5;
+		af = 5.0;
+		ad = 5.0;
+		ac = 'a';
+		aa = new int[5];
+		int index;
+		for (index = 0; index < 5; index += 1) {
+			aa[index] = index;
+		}
+		
+	}
+
+	Test getObject () {
+		return ao;
+	}
+
+	int getInt () {
+		return ai;
+	}
+
+	unsigned getUnsigned () {
+		return au;
+	}
+
+	float getFloat () {
+		return af;
+	}
+
+	double getDouble () {
+		return ad;
+	}
+
+	char getChar () {
+		return ac;
+	}
+
+	int[] getArray () {
+		return aa;
+	}
+/*
+	va_list getVaList (...) {
+		return ...;
+	}
+*/
+	void getVoid () {
+	}
+}
+
+void dostuff (Test a) {
+	printf("%p\n", a ? . getObject () ? 1 : 0);
+	printf("%d\n", a ? . getInt ());
+	printf("%d\n", a ? . getUnsigned ());
+	printf("%f\n", a ? . getFloat ());
+	printf("%f\n", a ? . getDouble ());
+	printf("%d\n", a ? . getChar ());
+	printf("%p\n", a ? . getArray () ? 1 : 0);
+/*
+	a ? . getVaList ();
+*/
+	a ? . getVoid ();
+}
+
+void dostuff_interface (ITest a) {
+	printf("%p\n", a ? . getObject () ? 1 : 0);
+	printf("%d\n", a ? . getInt ());
+	printf("%d\n", a ? . getUnsigned ());
+	printf("%f\n", a ? . getFloat ());
+	printf("%f\n", a ? . getDouble ());
+	printf("%d\n", a ? . getChar ());
+	printf("%p\n", a ? . getArray () ? 1 : 0);
+/*
+	a ? . getVaList ();
+*/
+	a ? . getVoid ();
+}
+
+void dostuff_member (Test a) {
+	printf("%p\n", a ? . ao ? 1 : 0);
+	printf("%d\n", a ? . ai);
+	printf("%d\n", a ? . au);
+	printf("%f\n", a ? . af);
+	printf("%f\n", a ? . ad);
+	printf("%d\n", a ? . ac);
+	printf("%p\n", a ? . aa ? 1 : 0);
+/*
+	a ? . getVaList ();
+*/
+}
+
+int main () {
+	Test a = new Test();
+	printf ("O_BRANCH_CALL:\n");
+	dostuff (null);
+	dostuff (a);
+
+	printf ("O_BRANCH_CALL_IF:\n");
+	dostuff_interface (null);
+	dostuff_interface (a);
+
+	printf ("ConditionalBinaryExpression:\n");
+	dostuff_member (null);
+	dostuff_member (a);
+	return 0;
+}

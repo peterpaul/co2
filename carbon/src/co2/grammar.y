@@ -50,6 +50,7 @@
   /* Expressions */
 #include "co2/BinaryExpression.h"
 #include "co2/CastExpression.h"
+#include "co2/ConditionalBinaryExpression.h"
 #include "co2/ConditionalExpression.h"
 #include "co2/Expression.h"
 #include "co2/FunctionCallExpression.h"
@@ -834,6 +835,7 @@ expression
 |	expression '(' opt_actual_argument_list ')' { $$ = O_CALL_CLASS(FunctionCallExpression(), new, $1, $3); }
 |	expression '[' expression ']' { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
 |	expression '.' expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
+|	expression '?' '.' expression { $$ = O_CALL_CLASS(ConditionalBinaryExpression(), new, $1, $<token>3, $4); }
 |	expression '+' expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
 |	expression '-' expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
 |	expression '/' expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
