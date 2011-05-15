@@ -214,6 +214,12 @@
 			   "runtime error: %s at %p doesn't respond to %s.", \
 			   _tmp->class->name, (void *)_tmp, __STRING(msg)); \
 		_tmp->class->msg(_tmp,##__VA_ARGS__);})
+#define O_BRANCH_CALL(o,msg,...)					\
+  ({typeof(o) _tmp = o;							\
+    assertTrue(_tmp == (typeof(_tmp))0 || _tmp->class->msg,		\
+	       "runtime error: %s at %p doesn't respond to %s.",	\
+	       _tmp->class->name, (void *)_tmp, __STRING(msg));		\
+    _tmp ? _tmp->class->msg(_tmp,##__VA_ARGS__) : (typeof(_tmp->class->msg(_tmp,##__VA_ARGS__)))0;})
 #define O_CALL_CLASS(o,msg,...)						\
 	({typeof(o) _tmp = o;						\
 		assertTrue(_tmp->msg,					\
@@ -228,24 +234,19 @@
 #define O_CALL(o,msg,...)						\
 	({typeof(o) _tmp = o;						\
 		_tmp->class->msg(_tmp,##__VA_ARGS__);})
+#define O_BRANCH_CALL(o,msg,...)					\
+  ({typeof(o) _tmp = o;							\
+    _tmp ? _tmp->class->msg(_tmp,##__VA_ARGS__) : (typeof(_tmp->class->msg(_tmp,##__VA_ARGS__)))0;})
 #define O_CALL_CLASS(o,msg,...)						\
 	({typeof(o) _tmp = o;						\
 		_tmp->msg(_tmp,##__VA_ARGS__);})
-#endif
+#endif /* O_DEBUG */
 
 #define O_GET_ARG(type)				\
   O_CAST(va_arg(*app, struct type *), type())
 
 #define O_BRANCH_GET_ARG(type)				\
   O_BRANCH_CAST(va_arg(*app, struct type *), type())
-
-#define O_BRANCH_CALL(o,msg,...)					\
-  ({typeof(o) _tmp = o;							\
-    assertTrue(_tmp == (typeof(_tmp))0 || _tmp->class->msg,		\
-	       "runtime error: %s at %p doesn't respond to %s.",	\
-	       _tmp->class->name, (void *)_tmp, __STRING(msg));		\
-    _tmp ? _tmp->class->msg(_tmp,##__VA_ARGS__) : (typeof(_tmp->class->msg(_tmp,##__VA_ARGS__)))0;})
-  
 
 /* Functions */
 void *o_cast(const void *_object, const void *_class);

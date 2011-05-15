@@ -46,12 +46,30 @@
 #define O_OBJECT_IF_END				\
 	}
 
+#ifdef O_DEBUG
 #define O_CALL_IF(interface,o,msg,...)					\
   ({typeof(o) _tmp = o;							\
     struct interface * _if = o_get_interface(_tmp, interface());	\
     assertTrue(_if->msg,"runtime error: %s at %p doesn't respond to %s.", \
 	       _tmp->class->name, (void *)_tmp, __STRING(msg));		\
     _if->msg(_tmp,##__VA_ARGS__);})
+#define O_BRANCH_CALL_IF(interface,o,msg,...)				\
+  ({typeof(o) _tmp = o;							\
+    struct interface * _if = _tmp ? o_get_interface(_tmp, interface()) : NULL; \
+    assertTrue(_tmp == (typeof(_tmp))0 || _if->msg,			\
+	       "runtime error: %s at %p doesn't respond to %s.",	\
+	       _tmp->class->name, (void *)_tmp, __STRING(msg));		\
+    _tmp ? _if->msg(_tmp,##__VA_ARGS__) : (typeof(_if->msg(_tmp,##__VA_ARGS__)))0;})
+#else
+#define O_CALL_IF(interface,o,msg,...)					\
+  ({typeof(o) _tmp = o;							\
+    struct interface * _if = o_get_interface(_tmp, interface());	\
+    _if->msg(_tmp,##__VA_ARGS__);})
+#define O_BRANCH_CALL_IF(interface,o,msg,...)				\
+  ({typeof(o) _tmp = o;							\
+    struct interface * _if = _tmp ? o_get_interface(_tmp, interface()) : NULL; \
+    _tmp ? _if->msg(_tmp,##__VA_ARGS__) : (typeof(_if->msg(_tmp,##__VA_ARGS__)))0;})
+#endif /* O_DEBUG */
 
 /*
 #define O_CALL_IF(interface,o,msg,...)					\
