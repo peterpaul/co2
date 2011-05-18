@@ -29,6 +29,7 @@
 #include "co2/TokenExpression.h"
 #include "co2/Type.h"
 #include "co2/RefList.h"
+#include "co2/ConditionalBinaryExpression.h"
 #include "co2/io.h"
 
 #define O_SUPER Expression()
@@ -103,7 +104,14 @@ O_IMPLEMENT (FunctionCallExpression, void, generate, (void *_self))
 	o_cast (function->operand[0]->type, ObjectType ());
       if (o_is_of (function_type->decl, ClassDeclaration ()))
 	{
-	  fprintf (out, "O_CALL ");
+	  if (o_is_of (self->function, ConditionalBinaryExpression ()))
+	    {
+	      fprintf (out, "O_BRANCH_CALL ");
+	    }
+	  else
+	    {
+	      fprintf (out, "O_CALL ");
+	    }
 	  fprintf (out, "(");
 	  bool is_first_arg = false;
 	  O_CALL (function->operand[0], generate);
@@ -116,7 +124,14 @@ O_IMPLEMENT (FunctionCallExpression, void, generate, (void *_self))
 	}
       else if (o_is_of (function_type->decl, InterfaceDeclaration ()))
 	{
-	  fprintf (out, "O_CALL_IF ");
+	  if (o_is_of (self->function, ConditionalBinaryExpression ()))
+	    {
+	      fprintf (out, "O_BRANCH_CALL_IF ");
+	    }
+	  else
+	    {
+	      fprintf (out, "O_CALL_IF ");
+	    }
 	  fprintf (out, "(");
 	  O_CALL (function_type->decl->name, generate);
 	  fprintf (out, ", ");

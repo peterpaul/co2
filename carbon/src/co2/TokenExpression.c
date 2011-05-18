@@ -36,7 +36,7 @@ O_IMPLEMENT (TokenExpression, void *, ctor, (void *_self, va_list * app))
   struct TokenExpression *self = O_CAST (_self, TokenExpression ());
   self = O_SUPER->ctor (self, app);
   self->token = O_RETAIN_ARG (Token);
-  if (self->token->type == IDENTIFIER || self->token->type == CLASS)
+  if (self->token->type == IDENTIFIER || self->token->type == TYPE_IDENTIFIER || self->token->type == CLASS)
     {
       self->scope = current_scope;
       if (self->scope && O_CALL (self->scope, exists, self->token))
@@ -81,6 +81,10 @@ O_IMPLEMENT (TokenExpression, void, generate_left, (void *_self, bool left))
       fprintf (out, "self->");
     }
   O_CALL (self->token, generate);
+  if (self->token->type == TYPE_IDENTIFIER)
+    {
+      fprintf (out, " ()");
+    }
 }
 
 O_IMPLEMENT (TokenExpression, void, set_scope, (void *_self, void *_scope))
@@ -95,6 +99,20 @@ O_IMPLEMENT (TokenExpression, void, type_check, (void *_self))
   struct TokenExpression *self = O_CAST (_self, TokenExpression ());
   switch (self->token->type)
     {
+    case TYPE_IDENTIFIER:
+      warning (self->token, "Handling TokenExpression: '%s'\n",
+	       self->token->name->data);
+      if (!self->decl || !self->check_global_scope)
+	{
+	  O_CALL (self, lookup);
+	}
+      if (!self->decl)
+	{
+	  return;
+	}
+      self->type = O_CALL_CLASS (ObjectType (), new, self->token, self->decl);
+      self->type = O_CALL (self->type, retain);
+      break;
     case CLASS:
     case IDENTIFIER:
       if (!self->decl || !self->check_global_scope)

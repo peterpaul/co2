@@ -50,6 +50,7 @@
   /* Expressions */
 #include "BinaryExpression.h"
 #include "CastExpression.h"
+#include "ConditionalBinaryExpression.h"
 #include "ConditionalExpression.h"
 #include "Expression.h"
 #include "FunctionCallExpression.h"
@@ -122,7 +123,7 @@
 %token <token> MACRO
 %token <token> MACRO_IDENTIFIER
 %token <token> NEW
-%token <token> _NULL
+%token <token> NULL_
 %token <token> RETURN
 %token <token> SELF
 %token <token> SIZEOF
@@ -134,7 +135,8 @@
 %token <token> TYPEDEF
 %token <token> TYPE_IDENTIFIER
 %token <token> UNSIGNED
-%token <token> VA_ARG /* '...' */
+ /* '...' */
+%token <token> VA_ARG
 %token <token> VA_LIST
 %token <token> VOID
 %token <token> WHILE
@@ -516,6 +518,7 @@ class_declaration
   decl->member_scope->parent = NULL;
   $$ =(struct Declaration *) decl;
 }
+;
 
 class_header
 :	CLASS TYPE_IDENTIFIER ':' TYPE_IDENTIFIER '<' interface_list '>'
@@ -713,12 +716,14 @@ break_statement
 {
   $$ = O_CALL_CLASS(BreakStatement(), new);
 }
+;
 
 continue_statement
 :	CONTINUE ';'
 {
   $$ = O_CALL_CLASS(ContinueStatement(), new);
 }
+;
 
 interface_declaration
 :	interface_header 
@@ -834,6 +839,7 @@ expression
 |	expression '(' opt_actual_argument_list ')' { $$ = O_CALL_CLASS(FunctionCallExpression(), new, $1, $3); }
 |	expression '[' expression ']' { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
 |	expression '.' expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
+|	expression '?' '.' expression { $$ = O_CALL_CLASS(ConditionalBinaryExpression(), new, $1, $<token>3, $4); }
 |	expression '+' expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
 |	expression '-' expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
 |	expression '/' expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
@@ -886,7 +892,11 @@ expression
 |	SIZEOF '(' type ')' { $$ = O_CALL_CLASS(SizeExpression(), new, $3); }
 |	'(' type ')' expression %prec CASTX { $$ = O_CALL_CLASS(CastExpression(), new, $2, $4); }
 |	expression '?' expression ':' expression { $$ = O_CALL_CLASS(ConditionalExpression (), new, $1, $3, $5); }
-|	expression IS_OF TYPE_IDENTIFIER { $$ = O_CALL_CLASS(IsOfExpression (), new, $1, $3); }
+|	expression IS_OF TYPE_IDENTIFIER {
+  struct TokenExpression * expr = O_CALL_CLASS(TokenExpression(), new, $3);
+  $$ = O_CALL_CLASS(IsOfExpression (), new, $1, expr);
+}
+|	expression IS_OF expression { $$ = O_CALL_CLASS(IsOfExpression (), new, $1, $3); }
 ;
 
 constant
@@ -894,7 +904,7 @@ constant
 |	FLOAT_CONSTANT { $$ = O_CALL_CLASS(TokenExpression(), new, $1); }
 |	INT_CONSTANT { $$ = O_CALL_CLASS(TokenExpression(), new, $1); }
 |	string_constant { $$ = O_CALL_CLASS(TokenExpression(), new, $1); }
-|	_NULL { $$ = O_CALL_CLASS(NullExpression(), new, $1); }
+|	NULL_ { $$ = O_CALL_CLASS(NullExpression(), new, $1); }
 ;
 
 opt_actual_argument_list

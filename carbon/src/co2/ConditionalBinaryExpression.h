@@ -16,19 +16,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef IsOfExpression_H
-#define IsOfExpression_H
+#ifndef ConditionalBinaryExpression_H
+#define ConditionalBinaryExpression_H
 
-#include "co2/Expression.h"
+#include "co2/BinaryExpression.h"
 
-#define IsOfExpressionClass_Attr		\
-  ExpressionClass_Attr
+#define ConditionalBinaryExpressionClass_Attr	\
+  BinaryExpressionClass_Attr
 
-#define IsOfExpression_Attr			\
-  Expression_Attr;				\
-  struct Expression * expr_to_check;		\
-  struct Expression * class_expr
+#define ConditionalBinaryExpression_Attr	\
+  BinaryExpression_Attr
 
-O_CLASS(IsOfExpression, Expression);
+O_CLASS (ConditionalBinaryExpression, BinaryExpression);
 
-#endif /* IsOfExpression_H */
+#endif /* ConditionalBinaryExpression_H */

@@ -29,7 +29,7 @@ O_IMPLEMENT (IsOfExpression, void *, ctor, (void *_self, va_list *app))
   struct IsOfExpression * self = O_CAST (_self, IsOfExpression());
   self = O_SUPER->ctor (self, app);
   self->expr_to_check = O_RETAIN_ARG (Expression);
-  self->class_token = O_RETAIN_ARG (Token);
+  self->class_expr = O_RETAIN_ARG (Expression);
   return self;
 }
 
@@ -37,7 +37,7 @@ O_IMPLEMENT (IsOfExpression, void *, dtor, (void *_self))
 {
   struct IsOfExpression *self = O_CAST (_self, IsOfExpression());
   O_CALL (self->expr_to_check, release);
-  O_CALL (self->class_token, release);
+  O_CALL (self->class_expr, release);
   return O_SUPER->dtor (self);
 }
 
@@ -45,7 +45,9 @@ O_IMPLEMENT (IsOfExpression, void, type_check, (void *_self))
 {
   struct IsOfExpression *self = O_CAST (_self, IsOfExpression());
   O_CALL (self->expr_to_check, type_check);
-  struct Token * int_token = O_CALL_CLASS(Token (), new_ctor, _Token_ctor_from_token, self->class_token, "int", INT);
+  O_CALL (self->class_expr, type_check);
+  struct Token * expr_token = O_CALL (self->class_expr, get_token);
+  struct Token * int_token = O_CALL_CLASS(Token (), new_ctor, _Token_ctor_from_token, expr_token, "int", INT);
   self->type = O_CALL_CLASS (PrimitiveType (), new, int_token);
   
   O_CALL (self->type, retain);
@@ -58,8 +60,8 @@ O_IMPLEMENT (IsOfExpression, void, generate, (void *_self))
   fprintf (out, "o_is_of (");
   O_CALL (self->expr_to_check, generate);
   fprintf (out, ", ");
-  O_CALL (self->class_token, generate);
-  fprintf (out, " ())");
+  O_CALL (self->class_expr, generate);
+  fprintf (out, ")");
 }
 
 O_OBJECT (IsOfExpression, Expression);

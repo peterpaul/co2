@@ -1,3 +1,10 @@
+carbon (0.1.1-1) natty; urgency=low
+
+  * Add ConditionalBinaryExpression
+  * Allow expression for the class in IS_OF expression
+
+ -- Peterpaul <peterpaul@hp-dm1>  Sun, 15 May 2011 22:13:14 +0200
+
 carbon (0.1.0-1) natty; urgency=low
 
   [ Peterpaul Taekele Klein Haneveld ]
