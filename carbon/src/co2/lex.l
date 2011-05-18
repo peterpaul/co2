@@ -97,7 +97,7 @@ STRING_CONST	\"({CHAR_SYMBOL}|\')*\"
 "interface"	return INTERFACE;
 "is_of"		return IS_OF;
 "new"		return NEW;
-"null"		yylval.token = O_CALL_CLASS(Token(), new, yytext, _NULL, current_file, linenumber); return yylval.token->type;
+"null"		yylval.token = O_CALL_CLASS(Token(), new, yytext, NULL_, current_file, linenumber); return yylval.token->type;
 "return"	return RETURN;
 "self"		yylval.token = O_CALL_CLASS(Token(), new, yytext, SELF, current_file, linenumber); return yylval.token->type;
 "sizeof"	return SIZEOF;

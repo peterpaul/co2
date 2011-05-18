@@ -123,7 +123,7 @@
 %token <token> MACRO
 %token <token> MACRO_IDENTIFIER
 %token <token> NEW
-%token <token> _NULL
+%token <token> NULL_
 %token <token> RETURN
 %token <token> SELF
 %token <token> SIZEOF
@@ -135,7 +135,8 @@
 %token <token> TYPEDEF
 %token <token> TYPE_IDENTIFIER
 %token <token> UNSIGNED
-%token <token> VA_ARG /* '...' */
+ /* '...' */
+%token <token> VA_ARG
 %token <token> VA_LIST
 %token <token> VOID
 %token <token> WHILE
@@ -517,6 +518,7 @@ class_declaration
   decl->member_scope->parent = NULL;
   $$ =(struct Declaration *) decl;
 }
+;
 
 class_header
 :	CLASS TYPE_IDENTIFIER ':' TYPE_IDENTIFIER '<' interface_list '>'
@@ -714,12 +716,14 @@ break_statement
 {
   $$ = O_CALL_CLASS(BreakStatement(), new);
 }
+;
 
 continue_statement
 :	CONTINUE ';'
 {
   $$ = O_CALL_CLASS(ContinueStatement(), new);
 }
+;
 
 interface_declaration
 :	interface_header 
@@ -900,7 +904,7 @@ constant
 |	FLOAT_CONSTANT { $$ = O_CALL_CLASS(TokenExpression(), new, $1); }
 |	INT_CONSTANT { $$ = O_CALL_CLASS(TokenExpression(), new, $1); }
 |	string_constant { $$ = O_CALL_CLASS(TokenExpression(), new, $1); }
-|	_NULL { $$ = O_CALL_CLASS(NullExpression(), new, $1); }
+|	NULL_ { $$ = O_CALL_CLASS(NullExpression(), new, $1); }
 ;
 
 opt_actual_argument_list
