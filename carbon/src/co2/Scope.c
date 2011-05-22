@@ -149,6 +149,39 @@ O_IMPLEMENT (Scope, void, error_not_found,
   error (token, "'%s' not declared.\n", token->name->data);
 }
 
+O_IMPLEMENT (Scope, struct String *, to_string, (void *_self))
+{
+  struct Scope *self = O_CAST (_self, Scope ());
+  struct String *result = NULL;
+  if (self->parent)
+    {
+      result = O_CALL (self->parent, to_string);
+      O_CALL(result, append_str, "<-");
+      if (self->name)
+	{
+	  O_CALL (result, append, self->name->name);
+	}
+      else
+	{
+	  struct String *super = O_SUPER->to_string (self);
+	  O_CALL (result, append, super);
+	  O_CALL (super, delete);
+	}
+    }
+  else
+    {
+      if (self->name)
+	{
+	  result = O_CALL_CLASS (String (), new, "%s", self->name->name->data); 
+	}
+      else
+	{
+	  result = O_SUPER->to_string (self);
+	}
+    }
+  return result;
+}
+
 O_OBJECT (Scope, Hash);
 O_OBJECT_METHOD (Scope, ctor);
 O_OBJECT_METHOD (Scope, dtor);
@@ -162,4 +195,5 @@ O_OBJECT_METHOD (Scope, find_type_in_this_scope);
 O_OBJECT_METHOD (Scope, find_type);
 O_OBJECT_METHOD (Scope, exists_in_this_scope);
 O_OBJECT_METHOD (Scope, exists);
+O_OBJECT_METHOD (Scope, to_string);
 O_END_OBJECT

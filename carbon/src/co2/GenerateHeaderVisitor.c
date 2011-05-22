@@ -123,9 +123,6 @@ O_IMPLEMENT(GenerateHeaderVisitor, void *, dtor, (void *_self))
   return O_SUPER->dtor(self);
 }
 
-// O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visit, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitArgumentDeclaration, (void *_self, void *_object), (_self, _object)) {}
-
 O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitClassDeclaration, (void *_self, void *_object), (_self, _object))
 {
   struct BaseCompileObjectVisitor *visitor = O_CAST(_self, BaseCompileObjectVisitor());
@@ -225,8 +222,6 @@ O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitDeclaration, (void *_self, void
       self->declared = true;
     }
 }
-
-O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitDestructorDeclaration, (void *_self, void *_object), (_self, _object)) {}
 
 O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitFunctionDeclaration, (void *_self, void *_object), (_self, _object))
 {
@@ -328,8 +323,6 @@ O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitInterfaceDeclaration, (void *_s
 
 }
 
-O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitMacroDeclaration, (void *_self, void *_object), (_self, _object)) {}
-
 O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitStructDeclaration, (void *_self, void *_object), (_self, _object))
 {
   struct BaseCompileObjectVisitor *visitor = O_CAST(_self, BaseCompileObjectVisitor());
@@ -385,36 +378,6 @@ O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitVariableDeclaration, (void *_se
   fprintf (out, ";\n");
 }
 
-O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitCatchStatement, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitCompoundStatement, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitDeleteStatement, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitDoStatement, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitExpressionStatement, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitForEachStatement, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitForStatement, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitIfStatement, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitReturnStatement, (void *_self, void *_object), (_self, _object)) {}
-// O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitStatement, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitThrowStatement, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitTryStatement, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitWhileStatement, (void *_self, void *_object), (_self, _object)) {}
-
-O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitBinaryExpression, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitCastExpression, (void *_self, void *_object), (_self, _object)) {}
-// O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitExpression, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitFunctionCallExpression, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitNestedExpression, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitNewExpression, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitNullExpression, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitSizeExpression, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitSuperExpression, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitTokenExpression, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitUnaryExpression, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitVarArgExpression, (void *_self, void *_object), (_self, _object)) {}
-
-O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitArrayType, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitFunctionType, (void *_self, void *_object), (_self, _object)) {}
-
 O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitObjectType, (void *_self, void *_object), (_self, _object))
 {
   struct BaseCompileObjectVisitor *visitor = O_CAST(_self, BaseCompileObjectVisitor());
@@ -429,111 +392,27 @@ O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitObjectType, (void *_self, void 
     }
 }
 
-O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitPrimitiveType, (void *_self, void *_object), (_self, _object)) {}
-// O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitType, (void *_self, void *_object), (_self, _object)) {}
-
-O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitFile, (void *_self, void *_object), (_self, _object)) {}
-
-
 O_OBJECT(GenerateHeaderVisitor, BaseCompileObjectVisitor);
 O_OBJECT_METHOD(GenerateHeaderVisitor, ctor);
 O_OBJECT_METHOD(GenerateHeaderVisitor, dtor);
-
-// O_OBJECT_METHOD (GenerateHeaderVisitor, visit);
-O_OBJECT_METHOD (GenerateHeaderVisitor, visitArgumentDeclaration);
 O_OBJECT_METHOD (GenerateHeaderVisitor, visitClassDeclaration);
 O_OBJECT_METHOD (GenerateHeaderVisitor, visitConstructorDeclaration);
 O_OBJECT_METHOD (GenerateHeaderVisitor, visitDeclaration);
-O_OBJECT_METHOD (GenerateHeaderVisitor, visitDestructorDeclaration);
 O_OBJECT_METHOD (GenerateHeaderVisitor, visitFunctionDeclaration);
 O_OBJECT_METHOD (GenerateHeaderVisitor, visitInterfaceDeclaration);
-O_OBJECT_METHOD (GenerateHeaderVisitor, visitMacroDeclaration);
 O_OBJECT_METHOD (GenerateHeaderVisitor, visitStructDeclaration);
 O_OBJECT_METHOD (GenerateHeaderVisitor, visitTypeDeclaration);
 O_OBJECT_METHOD (GenerateHeaderVisitor, visitVariableDeclaration);
-
-O_OBJECT_METHOD (GenerateHeaderVisitor, visitCatchStatement);
-O_OBJECT_METHOD (GenerateHeaderVisitor, visitCompoundStatement);
-O_OBJECT_METHOD (GenerateHeaderVisitor, visitDeleteStatement);
-O_OBJECT_METHOD (GenerateHeaderVisitor, visitDoStatement);
-O_OBJECT_METHOD (GenerateHeaderVisitor, visitExpressionStatement);
-O_OBJECT_METHOD (GenerateHeaderVisitor, visitForEachStatement);
-O_OBJECT_METHOD (GenerateHeaderVisitor, visitForStatement);
-O_OBJECT_METHOD (GenerateHeaderVisitor, visitIfStatement);
-O_OBJECT_METHOD (GenerateHeaderVisitor, visitReturnStatement);
-// O_OBJECT_METHOD (GenerateHeaderVisitor, visitStatement);
-O_OBJECT_METHOD (GenerateHeaderVisitor, visitThrowStatement);
-O_OBJECT_METHOD (GenerateHeaderVisitor, visitTryStatement);
-O_OBJECT_METHOD (GenerateHeaderVisitor, visitWhileStatement);
-
-O_OBJECT_METHOD (GenerateHeaderVisitor, visitBinaryExpression);
-O_OBJECT_METHOD (GenerateHeaderVisitor, visitCastExpression);
-// O_OBJECT_METHOD (GenerateHeaderVisitor, visitExpression);
-O_OBJECT_METHOD (GenerateHeaderVisitor, visitFunctionCallExpression);
-O_OBJECT_METHOD (GenerateHeaderVisitor, visitNestedExpression);
-O_OBJECT_METHOD (GenerateHeaderVisitor, visitNewExpression);
-O_OBJECT_METHOD (GenerateHeaderVisitor, visitNullExpression);
-O_OBJECT_METHOD (GenerateHeaderVisitor, visitSizeExpression);
-O_OBJECT_METHOD (GenerateHeaderVisitor, visitSuperExpression);
-O_OBJECT_METHOD (GenerateHeaderVisitor, visitTokenExpression);
-O_OBJECT_METHOD (GenerateHeaderVisitor, visitUnaryExpression);
-O_OBJECT_METHOD (GenerateHeaderVisitor, visitVarArgExpression);
-
-O_OBJECT_METHOD (GenerateHeaderVisitor, visitArrayType);
-O_OBJECT_METHOD (GenerateHeaderVisitor, visitFunctionType);
 O_OBJECT_METHOD (GenerateHeaderVisitor, visitObjectType);
-O_OBJECT_METHOD (GenerateHeaderVisitor, visitPrimitiveType);
-// O_OBJECT_METHOD (GenerateHeaderVisitor, visitType);
-
-O_OBJECT_METHOD (GenerateHeaderVisitor, visitFile);
-
 O_OBJECT_IF(CompileObjectVisitor);
-// O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visit);
-O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitArgumentDeclaration);
 O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitClassDeclaration);
 O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitConstructorDeclaration);
 O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitDeclaration);
-O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitDestructorDeclaration);
 O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitFunctionDeclaration);
 O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitInterfaceDeclaration);
-O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitMacroDeclaration);
 O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitStructDeclaration);
 O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitTypeDeclaration);
 O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitVariableDeclaration);
-
-O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitCatchStatement);
-O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitCompoundStatement);
-O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitDeleteStatement);
-O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitDoStatement);
-O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitExpressionStatement);
-O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitForEachStatement);
-O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitForStatement);
-O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitIfStatement);
-O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitReturnStatement);
-// O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitStatement);
-O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitThrowStatement);
-O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitTryStatement);
-O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitWhileStatement);
-
-O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitBinaryExpression);
-O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitCastExpression);
-// O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitExpression);
-O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitFunctionCallExpression);
-O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitNestedExpression);
-O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitNewExpression);
-O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitNullExpression);
-O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitSizeExpression);
-O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitSuperExpression);
-O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitTokenExpression);
-O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitUnaryExpression);
-O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitVarArgExpression);
-
-O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitArrayType);
-O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitFunctionType);
 O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitObjectType);
-O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitPrimitiveType);
-// O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitType);
-
-O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitFile);
 O_OBJECT_IF_END
 O_END_OBJECT

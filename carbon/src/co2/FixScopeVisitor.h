@@ -16,17 +16,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef HelloWorldVisitor_H
-#define HelloWorldVisitor_H
+#ifndef FixScopeVisitor_H
+#define FixScopeVisitor_H
 
 #include "co2/BaseCompileObjectVisitor.h"
 
-#define HelloWorldVisitorClass_Attr			\
+#define FixScopeVisitorClass_Attr		\
   BaseCompileObjectVisitorClass_Attr
 
-#define HelloWorldVisitor_Attr				\
+#define FixScopeVisitor_Attr		\
   BaseCompileObjectVisitor_Attr
 
-O_CLASS(HelloWorldVisitor, BaseCompileObjectVisitor);
+O_CLASS(FixScopeVisitor, BaseCompileObjectVisitor);
 
-#endif /* HelloWorldVisitor_H */
+#endif /* FixScopeVisitor_H */

@@ -21,12 +21,15 @@
 
 #include "co2/CompileObject.h"
 #include "co2/Hash.h"
+#include "co2/BaseCompileObjectVisitor.h"
 
 O_METHOD_DEF (File, void, sort, (void *_self));
+O_METHOD_DEF (File, void, accept_all_files, (void *_self, struct BaseCompileObjectVisitor *visitor));
 
 #define FileClass_Attr				\
   CompileObjectClass_Attr;			\
-  O_METHOD (File, sort)
+  O_METHOD (File, sort);			\
+  O_METHOD (File, accept_all_files)
 
 #define File_Attr				\
   CompileObject_Attr;				\
@@ -38,5 +41,6 @@ O_METHOD_DEF (File, void, sort, (void *_self));
 O_CLASS (File, CompileObject);
 
 struct Hash * get_hash_map ();
+void accept_all_files (void *_object, va_list *app);
 
 #endif /* File_H */

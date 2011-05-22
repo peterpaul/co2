@@ -23,8 +23,7 @@
 #include "co2/Declaration.h"
 #include "co2/io.h"
 #include "co2/error.h"
-#include "co2/HelloWorldVisitor.h"
-#include "co2/TypeCheckVisitor.h"
+#include "co2/FixScopeVisitor.h"
 #include "co2/GenerateHeaderVisitor.h"
 #include "co2/GenerateHeaderIncludesVisitor.h"
 #include "co2/GenerateSourceVisitor.h"
@@ -99,14 +98,9 @@ int mainImpl(const char * output_file)
   // sort members
   O_CALL (main_file, sort);
 
-  // struct BaseCompileObjectVisitor * visitor = O_CALL_CLASS (HelloWorldVisitor (), new);
-  // O_CALL (main_file, accept, visitor);
-
-  /*
-  struct TypeCheckVisitor * type_check_visitor = O_CALL_CLASS (TypeCheckVisitor (), new, out);
-  O_CALL (main_file, accept, type_check_visitor);
-  O_CALL (type_check_visitor, delete);
-  */
+  struct FixScopeVisitor * fix_scope_visitor = O_CALL_CLASS (FixScopeVisitor (), new, out);
+  O_CALL (main_file, accept_all_files, fix_scope_visitor);
+  O_CALL (fix_scope_visitor, delete);
 
   /* semantic analysis */
   O_CALL (main_file, type_check);

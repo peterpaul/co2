@@ -12,11 +12,11 @@ libcarbon_1_0_la_SOURCES= co2/grammar.y co2/lex.l co2/ArgumentDeclaration.c co2/
 		co2/CompoundStatement.c co2/ConditionalBinaryExpression.c co2/ConditionalExpression.c\
 		co2/ConstructorDeclaration.c co2/Context.c co2/ContinueStatement.c co2/Declaration.c co2/DeleteStatement.c\
 		co2/DestructorDeclaration.c co2/DoStatement.c co2/error.c co2/Expression.c\
-		co2/ExpressionStatement.c co2/FinallyStatement.c co2/GenerateHeaderIncludesVisitor.c co2/GenerateHeaderVisitor.c\
+		co2/ExpressionStatement.c co2/FinallyStatement.c co2/FixScopeVisitor.c co2/GenerateHeaderIncludesVisitor.c co2/GenerateHeaderVisitor.c\
 		co2/GenerateSourceIncludesVisitor.c co2/GenerateSourceVisitor.c co2/File.c\
 		co2/ForEachStatement.c co2/ForStatement.c\
 		co2/FunctionType.c co2/FunctionDeclaration.c co2/FunctionCallExpression.c\
-		co2/Hash.c co2/HelloWorldVisitor.c\
+		co2/Hash.c\
 		co2/IfStatement.c co2/IncludeStack.c co2/InterfaceDeclaration.c co2/io.c\
 		co2/IsOfExpression.c\
 		co2/MacroDeclaration.c co2/NewExpression.c co2/NestedExpression.c\
@@ -24,7 +24,7 @@ libcarbon_1_0_la_SOURCES= co2/grammar.y co2/lex.l co2/ArgumentDeclaration.c co2/
 		co2/PrimitiveType.c co2/RefList.c co2/ReturnStatement.c co2/Scope.c\
 		co2/SizeExpression.c co2/Statement.c co2/StructDeclaration.c co2/SuperExpression.c\
 		co2/ThrowStatement.c co2/Token.c co2/TokenExpression.c co2/TokenGenerator.c\
-		co2/TryStatement.c co2/Type.c co2/TypeCheckVisitor.c co2/TypeDeclaration.c\
+		co2/TryStatement.c co2/Type.c co2/TypeDeclaration.c\
 		co2/UnaryExpression.c\
 		co2/VarArgExpression.c co2/VariableDeclaration.c co2/WhileStatement.c
 libcarbon_1_0_la_HEADERS=co2/ArgumentDeclaration.h co2/ArrayType.h co2/BaseCompileObjectVisitor.h co2/BreakStatement.h\
@@ -34,11 +34,11 @@ libcarbon_1_0_la_HEADERS=co2/ArgumentDeclaration.h co2/ArrayType.h co2/BaseCompi
 		co2/CompoundStatement.h co2/ConditionalBinaryExpression.h co2/ConditionalExpression.h\
 		co2/ConstructorDeclaration.h co2/Context.h co2/ContinueStatement.h co2/Declaration.h co2/DeleteStatement.h\
 		co2/DestructorDeclaration.h co2/DoStatement.h co2/error.h co2/Expression.h\
-		co2/ExpressionStatement.h co2/FinallyStatement.h co2/GenerateHeaderIncludesVisitor.h co2/GenerateHeaderVisitor.h\
+		co2/ExpressionStatement.h co2/FinallyStatement.h co2/FixScopeVisitor.h co2/GenerateHeaderIncludesVisitor.h co2/GenerateHeaderVisitor.h\
 		co2/GenerateSourceIncludesVisitor.h co2/GenerateSourceVisitor.h co2/File.h\
 		co2/ForEachStatement.h co2/ForStatement.h\
 		co2/FunctionType.h co2/FunctionDeclaration.h co2/FunctionCallExpression.h\
-		co2/Hash.h co2/HelloWorldVisitor.h\
+		co2/Hash.h\
 		co2/IfStatement.h co2/IncludeStack.h co2/InterfaceDeclaration.h co2/io.h\
 		co2/IsOfExpression.h\
 		co2/MacroDeclaration.h co2/NewExpression.h co2/NestedExpression.h\
@@ -46,7 +46,7 @@ libcarbon_1_0_la_HEADERS=co2/ArgumentDeclaration.h co2/ArrayType.h co2/BaseCompi
 		co2/PrimitiveType.h co2/RefList.h co2/ReturnStatement.h co2/Scope.h\
 		co2/SizeExpression.h co2/Statement.h co2/StructDeclaration.h co2/SuperExpression.h\
 		co2/ThrowStatement.h co2/Token.h co2/TokenExpression.h co2/TokenGenerator.h\
-		co2/TryStatement.h co2/Type.h co2/TypeCheckVisitor.h co2/TypeDeclaration.h\
+		co2/TryStatement.h co2/Type.h co2/TypeDeclaration.h\
 		co2/UnaryExpression.h\
 		co2/VarArgExpression.h co2/VariableDeclaration.h co2/WhileStatement.h
 
