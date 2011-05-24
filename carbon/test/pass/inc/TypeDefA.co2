@@ -1,0 +1,16 @@
+include inc/TypeDefB
+
+class TypeDefA {
+	TypeDefC var;
+	TypeDefA (TypeDefC c) {
+		var = c;
+	}
+
+	void setVar (TypeDefC c) {
+		var = c;
+	}
+
+	TypeDefC getVar () {
+		return var;
+	}
+}

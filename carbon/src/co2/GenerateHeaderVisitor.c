@@ -338,6 +338,11 @@ O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitTypeDeclaration, (void *_self, 
 {
   struct BaseCompileObjectVisitor *visitor = O_CAST(_self, BaseCompileObjectVisitor());
   struct TypeDeclaration *self = O_CAST(_object, TypeDeclaration());
+  fprintf (out, "#ifndef TYPEDEF_");
+  O_CALL (self->name, generate);
+  fprintf (out, "\n#define TYPEDEF_");
+  O_CALL (self->name, generate);
+  fprintf (out, "\n");
   fprintf (out, "typedef ");
   if (o_is_of (self->type, FunctionType ()))
     {
@@ -351,6 +356,9 @@ O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitTypeDeclaration, (void *_self, 
       O_CALL (self->name, generate);
     }
   fprintf (out, ";\n");
+  fprintf (out, "#endif /* TYPEDEF_");
+  O_CALL (self->name, generate);
+  fprintf (out, " */\n");
 }
 
 O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitVariableDeclaration, (void *_self, void *_object), (_self, _object))
@@ -385,9 +393,16 @@ O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitObjectType, (void *_self, void 
 
   if (self->decl && !self->decl->defined)
     {
-      fprintf (out, "struct ");
-      O_CALL (self->token, generate);
-      fprintf (out, ";\n");
+      if (o_is_of (self->decl, TypeDeclaration ()) && !((struct TypeDeclaration *) self->decl)->is_struct)
+	{
+	  O_CALL (visitor, visit, self->decl);
+	}
+      else
+	{
+	  fprintf (out, "struct ");
+	  O_CALL (self->token, generate);
+	  fprintf (out, ";\n");
+	}
       self->decl->defined = true;
     }
 }

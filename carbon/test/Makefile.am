@@ -38,6 +38,7 @@ pass/class_decl_super.sh\
 pass/class_decl.sh\
 pass/class_intergrated.sh\
 pass/class_is_of.sh\
+pass/class_type_def_order.sh\
 pass/dependencies.sh\
 pass/expr_conditional_expr.sh\
 pass/external_definition.sh\
