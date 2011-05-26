@@ -47,15 +47,12 @@ INT_CONST	{DIGIT}+
 FLOAT_CONST	{DIGIT}*\.{DIGIT}+(e-?{DIGIT}+)?
 IDENTIFIER	{LOWER_LETTER}({LETTER}|{USCORE}|{DIGIT})*
 TYPE_IDENT	{UPPER_LETTER}({LETTER}|{USCORE}|{DIGIT})*
-MACRO_IDENT	{USCORE}({UPPER_LETTER}|{USCORE}|{DIGIT})*
 NON_ESCAPED	[^\\\n\'\"]
 ESCAPED		[ntvbrfa\\\?\'\"]|[0-7]+|x[0-9A-Fa-f]+
 CHAR_SYMBOL	{NON_ESCAPED}|\\{ESCAPED}
 CHAR_CONST	\'({CHAR_SYMBOL}|\")\'
 CHAR_CONST_ERR	\'({CHAR_SYMBOL}|\")*\'
 STRING_CONST	\"({CHAR_SYMBOL}|\')*\"
-
-
 
 %x MULTI_LINE_COMMENT
 %x ONE_LINE_COMMENT
@@ -134,7 +131,6 @@ STRING_CONST	\"({CHAR_SYMBOL}|\')*\"
 {FLOAT_CONST}	yylval.token = O_CALL_CLASS(Token(), new, yytext, FLOAT_CONSTANT, current_file, linenumber); return yylval.token->type;
 {IDENTIFIER}	yylval.token = O_CALL_CLASS(Token(), new, yytext, IDENTIFIER, current_file, linenumber); return yylval.token->type;
 {TYPE_IDENT}	yylval.token = O_CALL_CLASS(Token(), new, yytext, TYPE_IDENTIFIER, current_file, linenumber); return yylval.token->type;
-{MACRO_IDENT}	yylval.token = O_CALL_CLASS(Token(), new, yytext, MACRO_IDENTIFIER, current_file, linenumber); return yylval.token->type;
 {CHAR_CONST}	yylval.token = O_CALL_CLASS(Token(), new, yytext, CHAR_CONSTANT, current_file, linenumber); return yylval.token->type;
 {CHAR_CONST_ERR}  yylval.token = O_CALL_CLASS(Token(), new, yytext, CHAR_CONSTANT, current_file, linenumber); error(yylval.token, "invalid character constant %s", yytext); return yylval.token->type;
 {STRING_CONST}	yylval.token = O_CALL_CLASS(Token(), new, yytext, STRING_CONSTANT, current_file, linenumber); return yylval.token->type;

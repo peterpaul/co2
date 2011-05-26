@@ -24,7 +24,6 @@
 #include "co2/DestructorDeclaration.h"
 #include "co2/FunctionDeclaration.h"
 #include "co2/InterfaceDeclaration.h"
-#include "co2/MacroDeclaration.h"
 #include "co2/StructDeclaration.h"
 #include "co2/TypeDeclaration.h"
 #include "co2/VariableDeclaration.h"
@@ -98,8 +97,6 @@ O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitDeclaration, (void *_self, 
     O_CALL (self, visitFunctionDeclaration, decl);
   else if (o_is_of (decl, InterfaceDeclaration ()))
     O_CALL (self, visitInterfaceDeclaration, decl);
-  else if (o_is_of (decl, MacroDeclaration ()))
-    O_CALL (self, visitMacroDeclaration, decl);
   else if (o_is_of (decl, StructDeclaration ()))
     O_CALL (self, visitStructDeclaration, decl);
   else if (o_is_of (decl, TypeDeclaration ()))
@@ -213,7 +210,6 @@ O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitConstructorDeclaration, (vo
 O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitDestructorDeclaration, (void *_self, void *_object), (_self, _object)) {}
 O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitFunctionDeclaration, (void *_self, void *_object), (_self, _object)) {}
 O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitInterfaceDeclaration, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitMacroDeclaration, (void *_self, void *_object), (_self, _object)) {}
 O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitStructDeclaration, (void *_self, void *_object), (_self, _object)) {}
 O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitTypeDeclaration, (void *_self, void *_object), (_self, _object)) {}
 O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitVariableDeclaration, (void *_self, void *_object), (_self, _object)) {}
@@ -261,7 +257,6 @@ O_OBJECT_METHOD (BaseCompileObjectVisitor, visitConstructorDeclaration);
 O_OBJECT_METHOD (BaseCompileObjectVisitor, visitDestructorDeclaration);
 O_OBJECT_METHOD (BaseCompileObjectVisitor, visitFunctionDeclaration);
 O_OBJECT_METHOD (BaseCompileObjectVisitor, visitInterfaceDeclaration);
-O_OBJECT_METHOD (BaseCompileObjectVisitor, visitMacroDeclaration);
 O_OBJECT_METHOD (BaseCompileObjectVisitor, visitStructDeclaration);
 O_OBJECT_METHOD (BaseCompileObjectVisitor, visitTypeDeclaration);
 O_OBJECT_METHOD (BaseCompileObjectVisitor, visitVariableDeclaration);

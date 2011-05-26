@@ -26,7 +26,6 @@
 #include "co2/DestructorDeclaration.h"
 #include "co2/FunctionDeclaration.h"
 #include "co2/InterfaceDeclaration.h"
-#include "co2/MacroDeclaration.h"
 #include "co2/StructDeclaration.h"
 #include "co2/TypeDeclaration.h"
 #include "co2/VariableDeclaration.h"
@@ -120,8 +119,6 @@
 %token <token> INT
 %token <token> INT_CONSTANT
 %token <token> INTERFACE
-%token <token> MACRO
-%token <token> MACRO_IDENTIFIER
 %token <token> NEW
 %token <token> NULL_
 %token <token> RETURN
@@ -162,8 +159,6 @@
 %type	<declaration>	interface_header
 %type	<list>		interface_list
 %type	<list>		interface_method_declaration_list
-%type	<declaration>	macro_declaration
-%type	<list>		macro_identifier_list
 %type	<list>		opt_formal_argument_list
 %type	<declaration>	struct_declaration
 %type	<list>		struct_declaration_body
@@ -282,10 +277,6 @@ declaration
 |	struct_declaration
 |	class_declaration
 |	interface_declaration
-{
-  O_CALL(current_scope, declare, $1);
-}
-|	macro_declaration
 {
   O_CALL(current_scope, declare, $1);
 }
@@ -488,7 +479,6 @@ struct_declaration
 identifier
 : TYPE_IDENTIFIER
 | IDENTIFIER
-| MACRO_IDENTIFIER
 ;
 
 struct_declaration_body
@@ -935,25 +925,6 @@ string_constant
   O_CALL($2, delete);
 }
 |	STRING_CONSTANT
-;
-
-macro_declaration
-:	MACRO IDENTIFIER '(' macro_identifier_list ')' statement
-{
-  $$ = O_CALL_CLASS(MacroDeclaration(), new, $2, $4, $6);
-}
-;
-
-macro_identifier_list
-:	macro_identifier_list ',' IDENTIFIER
-{
-  O_CALL($$, append, $3);
-}
-|	IDENTIFIER
-{
-  $$ = O_CALL_CLASS(RefList(), new, 8, Token());
-  O_CALL($$, append, $1);
-}
 ;
 
 constructor_declaration
