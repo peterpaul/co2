@@ -1,3 +1,11 @@
+carbon (0.1.2-1) natty; urgency=low
+
+  * [bugfix] Raise error when function expression is not a function type
+  * [bugfix] Set the parent scope of class members before type checking
+  * [bugfix] Add typedef for undeclared types first used in function prototype
+
+ -- Peterpaul Taekele Klein Haneveld <peterpaul@peterpaul-dm1z>  Sun, 29 May 2011 17:31:13 +0200
+
 carbon (0.1.1-1) natty; urgency=low
 
   * Add ConditionalBinaryExpression

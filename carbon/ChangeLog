@@ -1,3 +1,8 @@
+0.1.2: Bugfix release
+	* [bugfix] Raise error when function expression is not a function type
+	* [bugfix] Set the parent scope of class members before type checking
+	* [bugfix] Add typedef for undeclared types first used in function prototype
+
 0.1.1:
 	* Add ConditionalBinaryExpression
 	* Allow expression for the class in IS_OF expression
