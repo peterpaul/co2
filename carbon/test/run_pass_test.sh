@@ -32,7 +32,7 @@ echo "CFLAGS=${CFLAGS}" >> ${LOGFILE}
 echo "LDFLAGS=${LDFLAGS}" >> ${LOGFILE}
 echo "LD=${LD}" >> ${LOGFILE}
 
-CFLAGS="${CFLAGS} -O0 -g3 -Wall -I../${SRCDIR}/pass"
+CFLAGS="${CFLAGS} -O0 -g3 -Wall -I../${SRCDIR}/pass -I."
 
 function compile_library_test {
     local TEST=$1
