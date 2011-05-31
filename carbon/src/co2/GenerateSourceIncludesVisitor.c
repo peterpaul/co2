@@ -77,6 +77,13 @@ O_IMPLEMENT_IF(GenerateSourceIncludesVisitor, void, visitTokenExpression, (void 
   struct GenerateSourceIncludesVisitor *visitor = O_CAST(_self, GenerateSourceIncludesVisitor());
   struct TokenExpression *self = O_CAST (_object, TokenExpression ());
 
+  if (self->decl && self->decl->file && self->decl->file != main_file)
+    {
+      struct String * filename = O_CALL_CLASS (String (), new, "\"%s.h\"", self->decl->file->name->data);
+      O_CALL (filename, retain);
+      O_CALL (visitor->map, set, filename->data, filename);
+    }
+
   if (self->type && o_is_of (self->type, ObjectType ()))
     {
       O_CALL (visitor, visitObjectType, self->type);

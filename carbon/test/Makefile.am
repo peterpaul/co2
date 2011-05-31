@@ -51,6 +51,7 @@ pass/fun_type.sh\
 pass/global_scope.sh\
 pass/import.sh\
 pass/include_subfolder.sh\
+pass/include_variable_and_function.sh\
 pass/interface_cast.sh\
 pass/interface_decl.sh\
 pass/interface_implementation.sh\
@@ -84,6 +85,7 @@ fail/class_decl_constructor.sh\
 fail/class_decl_redecl_var.sh\
 fail/class_decl.sh\
 fail/class_decl_type_check.sh\
+fail/class_function_type_error.sh\
 fail/function_decl_args.sh\
 fail/function_decl.sh\
 fail/function_decl_vararg.sh\

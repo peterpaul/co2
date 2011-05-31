@@ -1,0 +1,13 @@
+class Test {
+	int foo;
+	int bar () {
+		return 5;
+	}
+}
+
+int main () {
+	Test baz = new Test ();
+	baz.bar ();
+	baz.foo ();
+	return 0;
+}

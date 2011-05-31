@@ -5,7 +5,7 @@ include inc/TypeDefA
 	int printf (char *msg, ...);
 }
 int main () {
-	TypeDefB b = new TypeDefB(5);
-	printf ("b.getVar () = %d\n", b.getVar ());
+	foo = 5;
+	printf ("bar (8) = %d\n", bar (8));
 	return 0;
 }

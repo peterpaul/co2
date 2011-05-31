@@ -1,5 +1,11 @@
 include inc/TypeDefB
 
+int foo;
+
+int bar (int b) {
+	return b + foo;
+}
+
 class TypeDefA {
 	TypeDefC var;
 	TypeDefA (TypeDefC c) {
