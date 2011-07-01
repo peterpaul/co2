@@ -22,31 +22,49 @@
 class ObjectA
 {
 	ObjectA() {
-		foo = 3;
+		_foo = 3;
 	}
 
-	int foo;
+	ObjectA.foo (int _foo) {
+		self._foo = _foo;
+	}
+
+	int _foo;
 
 	int get_foo()
 	{
-		return foo;
+		return _foo;
 	}
+}
+
+int _round (double num) {
+	return (int) (num + 0.5);
 }
 
 class ObjectB : ObjectA
 {
-	ObjectB.bar() {
+	ObjectB(double bar) {
 		super();
+		self.bar = bar;
 	}
 
-	int foo(int bar) {
-		return get_foo() + bar;
+	ObjectB.foo (double bar, int foo) {
+		super.foo (foo);
+		self.bar = bar;
+	}
+
+	double bar;
+
+	int foobar() {
+		return get_foo() + _round (bar);
 	}
 }
 
 int main(int argc, char[][] argv)
 {
-	ObjectB b = new ObjectB();
-	printf ("b.foo(6) = %d\n", b.foo(6));
+	ObjectB a = new ObjectB(5.0);
+	printf ("a.foobar() = %d\n", a.foobar());
+	ObjectB b = new ObjectB.foo(5.0, 5);
+	printf ("b.foobar() = %d\n", b.foobar());
 	return 0;
 }

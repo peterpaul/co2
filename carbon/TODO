@@ -1,5 +1,6 @@
 Bug fixing:
 * add automatic casting between arithmetic types, object types and void *. [DONE]
+* promote float to double when passing through class constructor
 
 Refactoring:
 * add type member to declaration [DONE]

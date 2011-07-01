@@ -26,6 +26,7 @@ pass/cast_expression.sh\
 pass/class_conditional_dot_expr.sh\
 pass/class_decl_abstract.sh\
 pass/class_decl_constructor_parameters.sh\
+pass/class_decl_constructor_subclass_parameters.sh\
 pass/class_decl_constructor.sh\
 pass/class_decl_constructor_vararg.sh\
 pass/class_decl_destructor.sh\
