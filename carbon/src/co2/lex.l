@@ -78,9 +78,11 @@ STRING_CONST	\"({CHAR_SYMBOL}|\')*\"
 <INCLUDE>[^ \t\n]+	{ new_input (O_CALL_CLASS (String (), new, "%s", yytext)); }
 "break"		return BREAK;
 "catch"		return CATCH;
+"case"		return CASE;
 "char"		yylval.token = O_CALL_CLASS(Token(), new, yytext, CHAR, current_file, linenumber); return yylval.token->type;
 "class"		yylval.token = O_CALL_CLASS(Token(), new, yytext, CLASS, current_file, linenumber); return yylval.token->type;
 "continue"	return CONTINUE;
+"default"	return DEFAULT;
 "delete"	return DELETE;
 "do"		return DO;
 "double"	yylval.token = O_CALL_CLASS(Token(), new, yytext, DOUBLE, current_file, linenumber); return yylval.token->type;
@@ -100,6 +102,7 @@ STRING_CONST	\"({CHAR_SYMBOL}|\')*\"
 "sizeof"	return SIZEOF;
 "struct"	return STRUCT;
 "super"		yylval.token = O_CALL_CLASS(Token(), new, yytext, SUPER, current_file, linenumber); return yylval.token->type;
+"switch"	return SWITCH;
 "throw"		return THROW;
 "try"		return TRY;
 "typedef"	return TYPEDEF;

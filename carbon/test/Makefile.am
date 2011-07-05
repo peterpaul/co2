@@ -67,6 +67,7 @@ pass/scope_simple.sh\
 pass/scope.sh\
 pass/size_expression.sh\
 pass/struct_decl.sh\
+pass/switch_case_statement.sh\
 pass/try_statement_finally.sh\
 pass/try_statement_nested_finally.sh\
 pass/try_statement_nested_return.sh\

@@ -31,6 +31,7 @@
 #include "co2/VariableDeclaration.h"
   /* Statements */
 #include "co2/BreakStatement.h"
+#include "co2/CaseStatement.h"
 #include "co2/CatchStatement.h"
 #include "co2/CompoundStatement.h"
 #include "co2/ContinueStatement.h"
@@ -43,6 +44,7 @@
 #include "co2/IfStatement.h"
 #include "co2/ReturnStatement.h"
 #include "co2/Statement.h"
+#include "co2/SwitchStatement.h"
 #include "co2/TryStatement.h"
 #include "co2/ThrowStatement.h"
 #include "co2/WhileStatement.h"
@@ -98,11 +100,13 @@
 }
 
 %token <token> BREAK
+%token <token> CASE
 %token <token> CATCH
 %token <token> CHAR
 %token <token> CHAR_CONSTANT
 %token <token> CLASS
 %token <token> CONTINUE
+%token <token> DEFAULT
 %token <token> DO
 %token <token> DOUBLE
 %token <token> DELETE
@@ -127,6 +131,7 @@
 %token <token> STRING_CONSTANT
 %token <token> STRUCT
 %token <token> SUPER
+%token <token> SWITCH
 %token <token> THROW
 %token <token> TRY
 %token <token> TYPEDEF
@@ -168,12 +173,17 @@
 %type	<list>		variable_declaration_list
  /* Statements */
 %type	<statement>	break_statement
+%type	<list>		case_content_list
+%type	<statement>	case_statement
+%type	<list>		case_statement_list
+%type	<list>		case_statement_list_with_default
 %type	<statement>	catch_statement
 %type	<list>		catch_statement_list
 %type	<list>		compound_content
 %type	<list>		compound_content_list
 %type	<statement>	compound_statement
 %type	<statement>	continue_statement
+%type	<statement>	default_case
 %type	<statement>	delete_statement
 %type	<statement>	do_statement
 %type	<statement>	expression_statement
@@ -182,6 +192,7 @@
 %type	<statement>	if_statement
 %type	<statement>	return_statement
 %type	<statement>	statement
+%type	<statement>	switch_statement
 %type	<statement>	throw_statement
 %type	<statement>	try_statement
 %type	<statement>	while_statement
@@ -559,6 +570,7 @@ statement
 |	throw_statement
 |	break_statement
 |	continue_statement
+|	switch_statement
 ;
 
 compound_statement
@@ -712,6 +724,58 @@ continue_statement
 :	CONTINUE ';'
 {
   $$ = O_CALL_CLASS(ContinueStatement(), new);
+}
+;
+
+switch_statement
+:	SWITCH '(' expression ')' '{' case_statement_list_with_default '}'
+{
+  $$ = O_CALL_CLASS (SwitchStatement (), new, $3, $6);
+}
+;
+
+case_statement_list_with_default
+:	case_statement_list default_case
+{
+  O_CALL ($$, append, $2);
+}
+|	case_statement_list
+;
+
+
+case_statement_list
+:	case_statement_list case_statement
+{
+  O_CALL ($$, append, $2);
+}
+|	/* empty */
+{
+  $$ = O_CALL_CLASS (RefList (), new, 0, Statement ());
+}
+;
+
+case_statement
+:	CASE constant ':' case_content_list
+{
+  $$ = O_CALL_CLASS (CaseStatement (), new, $2, $4);
+}
+;
+
+case_content_list
+:	case_content_list statement
+{
+  O_CALL ($$, append, $2);
+}
+|	/* empty */
+{
+  $$ = O_CALL_CLASS (RefList (), new, 8, Statement ());
+}
+;
+
+default_case
+:	DEFAULT ':' case_content_list
+{
+  $$ = O_CALL_CLASS (CaseStatement (), new, NULL, $3);
 }
 ;
 

@@ -6,7 +6,7 @@ AM_YFLAGS=-d
 lib_LTLIBRARIES=libcarbon-1.0.la
 libcarbon_1_0_ladir=$(includedir)/carbon-1.0/co2
 libcarbon_1_0_la_SOURCES= co2/grammar.y co2/lex.l co2/ArgumentDeclaration.c co2/ArrayType.c co2/BaseCompileObjectVisitor.c co2/BreakStatement.c\
-		co2/BinaryExpression.c\
+		co2/BinaryExpression.c co2/CaseStatement.c\
 		co2/CastExpression.c co2/CatchStatement.c co2/ClassDeclaration.c\
 		co2/CompileObject.c co2/CompileObjectVisitor.c\
 		co2/CompoundStatement.c co2/ConditionalBinaryExpression.c co2/ConditionalExpression.c\
@@ -22,13 +22,13 @@ libcarbon_1_0_la_SOURCES= co2/grammar.y co2/lex.l co2/ArgumentDeclaration.c co2/
 		co2/NewExpression.c co2/NestedExpression.c\
 		co2/NullExpression.c co2/ObjectType.c co2/ObjectTypeDeclaration.c co2/Path.c\
 		co2/PrimitiveType.c co2/RefList.c co2/ReturnStatement.c co2/Scope.c\
-		co2/SizeExpression.c co2/Statement.c co2/StructDeclaration.c co2/SuperExpression.c\
+		co2/SizeExpression.c co2/Statement.c co2/StructDeclaration.c co2/SuperExpression.c co2/SwitchStatement.c\
 		co2/ThrowStatement.c co2/Token.c co2/TokenExpression.c co2/TokenGenerator.c\
 		co2/TryStatement.c co2/Type.c co2/TypeDeclaration.c\
 		co2/UnaryExpression.c\
 		co2/VarArgExpression.c co2/VariableDeclaration.c co2/WhileStatement.c
 libcarbon_1_0_la_HEADERS=co2/ArgumentDeclaration.h co2/ArrayType.h co2/BaseCompileObjectVisitor.h co2/BreakStatement.h\
-		co2/BinaryExpression.h\
+		co2/BinaryExpression.h co2/CaseStatement.h\
 		co2/CastExpression.h co2/CatchStatement.h co2/ClassDeclaration.h\
 		co2/CompileObject.h co2/CompileObjectVisitor.h co2/Compiler.h\
 		co2/CompoundStatement.h co2/ConditionalBinaryExpression.h co2/ConditionalExpression.h\
@@ -44,7 +44,7 @@ libcarbon_1_0_la_HEADERS=co2/ArgumentDeclaration.h co2/ArrayType.h co2/BaseCompi
 		co2/NewExpression.h co2/NestedExpression.h\
 		co2/NullExpression.h co2/ObjectType.h co2/ObjectTypeDeclaration.h co2/Path.h\
 		co2/PrimitiveType.h co2/RefList.h co2/ReturnStatement.h co2/Scope.h\
-		co2/SizeExpression.h co2/Statement.h co2/StructDeclaration.h co2/SuperExpression.h\
+		co2/SizeExpression.h co2/Statement.h co2/StructDeclaration.h co2/SuperExpression.h co2/SwitchStatement.h\
 		co2/ThrowStatement.h co2/Token.h co2/TokenExpression.h co2/TokenGenerator.h\
 		co2/TryStatement.h co2/Type.h co2/TypeDeclaration.h\
 		co2/UnaryExpression.h\
