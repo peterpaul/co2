@@ -5,6 +5,6 @@ class CompileObject : RefObject {
 	void optimize ();
 	void generate (FILE *fp);
 	Token get_token ();
-	void accept (BaseCompileObjectVisitor *visitor);
+	void accept (BaseCompileObjectVisitor visitor);
 }
 

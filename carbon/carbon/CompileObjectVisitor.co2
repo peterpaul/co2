@@ -1,0 +1,5 @@
+include CompileObject
+
+interface CompileObjectVisitor {
+	  void visit (CompileObject object);
+}

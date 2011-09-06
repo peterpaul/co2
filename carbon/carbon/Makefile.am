@@ -222,6 +222,8 @@ WhileStatement.h
 	-rm $@
 	carbon -P ../../co2-base/carbon -P ../../co2-base/carbon/co2 $< $@
 
+%.h: %.c
+
 libcarbon_1_0_la_CPPFLAGS = -I$(top_srcdir)/include -O0 -g3
 
 bin_PROGRAMS = Compiler
