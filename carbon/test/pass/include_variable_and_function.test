@@ -1,0 +1,11 @@
+include inc/TypeDefB
+include inc/TypeDefA
+
+["stdlib.h"] {
+	int printf (char *msg, ...);
+}
+int main () {
+	foo = 5;
+	printf ("bar (8) = %d\n", bar (8));
+	return 0;
+}

@@ -16,17 +16,55 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef MacroDeclaration_H
-#define MacroDeclaration_H
 
-#include "co2/Declaration.h"
+["stdio.h"] int printf(char * format, ...);
 
-#define MacroDeclarationClass_Attr			\
-  DeclarationClass_Attr
+class ObjectA
+{
+	ObjectA() {
+		_foo = 3;
+	}
 
-#define MacroDeclaration_Attr				\
-  Declaration_Attr
+	ObjectA.foo (int _foo) {
+		self._foo = _foo;
+	}
 
-O_CLASS (MacroDeclaration, Declaration);
+	int _foo;
 
-#endif /* MacroDeclaration_H */
+	int get_foo()
+	{
+		return _foo;
+	}
+}
+
+int _round (double num) {
+	return (int) (num + 0.5);
+}
+
+class ObjectB : ObjectA
+{
+	ObjectB(double bar) {
+		super();
+		self.bar = bar;
+	}
+
+	ObjectB.foo (double bar, int foo) {
+		super.foo (foo);
+		self.bar = bar;
+	}
+
+	double bar;
+
+	int foobar() {
+		return get_foo() + _round (bar);
+	}
+}
+
+int main(int argc, char[][] argv)
+{
+	ObjectB a = new ObjectB(5.0);
+	printf ("a.foobar() = %d\n", a.foobar());
+	ObjectB b = new ObjectB.foo(5.0, 5);
+	printf ("b.foobar() = %d\n", b.foobar());
+	return 0;
+}

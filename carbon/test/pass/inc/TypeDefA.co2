@@ -1,0 +1,22 @@
+include inc/TypeDefB
+
+int foo;
+
+int bar (int b) {
+	return b + foo;
+}
+
+class TypeDefA {
+	TypeDefC var;
+	TypeDefA (TypeDefC c) {
+		var = c;
+	}
+
+	void setVar (TypeDefC c) {
+		var = c;
+	}
+
+	TypeDefC getVar () {
+		return var;
+	}
+}

@@ -32,6 +32,7 @@
 #include "VariableDeclaration.h"
   /* Statements */
 #include "BreakStatement.h"
+#include "CaseStatement.h"
 #include "CatchStatement.h"
 #include "CompoundStatement.h"
 #include "ContinueStatement.h"
@@ -44,6 +45,7 @@
 #include "IfStatement.h"
 #include "ReturnStatement.h"
 #include "Statement.h"
+#include "SwitchStatement.h"
 #include "TryStatement.h"
 #include "ThrowStatement.h"
 #include "WhileStatement.h"
@@ -99,11 +101,13 @@
 }
 
 %token <token> BREAK
+%token <token> CASE
 %token <token> CATCH
 %token <token> CHAR
 %token <token> CHAR_CONSTANT
 %token <token> CLASS
 %token <token> CONTINUE
+%token <token> DEFAULT
 %token <token> DO
 %token <token> DOUBLE
 %token <token> DELETE
@@ -120,8 +124,6 @@
 %token <token> INT
 %token <token> INT_CONSTANT
 %token <token> INTERFACE
-%token <token> MACRO
-%token <token> MACRO_IDENTIFIER
 %token <token> NEW
 %token <token> NULL_
 %token <token> RETURN
@@ -130,6 +132,7 @@
 %token <token> STRING_CONSTANT
 %token <token> STRUCT
 %token <token> SUPER
+%token <token> SWITCH
 %token <token> THROW
 %token <token> TRY
 %token <token> TYPEDEF
@@ -162,8 +165,6 @@
 %type	<declaration>	interface_header
 %type	<list>		interface_list
 %type	<list>		interface_method_declaration_list
-%type	<declaration>	macro_declaration
-%type	<list>		macro_identifier_list
 %type	<list>		opt_formal_argument_list
 %type	<declaration>	struct_declaration
 %type	<list>		struct_declaration_body
@@ -173,12 +174,17 @@
 %type	<list>		variable_declaration_list
  /* Statements */
 %type	<statement>	break_statement
+%type	<list>		case_content_list
+%type	<statement>	case_statement
+%type	<list>		case_statement_list
+%type	<list>		case_statement_list_with_default
 %type	<statement>	catch_statement
 %type	<list>		catch_statement_list
 %type	<list>		compound_content
 %type	<list>		compound_content_list
 %type	<statement>	compound_statement
 %type	<statement>	continue_statement
+%type	<statement>	default_case
 %type	<statement>	delete_statement
 %type	<statement>	do_statement
 %type	<statement>	expression_statement
@@ -187,6 +193,7 @@
 %type	<statement>	if_statement
 %type	<statement>	return_statement
 %type	<statement>	statement
+%type	<statement>	switch_statement
 %type	<statement>	throw_statement
 %type	<statement>	try_statement
 %type	<statement>	while_statement
@@ -282,10 +289,6 @@ declaration
 |	struct_declaration
 |	class_declaration
 |	interface_declaration
-{
-  O_CALL(current_scope, declare, $1);
-}
-|	macro_declaration
 {
   O_CALL(current_scope, declare, $1);
 }
@@ -488,7 +491,6 @@ struct_declaration
 identifier
 : TYPE_IDENTIFIER
 | IDENTIFIER
-| MACRO_IDENTIFIER
 ;
 
 struct_declaration_body
@@ -569,6 +571,7 @@ statement
 |	throw_statement
 |	break_statement
 |	continue_statement
+|	switch_statement
 ;
 
 compound_statement
@@ -722,6 +725,58 @@ continue_statement
 :	CONTINUE ';'
 {
   $$ = O_CALL_CLASS(ContinueStatement(), new);
+}
+;
+
+switch_statement
+:	SWITCH '(' expression ')' '{' case_statement_list_with_default '}'
+{
+  $$ = O_CALL_CLASS (SwitchStatement (), new, $3, $6);
+}
+;
+
+case_statement_list_with_default
+:	case_statement_list default_case
+{
+  O_CALL ($$, append, $2);
+}
+|	case_statement_list
+;
+
+
+case_statement_list
+:	case_statement_list case_statement
+{
+  O_CALL ($$, append, $2);
+}
+|	/* empty */
+{
+  $$ = O_CALL_CLASS (RefList (), new, 0, Statement ());
+}
+;
+
+case_statement
+:	CASE constant ':' case_content_list
+{
+  $$ = O_CALL_CLASS (CaseStatement (), new, $2, $4);
+}
+;
+
+case_content_list
+:	case_content_list statement
+{
+  O_CALL ($$, append, $2);
+}
+|	/* empty */
+{
+  $$ = O_CALL_CLASS (RefList (), new, 8, Statement ());
+}
+;
+
+default_case
+:	DEFAULT ':' case_content_list
+{
+  $$ = O_CALL_CLASS (CaseStatement (), new, NULL, $3);
 }
 ;
 
@@ -935,25 +990,6 @@ string_constant
   O_CALL($2, delete);
 }
 |	STRING_CONSTANT
-;
-
-macro_declaration
-:	MACRO IDENTIFIER '(' macro_identifier_list ')' statement
-{
-  $$ = O_CALL_CLASS(MacroDeclaration(), new, $2, $4, $6);
-}
-;
-
-macro_identifier_list
-:	macro_identifier_list ',' IDENTIFIER
-{
-  O_CALL($$, append, $3);
-}
-|	IDENTIFIER
-{
-  $$ = O_CALL_CLASS(RefList(), new, 8, Token());
-  O_CALL($$, append, $1);
-}
 ;
 
 constructor_declaration

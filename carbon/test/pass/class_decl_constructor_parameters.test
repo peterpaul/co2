@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+["stdio.h"] int printf(char * format, ...);
 
 class ObjectA
 {
@@ -46,5 +47,6 @@ class ObjectB : ObjectA
 int main(int argc, char[][] argv)
 {
 	ObjectB b = new ObjectB();
-	return b.foo(6);
+	printf ("b.foo(6) = %d\n", b.foo(6));
+	return 0;
 }

@@ -16,26 +16,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "co2/MacroDeclaration.h"
+#ifndef FixScopeVisitor_H
+#define FixScopeVisitor_H
 
-#define O_SUPER Declaration()
+#include "co2/BaseCompileObjectVisitor.h"
 
-O_IMPLEMENT (MacroDeclaration, void *, ctor, (void *_self, va_list * app))
-{
-  struct MacroDeclaration *self = O_CAST (_self, MacroDeclaration ());
-  self = O_SUPER->ctor (self, app);
-  /* TODO initialize */
-  return self;
-}
+#define FixScopeVisitorClass_Attr		\
+  BaseCompileObjectVisitorClass_Attr
 
-O_IMPLEMENT (MacroDeclaration, void *, dtor, (void *_self))
-{
-  struct MacroDeclaration *self = O_CAST (_self, MacroDeclaration ());
-  /* TODO cleanup */
-  return O_SUPER->dtor (self);
-}
+#define FixScopeVisitor_Attr		\
+  BaseCompileObjectVisitor_Attr
 
-O_OBJECT (MacroDeclaration, Declaration);
-O_OBJECT_METHOD (MacroDeclaration, ctor);
-O_OBJECT_METHOD (MacroDeclaration, dtor);
-O_END_OBJECT
+O_CLASS(FixScopeVisitor, BaseCompileObjectVisitor);
+
+#endif /* FixScopeVisitor_H */

@@ -26,7 +26,6 @@
 #include "co2/StructDeclaration.h"
 #include "co2/io.h"
 #include "co2/PrimitiveType.h"
-#include "grammar.h"
 
 #define O_SUPER BinaryExpression()
 

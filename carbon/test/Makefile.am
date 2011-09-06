@@ -26,6 +26,7 @@ pass/cast_expression.sh\
 pass/class_conditional_dot_expr.sh\
 pass/class_decl_abstract.sh\
 pass/class_decl_constructor_parameters.sh\
+pass/class_decl_constructor_subclass_parameters.sh\
 pass/class_decl_constructor.sh\
 pass/class_decl_constructor_vararg.sh\
 pass/class_decl_destructor.sh\
@@ -38,6 +39,7 @@ pass/class_decl_super.sh\
 pass/class_decl.sh\
 pass/class_intergrated.sh\
 pass/class_is_of.sh\
+pass/class_type_def_order.sh\
 pass/dependencies.sh\
 pass/expr_conditional_expr.sh\
 pass/external_definition.sh\
@@ -50,6 +52,7 @@ pass/fun_type.sh\
 pass/global_scope.sh\
 pass/import.sh\
 pass/include_subfolder.sh\
+pass/include_variable_and_function.sh\
 pass/interface_cast.sh\
 pass/interface_decl.sh\
 pass/interface_implementation.sh\
@@ -64,6 +67,7 @@ pass/scope_simple.sh\
 pass/scope.sh\
 pass/size_expression.sh\
 pass/struct_decl.sh\
+pass/switch_case_statement.sh\
 pass/try_statement_finally.sh\
 pass/try_statement_nested_finally.sh\
 pass/try_statement_nested_return.sh\
@@ -83,6 +87,7 @@ fail/class_decl_constructor.sh\
 fail/class_decl_redecl_var.sh\
 fail/class_decl.sh\
 fail/class_decl_type_check.sh\
+fail/class_function_type_error.sh\
 fail/function_decl_args.sh\
 fail/function_decl.sh\
 fail/function_decl_vararg.sh\

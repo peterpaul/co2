@@ -32,7 +32,7 @@ echo "CFLAGS=${CFLAGS}" >> ${LOGFILE}
 echo "LDFLAGS=${LDFLAGS}" >> ${LOGFILE}
 echo "LD=${LD}" >> ${LOGFILE}
 
-CFLAGS="${CFLAGS} -O0 -g3 -Wall -I../${SRCDIR}/pass"
+CFLAGS="${CFLAGS} -O0 -g3 -Wall -I../${SRCDIR}/pass -I."
 
 function compile_library_test {
     local TEST=$1
@@ -47,8 +47,8 @@ function compile_library_test {
     local TARGETNAME=${TARGET}/${DIRNAME}/${BASENAME}
     mkdir -p ${TARGET}/${DIRNAME}
     # Compile the testcase
-    echo "Command: ${COMPILER} ${SRCDIR}/${TEST} ${TARGETNAME}.c" >> ${LOGFILE}
-    ${COMPILER} ${SRCDIR}/${TEST} ${TARGETNAME}.c >> ${LOGFILE} 2>&1
+    echo "Command: ${COMPILER} -P ${SRCDIR}/pass ${SRCDIR}/${TEST} ${TARGETNAME}.c" >> ${LOGFILE}
+    ${COMPILER} -P ${SRCDIR}/pass ${SRCDIR}/${TEST} ${TARGETNAME}.c >> ${LOGFILE} 2>&1
     if [[ "$?" != "0" ]]
     then
 	echo "ERROR: ${TEST} failed: Compiler error" >> ${LOGFILE}
@@ -69,7 +69,7 @@ function compile_library_gcc {
     fi
     local TARGETNAME=${TARGET}/${DIRNAME}/${BASENAME}
     # Compile the generated code with ${CC}
-    pushd $( dirname ${TARGETNAME}.bin ) >> ${LOGFILE} 2>&1
+    pushd ${TARGET}/pass >> ${LOGFILE} 2>&1
     echo "Command: ${CC} -g3 -c ${TARGETNAME}.c -o ${TARGETNAME}.o ${CFLAGS}" >> ${LOGFILE}
     ${CC} -g3 -c ${TARGETNAME}.c -o ${TARGETNAME}.o ${CFLAGS} >> ${LOGFILE} 2>&1
     local CC_STATUS=$?

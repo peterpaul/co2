@@ -16,31 +16,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef File_H
-#define File_H
 
-#include "co2/CompileObject.h"
-#include "co2/Hash.h"
-#include "co2/BaseCompileObjectVisitor.h"
 
-O_METHOD_DEF (File, void, sort, (void *_self));
-O_METHOD_DEF (File, void, accept_all_files, (void *_self, struct BaseCompileObjectVisitor *visitor));
+["stdio.h"] int printf(char * format, ...);
 
-#define FileClass_Attr				\
-  CompileObjectClass_Attr;			\
-  O_METHOD (File, sort);			\
-  O_METHOD (File, accept_all_files)
-
-#define File_Attr				\
-  CompileObject_Attr;				\
-  struct String * name;				\
-  struct String * absolute_path;		\
-  struct RefList * file_dependencies;		\
-  struct RefList * declarations
-
-O_CLASS (File, CompileObject);
-
-struct Hash * get_hash_map ();
-void accept_all_files (void *_object, va_list *app);
-
-#endif /* File_H */
+int main() {
+	int i;
+	for (i = 0; i < 10; i +=1) {
+		switch (i) {
+		case 7: {
+			int b;
+			printf ("Number:");
+			for (b = i; b > 0; b -= 2) {
+				printf (" %d", b);
+			}
+			printf ("\n");
+		}
+			break;
+		case 4:
+		case 8:
+		case 2:
+			printf ("Number: %d!\n", i);
+			break;
+		default:
+			printf ("Number: %d\n", i);
+			break;
+		}
+	}
+	return 0;
+}

@@ -235,10 +235,16 @@ O_IMPLEMENT (FunctionCallExpression, void, type_check, (void *_self))
   struct FunctionCallExpression *self =
     O_CAST (_self, FunctionCallExpression ());
   O_CALL (self->function, type_check);
-    if (!self->function->type)
-      {
-	return;
-      }
+  if (!self->function->type)
+    {
+      return;
+    }
+  if (!o_is_of (self->function->type, FunctionType ()))
+    {
+      struct Token *token = O_CALL (self->function, get_token);
+      error (token, "'%s' is not a function\n", token->name->data);
+      return;
+    }
   struct FunctionType *function_type =
     o_cast (self->function->type, FunctionType ());
   self->type = O_CALL (function_type->return_type, retain);

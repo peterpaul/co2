@@ -16,17 +16,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef HelloWorldVisitor_H
-#define HelloWorldVisitor_H
+#ifndef SwitchStatement_H
+#define SwitchStatement_H
 
-#include "co2/BaseCompileObjectVisitor.h"
+#include "co2/Statement.h"
 
-#define HelloWorldVisitorClass_Attr			\
-  BaseCompileObjectVisitorClass_Attr
+#define SwitchStatementClass_Attr			\
+  StatementClass_Attr
 
-#define HelloWorldVisitor_Attr				\
-  BaseCompileObjectVisitor_Attr
+#define SwitchStatement_Attr			\
+  Statement_Attr;				\
+  struct Expression * expr;			\
+  struct RefList * cases
 
-O_CLASS(HelloWorldVisitor, BaseCompileObjectVisitor);
+O_CLASS(SwitchStatement, Statement);
 
-#endif /* HelloWorldVisitor_H */
+#endif /* SwitchStatement_H */

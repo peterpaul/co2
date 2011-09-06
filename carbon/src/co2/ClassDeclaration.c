@@ -93,17 +93,6 @@ O_IMPLEMENT (ClassDeclaration, void, type_check, (void *_self))
 {
   struct ClassDeclaration *self = O_CAST (_self, ClassDeclaration ());
   O_BRANCH_CALL (current_context, add, self);
-  if (self->superclass)
-    {
-      struct Declaration *_super_class =
-	O_CALL (self->scope, lookup, self->superclass);
-      if (_super_class)
-	{
-	  struct ClassDeclaration *super_class =
-	    O_CAST (_super_class, ClassDeclaration ());
-	  self->member_scope->parent = super_class->member_scope;
-	}
-    }
   /* TODO check whether:
    * 1. superclasses already implement interfaces, if so: fail
    * 2. foreach interface, methods already exists in other interface (including interfaces from superclasses), if so: fail

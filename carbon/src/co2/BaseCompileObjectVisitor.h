@@ -32,7 +32,6 @@
   O_METHOD(CompileObjectVisitor, visitDestructorDeclaration);	\
   O_METHOD(CompileObjectVisitor, visitFunctionDeclaration);	\
   O_METHOD(CompileObjectVisitor, visitInterfaceDeclaration);	\
-  O_METHOD(CompileObjectVisitor, visitMacroDeclaration);	\
   O_METHOD(CompileObjectVisitor, visitStructDeclaration);	\
   O_METHOD(CompileObjectVisitor, visitTypeDeclaration);		\
   O_METHOD(CompileObjectVisitor, visitVariableDeclaration);	\

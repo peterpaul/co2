@@ -68,6 +68,14 @@ optimize (void *_object)
 {
 }
 
+void
+accept_all_files (void *_file, va_list *app)
+{
+  struct File *file = O_CAST (_file, File ());
+  struct BaseCompileObjectVisitor *visitor = O_GET_ARG (BaseCompileObjectVisitor);
+  O_CALL (file, accept_all_files, visitor);
+}
+
 O_IMPLEMENT (File, void *, ctor, (void *_self, va_list * app))
 {
   struct File *self = O_CAST (_self, File ());
@@ -90,6 +98,14 @@ O_IMPLEMENT (File, void *, dtor, (void *_self))
   O_CALL (self->file_dependencies, release);
   return O_SUPER->dtor (self);
 }
+
+O_IMPLEMENT (File, void, accept_all_files, (void *_self, struct BaseCompileObjectVisitor *visitor))
+{
+  struct File *self = O_CAST (_self, File ());
+  O_CALL (self->file_dependencies, map_args, accept_all_files, visitor);
+  O_CALL (self, accept, visitor);
+}
+
 
 O_IMPLEMENT (File, void, accept, (void *_self, struct BaseCompileObjectVisitor *visitor))
 {
@@ -400,4 +416,5 @@ O_OBJECT_METHOD (File, type_check);
 O_OBJECT_METHOD (File, optimize);
 O_OBJECT_METHOD (File, generate);
 O_OBJECT_METHOD (File, accept);
+O_OBJECT_METHOD (File, accept_all_files);
 O_END_OBJECT

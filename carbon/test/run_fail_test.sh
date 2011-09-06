@@ -1,6 +1,8 @@
 #!/bin/bash -u
 # Copyright (C) 2011 Peterpaul Taekele Klein Haneveld
 
+LD=gcc
+
 BASEDIR=$( pwd )
 COMPILER=${BASEDIR}/../src/carbon
 
@@ -18,10 +20,11 @@ if [ "${SRCDIR-x}" == "x" ]; then
 fi
 
 mkdir -p ${TARGET}/fail
-find fail -name "*.h" -exec cp -t ${TARGET}/fail {} \;
+find ${SRCDIR}/fail -name "*.h" -exec cp -u -t ${TARGET}/fail {} \;
 
 function run_fail_test {
     local TEST=$1
+
     local BASENAME=$( basename ${TEST} .test )
     local DIRNAME=$( dirname ${TEST} )
     local CO2=$( echo ${BASENAME} | grep ".co2" | wc -l )
@@ -32,8 +35,8 @@ function run_fail_test {
     local TARGETNAME=${TARGET}/${DIRNAME}/${BASENAME}
     mkdir -p ${TARGET}/${DIRNAME}
     # Compile the testcase
-    echo "Command: ${COMPILER} ${SRCDIR}/${TEST} ${TARGETNAME}.c" >> ${LOGFILE}
-    ${COMPILER} ${SRCDIR}/${TEST} ${TARGETNAME}.c >> ${LOGFILE} 2>&1
+    echo "Command: ${COMPILER} -P ${SRCDIR}/fail ${SRCDIR}/${TEST} ${TARGETNAME}.c" >> ${LOGFILE}
+    ${COMPILER} -P ${SRCDIR}/fail ${SRCDIR}/${TEST} ${TARGETNAME}.c >> ${LOGFILE} 2>&1
     if [[ "$?" == "0" ]]
     then
 	return 1

@@ -16,17 +16,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef TypeCheckVisitor_H
-#define TypeCheckVisitor_H
+#ifndef CaseStatement_H
+#define CaseStatement_H
 
-#include "co2/BaseCompileObjectVisitor.h"
+#include "co2/Statement.h"
 
-#define TypeCheckVisitorClass_Attr		\
-  BaseCompileObjectVisitorClass_Attr
+#define CaseStatementClass_Attr			\
+  StatementClass_Attr
 
-#define TypeCheckVisitor_Attr		\
-  BaseCompileObjectVisitor_Attr
+#define CaseStatement_Attr			\
+  Statement_Attr;				\
+  struct Expression * expr;			\
+  struct RefList * statements
 
-O_CLASS(TypeCheckVisitor, BaseCompileObjectVisitor);
+O_CLASS(CaseStatement, Statement);
 
-#endif /* TypeCheckVisitor_H */
+#endif /* CaseStatement_H */
