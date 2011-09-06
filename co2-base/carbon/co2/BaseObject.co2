@@ -54,6 +54,8 @@
 	char *strdup(char *s);
 	char *strtok_r(char *str, char *delim, char **saveptr);
 	int strcmp(char *s1, char *s2);
+	char *strchr(char *s, char c);
+	char *strrchr(char *s, char c);
 }
 
 ["stdlib.h"] {
@@ -71,11 +73,18 @@
 
 ["stdio.h"] {
 	typedef FILE = void;
+	FILE *stdout, stderr;
 	int printf(char *format, ...);
 	int fprintf(FILE *stream, char *format, ...);
 	int snprintf(char *str, int size, char *format, ...);
+	int vfprintf(FILE *stream, char *format, va_list ap);
 	int vsnprintf(char *str, int size, char *format, va_list ap);
-	FILE *stdout, stderr;
+	FILE *fopen(char *path, char *mode);
+	int fclose(FILE *fp);
+}
+
+["unistd.h"] {
+	char *getcwd(char *buf, int size);
 }
 
 include co2/String

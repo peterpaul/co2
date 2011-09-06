@@ -19,6 +19,7 @@ co2/HashMapIterator.co2\
 co2/HashSet.co2\
 co2/HashSetIterator.co2\
 co2/IndexOutOfBoundsException.co2\
+co2/IntArray.co2\
 co2/Iterable.co2\
 co2/Iterator.co2\
 co2/KeyValuePair.co2\
@@ -55,6 +56,7 @@ co2/HashMapIterator.c\
 co2/HashSet.c\
 co2/HashSetIterator.c\
 co2/IndexOutOfBoundsException.c\
+co2/IntArray.c\
 co2/Iterable.c\
 co2/Iterator.c\
 co2/KeyValuePair.c\
@@ -91,6 +93,7 @@ co2/HashMapIterator.h\
 co2/HashSet.h\
 co2/HashSetIterator.h\
 co2/IndexOutOfBoundsException.h\
+co2/IntArray.h\
 co2/Iterable.h\
 co2/Iterator.h\
 co2/KeyValuePair.h\

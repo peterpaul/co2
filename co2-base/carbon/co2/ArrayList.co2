@@ -51,4 +51,11 @@ class ArrayList : Array <List> {
 	Iterator iterator () {
 		return new ArrayIterator (self);
 	}
+
+	RefObject removeLast () {
+		RefObject item = get (length - 1);
+		set (length - 1, null);
+		length -= 1;
+		return item;
+	}
 }

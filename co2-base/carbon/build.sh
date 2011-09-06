@@ -44,7 +44,7 @@ else
     make -k
     make -k
     rm TestLogger.bin TestRefObject.bin TestMap.bin TestSet.bin
-    CO2FLAGS="-O0 -g3 -I/home/peterpaul/local/co2-0.0.2/include/co2-1.0 -I. -L/home/peterpaul/local/co2-0.0.2/lib -lco2-1.0 $LIBSOURCES"
+    CO2FLAGS="-O0 -g3 -I/home/peterpaul/local/co2-1.0/include/co2-1.0 -I. -L/home/peterpaul/local/co2-1.0/lib -lco2-1.0 $LIBSOURCES"
     gcc ${CO2FLAGS} co2/TestLogger.c -o TestLogger.bin
     gcc ${CO2FLAGS} co2/TestRefObject.c -o TestRefObject.bin
     gcc ${CO2FLAGS} co2/TestMap.c -o TestMap.bin

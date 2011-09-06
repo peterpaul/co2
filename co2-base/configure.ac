@@ -23,7 +23,7 @@ AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 
 # Checks for libraries.
-PKG_CHECK_MODULES([CO2], [co2-1.0 >= 0.0.1],,AC_MSG_ERROR([required module missing]))
+PKG_CHECK_MODULES([CO2], [libco2-1.0 >= 0.1.999],,AC_MSG_ERROR([required module missing]))
 CFLAGS="$CFLAGS $CO2_CFLAGS"
 LDFLAGS="$LDFLAGS $CO2_LIBS"
 

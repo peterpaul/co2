@@ -7,4 +7,5 @@ interface List <Collection> {
 	RefObject set (unsigned index, RefObject item);
 	RefObject add (RefObject item);
 	List addAll (List list);
+	RefObject removeLast ();
 }

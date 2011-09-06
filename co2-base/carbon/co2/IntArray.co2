@@ -1,0 +1,62 @@
+include co2/IndexOutOfBoundsException
+include co2/OutOfMemoryException
+include co2/RefObject
+
+class IntArray : RefObject {
+	int[] data;
+	unsigned nmemb, max;
+
+	IntArray (unsigned nmemb) {
+		self.nmemb = nmemb;
+		max = get_max (nmemb);
+		data = new int[max];
+	}
+
+	~IntArray () {
+		delete data;
+	}
+
+	unsigned get_max (unsigned nmemb) {
+		unsigned max = 8;
+		while (max < nmemb) {
+			max *= 2;
+		}
+		return max;
+	}
+
+	int get (unsigned index) {
+		if (index >= nmemb) {
+			throw new IndexOutOfBoundsException (index, nmemb);
+		}
+		return data[index];
+	}
+
+	int set (unsigned index, int item) {
+		if (index >= nmemb) {
+			throw new IndexOutOfBoundsException (index, nmemb);
+		}
+		return data[index] = item;
+	}
+
+	void resize (unsigned nmemb) {
+		if (nmemb > max) {
+			int max = get_max (nmemb);
+			int[] resized_data = realloc (data, sizeof (int) * max);
+			if (resized_data == null) {
+				throw new OutOfMemoryException ();
+			}
+			data = resized_data;
+			self.max = max;
+		}
+		self.nmemb = nmemb;
+	}
+
+	int append (int item) {
+		resize (nmemb + 1);
+		return set (nmemb - 1, item);
+	}
+
+	unsigned size () {
+		return nmemb;
+	}
+}

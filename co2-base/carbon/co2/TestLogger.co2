@@ -5,8 +5,11 @@ int main () {
 	new ReleasePool ();
 	Logger logger = new Logger ();
 	logger.log (finest, "hello %s", "world");
-	logger.log (finest, "hello %s", "Peterpaul");
-	logger.log (finest, "hello %s", "Simone");
+	logger.log (finer, "hello %s", "Peterpaul");
+	logger.log (fine, "hello %s", "world");
+	logger.log (warning, "hello %s", "Peterpaul");
+	logger.log (error, "hello %s", "Peterpaul");
+	logger.log (fatal, "hello %s", "Peterpaul");
 	delete current_release_pool;
 	return 0;
 }

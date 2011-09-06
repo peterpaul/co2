@@ -35,12 +35,8 @@ class Array : RefObject {
 		if (index >= size) {
 			throw new IndexOutOfBoundsException (index, size);
 		}
-		if (item) {
-			item.retain ();
-		}
-		if (data[index]) {
-			data[index].release ();
-		}
+		item?.retain ();
+		data[index]?.release ();
 		return data[index] = item;
 	}
 
@@ -49,13 +45,11 @@ class Array : RefObject {
 		// TODO release or throw Exception?
 		if (size < self.size) {
 			for (index = size; index < self.size; index += 1) {
-				if (data[index]) {
-					data[index].release ();
-				}
+				data[index]?.release ();
 			}
 		}
 		// reallocate memory
-		RefObject[] data = realloc (self.data, sizeof (RefObject));
+		RefObject[] data = realloc (self.data, sizeof (RefObject) * size);
 		if (data == null) {
 			throw new OutOfMemoryException ();
 		}
