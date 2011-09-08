@@ -522,25 +522,15 @@ class_declaration
 ;
 
 class_header
-:	CLASS TYPE_IDENTIFIER ':' TYPE_IDENTIFIER '<' interface_list '>'
+:	CLASS TYPE_IDENTIFIER ':' TYPE_IDENTIFIER interface_list
 {
   O_CALL ($1, delete);
-  $$ = O_CALL_CLASS(ClassDeclaration(), new, $2, $4, $6);
+  $$ = O_CALL_CLASS(ClassDeclaration(), new, $2, $4, $5);
 }
-|	CLASS TYPE_IDENTIFIER ':' TYPE_IDENTIFIER
+|	CLASS TYPE_IDENTIFIER interface_list
 {
   O_CALL ($1, delete);
-  $$ = O_CALL_CLASS(ClassDeclaration(), new, $2, $4, NULL);
-}
-|	CLASS TYPE_IDENTIFIER '<' interface_list '>'
-{
-  O_CALL ($1, delete);
-  $$ = O_CALL_CLASS(ClassDeclaration(), new, $2, NULL, $4);
-}
-|	CLASS TYPE_IDENTIFIER
-{
-  O_CALL ($1, delete);
-  $$ = O_CALL_CLASS(ClassDeclaration(), new, $2, NULL, NULL);
+  $$ = O_CALL_CLASS(ClassDeclaration(), new, $2, NULL, $3);
 }
 ;
 
@@ -549,10 +539,9 @@ interface_list
 {
   O_CALL($$, append, $3);
 }
-|	TYPE_IDENTIFIER
+|	/* empty */
 {
   $$ = O_CALL_CLASS(RefList(), new, 8, Token());
-  O_CALL($$, append, $1);
 }
 ;
 
@@ -794,13 +783,9 @@ interface_declaration
 ;
 
 interface_header
-:	INTERFACE TYPE_IDENTIFIER '<' interface_list '>' 
+:	INTERFACE TYPE_IDENTIFIER interface_list 
 {
-  $$ = O_CALL_CLASS(InterfaceDeclaration(), new, $2, $4);
-}
-|	INTERFACE TYPE_IDENTIFIER 
-{
-  $$ = O_CALL_CLASS(InterfaceDeclaration(), new, $2, NULL);
+  $$ = O_CALL_CLASS(InterfaceDeclaration(), new, $2, $3);
 }
 ;
 

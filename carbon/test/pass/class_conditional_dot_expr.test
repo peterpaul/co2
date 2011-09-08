@@ -35,7 +35,7 @@ interface ITest {
 	void getVoid ();
 }
 
-class Test <ITest> {
+class Test, ITest {
 	Test ao;
 	int ai;
 	unsigned au;

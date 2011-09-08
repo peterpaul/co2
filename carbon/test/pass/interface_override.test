@@ -34,7 +34,7 @@ class C {
 	int ca (int a, int b) return a + b;	
 }
 
-class D : C <A, B> {
+class D : C, A, B {
 	int aa (int a, int b) return super (a, b);
 	int bb (int a, int b) return super (a, b);
 
