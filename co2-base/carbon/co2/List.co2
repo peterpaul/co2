@@ -1,7 +1,7 @@
 include co2/RefObject
 include co2/Collection
 
-interface List <Collection> {
+interface List, Collection {
 	unsigned size ();
 	RefObject get (unsigned index);
 	RefObject set (unsigned index, RefObject item);

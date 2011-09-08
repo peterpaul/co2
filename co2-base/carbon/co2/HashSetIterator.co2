@@ -2,7 +2,7 @@ include co2/KeyValuePair
 include co2/HashSet
 include co2/ArrayIterator
 
-class HashSetIterator : BaseObject <Iterator> {
+class HashSetIterator : BaseObject, Iterator {
 	Iterator arrayIterator;
 
 	HashSetIterator (HashSet set) {

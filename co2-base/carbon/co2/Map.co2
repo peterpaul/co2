@@ -1,7 +1,7 @@
 include co2/RefObject
 include co2/Collection
 
-interface Map <Collection> {
+interface Map, Collection {
 	unsigned size ();
 	RefObject get (RefObject key);
 	RefObject put (RefObject key, RefObject value);

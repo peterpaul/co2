@@ -1,7 +1,7 @@
 include co2/RefObject
 include co2/Collection
 
-interface Set <Collection> {
+interface Set, Collection {
 	unsigned size ();
 	int contains (RefObject item);
 	RefObject add (RefObject item);

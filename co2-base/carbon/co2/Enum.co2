@@ -2,7 +2,7 @@ include co2/String
 include co2/RefObject
 include co2/Comparable
 
-class Enum : RefObject <Comparable> {
+class Enum : RefObject, Comparable {
 	String name;
 	int value;
 

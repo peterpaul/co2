@@ -3,7 +3,7 @@ include co2/RefObject
 include co2/Array
 include co2/HashSetIterator
 
-class HashSet : RefObject <Set> {
+class HashSet : RefObject, Set {
 	Array entries;
 	unsigned length;
 

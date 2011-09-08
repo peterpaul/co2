@@ -1,7 +1,7 @@
 include co2/LogFormatter
 include co2/LogRecord
 
-class SimpleFormatter : BaseObject <LogFormatter> {
+class SimpleFormatter : BaseObject, LogFormatter {
 	SimpleFormatter () {
 		super ();
 	}

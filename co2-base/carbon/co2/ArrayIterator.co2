@@ -2,7 +2,7 @@ include co2/RefObject
 include co2/Array
 include co2/Iterator
 
-class ArrayIterator : BaseObject <Iterator> {
+class ArrayIterator : BaseObject, Iterator {
 	Array array;
 	unsigned index;
 	

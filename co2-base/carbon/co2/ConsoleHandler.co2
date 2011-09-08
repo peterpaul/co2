@@ -1,7 +1,7 @@
 include co2/LogHandler
 include co2/LogFormatter
 
-class ConsoleHandler : BaseObject <LogHandler> {
+class ConsoleHandler : BaseObject, LogHandler {
 	LogFormatter formatter;
 
 	ConsoleHandler (LogFormatter f) {

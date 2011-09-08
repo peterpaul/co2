@@ -1,7 +1,7 @@
 include co2/BaseObject
 include co2/Throwable 
 
-class Exception : BaseObject <Throwable> {
+class Exception : BaseObject, Throwable {
 	String message;
 	Exception reason;
 	String file;
