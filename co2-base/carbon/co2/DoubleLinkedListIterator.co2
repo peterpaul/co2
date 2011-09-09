@@ -1,0 +1,36 @@
+include co2/RefObject
+include co2/DoubleLinkedList
+include co2/Iterator
+
+class DoubleLinkedListIterator : BaseObject, Iterator {
+	DoubleLinkedItem item;
+	
+	DoubleLinkedListIterator (DoubleLinkedList list) {
+		super ();
+		item = list.head;
+	}
+
+	~DoubleLinkedListIterator () {
+		item = null;
+	}
+
+	void findNext () {
+		while (item && item.item == null) {
+			item = item.next;
+		}
+	}
+
+	int hasNext () {
+		findNext ();
+		return item != null;
+	}
+
+	RefObject getNext () {
+		if (hasNext ()) {
+			DoubleLinkedItem link = item;
+			item = item.next;
+			return link.item;
+		}
+		return null;
+	}
+}

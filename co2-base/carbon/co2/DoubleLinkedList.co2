@@ -1,0 +1,96 @@
+include co2/RefObject
+include co2/DoubleLinkedItem
+include co2/IndexOutOfBoundsException
+include co2/DoubleLinkedListIterator
+
+class DoubleLinkedList : RefObject, List {
+	DoubleLinkedItem head, tail;
+	unsigned length;
+
+	DoubleLinkedList () {
+		super ();
+		length = 0;
+		head = tail = null;
+	}
+
+	unsigned size () {
+		return length;
+	}
+
+	DoubleLinkedItem atIndex (unsigned index) {
+		if (index >= length) {
+			throw new IndexOutOfBoundsException (index, length);
+		}
+		if (index <= ((length - 1) - index)) {
+			DoubleLinkedItem link = head;
+			int i;
+			for (i = 0; i < index; i += 1) {
+				link = link.next;
+			}
+			return link;
+		} else {
+			DoubleLinkedItem link = tail;
+			int i;
+			for (i = 0; i < (length - 1) - index; i += 1) {
+				link = link.prev;
+			}
+			return link;
+		}
+	}
+
+	RefObject get (unsigned index) {
+		return atIndex (index).item;
+	}
+
+	RefObject set (unsigned index, RefObject item) {
+		return atIndex (index).set (item);
+	}
+
+	RefObject add (RefObject item) {
+		tail = new DoubleLinkedItem.linked (item, tail, null);
+		if (head == null) {
+			head = tail;
+		}
+		length += 1;
+		return item;
+	}
+
+	List addAll (List list) {
+		Iterator it = list.iterator ();
+		while (it.hasNext ()) {
+			add (it.getNext ());
+		}
+		delete it;
+		return self;
+	}
+
+	RefObject removeLast () {
+		DoubleLinkedItem link = tail;
+		tail = tail.prev;
+
+		RefObject result = link.item;
+		link.item = null;
+		delete link;
+
+		length -= 1;
+
+		return result.autoRelease ();
+	}
+
+	Iterator iterator () {
+		return new DoubleLinkedListIterator (self);
+	}
+
+	RefObject insert (unsigned index, RefObject item) {
+		if (index == length) {
+			return add (item);
+		}
+		DoubleLinkedItem position = atIndex (index);
+		DoubleLinkedItem link = new DoubleLinkedItem.linked (item, position.prev, position);
+		if (index == 0) {
+			head = link;
+		}
+		length += 1;
+		return item;
+	}
+}

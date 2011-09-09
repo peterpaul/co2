@@ -1,0 +1,45 @@
+include co2/RefObject
+include co2/ReleasePool
+include co2/List
+include co2/ArrayList
+include co2/DoubleLinkedList
+include co2/Iterator
+
+int mainImpl (List list) {
+	int i;
+	for (i = 0; i < 10; i += 1) {
+		String val = new String ("%d", i);
+		list.add (val);
+	}
+
+	Iterator it = list.iterator ();
+	while (it.hasNext ()) {
+		String val = (String) it.getNext ();
+		printf ("%s\n", val.data);
+	}
+	delete it;
+
+	for (i = 0; i < 10; i += 1) {
+		String val = (String) list.get (i);
+		printf ("%s: %s\n", val.data);
+	}
+
+	return 0;
+}
+
+int main() {
+	int result = 0;
+	new ReleasePool ();
+	try {
+		result = mainImpl (new ArrayList (8));
+		result = mainImpl (new DoubleLinkedList ());
+	} catch (Exception e) {
+		result = 1;
+		String message = e.toString ();
+		printf ("Caught Exception: %s\n%s", e.class.class_name, message.data);
+		delete e;
+	} finally {
+		delete current_release_pool;
+		return result;
+	}
+}

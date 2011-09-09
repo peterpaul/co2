@@ -12,6 +12,9 @@ co2/BaseObject.co2\
 co2/Collection.co2\
 co2/Comparable.co2\
 co2/ConsoleHandler.co2\
+co2/DoubleLinkedList.co2\
+co2/DoubleLinkedListIterator.co2\
+co2/DoubleLinkedItem.co2\
 co2/Enum.co2\
 co2/Exception.co2\
 co2/HashMap.co2\
@@ -49,6 +52,9 @@ co2/BaseObject.c\
 co2/Collection.c\
 co2/Comparable.c\
 co2/ConsoleHandler.c\
+co2/DoubleLinkedList.c\
+co2/DoubleLinkedListIterator.c\
+co2/DoubleLinkedItem.c\
 co2/Enum.c\
 co2/Exception.c\
 co2/HashMap.c\
@@ -86,6 +92,9 @@ co2/BaseObject.h\
 co2/Collection.h\
 co2/Comparable.h\
 co2/ConsoleHandler.h\
+co2/DoubleLinkedList.h\
+co2/DoubleLinkedListIterator.h\
+co2/DoubleLinkedItem.h\
 co2/Enum.h\
 co2/Exception.h\
 co2/HashMap.h\
@@ -122,7 +131,7 @@ co2/Throwable.h
 
 libco2_base_1_0_la_CPPFLAGS = -I$(top_srcdir)/include
 
-bin_PROGRAMS = TestRefObject TestLogger TestMap TestSet
+bin_PROGRAMS = TestRefObject TestLogger TestMap TestSet TestList
 
 TestRefObject_SOURCES = co2/TestRefObject.c
 TestRefObject_CPPFLAGS = -I$(top_srcdir)/include
@@ -139,6 +148,10 @@ TestMap_LDFLAGS = $(CO2_LIBS) -lco2-base-1.0
 TestSet_SOURCES = co2/TestSet.c
 TestSet_CPPFLAGS = -I$(top_srcdir)/include
 TestSet_LDFLAGS = $(CO2_LIBS) -lco2-base-1.0
+
+TestList_SOURCES = co2/TestList.c
+TestList_CPPFLAGS = -I$(top_srcdir)/include
+TestList_LDFLAGS = $(CO2_LIBS) -lco2-base-1.0
 
 distclean-local:
 	-rm -r ${bin_PROGRAMS}

@@ -1,0 +1,46 @@
+include co2/RefObject
+
+class DoubleLinkedItem : RefObject {
+	DoubleLinkedItem prev, next;
+	RefObject item;
+
+	DoubleLinkedItem (RefObject item) {
+		super ();
+		self.item = item?.retain ();
+		prev = next = null;
+	}
+
+	DoubleLinkedItem.linked (RefObject item, DoubleLinkedItem prev, DoubleLinkedItem next) {
+		super ();
+		self.item = item?.retain ();
+		link (prev, next);
+	}
+
+	~DoubleLinkedItem () {
+		if (prev) {
+			prev.next = next;
+		}
+		if (next) {
+			next.prev = prev;
+		}
+		item?.release ();
+	}
+
+	RefObject set (RefObject item) {
+		item?.retain ();
+		self.item?.release ();
+		self.item = item;
+		return item;
+	}
+
+	void link (DoubleLinkedItem left, DoubleLinkedItem right) {
+		prev = left;
+		if (left) {
+			left.next = self;
+		}
+		next = right;
+		if (right) {
+			right.prev = self;
+		}
+	}
+}
