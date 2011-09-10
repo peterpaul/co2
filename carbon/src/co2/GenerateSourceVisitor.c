@@ -402,6 +402,11 @@ O_IMPLEMENT_IF(GenerateSourceVisitor, void, visitFunctionDeclaration, (void *_se
     }
   else
     {
+      // don't generate for definitions
+      if (!self->body)
+	{
+	  return;
+	}
       bool first_formal_arg = true;
       struct FunctionType *function_type = o_cast (self->type, FunctionType ());
       O_CALL (function_type->return_type, generate);
