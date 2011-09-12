@@ -291,7 +291,7 @@ declaration
 |	interface_declaration
 /* {
   O_CALL(current_scope, declare, $1);
-}
+} */
 |	constructor_declaration
 /* {
   O_CALL(current_scope, declare, $1);
