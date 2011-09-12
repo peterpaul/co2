@@ -14,6 +14,7 @@ CompileObjectVisitor.c
 Compiler.c
 CompoundStatement.c
 ConditionalExpression.c
+ConditionalBinaryExpression.c
 ConstructorDeclaration.c
 Context.c
 ContinueStatement.c

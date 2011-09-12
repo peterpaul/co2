@@ -1,0 +1,4 @@
+include CompileObject
+
+class Statement : CompileObject {
+}

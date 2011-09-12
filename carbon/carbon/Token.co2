@@ -2,6 +2,8 @@ include co2/String
 include CompileObject
 include File
 
+int _VA_ARG;
+
 class Token : CompileObject {
 	String name;
 	File file;
@@ -18,8 +20,8 @@ class Token : CompileObject {
 
 	Token.fromToken (Token token) {
 		super ();
-		self.name = token.name.retain ();
-		self.type = token.type ();
+		self.name = (String) token.name.retain ();
+		self.type = token.type;
 		self.file = token.file; // don't retain, this is a weak reference
 		self.line = token.line;
 	}

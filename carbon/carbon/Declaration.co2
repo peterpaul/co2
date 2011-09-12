@@ -1,0 +1,41 @@
+include CompileObject
+include Token
+include Scope
+include Type
+include ClassDeclaration
+include File
+
+class Declaration : CompileObject {
+	Token name;
+	Scope scope;
+	Type type;
+	Token include_file;
+	ClassDeclaration class_decl;
+	File file;
+	Bool declared, defined;
+
+	Declaration (Token a_name) {
+		name = (Token) a_name.retain ();
+		file = current_file;
+	}
+
+	~Declaration () {
+		name.release();
+		type?.release();
+		include_file?.release();
+		class_decl?.release();
+		scope?.release();
+	}
+
+	void set_scope (Scope a_scope) {
+		scope = (Scope) a_scope.retain ();
+	}
+
+	void set_class_decl (ClassDeclaration a_class_decl) {
+		class_decl = (ClassDeclaration) a_class_decl.retain ();
+	}
+
+	void set_include_file (Token an_include_file) {
+		include_file = (Token) an_include_file.retain ();
+	}
+}

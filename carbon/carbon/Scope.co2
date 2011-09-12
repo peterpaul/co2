@@ -1,0 +1,120 @@
+include co2/Enum
+include co2/HashMap
+include co2/RefObject
+include Token
+include Declaration
+include error
+
+int scope_initialized = false;
+
+class ScopeType : Enum {
+	ScopeType () {
+		super ();
+		if (!scope_initialized) {
+			scope_initialized = true;
+			global_scope_type = createPrivateScopeType (1, "global_scope_type");
+			variable_scope_type = createPrivateScopeType (2, "variable_scope_type");
+			class_scope_type = createPrivateScopeType (3, "class_scope_type");
+			argument_scope_type = createPrivateScopeType (4, "argument_scope_type");
+			compound_scope_type = createPrivateScopeType (5, "compound_scope_type");
+			interface_scope_type = createPrivateScopeType (6, "interface_scope_type");
+			struct_scope_type = createPrivateScopeType (7, "struct_scope_type");
+			catch_scope_type = createPrivateScopeType (7, "catch_scope_type");
+		}
+		name = null;
+		value = 0;
+	}
+
+	ScopeType.private (int v, char * n) {
+		super.private (v, n);
+	}
+}
+
+ScopeType createPrivateScopeType (int v, char * n)
+{
+	ScopeType l = new ScopeType.private (v, n);
+	l.retain ();
+	return l;
+}
+
+ScopeType global_scope_type, variable_scope_type, class_scope_type, argument_scope_type, compound_scope_type, interface_scope_type, struct_scope_type, catch_scope_type;
+
+Scope current_scope = null;
+Scope global_scope = null;
+
+class Scope : RefObject {
+	ScopeType type;
+	Token name;
+	Scope parent;
+	HashMap map;
+
+	Scope (ScopeType type, Token name) {
+		super ();
+		self.type = type;
+		self.name = name;
+		parent = current_scope;
+		map = new HashMap (127);
+		current_scope = self;
+	}
+
+	~Scope () {
+		name?.release ();
+	}
+
+	Declaration declare (Declaration decl) {
+		map.put (decl.name, decl);
+		decl.set_scope (self);
+	}
+
+	void leave () {
+		current_scope = parent;
+	}
+
+	Declaration lookup_in_this_scope (Token token) {
+		map.get (token);
+	}
+
+	Declaration lookup (Token token) {
+		Declaration result = lookup_in_this_scope (token);
+		if (result == null) {
+			if (parent == null) {
+				error_not_found (token);
+			} else {
+				result = parent.lookup (token);
+			}
+		}
+		return result;
+	}
+
+	Declaration find_type_in_this_scope (Token token, Class type) {
+		Declaration result = (Declaration) map.get (token);
+		if (result != null && !(result is_of type)) {
+			result == null;
+		}
+		return result;
+	}
+
+	Declaration find_type (Token token, Class type) {
+		Declaration result = find_type_in_this_scope (token, type);
+		if (result == null && parent != null) {
+			result = parent.find_type (token, type);
+		}
+		return result;
+	}
+ 
+	Bool exists_in_this_scope (Token token) {
+		return map.get (token) != null;
+	}
+
+	Bool exists (Token token) {
+		Bool result = exists_in_this_scope (token);
+		if (result == false && parent != null) {
+			result = parent.exists (token);
+		}
+		return result;
+	}
+
+	void error_not_found (Token token) {
+		error (token, "'%s' not declared.\n", token.name.data);
+	}
+}

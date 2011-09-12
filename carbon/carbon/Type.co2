@@ -1,0 +1,7 @@
+include CompileObject
+
+class Type : CompileObject {
+	Type () {
+		super ();
+	}
+}

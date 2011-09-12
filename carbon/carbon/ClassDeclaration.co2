@@ -1,0 +1,8 @@
+include ObjectTypeDeclaration
+include Token
+
+class ClassDeclaration : ObjectTypeDeclaration {
+	ClassDeclaration (Token name) {
+		super (name);
+	}
+}

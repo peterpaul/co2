@@ -1,5 +1,14 @@
 include co2/RefObject
 include CompileObjectVisitor
 
-class BaseCompileObjectVisitor : RefObject <CompileObjectVisitor> {
+class BaseCompileObjectVisitor : RefObject, CompileObjectVisitor {
+	FILE *fp;
+
+	BaseCompileObjectVisitor (FILE *fp) {
+		super ();
+		self.fp = fp;
+	}
+
+	void visit (CompileObject object) {
+	}
 }

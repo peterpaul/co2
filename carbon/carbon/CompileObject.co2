@@ -1,10 +1,19 @@
 include co2/RefObject
+include Token
+include CompileObjectVisitor
 
 class CompileObject : RefObject {
+	CompileObject () {
+		super ();
+	}
 	void type_check ();
 	void optimize ();
 	void generate (FILE *fp);
 	Token get_token ();
-	void accept (BaseCompileObjectVisitor visitor);
+
+	void accept (CompileObjectVisitor visitor) {
+		visitor.visit (self);
+	}
 }
 
+typedef Bool = int;

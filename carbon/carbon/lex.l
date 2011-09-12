@@ -20,10 +20,11 @@
 #include "Compiler.h"
 #include "grammar.h"
 #include "Token.h"
-#include "RefList.h"
+#include "co2/ArrayList.h"
 #include "IncludeStack.h"
-#include "String.h"
-#include "List.h"
+#include "co2/String.h"
+#include "co2/List.h"
+#include "co2/Map.h"
 #include "File.h"
 #include "error.h"
 #include <limits.h>
@@ -32,7 +33,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-struct RefList * path;
+struct ArrayList * path;
 
 void new_input(struct String *);
 %}
@@ -169,14 +170,14 @@ int yywrap()
  */
 struct File * validate_file(struct File * file)
 {
-	struct File * existing_file = O_CALL (get_hash_map (), get, file->absolute_path->data);
+	struct File * existing_file = O_CALL_IF (Map, get_hash_map (), get, file->absolute_path);
 	if (existing_file)
 	{
 		/* printf ("skipping already parsed file: %s\n", file->absolute_path->data); */
 		O_CALL (file, delete);
 		return NULL;
 	}
-	O_CALL (get_hash_map (), add, file->absolute_path->data, file);
+	O_CALL_IF (Map, get_hash_map (), put, file->absolute_path, file);
 	yyin = fopen (file->absolute_path->data, "r");
 	return file;
 }
@@ -229,7 +230,7 @@ void new_input(struct String * file_name)
 	if (new_file) {
 		O_CALL_CLASS(IncludeStack(), new, linenumber, current_file, YY_CURRENT_BUFFER);
 		current_file = new_file;
-		O_CALL (include_stack->current_file->file_dependencies, append, current_file);
+		O_CALL_IF (List, include_stack->current_file->file_dependencies, add, current_file);
 		linenumber = 1;
 		yy_switch_to_buffer(yy_create_buffer(yyin, YY_BUF_SIZE));
 	}
@@ -249,7 +250,7 @@ O_IMPLEMENT (IncludeStack, void *, ctor, (void *_self, va_list * app))
   self->parent = include_stack;
   include_stack = self;
   self->current_line = va_arg (*app, unsigned);
-  self->current_file = O_RETAIN_ARG (File);
+  self->current_file = O_GET_ARG (File);
   self->buffer_state = va_arg (*app, YY_BUFFER_STATE);
   return self;
 }

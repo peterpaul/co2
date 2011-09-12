@@ -1,0 +1,29 @@
+include Declaration
+include Expression
+include Type
+include Context
+
+class VariableDeclaration : Declaration {
+	Expression expr;
+
+	VariableDeclaration (Token a_name, Expression an_expr) {
+		super (a_name);
+		expr = (Expression) an_expr?.retain ();
+	}
+
+	~VariableDeclaration () {
+		expr?.release ();
+	}
+
+	void accept (CompileObjectVisitor visitor) {
+		current_context?.add (self);
+		type.accept (visitor);
+		expr?.accept (visitor);
+		visitor.visit (self);
+		current_context?.remove_last ();
+	}
+
+	void set_type (Type type) {
+		self.type = (Type) type.retain ();
+	}
+}

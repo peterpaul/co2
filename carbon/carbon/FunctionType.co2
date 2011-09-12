@@ -1,0 +1,20 @@
+include Type
+include co2/List
+
+class FunctionType : Type {
+	Bool has_var_args;
+	Type return_type;
+	List parameters;
+	Token generated_name;
+
+	FunctionType.from_decl () {
+		super ();
+	}
+
+	FunctionType.from_expr () {
+		super ();
+	}
+
+	void generate_named (FILE *fp, Token name) {
+	}
+}

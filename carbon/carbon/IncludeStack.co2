@@ -1,0 +1,18 @@
+include co2/RefObject
+include File
+
+int linenumber;
+IncludeStack include_stack;
+
+["Compiler.h"] {
+	struct yy_buffer_state {}
+	typedef YyBufferState = struct yy_buffer_state;
+	typedef YY_BUFFER_STATE = YyBufferState *;
+}
+
+class IncludeStack : RefObject {
+	IncludeStack parent;
+	unsigned current_line;
+	File current_file;
+	YY_BUFFER_STATE buffer_state;
+}

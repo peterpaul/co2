@@ -1,3 +1,227 @@
-int main() {
-	return 0;
+include co2/BaseObject
+include CompileObjectVisitor
+include GenerateHeaderIncludesVisitor
+include GenerateHeaderVisitor
+include GenerateSourceIncludesVisitor
+include GenerateSourceVisitor
+include File
+include io
+include error
+
+File main_file;
+
+["grammar.h"] {
+	int parse ();
+}
+
+char *extract_name (char *file) {
+	char * start = strrchr (file, '/');
+	if (start == null) {
+		start = file;
+	} else {
+		start = &start[1];
+	}
+	char * end = strrchr (file, '.');
+	if (end == null) {
+		end = &file[strlen(file)];
+	}
+	int size = 0;
+	while (end > start) {
+		size += 1;
+		// end -= 1;
+		end = &end[-1];
+	}
+	char *base = new char[size + 1];
+	strncpy (base, start, size);
+	base[size] = '\0';
+	return base;
+}
+
+char *get_header_file (char *c_file) {
+	int len = strlen (c_file);
+	char *header_file = new char[len + 1];
+	strcpy (header_file, c_file);
+	header_file[len - 1] = 'h';
+	return header_file;
+}
+
+int mainImpl (char *output_file) {
+	parse ();
+	if (main_file == null || errors != 0) {
+		return 1;
+	}
+
+	main_file.sort ();
+
+	main_file.type_check ();
+	if (errors != 0) {
+		return 1;
+	}
+
+	main_file.optimize ();
+	if (errors != 0) {
+		return 1;
+	}
+
+	if (output_file != null) {
+		char *header_file = get_header_file (output_file);
+		open_output (header_file);
+		free (header_file);
+	} else {
+		open_output (null);
+	}
+
+	char *header_name = extract_name (main_file.name.data);
+	fprintf (out, "#ifndef %s_H\n", header_name);
+	fprintf (out, "#define %s_H\n", header_name);
+	fprintf (out, "#include \"co2/Object.h\"\n");
+
+	CompileObjectVisitor include_visitor = new GenerateHeaderIncludesVisitor (out);
+	main_file.accept (include_visitor);
+	delete include_visitor;
+
+	CompileObjectVisitor header_visitor = new GenerateHeaderVisitor (out);
+	main_file.accept (header_visitor);
+	delete header_visitor;
+
+	fprintf (out, "endif /* %s_H */\n", header_name);
+	free (header_name);
+
+	if (out != stdout) {
+		fclose (out);
+	}
+
+	if (output_file) {
+		open_output (output_file);
+		char *base = extract_name (output_file);
+		fprintf (out, "#include \"%s.h\"\n", base);
+		free (base);
+	} else {
+		open_output (null);
+	}
+
+	GenerateSourceIncludesVisitor source_include_visitor = new GenerateSourceIncludesVisitor (out);
+	main_file.accept (source_include_visitor);
+	delete source_include_visitor;
+
+	GenerateSourceVisitor source_visitor = new GenerateSourceVisitor (out);
+	main_file.accept (source_visitor);
+	delete source_visitor;
+
+	if (out != stdout) {
+		fclose (out);
+	}
+
+	return errors;
+}
+
+/*
+["config.h"] {
+	char * PACKAGE_STRING;
+	char * PACKAGE;
+}
+
+void version () {
+	fprintf (stdout, "%s\n", PACKAGE_STRING);
+}
+
+void usage () {
+	fprintf (stdout, "Compiler for the carbon programming language\n");
+	fprintf (stdout, "\n");
+	fprintf (stdout, "USAGE:\n");
+	fprintf (stdout, "    %s [OPTION]... [SOURCE_FILE] [C_OUTPUT_FILE]\n", PACKAGE);
+	fprintf (stdout, "\n");
+	fprintf (stdout, "ARGUMENTS:\n");
+	fprintf (stdout, "        SOURCE_FILE:    %s source file\n", PACKAGE);
+	fprintf (stdout, "        C_OUTPUT_FILE:  filename of c output\n");
+	fprintf (stdout, "\n");
+	fprintf (stdout, "OPTIONS:\n");
+	fprintf (stdout, "        -P INCLUDE_DIR: include directory to add to search path\n");
+	fprintf (stdout, "        -h,--help:      show this help\n");
+	fprintf (stdout, "        -V,--version:   show version\n");
+	fprintf (stdout, "\n");
+}
+*/
+void version () {
+}
+void usage () {
+}
+
+int main(int argc, char **argv) {
+	new ReleasePool ();
+	char *input_file = null;
+	char *output_file = null;
+	path = new ArrayList (8);
+	int arg = 1;
+	Bool next_is_option = false;
+	while (arg < argc) {
+		if (argv[arg][0] == '-') {
+			if (strlen (argv[arg]) == 2) {
+				switch (argv[arg][1]) {
+				case 'P':
+					next_is_option = true;
+					break;
+				case 'h':
+					usage ();
+					return 0;
+				case 'V':
+					version ();
+					return 0;
+				default:
+					error (null, "invalid option: %s\n", argv[arg]);
+				}
+			} else if (strcmp (argv[arg], "--help") == 0) {
+				usage ();
+				return 0;
+			} else if (strcmp (argv[arg], "--version") == 0) {
+				version ();
+				return 0;
+			} else {
+				error (null, "invalid option: %s\n", argv[arg]);
+			}
+		} else {
+			if (next_is_option) {
+				String dir = new String ("%s", argv[arg]);
+				path.add (dir);
+				next_is_option = false;
+			} else if (input_file == null) {
+				input_file = argv[arg];
+			} else if (output_file == null) {
+				output_file = argv[arg];
+			} else {
+				error (null, "Too many arguments (%s)\n", argv[arg]);
+			}
+		}
+		arg += 1;
+	}
+
+	if (next_is_option) {
+		error (null, "-P takes one argument\n");
+	}
+
+	if (errors != 0) {
+		return 1;
+	}
+
+	file_path = (String) analyze_file_name (input_file).retain ();
+	base_dir = (String) determine_base_dir (file_path).retain ();
+	path.add (base_dir);
+
+	if (input_file) {
+		main_file = try_search_path (new String ("%s", input_file));
+	} else {
+		String stdin_file = new String ("_stdin_");
+		main_file = new File (stdin_file, stdin_file);
+	}
+	current_file = (File) main_file.retain ();
+
+	int retval = mainImpl (output_file);
+
+	main_file.release ();
+	file_path.release ();
+	base_dir.release ();
+
+	delete current_release_pool;
+
+	return retval;
 }

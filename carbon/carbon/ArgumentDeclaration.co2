@@ -1,0 +1,41 @@
+include CompileObjectVisitor
+include Context
+include Declaration
+include FunctionType
+
+class ArgumentDeclaration : Declaration {
+	ArgumentDeclaration (Token name, Type type) {
+		super (name);
+		self.type = (Type) type.retain ();
+	}
+
+	~ArgumentDeclaration () {
+		type.release ();
+	}
+
+	void accept (CompileObjectVisitor visitor) {
+		current_context?.add (self);
+		type.accept (visitor);
+		visitor.visit (self);
+		current_context?.remove_last ();
+	}
+
+	void generate (FILE *fp) {
+		if (name.type == _VA_ARG) {
+			name.generate (fp);
+		}
+		else if (type is_of FunctionType) {
+			((FunctionType) type).generate_named (fp, name);
+		} else {
+			type.generate (fp);
+			fprintf (fp, " ");
+			name.generate (fp);
+		}
+	}
+
+	void type_check () {
+		current_context?.add (self);
+		type.type_check ();
+		current_context.remove_last ();
+	}
+}

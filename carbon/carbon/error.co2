@@ -1,0 +1,31 @@
+include Token
+
+int errors;
+int warnings;
+
+int write_error_message (Token token, char *type,  char *msg, va_list app) {
+	int result = 0;
+	if (token) {
+		result += fprintf (stderr, "%s:%d:%s: ", token.file.absolute_path.data, token.line, type);
+	} else if (current_file != null && current_file.absolute_path != null) {
+		result += fprintf (stderr, "%s:0:%s: ", current_file.absolute_path.data, type);
+	} else {
+		result += fprintf (stderr, "<null>:0:%s: ", type);
+	}
+	result += vfprintf (stderr, msg, app);
+	return result;
+}
+
+int error (Token token, char *msg, ...) {
+	int result;
+	errors += 1;
+	result = write_error_message (token, "ERROR", msg, ...);
+	return result;
+}
+
+int warning (Token token, char *msg, ...) {
+	int result;
+	warnings += 1;
+	result = write_error_message (token, "WARNING", msg, ...);
+	return result;
+}

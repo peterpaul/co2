@@ -1,23 +1,25 @@
-MAINTAINERCLEANFILES = Makefile.in
-ACLOCAL_AMFLAGS = -I m4
+MAINTAINERCLEANFILES=Makefile.in
+ACLOCAL_AMFLAGS=-I m4
 
-AM_YFLAGS = -d
+AM_YFLAGS=-d
 
-lib_LTLIBRARIES = libcarbon-1.0.la
-libcarbon_1_0_ladir=$(includedir)/carbon-1.0/co2
+lib_LTLIBRARIES=libcarbon-1.0.la
+libcarbon_1_0_ladir=$(includedir)/carbon-1.0
 
-libcarbon_1_0_la_CO2SOURCES = \
+libcarbon_1_0_la_CO2SOURCES=\
 ArgumentDeclaration.co2\
 ArrayType.co2\
 BaseCompileObjectVisitor.co2\
 BinaryExpression.co2\
 BreakStatement.co2\
+CaseStatement.co2\
 CastExpression.co2\
 CatchStatement.co2\
 ClassDeclaration.co2\
 CompileObject.co2\
 CompileObjectVisitor.co2\
 CompoundStatement.co2\
+ConditionalBinaryExpression.co2\
 ConditionalExpression.co2\
 ConstructorDeclaration.co2\
 Context.co2\
@@ -63,6 +65,7 @@ SizeExpression.co2\
 Statement.co2\
 StructDeclaration.co2\
 SuperExpression.co2\
+SwitchStatement.co2\
 ThrowStatement.co2\
 Token.co2\
 TokenExpression.co2\
@@ -76,7 +79,8 @@ VarArgExpression.co2\
 VariableDeclaration.co2\
 WhileStatement.co2
 
-libcarbon_1_0_la_SOURCES = \
+libcarbon_1_0_la_SOURCES=\
+$(libcarbon_1_0_la_CO2SOURCES)\
 grammar.y\
 lex.l\
 ArgumentDeclaration.c\
@@ -84,12 +88,14 @@ ArrayType.c\
 BaseCompileObjectVisitor.c\
 BinaryExpression.c\
 BreakStatement.c\
+CaseStatement.c\
 CastExpression.c\
 CatchStatement.c\
 ClassDeclaration.c\
 CompileObject.c\
 CompileObjectVisitor.c\
 CompoundStatement.c\
+ConditionalBinaryExpression.c\
 ConditionalExpression.c\
 ConstructorDeclaration.c\
 Context.c\
@@ -115,7 +121,6 @@ GenerateSourceVisitor.c\
 Hash.c\
 HelloWorldVisitor.c\
 IfStatement.c\
-IncludeStack.c\
 InterfaceDeclaration.c\
 io.c\
 IsOfExpression.c\
@@ -135,6 +140,7 @@ SizeExpression.c\
 Statement.c\
 StructDeclaration.c\
 SuperExpression.c\
+SwitchStatement.c\
 ThrowStatement.c\
 Token.c\
 TokenExpression.c\
@@ -148,18 +154,20 @@ VarArgExpression.c\
 VariableDeclaration.c\
 WhileStatement.c
 
-libcarbon_1_0_la_HEADERS = \
+libcarbon_1_0_la_HEADERS=\
 ArgumentDeclaration.h\
 ArrayType.h\
 BaseCompileObjectVisitor.h\
 BinaryExpression.h\
 BreakStatement.h\
+CaseStatement.h\
 CastExpression.h\
 CatchStatement.h\
 ClassDeclaration.h\
 CompileObject.h\
 CompileObjectVisitor.h\
 CompoundStatement.h\
+ConditionalBinaryExpression.h\
 ConditionalExpression.h\
 ConstructorDeclaration.h\
 Context.h\
@@ -205,6 +213,7 @@ SizeExpression.h\
 Statement.h\
 StructDeclaration.h\
 SuperExpression.h\
+SwitchStatement.h\
 ThrowStatement.h\
 Token.h\
 TokenExpression.h\
@@ -224,13 +233,17 @@ WhileStatement.h
 
 %.h: %.c
 
-libcarbon_1_0_la_CPPFLAGS = -I$(top_srcdir)/include -O0 -g3
+grammar.h: grammar.c
 
-bin_PROGRAMS = Compiler
+libcarbon_1_0_la_CPPFLAGS=-O0 -g3
 
-Compiler_SOURCES = Compiler.c
-Compiler_CPPFLAGS = -I$(top_srcdir)/include
-Compiler_LDFLAGS = $(CO2_LIBS) -lcarbon-1.0
+bin_PROGRAMS=carbon
+carbon_SOURCES=Compiler.co2 Compiler.c
+carbon_LDADD=libcarbon-1.0.la
+carbon_LDFLAGS=$(CO2_LIBS) $(CO2BASE_LIBS)
 
 distclean-local:
 	-rm -r ${bin_PROGRAMS}
+
+clean-local:
+	-rm grammar.c grammar.h lex.c

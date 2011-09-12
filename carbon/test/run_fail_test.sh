@@ -4,7 +4,7 @@
 LD=gcc
 
 BASEDIR=$( pwd )
-COMPILER=${BASEDIR}/../src/carbon
+COMPILER=${BASEDIR}/../carbon/carbon
 
 TARGET=${BASEDIR}/target
 

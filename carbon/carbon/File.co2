@@ -1,0 +1,44 @@
+include co2/String
+include co2/List
+include co2/Map
+include co2/HashMap
+include Context
+include Declaration
+
+File try_search_path(String file_name);
+
+Map file_hash_map = null;
+Map get_hash_map() {
+	if (file_hash_map == null) {
+		file_hash_map = new HashMap(127);
+	}
+}
+
+void file_type_check (CompileObject object) {
+	if (object is_of Declaration) {
+		current_context = new Context();
+		current_context.retain ();
+		object.type_check();
+		current_context.release ();
+		current_context = null;
+	} else {
+		object.type_check ();
+	}
+}
+
+File current_file;
+
+class File : CompileObject {
+	void sort() {
+	}
+
+	String name, absolute_path;
+	List file_dependencies, declarations;
+
+	File (String name, String absolute_path) {
+		self.name = (String) name.retain ();
+		self.absolute_path = (String) absolute_path.retain ();
+	}
+
+
+}
