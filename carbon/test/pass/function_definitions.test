@@ -17,49 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+["stdio.h"] int printf(char * format, ...);
 
-interface A {
-	int aa (int a, int b);
-	int ab (int a, int b);
-}
+["include.h"] int test_var;
 
-interface B {
-	int ba (int a, int b);
-	int bb (int a, int b);
-}
+int test_fun (int a, int b);
 
-class C {
-	int aa (int a, int b) return a + b;
-	int bb (int a, int b) return a + b;
-	int ca (int a, int b) return a + b;	
-}
-
-class D : C, A, B {
-	int aa (int a, int b) return super (a, b);
-	int bb (int a, int b) return super (a, b);
-
-	int ab (int a, int b) return a + b;
-	int ba (int a, int b) return a + b;
-
-	int ca (int a, int b) return super (a, b);
-	int da (int a, int b) return a + b;
-}
-
-int main () {
-	D d = new D();
-	A a = (A) d;
-	B b = (B) d;
-	C c = (C) d;
-	d.aa(4, 5);
-	a.aa(4, 5);
-	d.ab(4, 5);
-	a.ab(4, 5);
-	d.ba(4, 5);
-	b.ba(4, 5);
-	d.bb(4, 5);
-	b.bb(4, 5);
-	d.ca(4, 5);
-	c.ca(4, 5);
-	d.da(4, 5);
+int main(int argc, char ** argv)
+{
+	printf("Hello %s: %d\n", "World", test_fun (2, 5));
+	
 	return 0;
 }

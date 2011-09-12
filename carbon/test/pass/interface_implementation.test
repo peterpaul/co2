@@ -25,7 +25,7 @@ interface Operation
 	int fun(int a, int b);
 }
 
-class AddOperation <Operation>
+class AddOperation, Operation
 {
 	int last_result;
 	int fun(int a, int b)

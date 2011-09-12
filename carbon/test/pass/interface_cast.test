@@ -25,7 +25,7 @@ interface Foo {
 	int foobar ();
 }
 
-class Bar <Foo> {
+class Bar, Foo {
 	int foobar () return 5;
 }
 

@@ -1,3 +1,12 @@
+carbon (0.1.3-1) natty; urgency=low
+
+  * Switch-case statement added
+  * Syntax change for implementing interfaces: [ ',' INTERFACE ]*
+  * [bugfix] Generate #inlude statement for all externally defined tokens
+  * [bugfix] Do not generate a function when the body is undefined
+
+ -- Peterpaul Taekele Klein Haneveld <peterpaul@peterpaul-dm1z>  Mon, 12 Sep 2011 06:21:01 +0200
+
 carbon (0.1.2-1) natty; urgency=low
 
   * [bugfix] Raise error when function expression is not a function type

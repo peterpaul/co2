@@ -22,7 +22,7 @@ interface Baz
 {
 }
 
-class ObjectA <Baz>
+class ObjectA, Baz
 {
 	int foo;
 }
