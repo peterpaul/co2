@@ -42,6 +42,14 @@ void *o_cast(const void *_object, const void *_class)
 	return (void *) _object;
 }
 
+void *o_branch_cast_interface(const void *_object, const void *_interface)
+{
+	if (_object != NULL) {
+		return o_cast_interface(_object, _interface);
+	}
+	return NULL;
+}
+
 void *o_cast_interface(const void *_object, const void *_interface)
 {
   const struct Object *object = O_IS_OBJECT(_object);
