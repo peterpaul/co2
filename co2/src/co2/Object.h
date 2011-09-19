@@ -218,7 +218,7 @@
   ({typeof(o) _tmp = o;							\
     assertTrue(_tmp == (typeof(_tmp))0 || _tmp->class->msg,		\
 	       "runtime error: %s at %p doesn't respond to %s.",	\
-	       _tmp->class->name, (void *)_tmp, __STRING(msg));		\
+	       _tmp->class->class_name, (void *)_tmp, __STRING(msg));	\
     _tmp ? _tmp->class->msg(_tmp,##__VA_ARGS__) : (typeof(_tmp->class->msg(_tmp,##__VA_ARGS__)))0;})
 #define O_CALL_CLASS(o,msg,...)						\
 	({typeof(o) _tmp = o;						\
