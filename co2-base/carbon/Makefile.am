@@ -1,7 +1,7 @@
-MAINTAINERCLEANFILES = Makefile.in
-ACLOCAL_AMFLAGS = -I m4
+MAINTAINERCLEANFILES=Makefile.in
+ACLOCAL_AMFLAGS=-I m4
 
-lib_LTLIBRARIES = libco2-base-1.0.la
+lib_LTLIBRARIES=libco2-base-1.0.la
 libco2_base_1_0_ladir=$(includedir)/co2-base-1.0/co2
 
 libco2_base_1_0_la_CO2SOURCES=\
@@ -129,29 +129,4 @@ co2/Throwable.h
 
 %.h: %.c
 
-libco2_base_1_0_la_CPPFLAGS = -I$(top_srcdir)/include
-
-bin_PROGRAMS = TestRefObject TestLogger TestMap TestSet TestList
-
-TestRefObject_SOURCES = co2/TestRefObject.c
-TestRefObject_CPPFLAGS = -I$(top_srcdir)/include
-TestRefObject_LDFLAGS = $(CO2_LIBS) -lco2-base-1.0
-
-TestLogger_SOURCES = co2/TestLogger.c
-TestLogger_CPPFLAGS = -I$(top_srcdir)/include
-TestLogger_LDFLAGS = $(CO2_LIBS) -lco2-base-1.0
-
-TestMap_SOURCES = co2/TestMap.c
-TestMap_CPPFLAGS = -I$(top_srcdir)/include
-TestMap_LDFLAGS = $(CO2_LIBS) -lco2-base-1.0
-
-TestSet_SOURCES = co2/TestSet.c
-TestSet_CPPFLAGS = -I$(top_srcdir)/include
-TestSet_LDFLAGS = $(CO2_LIBS) -lco2-base-1.0
-
-TestList_SOURCES = co2/TestList.c
-TestList_CPPFLAGS = -I$(top_srcdir)/include
-TestList_LDFLAGS = $(CO2_LIBS) -lco2-base-1.0
-
-distclean-local:
-	-rm -r ${bin_PROGRAMS}
+libco2_base_1_0_la_CPPFLAGS=-O0 -g3 -DO_DEBUG

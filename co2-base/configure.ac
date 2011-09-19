@@ -41,7 +41,7 @@ AC_CHECK_FUNCS([gettimeofday localtime_r strdup strstr tzset])
 
 AC_CONFIG_FILES([Makefile
                  carbon/Makefile
-		 carbon/co2/Makefile
+		 test/Makefile
                  co2-base-1.0.pc])
 
 AC_OUTPUT
