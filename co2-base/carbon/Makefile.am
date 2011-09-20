@@ -43,8 +43,7 @@ co2/SimpleFormatter.co2\
 co2/String.co2\
 co2/Throwable.co2
 
-libco2_base_1_0_la_SOURCES=\
-$(libco2_base_1_0_la_CO2SOURCES)\
+GENERATED_CSOURCES=\
 co2/Array.c\
 co2/ArrayIterator.c\
 co2/ArrayList.c\
@@ -83,8 +82,7 @@ co2/SimpleFormatter.c\
 co2/String.c\
 co2/Throwable.c
 
-libco2_base_1_0_la_HEADERS=\
-$(libco2_base_1_0_la_CO2SOURCES)\
+GENERATED_CHEADERS=\
 co2/Array.h\
 co2/ArrayIterator.h\
 co2/ArrayList.h\
@@ -123,8 +121,20 @@ co2/SimpleFormatter.h\
 co2/String.h\
 co2/Throwable.h
 
+BUILT_SOURCES=\
+$(GENERATED_CSOURCES)\
+$(GENERATED_CHEADERS)
+
+libco2_base_1_0_la_SOURCES=\
+$(libco2_base_1_0_la_CO2SOURCES)\
+$(GENERATED_CSOURCES)
+
+libco2_base_1_0_la_HEADERS=\
+$(libco2_base_1_0_la_CO2SOURCES)\
+$(GENERATED_CHEADERS)
+
 %.c: %.co2
-	-rm $@
+	-rm -f $@
 	carbon -P . $< $@
 
 %.h: %.c
