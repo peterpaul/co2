@@ -209,37 +209,37 @@
 #define O_BRANCH_CAST(o,c)			\
   o_branch_cast(o,c)
 #define O_CALL(o,msg,...)						\
-	({typeof(o) _tmp = o;						\
-		assertTrue(_tmp->class->msg,				\
+	({typeof(o) _o_tmp_##msg = o;						\
+		assertTrue(_o_tmp_##msg->class->msg,				\
 			   "runtime error: %s at %p doesn't respond to %s.", \
-			   _tmp->class->class_name, (void *)_tmp, __STRING(msg)); \
-		_tmp->class->msg(_tmp,##__VA_ARGS__);})
+			   _o_tmp_##msg->class->class_name, (void *)_o_tmp_##msg, __STRING(msg)); \
+		_o_tmp_##msg->class->msg(_o_tmp_##msg,##__VA_ARGS__);})
 #define O_BRANCH_CALL(o,msg,...)					\
-  ({typeof(o) _tmp = o;							\
-    assertTrue(_tmp == (typeof(_tmp))0 || _tmp->class->msg,		\
+  ({typeof(o) _o_tmp_##msg = o;							\
+    assertTrue(_o_tmp_##msg == (typeof(_o_tmp_##msg))0 || _o_tmp_##msg->class->msg,		\
 	       "runtime error: %s at %p doesn't respond to %s.",	\
-	       _tmp->class->class_name, (void *)_tmp, __STRING(msg));	\
-    _tmp ? _tmp->class->msg(_tmp,##__VA_ARGS__) : (typeof(_tmp->class->msg(_tmp,##__VA_ARGS__)))0;})
+	       _o_tmp_##msg->class->class_name, (void *)_o_tmp_##msg, __STRING(msg));	\
+    _o_tmp_##msg ? _o_tmp_##msg->class->msg(_o_tmp_##msg,##__VA_ARGS__) : (typeof(_o_tmp_##msg->class->msg(_o_tmp_##msg,##__VA_ARGS__)))0;})
 #define O_CALL_CLASS(o,msg,...)						\
-	({typeof(o) _tmp = o;						\
-		assertTrue(_tmp->msg,					\
+	({typeof(o) _o_tmp_##msg = o;						\
+		assertTrue(_o_tmp_##msg->msg,					\
 			   "runtime error: %s at %p doesn't respond to %s.", \
-			   _tmp->class_name, (void *)_tmp, __STRING(msg));	\
-		_tmp->msg(_tmp,##__VA_ARGS__);})
+			   _o_tmp_##msg->class_name, (void *)_o_tmp_##msg, __STRING(msg));	\
+		_o_tmp_##msg->msg(_o_tmp_##msg,##__VA_ARGS__);})
 #else
 #define O_CAST(o,c)				\
   (void *) o
 #define O_BRANCH_CAST(o,c)			\
   (void *) o
 #define O_CALL(o,msg,...)						\
-	({typeof(o) _tmp = o;						\
-		_tmp->class->msg(_tmp,##__VA_ARGS__);})
+	({typeof(o) _o_tmp_##msg = o;						\
+		_o_tmp_##msg->class->msg(_o_tmp_##msg,##__VA_ARGS__);})
 #define O_BRANCH_CALL(o,msg,...)					\
-  ({typeof(o) _tmp = o;							\
-    _tmp ? _tmp->class->msg(_tmp,##__VA_ARGS__) : (typeof(_tmp->class->msg(_tmp,##__VA_ARGS__)))0;})
+  ({typeof(o) _o_tmp_##msg = o;							\
+    _o_tmp_##msg ? _o_tmp_##msg->class->msg(_o_tmp_##msg,##__VA_ARGS__) : (typeof(_o_tmp_##msg->class->msg(_o_tmp_##msg,##__VA_ARGS__)))0;})
 #define O_CALL_CLASS(o,msg,...)						\
-	({typeof(o) _tmp = o;						\
-		_tmp->msg(_tmp,##__VA_ARGS__);})
+	({typeof(o) _o_tmp_##msg = o;						\
+		_o_tmp_##msg->msg(_o_tmp_##msg,##__VA_ARGS__);})
 #endif /* O_DEBUG */
 
 #define O_GET_ARG(type)				\
