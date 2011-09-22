@@ -408,6 +408,22 @@ O_IMPLEMENT (File, void, generate, (void *_self))
   O_CALL (declarations, release);
 }
 
+static void
+File_generateDepend_callback (void *_object)
+{
+  struct File *object = O_CAST (_object, File ());
+
+  O_CALL (object, generateDepend);
+  printf (" \\\n %s", object->absolute_path->data);
+}
+
+O_IMPLEMENT (File, void, generateDepend, (void *_self))
+{
+  struct File *self = O_CAST (_self, File ());
+
+  O_CALL (self->file_dependencies, map, File_generateDepend_callback);
+}
+
 O_OBJECT (File, CompileObject);
 O_OBJECT_METHOD (File, ctor);
 O_OBJECT_METHOD (File, dtor);
@@ -415,6 +431,7 @@ O_OBJECT_METHOD (File, sort);
 O_OBJECT_METHOD (File, type_check);
 O_OBJECT_METHOD (File, optimize);
 O_OBJECT_METHOD (File, generate);
+O_OBJECT_METHOD (File, generateDepend);
 O_OBJECT_METHOD (File, accept);
 O_OBJECT_METHOD (File, accept_all_files);
 O_END_OBJECT
