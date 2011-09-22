@@ -47,8 +47,8 @@ function compile_library_test {
     local TARGETNAME=${TARGET}/${DIRNAME}/${BASENAME}
     mkdir -p ${TARGET}/${DIRNAME}
     # Compile the testcase
-    echo "Command: ${COMPILER} -P ${SRCDIR}/pass ${SRCDIR}/${TEST} ${TARGETNAME}.c" >> ${LOGFILE}
-    ${COMPILER} -P ${SRCDIR}/pass ${SRCDIR}/${TEST} ${TARGETNAME}.c >> ${LOGFILE} 2>&1
+    echo "Command: ${COMPILER} -I ${SRCDIR}/pass ${SRCDIR}/${TEST} ${TARGETNAME}.c" >> ${LOGFILE}
+    ${COMPILER} -I ${SRCDIR}/pass ${SRCDIR}/${TEST} ${TARGETNAME}.c >> ${LOGFILE} 2>&1
     if [[ "$?" != "0" ]]
     then
 	echo "ERROR: ${TEST} failed: Compiler error" >> ${LOGFILE}

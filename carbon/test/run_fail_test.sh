@@ -35,8 +35,8 @@ function run_fail_test {
     local TARGETNAME=${TARGET}/${DIRNAME}/${BASENAME}
     mkdir -p ${TARGET}/${DIRNAME}
     # Compile the testcase
-    echo "Command: ${COMPILER} -P ${SRCDIR}/fail ${SRCDIR}/${TEST} ${TARGETNAME}.c" >> ${LOGFILE}
-    ${COMPILER} -P ${SRCDIR}/fail ${SRCDIR}/${TEST} ${TARGETNAME}.c >> ${LOGFILE} 2>&1
+    echo "Command: ${COMPILER} -I ${SRCDIR}/fail ${SRCDIR}/${TEST} ${TARGETNAME}.c" >> ${LOGFILE}
+    ${COMPILER} -I ${SRCDIR}/fail ${SRCDIR}/${TEST} ${TARGETNAME}.c >> ${LOGFILE} 2>&1
     if [[ "$?" == "0" ]]
     then
 	return 1

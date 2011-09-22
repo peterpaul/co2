@@ -213,7 +213,7 @@ usage ()
   fprintf (stdout, "        C_OUTPUT_FILE:  filename of c output\n");
   fprintf (stdout, "\n");
   fprintf (stdout, "OPTIONS:\n");
-  fprintf (stdout, "        -P INCLUDE_DIR: include directory to add to search path\n");
+  fprintf (stdout, "        -I INCLUDE_DIR: include directory to add to search path\n");
   fprintf (stdout, "        -h,--help:      show this help\n");
   fprintf (stdout, "        -V,--version:   show version\n");
   fprintf (stdout, "        -d,--depend:    show dependencies\n");
@@ -239,7 +239,7 @@ main (int argc, char **argv)
 	    {
 	      switch (argv[arg][1])
 		{
-		case 'P':
+		case 'I':
 		  nextIsOption = true;
 		  break;
 		case 'h':
@@ -300,7 +300,7 @@ main (int argc, char **argv)
 
   if (nextIsOption)
     {
-      error (NULL, "-P takes one argument\n");
+      error (NULL, "-I takes one argument\n");
     }
 
   if (errors != 0)
