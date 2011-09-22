@@ -20,7 +20,7 @@
 #define INCLUDESTACK_H
 
 #include "co2/RefObject.h"
-#include "co2/File.h"
+#include "File.h"
 
 #define IncludeStackClass_Attr			\
   RefObjectClass_Attr
