@@ -229,7 +229,7 @@ WhileStatement.h
 
 %.c: %.co2
 	-rm $@
-	carbon -P ../../co2-base/carbon -P ../../co2-base/carbon/co2 $< $@
+	carbon -I ../../co2-base/carbon -I ../../co2-base/carbon/co2 $< $@
 
 %.h: %.c
 
@@ -242,9 +242,9 @@ carbon_SOURCES=Compiler.co2 Compiler.c
 carbon_LDADD=libcarbon-1.0.la
 carbon_LDFLAGS=$(CO2_LIBS) $(CO2BASE_LIBS)
 
-#IncludeStack.h: IncludeStack.co2
-#	-rm $@
-#	carbon -P ../../co2-base/carbon -P ../../co2-base/carbon/co2 $< IncludeStack.c
+IncludeStack.h: IncludeStack.co2
+	-rm $@
+	carbon -I ../../co2-base/carbon -I ../../co2-base/carbon/co2 $< IncludeStack.c
 
 distclean-local:
 	-rm -r ${bin_PROGRAMS}
