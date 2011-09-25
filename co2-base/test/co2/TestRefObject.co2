@@ -30,7 +30,7 @@ int mainImpl () {
 			list.add (create (i));
 		}
 
-		for (i = 0; i < 17; i += 1) {
+		for (i = 0; i < 15; i += 1) {
 			TestRefObject obj = (TestRefObject) list.get (i);
 			printf ("%d\n", obj.val);
 			if (random () % 2 == 0) {

@@ -3,7 +3,7 @@ ACLOCAL_AMFLAGS=-I m4
 
 %.c: %.co2
 	-rm $@
-	carbon -P . -P ../carbon $< $@
+	carbon -I . -I ../carbon $< $@
 
 %.h: %.c
 

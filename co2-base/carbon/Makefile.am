@@ -135,7 +135,7 @@ $(GENERATED_CHEADERS)
 
 %.c: %.co2
 	-rm -f $@
-	carbon -P . $< $@
+	carbon -I . $< $@
 
 %.h: %.c
 
