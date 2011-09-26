@@ -414,13 +414,13 @@ File_generateDepend_callback (void *_object)
   struct File *object = O_CAST (_object, File ());
 
   O_CALL (object, generateDepend);
-  printf (" \\\n %s", object->absolute_path->data);
 }
 
 O_IMPLEMENT (File, void, generateDepend, (void *_self))
 {
   struct File *self = O_CAST (_self, File ());
 
+  printf (" \\\n %s", self->absolute_path->data);
   O_CALL (self->file_dependencies, map, File_generateDepend_callback);
 }
 
