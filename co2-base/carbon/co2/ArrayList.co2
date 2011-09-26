@@ -6,7 +6,12 @@ include co2/ArrayIterator
 class ArrayList : Array, List {
 	unsigned length;
 
-	ArrayList (int size) {
+	ArrayList () {
+		super (128);
+		length = 0;
+	}
+
+	ArrayList.withSize (int size) {
 		super (size);
 		length = 0;
 	}

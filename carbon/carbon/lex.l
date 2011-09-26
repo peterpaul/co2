@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 %{
-#include "Compiler.h"
+//#include "Compiler.h"
 #include "grammar.h"
 #include "Token.h"
 #include "co2/ArrayList.h"

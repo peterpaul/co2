@@ -6,8 +6,8 @@ AC_INIT([carbon], [0.1.999], [pp_kl_h@hotmail.com])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE
 AM_SILENT_RULES([yes])
-AC_CONFIG_SRCDIR([src/co2/Compiler.c])
-AC_CONFIG_HEADERS([src/config.h])
+AC_CONFIG_SRCDIR([carbon/Compiler.co2])
+AC_CONFIG_HEADERS([carbon/config.h])
 
 # Checks for programs.
 AC_PROG_CXX

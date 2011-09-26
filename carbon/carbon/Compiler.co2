@@ -151,7 +151,7 @@ int main(int argc, char **argv) {
 	new ReleasePool ();
 	char *input_file = null;
 	char *output_file = null;
-	path = new ArrayList (8);
+	path = new ArrayList ();
 	int arg = 1;
 	Bool next_is_option = false;
 	while (arg < argc) {

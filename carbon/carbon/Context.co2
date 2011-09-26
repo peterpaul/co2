@@ -12,7 +12,7 @@ class Context : RefObject {
 	List stack;
 
 	Context () {
-		stack = new ArrayList (8);
+		stack = new ArrayList ();
 		((ArrayList) stack).retain ();
 	}
 

@@ -6,6 +6,10 @@ class Enum : RefObject, Comparable {
 	String name;
 	int value;
 
+	Enum () {
+		super ();
+	}
+
 	Enum.private (int v, char * n) {
 		super ();
 		name = new String ("%s", n);

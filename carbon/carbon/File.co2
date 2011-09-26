@@ -10,8 +10,9 @@ File try_search_path(String file_name);
 Map file_hash_map = null;
 Map get_hash_map() {
 	if (file_hash_map == null) {
-		file_hash_map = new HashMap(127);
+		file_hash_map = new HashMap (127);
 	}
+	return file_hash_map;
 }
 
 void file_type_check (CompileObject object) {

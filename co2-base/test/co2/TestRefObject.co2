@@ -23,7 +23,7 @@ int mainImpl () {
 	new ReleasePool ();
 	List list;
 	try {
-		list = new ArrayList(15);
+		list = new ArrayList.withSize(15);
 		((ArrayList) list).retain ();
 		int i;
 		for (i = 0; i < 15; i += 1) {

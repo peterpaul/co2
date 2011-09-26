@@ -146,7 +146,7 @@ class String : RefObject {
 	}
 
 	List split (char[] delim) {
-		List list = new ArrayList (8);
+		List list = new ArrayList ();
 		char[] saveptr;
 		char[] token;
 		char[] data_bak = strdup (data);

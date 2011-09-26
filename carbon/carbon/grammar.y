@@ -1013,8 +1013,10 @@ void yyerror(const char * msg)
 }
 int parse()
 {
-  struct ScopeType * _tmp = O_CALL_CLASS (ScopeType (), new);
-  O_CALL (_tmp, delete);
+  {
+    struct ScopeType * _tmp = O_CALL_CLASS (ScopeType (), new);
+    O_CALL (_tmp, delete);
+  }
 
   global_scope = O_CALL_CLASS(Scope(), new, global_scope_type, NULL);
   int result = yyparse();

@@ -1,4 +1,4 @@
-/*
+1;2790;0c/*
  * carbon Compiler and programming language for libco2
  *
  * Copyright (C) 2011 Peterpaul Taekele Klein Haneveld
@@ -20,7 +20,7 @@
 #define INCLUDESTACK_H
 
 #include "co2/RefObject.h"
-#include "File.h"
+#include "co2/File.h"
 
 #define IncludeStackClass_Attr			\
   RefObjectClass_Attr

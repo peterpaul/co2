@@ -4,7 +4,7 @@ include File
 int linenumber;
 IncludeStack include_stack;
 
-["Compiler.h"] {
+["File.h"] {
 	struct yy_buffer_state {}
 	typedef YyBufferState = struct yy_buffer_state;
 	typedef YY_BUFFER_STATE = YyBufferState *;
