@@ -1,11 +1,15 @@
 MAINTAINERCLEANFILES=Makefile.in
 ACLOCAL_AMFLAGS=-I m4
 
-%.c: %.co2
-	-rm $@
-	carbon -I . -I ../carbon $< $@
+CO2SOURCES=\
+co2/TestRefObject.co2\
+co2/TestLogger.co2\
+co2/TestMap.co2\
+co2/TestSet.co2\
+co2/TestList.co2
 
-%.h: %.c
+DEPENDENCIES=\
+$(CO2SOURCES:.co2=.d)
 
 bin_PROGRAMS=TestRefObject TestLogger TestMap TestSet TestList
 TESTS=$(bin_PROGRAMS)
@@ -35,5 +39,24 @@ TestList_LDADD=../carbon/libco2-base-1.0.la
 TestList_LDFLAGS=$(CO2_LIBS)
 TestList_CPPFLAGS=-O0 -g3 -DO_DEBUG -I../carbon
 
+CARBON_FLAGS=-I . -I ../carbon
+
+%.c: %.co2
+	-rm -f $@
+	carbon $(CARBON_FLAGS) $< $@
+	indent $@
+
+%.h: %.c
+
+%.d: %.co2
+	-rm -f $@
+	echo -n "`echo $@ | sed 's/\.d/.c/g'` " > $@
+	carbon --depend $(CARBON_FLAGS) $< $@ >> $@
+
 distclean-local:
-	-rm -r ${bin_PROGRAMS}
+	-rm -r $(bin_PROGRAMS)
+
+clean-local:
+	-rm -f $(DEPENDENCIES)
+
+include $(DEPENDENCIES)

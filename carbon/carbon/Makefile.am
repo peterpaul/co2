@@ -3,6 +3,8 @@ ACLOCAL_AMFLAGS=-I m4
 
 AM_YFLAGS=-d
 
+CO2_BASE_PATH=$(shell pkg-config co2-base-1.0 --cflags | sed 's/-I/-I /g' | sed 's/[ \t]*$$//g' )
+
 lib_LTLIBRARIES=libcarbon-1.0.la
 libcarbon_1_0_ladir=$(includedir)/carbon-1.0
 
@@ -45,7 +47,6 @@ GenerateSourceVisitor.co2\
 Hash.co2\
 HelloWorldVisitor.co2\
 IfStatement.co2\
-IncludeStack.co2\
 InterfaceDeclaration.co2\
 io.co2\
 IsOfExpression.co2\
@@ -79,163 +80,46 @@ VarArgExpression.co2\
 VariableDeclaration.co2\
 WhileStatement.co2
 
+GENERATED_CSOURCES=\
+$(libcarbon_1_0_la_CO2SOURCES:.co2=.c)
+
+GENERATED_CHEADERS=\
+$(libcarbon_1_0_la_CO2SOURCES:.co2=.h)
+
+GENERATED_CO2DEPEND=\
+$(libcarbon_1_0_la_CO2SOURCES:.co2=.d)
+
+BUILT_SOURCES=\
+$(GENERATED_CSOURCES)\
+$(GENERATED_CHEADERS)
+
 libcarbon_1_0_la_SOURCES=\
 $(libcarbon_1_0_la_CO2SOURCES)\
 grammar.y\
 lex.l\
-ArgumentDeclaration.c\
-ArrayType.c\
-BaseCompileObjectVisitor.c\
-BinaryExpression.c\
-BreakStatement.c\
-CaseStatement.c\
-CastExpression.c\
-CatchStatement.c\
-ClassDeclaration.c\
-CompileObject.c\
-CompileObjectVisitor.c\
-CompoundStatement.c\
-ConditionalBinaryExpression.c\
-ConditionalExpression.c\
-ConstructorDeclaration.c\
-Context.c\
-ContinueStatement.c\
-Declaration.c\
-DeleteStatement.c\
-DestructorDeclaration.c\
-DoStatement.c\
-error.c\
-Expression.c\
-ExpressionStatement.c\
-File.c\
-FinallyStatement.c\
-ForEachStatement.c\
-ForStatement.c\
-FunctionCallExpression.c\
-FunctionDeclaration.c\
-FunctionType.c\
-GenerateHeaderIncludesVisitor.c\
-GenerateHeaderVisitor.c\
-GenerateSourceIncludesVisitor.c\
-GenerateSourceVisitor.c\
-Hash.c\
-HelloWorldVisitor.c\
-IfStatement.c\
-InterfaceDeclaration.c\
-io.c\
-IsOfExpression.c\
-MacroDeclaration.c\
-NestedExpression.c\
-NewExpression.c\
-NullExpression.c\
-ObjectType.c\
-ObjectTypeDeclaration.c\
-Path.c\
-PrimitiveType.c\
-RefList.c\
-ReturnStatement.c\
-Scope.c\
-Set.c\
-SizeExpression.c\
-Statement.c\
-StructDeclaration.c\
-SuperExpression.c\
-SwitchStatement.c\
-ThrowStatement.c\
-Token.c\
-TokenExpression.c\
-TokenGenerator.c\
-TryStatement.c\
-TypeCheckVisitor.c\
-Type.c\
-TypeDeclaration.c\
-UnaryExpression.c\
-VarArgExpression.c\
-VariableDeclaration.c\
-WhileStatement.c
+$(GENERATED_CSOURCES)
 
 libcarbon_1_0_la_HEADERS=\
-ArgumentDeclaration.h\
-ArrayType.h\
-BaseCompileObjectVisitor.h\
-BinaryExpression.h\
-BreakStatement.h\
-CaseStatement.h\
-CastExpression.h\
-CatchStatement.h\
-ClassDeclaration.h\
-CompileObject.h\
-CompileObjectVisitor.h\
-CompoundStatement.h\
-ConditionalBinaryExpression.h\
-ConditionalExpression.h\
-ConstructorDeclaration.h\
-Context.h\
-ContinueStatement.h\
-Declaration.h\
-DeleteStatement.h\
-DestructorDeclaration.h\
-DoStatement.h\
-error.h\
-Expression.h\
-ExpressionStatement.h\
-File.h\
-FinallyStatement.h\
-ForEachStatement.h\
-ForStatement.h\
-FunctionCallExpression.h\
-FunctionDeclaration.h\
-FunctionType.h\
-GenerateHeaderIncludesVisitor.h\
-GenerateHeaderVisitor.h\
-GenerateSourceIncludesVisitor.h\
-GenerateSourceVisitor.h\
-Hash.h\
-HelloWorldVisitor.h\
-IfStatement.h\
-IncludeStack.h\
-InterfaceDeclaration.h\
-io.h\
-IsOfExpression.h\
-MacroDeclaration.h\
-NestedExpression.h\
-NewExpression.h\
-NullExpression.h\
-ObjectType.h\
-ObjectTypeDeclaration.h\
-Path.h\
-PrimitiveType.h\
-RefList.h\
-ReturnStatement.h\
-Scope.h\
-Set.h\
-SizeExpression.h\
-Statement.h\
-StructDeclaration.h\
-SuperExpression.h\
-SwitchStatement.h\
-ThrowStatement.h\
-Token.h\
-TokenExpression.h\
-TokenGenerator.h\
-TryStatement.h\
-TypeCheckVisitor.h\
-Type.h\
-TypeDeclaration.h\
-UnaryExpression.h\
-VarArgExpression.h\
-VariableDeclaration.h\
-WhileStatement.h
+$(libcarbon_1_0_la_CO2SOURCES)\
+$(GENERATED_CHEADERS)
+
+CARBON_FLAGS=$(CO2_BASE_PATH) $(CO2_BASE_PATH)/co2
 
 %.c: %.co2
-	-rm $@
-	carbon -I ../../co2-base/carbon -I ../../co2-base/carbon/co2 $< $@
+	-rm -f $@
+	carbon $(CARBON_FLAGS) $< $@
+	indent $@
 
 %.h: %.c
 
+%.d: %.co2
+	-rm -f $@
+	echo -n "`echo $@ | sed 's/\.d/.c/g'` " > $@
+	carbon --depend $(CARBON_FLAGS) $< $@ >> $@
+
 grammar.h: grammar.c
 
-libcarbon_1_0_la_CPPFLAGS=-O0 -g3
+libcarbon_1_0_la_CPPFLAGS=-O0 -g3 -DO_DEBUG
 
 bin_PROGRAMS=carbon
 carbon_SOURCES=Compiler.co2 Compiler.c
@@ -244,10 +128,13 @@ carbon_LDFLAGS=$(CO2_LIBS) $(CO2BASE_LIBS)
 
 IncludeStack.h: IncludeStack.co2
 	-rm $@
-	carbon -I ../../co2-base/carbon -I ../../co2-base/carbon/co2 $< IncludeStack.c
+	carbon $(CARBON_FLAGS) $< IncludeStack.c
 
 distclean-local:
 	-rm -r ${bin_PROGRAMS}
 
 clean-local:
-	-rm grammar.c grammar.h lex.c
+	-rm -f grammar.c grammar.h lex.c
+	-rm -f $(GENERATED_CHEADERS) $(GENERATED_CSOURCES) $(GENERATED_CO2DEPEND)
+
+include $(GENERATED_CO2DEPEND)
