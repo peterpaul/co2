@@ -28,11 +28,14 @@
 		return interface->name act_args;			\
 	}
 
-#define O_IMPLEMENT_IF(klass,type,name,args,act_args)			\
+#define O_IMPLEMENT_IF_BINDING(klass,type,name,args,act_args)		\
 	static O_FUNCTION_DEF(klass,type,name##_impl,args) {		\
 		struct klass * self = O_CAST(_self, klass());		\
 		return self->class->name act_args;			\
 	}								\
+
+#define O_IMPLEMENT_IF(klass,type,name,args,act_args)			\
+	O_IMPLEMENT_IF_BINDING(klass,type,name,args,act_args)		\
 	static O_FUNCTION_DEF(_##klass,type,name,args)
 
 #define O_OBJECT_IF(IF)							\
