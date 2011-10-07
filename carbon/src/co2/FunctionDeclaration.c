@@ -102,6 +102,15 @@ FunctionDeclaration_find_in_interface (void *_self, va_list * app)
     }
 }
 
+void
+FunctionDeclaration_find_in_interface_ (void *_self, ...)
+{
+  va_list ap;
+  va_start (ap, _self);
+  FunctionDeclaration_find_in_interface (_self, &ap);
+  va_end (ap);
+}
+
 O_IMPLEMENT (FunctionDeclaration, void, type_check, (void *_self))
 {
   struct FunctionDeclaration *self = O_CAST (_self, FunctionDeclaration ());
@@ -113,6 +122,8 @@ O_IMPLEMENT (FunctionDeclaration, void, type_check, (void *_self))
   struct FunctionType *function_type = o_cast (self->type, FunctionType ());
   struct ClassDeclaration *class_decl =
     O_BRANCH_CALL (current_context, find, ClassDeclaration ());
+  struct InterfaceDeclaration *interface_decl =
+    O_BRANCH_CALL (current_context, find, InterfaceDeclaration ());
   if (function_type->has_var_args)
     {
       if (class_decl == NULL && self->formal_arguments->length <= 1)
@@ -125,6 +136,10 @@ O_IMPLEMENT (FunctionDeclaration, void, type_check, (void *_self))
     {
       O_CALL (class_decl->interfaces, map_args,
 	      FunctionDeclaration_find_in_interface, self);
+    }
+  else if (interface_decl)
+    {
+      FunctionDeclaration_find_in_interface_ (interface_decl->name, self);
     }
   O_BRANCH_CALL (current_context, remove_last);
 }

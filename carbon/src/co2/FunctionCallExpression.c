@@ -74,7 +74,8 @@ O_IMPLEMENT (FunctionCallExpression, void, generate, (void *_self))
 	{
 	  struct FunctionDeclaration *fun_decl =
 	    (struct FunctionDeclaration *) function->decl;
-	  if (fun_decl->scope->type == CLASS_SCOPE)
+	  switch (fun_decl->scope->type) {
+	  case CLASS_SCOPE:
 	    {
 	      fprintf (out, "O_CALL ");
 	      fprintf (out, "(");
@@ -86,10 +87,24 @@ O_IMPLEMENT (FunctionCallExpression, void, generate, (void *_self))
 	      fprintf (out, ")");
 	      return;
 	    }
-	  else
+	  case INTERFACE_SCOPE:
+	    {
+	      fprintf (out, "O_CALL_IF ");
+	      fprintf (out, "(");
+	      O_CALL (fun_decl->interface_decl->name, generate);
+	      bool is_first_arg = false;
+	      fprintf (out, ", self, ");
+	      O_CALL (function->token, generate);
+	      O_CALL (self->actual_arguments, map_args,
+		      Expression_generate_actual_argument, &is_first_arg);
+	      fprintf (out, ")");
+	      return;
+	    }
+	  default:
 	    {
 	      O_CALL (function->token, generate);
 	    }
+	  }
 	}
       else
 	{

@@ -1,0 +1,4 @@
+f.bar(f) = 19
+f.bar(g) = 15
+g.bar(f) = 9
+g.bar(g) = 5

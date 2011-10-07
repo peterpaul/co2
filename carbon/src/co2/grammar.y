@@ -796,6 +796,11 @@ interface_method_declaration_list
   O_CALL(current_scope, declare, $2);
   O_CALL($1, append, $2);
 }
+|	interface_method_declaration_list function_declaration
+{
+  O_CALL(current_scope, declare, $2);
+  O_CALL($1, append, $2);
+}
 |	/* empty */
 {
   $$ = O_CALL_CLASS(RefList(), new, 8, Declaration());

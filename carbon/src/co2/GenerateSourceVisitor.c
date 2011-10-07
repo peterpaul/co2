@@ -105,8 +105,9 @@ static void
 ClassDeclaration_generate_interface_method_registration (void *_method_decl,
 							 va_list * app)
 {
-  struct Declaration *method_decl = O_CAST (_method_decl, Declaration ());
-  struct Token *token = O_GET_ARG (Token);
+  struct FunctionDeclaration *method_decl = O_CAST (_method_decl, FunctionDeclaration ());
+  struct ClassDeclaration *class_decl = O_GET_ARG (ClassDeclaration);
+  struct Token *token = O_CAST (class_decl->name, Token ());
 
   fprintf (out, "O_OBJECT_IF_METHOD (");
   O_CALL (token, generate);
@@ -120,21 +121,83 @@ ClassDeclaration_generate_method_implementation_2 (void *_interface_name,
 						   va_list * app)
 {
   struct Token *interface_name = O_CAST (_interface_name, Token ());
-  struct Token *implementation_name = O_GET_ARG (Token);
+  struct ClassDeclaration *class_decl = O_GET_ARG (ClassDeclaration);
+
   struct Declaration *_decl =
     O_CALL (global_scope, lookup_in_this_scope, interface_name);
   struct InterfaceDeclaration *interface_decl =
     O_CAST (_decl, InterfaceDeclaration ());
+
+  void ClassDeclaration_generate_mixin_method_registration (void *_method_decl, va_list *app)
+  {
+    struct FunctionDeclaration *method_decl = O_CAST (_method_decl, FunctionDeclaration ());
+    
+    if (method_decl->body && !O_CALL (class_decl->member_scope, exists, method_decl->name))
+      {
+	fprintf (out, "O_OBJECT_METHOD (");
+	O_CALL (method_decl->interface_decl->name, generate);
+	fprintf (out, ", ");
+	O_CALL (method_decl->name, generate);
+	fprintf (out, ");\n");
+      }
+  }
+
+  O_CALL (interface_decl->members, map_args,
+	  ClassDeclaration_generate_mixin_method_registration,
+	  class_decl);
 
   fprintf (out, "O_OBJECT_IF (");
   O_CALL (interface_name, generate);
   fprintf (out, ");\n");
   O_CALL (interface_decl->members, map_args,
 	  ClassDeclaration_generate_interface_method_registration,
-	  implementation_name);
+	  class_decl);
   fprintf (out, "O_OBJECT_IF_END\n");
   
-  O_BRANCH_CALL (interface_decl->interfaces, map_args, ClassDeclaration_generate_method_implementation_2, implementation_name);
+  O_BRANCH_CALL (interface_decl->interfaces, map_args, ClassDeclaration_generate_method_implementation_2, class_decl);
+}
+
+static void ClassDeclaration_generate_interface_method_binding_impl (void *_decl, va_list *app)
+{
+  struct FunctionDeclaration * method_decl = O_CAST (_decl, FunctionDeclaration ());
+  struct ClassDeclaration *class_decl = O_GET_ARG (ClassDeclaration);
+  struct InterfaceDeclaration *interface_decl = O_GET_ARG (InterfaceDeclaration);
+
+  if (method_decl->body && 
+      !O_CALL (class_decl->member_scope, exists, method_decl->name))
+    {
+      struct FunctionType *method_type =
+	o_cast (method_decl->type, FunctionType ());
+      fprintf (out, "O_IMPLEMENT_IF_BINDING (");
+      O_CALL (class_decl->name, generate);
+      fprintf (out, ", ");
+      O_CALL (method_type->return_type, generate);
+      fprintf (out, ", ");
+      O_CALL (method_decl->name, generate);
+      fprintf (out, ", (void *_self");
+      O_CALL (method_decl->formal_arguments, map,
+	      ObjectTypeDeclaration_generate_method_arguments);
+      fprintf (out, "), (_self");
+      O_CALL (method_decl->formal_arguments, map,
+	      ObjectTypeDeclaration_generate_method_argument_names);
+      fprintf (out, "));\n");
+    }
+}
+
+static void ClassDeclaration_generate_interface_method_binding (void *_interface_name, va_list *app)
+{
+  struct Token *interface_name = O_CAST (_interface_name, Token ());
+  struct ClassDeclaration *class_decl = O_GET_ARG (ClassDeclaration);
+
+  struct Declaration *_decl =
+    O_CALL (global_scope, lookup_in_this_scope, interface_name);
+  struct InterfaceDeclaration *interface_decl =
+    O_CAST (_decl, InterfaceDeclaration ());
+
+  O_CALL (interface_decl->members, map_args, ClassDeclaration_generate_interface_method_binding_impl, class_decl, interface_decl);
+
+  O_BRANCH_CALL (interface_decl->interfaces, map_args, ClassDeclaration_generate_interface_method_binding, class_decl);
+
 }
 
 #define O_SUPER BaseCompileObjectVisitor()
@@ -175,6 +238,9 @@ O_IMPLEMENT_IF(GenerateSourceVisitor, void, visitClassDeclaration, (void *_self,
 	    DestructorDeclaration ());
   O_CALL (destructors, retain);
 
+  O_CALL (self->interfaces, map_args, ClassDeclaration_generate_interface_method_binding, self);
+  fprintf (out, "\n");
+
   fprintf (out, "#define O_SUPER ");
   generate_superclass (self);
   fprintf (out, " ()\n\n");
@@ -193,7 +259,7 @@ O_IMPLEMENT_IF(GenerateSourceVisitor, void, visitClassDeclaration, (void *_self,
 	  ObjectTypeDeclaration_generate_method_registration_2, self);
 
   O_BRANCH_CALL (self->interfaces, map_args,
-		 ClassDeclaration_generate_method_implementation_2, self->name);
+		 ClassDeclaration_generate_method_implementation_2, self);
 
   fprintf (out, "O_END_OBJECT\n\n");
 
@@ -297,6 +363,80 @@ O_IMPLEMENT_IF(GenerateSourceVisitor, void, visitDestructorDeclaration, (void *_
   fprintf (out, "}\n\n");
 }
 
+void GenerateSourceVisitor_visitFunctionDeclaration_generateImplementation(struct FunctionDeclaration * self, struct Declaration * parent_decl)
+{
+  struct FunctionType *method_type =
+    o_cast (self->type, FunctionType ());
+  if (self->interface_decl && o_is_of (parent_decl, ClassDeclaration ()))
+    {
+      fprintf (out, "O_IMPLEMENT_IF (");
+    }
+  else
+    {
+      fprintf (out, "O_IMPLEMENT (");
+    }
+  O_CALL (parent_decl->name, generate);
+  fprintf (out, ", ");
+  O_CALL (method_type->return_type, generate);
+  fprintf (out, ", ");
+  O_CALL (self->name, generate);
+  fprintf (out, ", (void *_self");
+  O_CALL (self->formal_arguments, map,
+	  ObjectTypeDeclaration_generate_method_arguments);
+  if (self->interface_decl && o_is_of (parent_decl, ClassDeclaration ()))
+    {
+      fprintf (out, "), (_self");
+      O_CALL (self->formal_arguments, map,
+	      ObjectTypeDeclaration_generate_method_argument_names);
+    }
+  fprintf (out, "))\n");
+  fprintf (out, "{\n");
+
+  if (o_is_of (parent_decl, InterfaceDeclaration ()))
+    {
+      fprintf (out, "struct Object * self = O_CAST (_self, Object ());\n");
+      fprintf (out, "assertTrue (o_implements (self, ");
+      O_CALL (parent_decl->name, generate);
+      fprintf (out, " ()), \"runtime error: %%s at %%p does not implement %s.\", self->class->name, (void *)self);\n", parent_decl->name->name->data);
+    }
+  else
+    {
+      fprintf (out, "struct ");
+      O_CALL (parent_decl->name, generate);
+      fprintf (out, "* self = O_CAST (_self, ");
+      O_CALL (parent_decl->name, generate);
+      fprintf (out, " ());\n");
+    }
+  if (method_type->has_var_args)
+    {
+      fprintf (out, "va_list ap;\n");
+      fprintf (out, "va_start (ap, ");
+      if (self->formal_arguments->length == 1)
+	{
+	  fprintf (out, "_self");
+	}
+      else
+	{
+	  struct ArgumentDeclaration *arg_decl =
+	    O_CALL (self->formal_arguments, get,
+		    self->formal_arguments->length - 2);
+	  O_CALL (arg_decl->name, generate);
+	}
+      fprintf (out, ");\n");
+    }
+  
+  O_CALL (self->body, generate);
+  
+  if (method_type->has_var_args && 
+      (o_is_of (method_type->return_type, PrimitiveType ())
+       && ((struct PrimitiveType *) method_type->return_type)->token->type == VOID))
+    {
+      fprintf (out, "va_end (ap);\n");
+    }
+      
+  fprintf (out, "}\n\n");
+}
+
 O_IMPLEMENT_IF(GenerateSourceVisitor, void, visitFunctionDeclaration, (void *_self, void *_object), (_self, _object))
 {
   struct BaseCompileObjectVisitor *visitor = O_CAST(_self, BaseCompileObjectVisitor());
@@ -316,66 +456,7 @@ O_IMPLEMENT_IF(GenerateSourceVisitor, void, visitFunctionDeclaration, (void *_se
 	{
 	  return;
 	}
-      struct FunctionType *method_type =
-	o_cast (self->type, FunctionType ());
-      if (self->interface_decl)
-	{
-	  fprintf (out, "O_IMPLEMENT_IF (");
-	}
-      else
-	{
-	  fprintf (out, "O_IMPLEMENT (");
-	}
-      O_CALL (class_decl->name, generate);
-      fprintf (out, ", ");
-      O_CALL (method_type->return_type, generate);
-      fprintf (out, ", ");
-      O_CALL (self->name, generate);
-      fprintf (out, ", (void *_self");
-      O_CALL (self->formal_arguments, map,
-	      ObjectTypeDeclaration_generate_method_arguments);
-      if (self->interface_decl)
-	{
-	  fprintf (out, "), (_self");
-	  O_CALL (self->formal_arguments, map,
-		  ObjectTypeDeclaration_generate_method_argument_names);
-	}
-      fprintf (out, "))\n");
-      fprintf (out, "{\n");
-      fprintf (out, "struct ");
-      O_CALL (class_decl->name, generate);
-      fprintf (out, "* self = O_CAST (_self, ");
-      O_CALL (class_decl->name, generate);
-      fprintf (out, " ());\n");
-      
-      if (method_type->has_var_args)
-	{
-	  fprintf (out, "va_list ap;\n");
-	  fprintf (out, "va_start (ap, ");
-	  if (self->formal_arguments->length == 1)
-	    {
-	      fprintf (out, "_self");
-	    }
-	  else
-	    {
-	      struct ArgumentDeclaration *arg_decl =
-		O_CALL (self->formal_arguments, get,
-			self->formal_arguments->length - 2);
-	      O_CALL (arg_decl->name, generate);
-	    }
-	  fprintf (out, ");\n");
-	}
-      
-      O_CALL (self->body, generate);
-      
-      if (method_type->has_var_args && 
-	  (o_is_of (method_type->return_type, PrimitiveType ())
-	   && ((struct PrimitiveType *) method_type->return_type)->token->type == VOID))
-	{
-	  fprintf (out, "va_end (ap);\n");
-	}
-      
-      fprintf (out, "}\n\n");
+      GenerateSourceVisitor_visitFunctionDeclaration_generateImplementation (self, class_decl);
     }
   else if (interface_decl)
     {
@@ -399,6 +480,10 @@ O_IMPLEMENT_IF(GenerateSourceVisitor, void, visitFunctionDeclaration, (void *_se
       O_CALL (self->formal_arguments, map,
 	      ObjectTypeDeclaration_generate_method_argument_names);
       fprintf (out, "));\n");
+      if (self->body)
+	{
+	  GenerateSourceVisitor_visitFunctionDeclaration_generateImplementation (self, interface_decl);
+	}
     }
   else
     {

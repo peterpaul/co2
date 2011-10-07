@@ -103,6 +103,35 @@ InterfaceDeclaration_generate_method_registration (void *_method_decl,
   fprintf (out, ")");
 }
 
+static void ClassDeclaration_generate_mixin_registration (void *_interface_name, va_list *app)
+{
+  struct Token *interface_name =
+    O_CAST (_interface_name, Token ());
+  struct ClassDeclaration *class_decl = O_GET_ARG (ClassDeclaration);
+
+  struct Declaration * decl = O_CALL (global_scope, lookup_in_this_scope, interface_name);
+  struct InterfaceDeclaration * interface_decl = O_CAST (decl, InterfaceDeclaration ());
+
+  void ClassDeclaration_generate_mixin_method_registration_2 (void *_method_decl)
+  {
+    struct FunctionDeclaration *method_decl = O_CAST (_method_decl, FunctionDeclaration ());
+    
+    if (method_decl->body && !O_CALL (class_decl->member_scope, exists, method_decl->name))
+      {
+	fprintf (out, "; \\\n O_METHOD (");
+	O_CALL (interface_decl->name, generate);
+	fprintf (out, ", ");
+	O_CALL (method_decl->name, generate);
+	fprintf (out, ")");
+      }
+  }
+
+  O_CALL (interface_decl->members, map, ClassDeclaration_generate_mixin_method_registration_2);
+
+  O_BRANCH_CALL (interface_decl->interfaces, map_args, ClassDeclaration_generate_mixin_registration, class_decl);
+
+}
+
 #define O_SUPER BaseCompileObjectVisitor()
 
 O_IMPLEMENT(GenerateHeaderVisitor, void *, ctor, (void *_self, va_list *app))
@@ -163,6 +192,7 @@ O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitClassDeclaration, (void *_self,
 	  ClassDeclaration_generate_constructor_registration, self);
   O_CALL (new_methods, map_args,
 	  ClassDeclaration_generate_method_registration, self);
+  O_CALL (self->interfaces, map_args, ClassDeclaration_generate_mixin_registration, self);
   fprintf (out, "\n\n");
 
   fprintf (out, "#define ");
