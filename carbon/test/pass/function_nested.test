@@ -1,0 +1,18 @@
+["stdio.h"] int printf(char * format, ...);
+
+int main () {
+
+	int a = 5;
+
+	int doStuff (int b) {
+		return a + b;
+	}
+
+	printf ("a = 5: doStuff(5) = %d\n", doStuff(5));
+	a = 6;
+	printf ("a = 6: doStuff(-3) = %d\n", doStuff(-3));
+	a = -6;
+	printf ("a = -6: doStuff(3) = %d\n", doStuff(3));
+
+	return 0;
+}

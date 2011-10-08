@@ -32,4 +32,6 @@
 
 O_CLASS (FunctionDeclaration, Declaration);
 
+void FunctionDeclaration_generateFunction (struct FunctionDeclaration *self);
+
 #endif /* FUNDECLARATION_H */

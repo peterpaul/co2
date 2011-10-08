@@ -72,6 +72,46 @@ FunctionDeclaration_generate_formal_arg (void *_decl, va_list * ap)
   O_CALL (decl, generate);
 }
 
+void FunctionDeclaration_generateFunction (struct FunctionDeclaration *self)
+{
+  // don't generate for definitions
+  if (!self->body)
+    {
+      return;
+    }
+  bool first_formal_arg = true;
+  struct FunctionType *function_type = o_cast (self->type, FunctionType ());
+  O_CALL (function_type->return_type, generate);
+  fprintf (out, " ");
+  O_CALL (self->name, generate);
+  fprintf (out, " (");
+  O_CALL (self->formal_arguments, map_args,
+	  FunctionDeclaration_generate_formal_arg, &first_formal_arg);
+  fprintf (out, ")\n");
+  fprintf (out, "{\n");
+      
+  if (function_type->has_var_args)
+    {
+      fprintf (out, "va_list ap;\n");
+      fprintf (out, "va_start (ap, ");
+      struct ArgumentDeclaration *arg_decl =
+	O_CALL (self->formal_arguments, get,
+		self->formal_arguments->length - 2);
+      O_CALL (arg_decl->name, generate);
+      fprintf (out, ");\n");
+    }
+  O_BRANCH_CALL (self->body, generate);
+      
+  if (function_type->has_var_args && 
+      (o_is_of (function_type->return_type, PrimitiveType ())
+       && ((struct PrimitiveType *) function_type->return_type)->token->type == VOID))
+    {
+      fprintf (out, "va_end (ap);\n");
+    }
+      
+  fprintf (out, "}\n\n");
+}
+
 void
 FunctionDeclaration_find_in_interface (void *_self, va_list * app)
 {
@@ -144,9 +184,16 @@ O_IMPLEMENT (FunctionDeclaration, void, type_check, (void *_self))
   O_BRANCH_CALL (current_context, remove_last);
 }
 
+O_IMPLEMENT (FunctionDeclaration, void, generate, (void *_self))
+{
+  struct FunctionDeclaration *self = O_CAST (_self, FunctionDeclaration ());
+  FunctionDeclaration_generateFunction (self);
+}
+
 O_OBJECT (FunctionDeclaration, Declaration);
 O_OBJECT_METHOD (FunctionDeclaration, ctor);
 O_OBJECT_METHOD (FunctionDeclaration, dtor);
 O_OBJECT_METHOD (FunctionDeclaration, accept);
 O_OBJECT_METHOD (FunctionDeclaration, type_check);
+O_OBJECT_METHOD (FunctionDeclaration, generate);
 O_END_OBJECT

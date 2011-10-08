@@ -1,0 +1,3 @@
+a = 5: doStuff(5) = 10
+a = 6: doStuff(-3) = 3
+a = -6: doStuff(3) = -3
