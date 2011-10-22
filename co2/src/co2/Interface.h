@@ -36,7 +36,7 @@
 
 #define O_IMPLEMENT_IF(klass,type,name,args,act_args)			\
 	O_IMPLEMENT_IF_BINDING(klass,type,name,args,act_args)		\
-	static O_FUNCTION_DEF(_##klass,type,name,args)
+	O_FUNCTION_DEF(_##klass,type,name,args)
 
 #define O_OBJECT_IF(IF)							\
 	{								\
@@ -45,6 +45,9 @@
 
 #define O_OBJECT_IF_METHOD(klass,method)		\
 	interface->method = klass##_##method##_impl
+
+#define O_OBJECT_IF_METHOD_BINDING(klass,if_method,method)	\
+	interface->if_method = klass##_##method##_impl
 
 #define O_OBJECT_IF_END				\
 	}
