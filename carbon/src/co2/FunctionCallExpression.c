@@ -31,6 +31,7 @@
 #include "co2/RefList.h"
 #include "co2/ConditionalBinaryExpression.h"
 #include "co2/io.h"
+#include "co2/InterfaceMethodDefinition.h"
 
 #define O_SUPER Expression()
 
@@ -91,7 +92,21 @@ O_IMPLEMENT (FunctionCallExpression, void, generate, (void *_self))
 	    {
 	      fprintf (out, "O_CALL_IF ");
 	      fprintf (out, "(");
-	      O_CALL (fun_decl->interface_decl->name, generate);
+	      if (!fun_decl->implemented_methods)
+		{
+		  struct InterfaceDeclaration *interface_decl = O_CALL (current_context, find, InterfaceDeclaration ());
+		  O_CALL (interface_decl->name, generate);		  
+		}
+	      else if (fun_decl->implemented_methods->length == 1)
+		{
+		  struct InterfaceMethodDefinition *method_def = O_CAST (O_CALL (fun_decl->implemented_methods, get, 0), InterfaceMethodDefinition ());
+		  struct InterfaceDeclaration *interface_decl = method_def->interface_decl;
+		  O_CALL (interface_decl->name, generate);
+		}
+	      else
+		{
+		  error (function->token, "ambiguous method name: %s\n", function->token->name->data);
+		}
 	      bool is_first_arg = false;
 	      fprintf (out, ", self, ");
 	      O_CALL (function->token, generate);

@@ -53,20 +53,20 @@ O_IMPLEMENT (InterfaceDeclaration, void, accept, (void *_self, struct BaseCompil
   O_BRANCH_CALL (current_context, remove_last);
 }
 
-static void InterfaceDeclaration_add_member_to_scope(void *_decl, va_list *app)
-{
-  struct Declaration *decl = O_CAST(_decl, Declaration ());
-  struct InterfaceDeclaration *self = O_GET_ARG (InterfaceDeclaration);
-  O_CALL (self->member_scope, declare, decl);
-  O_CALL (self->members, append, decl);
-}
-
 static void InterfaceDeclaration_add_to_scope(void *_token, va_list *app)
 {
   struct Token *token = O_CAST(_token, Token ());
   struct InterfaceDeclaration *interface = O_CAST(O_CALL (global_scope, lookup, token), InterfaceDeclaration ());
   struct InterfaceDeclaration *self = O_GET_ARG (InterfaceDeclaration);
-  O_CALL (interface->members, map_args, InterfaceDeclaration_add_member_to_scope, self);
+
+  void InterfaceDeclaration_add_member_to_scope(void *_decl)
+  {
+    struct Declaration *decl = O_CAST(_decl, Declaration ());
+    O_CALL (self->member_scope, declare, decl);
+    O_CALL (self->members, append, decl);
+  }
+
+  O_CALL (interface->members, map, InterfaceDeclaration_add_member_to_scope);
 }
 
 O_IMPLEMENT (InterfaceDeclaration, void, type_check, (void *_self))
@@ -77,17 +77,6 @@ O_IMPLEMENT (InterfaceDeclaration, void, type_check, (void *_self))
   O_BRANCH_CALL (self->interfaces, map_args, InterfaceDeclaration_add_to_scope, self);
   O_CALL (self->members, map, CompileObject_type_check);
   O_BRANCH_CALL (current_context, remove_last);
-}
-
-static void InterfaceDeclaration_is_compatible_with_class(void *_self, va_list *app)
-{
-  struct Token *self = O_CAST(_self, Token ());
-  struct InterfaceDeclaration *interface = O_CAST(va_arg(*app, struct InterfaceDeclaration*), InterfaceDeclaration ());
-  bool *found = va_arg(*app, bool*);
-  if (strcmp(self->name->data, interface->name->name->data) == 0) 
-    {
-      *found = true;
-    }
 }
 
 static struct ClassDeclaration *InterfaceDeclaration_get_super_class(struct ClassDeclaration *decl)
@@ -107,6 +96,16 @@ O_IMPLEMENT (InterfaceDeclaration, bool, is_compatible,
   struct InterfaceDeclaration *self = O_CAST (_self, InterfaceDeclaration ());
   struct ObjectTypeDeclaration *other = o_cast (_other, ObjectTypeDeclaration ());
   bool found = false;
+
+  void InterfaceDeclaration_is_compatible_with_class(void *_self)
+  {
+    struct Token *token = O_CAST(_self, Token ());
+    if (strcmp(token->name->data, self->name->name->data) == 0) 
+      {
+	found = true;
+      }
+  }
+
   if (o_is_of (other, ClassDeclaration ()))
     {
       struct ClassDeclaration *class_decl = O_CAST (other, ClassDeclaration ());

@@ -22,6 +22,7 @@
 #include "co2/VariableDeclaration.h"
 #include "co2/FunctionDeclaration.h"
 #include "co2/InterfaceDeclaration.h"
+#include "co2/InterfaceMethodDefinition.h"
 #include "co2/ConstructorDeclaration.h"
 #include "co2/DestructorDeclaration.h"
 #include "co2/StructDeclaration.h"
@@ -61,14 +62,7 @@ ClassDeclaration_generate_method_registration (void *_method_decl,
     O_CAST (_method_decl, FunctionDeclaration ());
   struct ClassDeclaration *class_decl = O_GET_ARG (ClassDeclaration);
   fprintf (out, "; \\\n O_METHOD (");
-  if (method_decl->interface_decl)
-    {
-      O_CALL (method_decl->interface_decl->name, generate);
-    }
-  else
-    {
-      O_CALL (class_decl->name, generate);
-    }
+  O_CALL (class_decl->name, generate);
   fprintf (out, ", ");
   O_CALL (method_decl->name, generate);
   fprintf (out, ")");
@@ -266,11 +260,6 @@ O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitFunctionDeclaration, (void *_se
 	  return;
 	}
 
-      if (self->interface_decl)
-	{
-	  return;
-	}
-      
       struct FunctionType *method_type =
 	o_cast (self->type, FunctionType ());
       fprintf (out, "O_METHOD_DEF (");

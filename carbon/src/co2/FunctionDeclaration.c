@@ -25,6 +25,7 @@
 #include "co2/ArgumentDeclaration.h"
 #include "co2/ClassDeclaration.h"
 #include "co2/InterfaceDeclaration.h"
+#include "co2/InterfaceMethodDefinition.h"
 #include "grammar.h"
 #include "co2/PrimitiveType.h"
 
@@ -112,7 +113,7 @@ void FunctionDeclaration_generateFunction (struct FunctionDeclaration *self)
   fprintf (out, "}\n\n");
 }
 
-void
+static void
 FunctionDeclaration_find_in_interface (void *_self, va_list * app)
 {
   struct Token *self = O_CAST (_self, Token ());
@@ -130,19 +131,26 @@ FunctionDeclaration_find_in_interface (void *_self, va_list * app)
 	  if (O_CALL (interface_decl->member_scope, exists,
 		      function_decl->name))
 	    {
-	      function_decl->interface_decl =
-		interface_decl;
+	      if (function_decl->body)
+		{
+		  struct InterfaceMethodDefinition * implementation = O_CALL_CLASS (InterfaceMethodDefinition (), new, interface_decl->name, function_decl->name);
+		  implementation->interface_decl = O_CALL (interface_decl, retain);
+		  implementation->method_decl = O_CALL (interface_decl->member_scope, lookup, function_decl->name);
+		  O_CALL (implementation->method_decl, retain);
+		  O_CALL (function_decl->implemented_methods, append, implementation);
+		}
 	    }
+	  O_BRANCH_CALL (interface_decl->interfaces, map_args, FunctionDeclaration_find_in_interface, function_decl);
 	}
       else
 	{
-	  error (function_decl->name, "%s is not an interface",
+	  error (function_decl->name, "%s is not an interface\n",
 		 _decl->name->name->data);
 	}
     }
 }
 
-void
+static void
 FunctionDeclaration_find_in_interface_ (void *_self, ...)
 {
   va_list ap;
@@ -151,12 +159,39 @@ FunctionDeclaration_find_in_interface_ (void *_self, ...)
   va_end (ap);
 }
 
+static void FunctionDeclaration_type_check_implemented_methods (void *_implemented_method, va_list *app)
+{
+  struct InterfaceMethodDefinition * implemented_method = O_CAST (_implemented_method, InterfaceMethodDefinition ());
+  struct FunctionDeclaration * fun_decl = O_GET_ARG (FunctionDeclaration);
+
+  struct Declaration *_interface_decl = O_CALL (global_scope, lookup, implemented_method->interface_name);
+  if (!o_is_of(_interface_decl, InterfaceDeclaration ()))
+    {
+      error (implemented_method->interface_name, "Not an interface: '%s'\n", implemented_method->interface_name->name->data);
+      return;
+    }
+  implemented_method->interface_decl = O_CAST (O_CALL (_interface_decl, retain), InterfaceDeclaration ());
+
+  if (implemented_method->method_name == NULL)
+    {
+      implemented_method->method_name = O_CALL (fun_decl->name, retain);
+    }
+  struct Declaration *_method_decl = O_CALL (implemented_method->interface_decl->member_scope, lookup, implemented_method->method_name);
+  if (!o_is_of(_method_decl, FunctionDeclaration ()))
+    {
+      error (implemented_method->method_name, "Not a function: '%s'\n", implemented_method->method_name->name->data);
+      return;
+    }
+  implemented_method->method_decl = O_CAST (O_CALL (_method_decl, retain), FunctionDeclaration ());
+}
+
 O_IMPLEMENT (FunctionDeclaration, void, type_check, (void *_self))
 {
   struct FunctionDeclaration *self = O_CAST (_self, FunctionDeclaration ());
   O_BRANCH_CALL (current_context, add, self);
   O_CALL (self->type, type_check);
   O_CALL (self->formal_arguments, map, CompileObject_type_check);
+  O_BRANCH_CALL (self->implemented_methods, map_args, FunctionDeclaration_type_check_implemented_methods, self);
   O_BRANCH_CALL (self->body, type_check);
 
   struct FunctionType *function_type = o_cast (self->type, FunctionType ());

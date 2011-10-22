@@ -27,7 +27,7 @@
 #define FunctionDeclaration_Attr		\
   Declaration_Attr;				\
   struct RefList * formal_arguments;		\
-  struct InterfaceDeclaration * interface_decl;	\
+  struct RefList * implemented_methods;		\
   struct Statement * body
 
 O_CLASS (FunctionDeclaration, Declaration);

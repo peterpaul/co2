@@ -188,9 +188,9 @@ static int InterfaceDeclaration_compare_Class (const struct InterfaceDeclaration
   O_BRANCH_CALL (decl2->interfaces, map_args, Token_equals_callback, decl1->name, &depends);
   if (depends)
     {
-      fprintf (stderr, "%s depends on %s\n", decl2->name->name->data, decl1->name->name->data);
       return -1;
     }
+  return 0;
 }
 
 static bool ClassDeclaration_1_depends_on_2 (const struct ClassDeclaration * decl1, const struct ClassDeclaration * decl2)

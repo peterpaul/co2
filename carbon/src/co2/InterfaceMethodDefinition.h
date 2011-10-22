@@ -16,27 +16,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef ObjectTypeDeclaration_H
-#define ObjectTypeDeclaration_H
+#ifndef InterfaceMethodDefinition_H
+#define InterfaceMethodDefinition_H
 
-#include "co2/Declaration.h"
+#include "co2/CompileObject.h"
+#include "co2/Token.h"
 
-O_METHOD_DEF (ObjectTypeDeclaration, bool, is_compatible,
-	      (void *_self, void *_other));
+#define InterfaceMethodDefinitionClass_Attr	\
+  CompileObjectClass_Attr
 
-#define ObjectTypeDeclarationClass_Attr			\
-  DeclarationClass_Attr;				\
-  O_METHOD(ObjectTypeDeclaration, is_compatible)
+#define InterfaceMethodDefinition_Attr		\
+  CompileObject_Attr;				\
+  struct Token * interface_name;		\
+  struct Token * method_name;			\
+  struct InterfaceDeclaration * interface_decl;	\
+  struct FunctionDeclaration * method_decl
 
-#define ObjectTypeDeclaration_Attr		\
-  Declaration_Attr;				\
-  struct RefList * members;			\
-  struct Scope * member_scope
+O_CLASS(InterfaceMethodDefinition, CompileObject);
 
-O_CLASS (ObjectTypeDeclaration, Declaration);
-
-void ObjectTypeDeclaration_generate_method_arguments (void *_arg);
-void ObjectTypeDeclaration_generate_method_argument_names (void *_arg);
-void ObjectTypeDeclaration_generate_method_registration_2 (void *_method_decl, va_list * app);
-
-#endif /* ObjectTypeDeclaration_H */
+#endif /* InterfaceMethodDefinition_H */

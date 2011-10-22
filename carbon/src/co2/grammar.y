@@ -26,6 +26,7 @@
 #include "co2/DestructorDeclaration.h"
 #include "co2/FunctionDeclaration.h"
 #include "co2/InterfaceDeclaration.h"
+#include "co2/InterfaceMethodDefinition.h"
 #include "co2/StructDeclaration.h"
 #include "co2/TypeDeclaration.h"
 #include "co2/VariableDeclaration.h"
@@ -160,6 +161,8 @@
 %type	<declaration>	function_declaration
 %type	<declaration>	function_header
 %type	<token>		header_file
+%type	<object>	implemented_interface_method
+%type	<list>		implemented_interface_methods
 %type	<declaration>	interface_declaration
 %type	<declaration>	interface_header
 %type	<list>		interface_list
@@ -409,11 +412,34 @@ variable_declaration_id
 ;
 
 function_declaration
-:	function_header statement
+:	function_header implemented_interface_methods statement
 {
   struct FunctionDeclaration * decl = O_CAST($1, FunctionDeclaration());
-  decl->body = O_CALL($2, retain);
+  decl->implemented_methods = O_CALL($2, retain);
+  decl->body = O_CALL($3, retain);
   O_CALL(current_scope, leave);
+}
+;
+
+implemented_interface_methods
+:	implemented_interface_methods implemented_interface_method
+{
+  O_CALL ($1, append, $2);
+}
+|	/* empty */
+{
+  $$ = O_CALL_CLASS (RefList (), new, 8, InterfaceMethodDefinition ());
+}
+;
+
+implemented_interface_method
+:	',' TYPE_IDENTIFIER
+{
+  $$ = O_CALL_CLASS (InterfaceMethodDefinition (), new, $2, NULL);
+}
+|	',' TYPE_IDENTIFIER '.' IDENTIFIER
+{
+  $$ = O_CALL_CLASS (InterfaceMethodDefinition (), new, $2, $4);
 }
 ;
 

@@ -56,6 +56,7 @@ pass/import.sh\
 pass/include_subfolder.sh\
 pass/include_variable_and_function.sh\
 pass/interface_cast.sh\
+pass/interface_decl_diamont.sh\
 pass/interface_decl_mixin.sh\
 pass/interface_decl.sh\
 pass/interface_implementation.sh\
