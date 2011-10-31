@@ -426,7 +426,7 @@ void *o_get_class(const char *class_name)
 	struct ClassHashmapTuple *tuple =
 	    o_find_class_hashmap_tuple(class_hashmap[index], class_name);
 
-	return tuple->class;;
+	return tuple->class;
 }
 
 void o_print_classes(FILE * fp)

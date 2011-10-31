@@ -63,7 +63,6 @@ O_IMPLEMENT (RefList, void *, resize, (void *_self, unsigned size))
   struct RefList *self = O_CAST (_self, RefList ());
   assert (size >= self->length);
   self->data = realloc (self->data, sizeof (void *[size]));
-  if (size > 0);
   self->max = size;
   return self;
 }

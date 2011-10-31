@@ -64,7 +64,7 @@ O_IMPLEMENT (SuperExpression, void, type_check, (void *_self))
   self->class_context = O_BRANCH_CALL (current_context, find, ClassDeclaration ());
   /* get method context */
   self->method_context =
-    O_BRANCH_CALL (current_context, find, ConstructorDeclaration ());;
+    O_BRANCH_CALL (current_context, find, ConstructorDeclaration ());
   if (self->method_context == NULL)
     {
       self->method_context =

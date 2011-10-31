@@ -253,6 +253,7 @@ main (int argc, char **argv)
 		  break;
 		default:
 		  error (NULL, "invalid option: %s\n", argv[arg]);
+		  break;
 		}
 	    }
 	  else if (strcmp (argv[arg], "--help") == 0)

@@ -83,7 +83,7 @@ O_IMPLEMENT (ObjectType, struct Token *, get_token, (void *_self))
 O_IMPLEMENT (ObjectType, struct String *, to_string, (void *_self))
 {
   struct ObjectType *self = O_CAST (_self, ObjectType ());
-  return O_CALL_CLASS (String (), new, "%s", self->token->name->data);;
+  return O_CALL_CLASS (String (), new, "%s", self->token->name->data);
 }
 
 O_IMPLEMENT (ObjectType, bool, is_compatible, (void *_self, void *_other))

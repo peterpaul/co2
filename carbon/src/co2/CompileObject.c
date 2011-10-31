@@ -43,7 +43,7 @@ type_filter (void *_member, va_list * app)
 int
 not_type_filter (void *_member, va_list * app)
 {
-  return !type_filter (_member, app);;
+  return !type_filter (_member, app);
 }
 
 void
