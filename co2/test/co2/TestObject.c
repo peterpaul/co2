@@ -21,7 +21,7 @@
 
 #include "co2/MyObject.h"
 #include "co2/MySingleton.h"
-#include "co2/TestInterface.h"
+#include "co2/MyInterfaceImpl.h"
 
 int test_if(void *_self)
 {
@@ -96,8 +96,8 @@ int main(void)
 	printf("\n");
 	fflush(stdout);
 
-	struct TestInterface *IF = O_CALL_CLASS(TestInterface(), new, 8);
-	printf("test_if returned: %d\n", MyInterface_getValue(IF));
+	struct MyInterfaceImpl *IF = O_CALL_CLASS(MyInterfaceImpl(), new, 8);
+	printf("test_if returned: %d\n", O_CALL_IF(MyInterface, IF, getValue));
 
 	/* o_cleanup_class_hashmap(); */
 

@@ -44,6 +44,7 @@ O_IMPLEMENT(ArrayList, void *, prepend, (void *_self, void *item))
   memmove(&self->data[1], &self->data[0], sizeof(void *[self->length]));
   O_CALL(self, set, 0, item);
   self->length ++;
+  return item;
 }
 
 O_IMPLEMENT(ArrayList, void *, append, (void *_self, void *item))
@@ -55,6 +56,7 @@ O_IMPLEMENT(ArrayList, void *, append, (void *_self, void *item))
     }
   O_CALL(self, set, self->length, item);
   self->length ++;
+  return item;
 }
 
 static void ArrayList_append_item(void *_item, va_list * ap)
@@ -154,4 +156,11 @@ O_IMPLEMENT(ArrayList, void *, getIterator, (void *_self));
 O_OBJECT(ArrayList, Array);
 O_OBJECT_METHOD(ArrayList, ctor);
 O_OBJECT_METHOD(ArrayList, dtor);
+O_OBJECT_METHOD(ArrayList, prepend);
+O_OBJECT_METHOD(ArrayList, append);
+O_OBJECT_METHOD(ArrayList, merge);
+O_OBJECT_METHOD(ArrayList, map);
+O_OBJECT_METHOD(ArrayList, map_args);
+O_OBJECT_METHOD(ArrayList, filter);
+O_OBJECT_METHOD(ArrayList, filter_args);
 O_END_OBJECT

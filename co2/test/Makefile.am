@@ -11,20 +11,20 @@ co2/IList.c\
 co2/LinkedList.c\
 co2/ListList.c\
 co2/MyInterface.c\
+co2/MyInterfaceImpl.c\
 co2/MyObject.c\
 co2/MySingleton.c\
 co2/RefArray.c\
-co2/TestInterface.c\
 co2/Array.h\
 co2/ArrayList.h\
 co2/IList.h\
 co2/LinkedList.h\
 co2/ListList.h\
 co2/MyInterface.h\
+co2/MyInterfaceImpl.h\
 co2/MyObject.h\
 co2/MySingleton.h\
-co2/RefArray.h\
-co2/TestInterface.h
+co2/RefArray.h
 
 libtest_a_CPPFLAGS=-I$(top_srcdir)/src
 
