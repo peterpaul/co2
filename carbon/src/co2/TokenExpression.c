@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "co2/Declaration.h"
-#include "co2/Scope.h"
+#include "co2/IScope.h"
 #include "co2/TokenExpression.h"
 #include "grammar.h"
 #include "co2/PrimitiveType.h"
@@ -39,15 +39,6 @@ O_IMPLEMENT (TokenExpression, void *, ctor, (void *_self, va_list * app))
   if (self->token->type == IDENTIFIER || self->token->type == TYPE_IDENTIFIER || self->token->type == CLASS)
     {
       self->scope = current_scope;
-      if (self->scope && O_CALL (self->scope, exists, self->token))
-	{
-	  self->decl = O_CALL (self->scope, lookup, self->token);
-	}
-      if (!self->decl && O_CALL (global_scope, exists, self->token))
-	{
-	  self->decl = O_CALL (global_scope, lookup, self->token);
-	}
-      O_BRANCH_CALL (self->decl, retain);
     }
   self->check_global_scope = true;
   return self;
@@ -90,13 +81,25 @@ O_IMPLEMENT (TokenExpression, void, generate_left, (void *_self, bool left))
 O_IMPLEMENT (TokenExpression, void, set_scope, (void *_self, void *_scope))
 {
   struct TokenExpression *self = O_CAST (_self, TokenExpression ());
-  self->scope = O_CAST (_scope, Scope ());
+  self->scope = O_CAST_INTERFACE (_scope, IScope ());
   self->check_global_scope = false;
 }
 
 O_IMPLEMENT (TokenExpression, void, type_check, (void *_self))
 {
   struct TokenExpression *self = O_CAST (_self, TokenExpression ());
+  if (self->token->type == IDENTIFIER || self->token->type == TYPE_IDENTIFIER || self->token->type == CLASS)
+    {
+      if (self->scope && O_CALL_IF (IScope, self->scope, exists, self->token))
+	{
+	  self->decl = O_CALL_IF (IScope, self->scope, lookup, self->token);
+	}
+      if (!self->decl && O_CALL_IF (IScope, global_scope, exists, self->token))
+	{
+	  self->decl = O_CALL_IF (IScope, global_scope, lookup, self->token);
+	}
+      O_BRANCH_CALL (self->decl, retain);
+    }
   switch (self->token->type)
     {
     case TYPE_IDENTIFIER:
@@ -189,18 +192,18 @@ O_IMPLEMENT (TokenExpression, void, lookup, (void *_self))
   O_BRANCH_CALL (self->decl, release);
   if (self->check_global_scope)
     {
-      if (O_CALL (self->scope, exists, self->token))
+      if (O_CALL_IF (IScope, self->scope, exists, self->token))
 	{
-	  self->decl = O_CALL (self->scope, lookup, self->token);
+	  self->decl = O_CALL_IF (IScope, self->scope, lookup, self->token);
 	}
       else
 	{
-	  self->decl = O_CALL (global_scope, lookup, self->token);
+	  self->decl = O_CALL_IF (IScope, global_scope, lookup, self->token);
 	}
     }
   else
     {
-      self->decl = O_CALL (self->scope, lookup, self->token);
+      self->decl = O_CALL_IF (IScope, self->scope, lookup, self->token);
     }
   O_BRANCH_CALL (self->decl, retain);
 }

@@ -38,9 +38,6 @@
 #include "co2/Type.h"
 #include "co2/io.h"
 
-int new_constructor_filter (void *_constructor);
-void FunctionDeclaration_generate_formal_arg (void *_decl, va_list * ap);
-
 static void
 ClassDeclaration_generate_constructor_arguments (void *_arg)
 {
@@ -83,41 +80,9 @@ ClassDeclaration_generate_method_implementation_2 (void *_interface_name,
   struct ClassDeclaration *class_decl = O_GET_ARG (ClassDeclaration);
 
   struct Declaration *_decl =
-    O_CALL (global_scope, lookup_in_this_scope, interface_name);
+    O_CALL_IF (IScope, global_scope, lookup_in_this_scope, interface_name);
   struct InterfaceDeclaration *interface_decl =
     O_CAST (_decl, InterfaceDeclaration ());
-
-  void generate_mixin_method_registration (void *_method_decl)
-  {
-    struct FunctionDeclaration *method_decl = O_CAST (_method_decl, FunctionDeclaration ());
-    
-    if (method_decl->body && !O_CALL (class_decl->member_scope, exists, method_decl->name))
-      {
-	fprintf (out, "O_OBJECT_METHOD (");
-	O_CALL (interface_decl->name, generate);
-	fprintf (out, ", ");
-	O_CALL (method_decl->name, generate);
-	fprintf (out, ");\n");
-      }
-  }
-
-  void generate_mixin_interface_method_registration (void *_method_decl)
-  {
-    struct FunctionDeclaration *method_decl = O_CAST (_method_decl, FunctionDeclaration ());
-    
-    if (method_decl->body && !O_CALL (class_decl->member_scope, exists, method_decl->name))
-      {
-	fprintf (out, "O_OBJECT_IF_METHOD_BINDING (");
-	O_CALL (class_decl->name, generate);
-	fprintf (out, ", ");
-	O_CALL (method_decl->name, generate);
-	fprintf (out, ", ");
-	O_CALL (method_decl->name, generate);
-	fprintf (out, ");\n");
-      }
-  }
-
-  O_CALL (interface_decl->members, map, generate_mixin_method_registration);
 
   /**
    * Iterate over all methods of a class.
@@ -134,7 +99,9 @@ ClassDeclaration_generate_method_implementation_2 (void *_interface_name,
 	void generate_method_bindings_filter_2 (void *_if)
 	{
 	  struct InterfaceMethodDefinition * imd = o_cast (_if, InterfaceMethodDefinition ());
-	  if (imd->interface_decl == interface_decl)
+
+	  if (interface_implements (imd->interface_decl, interface_decl)
+	      && O_CALL_IF (IScope, interface_decl->member_scope, exists, imd->method_decl->name))
 	    {
 	      fprintf (out, "O_OBJECT_IF_METHOD_BINDING (");
 	      O_CALL (class_decl->name, generate);
@@ -154,8 +121,6 @@ ClassDeclaration_generate_method_implementation_2 (void *_interface_name,
   O_CALL (interface_name, generate);
   fprintf (out, ");\n");
 
-  O_CALL (interface_decl->members, map, generate_mixin_interface_method_registration);
-
   O_CALL (class_decl->members, map, generate_method_bindings_filter_1);
 
   fprintf (out, "O_OBJECT_IF_END\n");
@@ -169,32 +134,40 @@ static void ClassDeclaration_generate_interface_method_binding (void *_interface
   struct ClassDeclaration *class_decl = O_GET_ARG (ClassDeclaration);
 
   struct Declaration *_decl =
-    O_CALL (global_scope, lookup_in_this_scope, interface_name);
+    O_CALL_IF (IScope, global_scope, lookup_in_this_scope, interface_name);
   struct InterfaceDeclaration *interface_decl =
     O_CAST (_decl, InterfaceDeclaration ());
 
   void generate_interface_method_binding_impl (void *_decl)
   {
-    struct FunctionDeclaration * method_decl = O_CAST (_decl, FunctionDeclaration ());
+    struct FunctionDeclaration * if_method_decl = O_CAST (_decl, FunctionDeclaration ());
 
-    if (method_decl->body && 
-	!O_CALL (class_decl->member_scope, exists, method_decl->name))
+    struct FunctionDeclaration * method_decl = NULL;
+    if (O_CALL_IF (IScope, class_decl->member_scope, exists, if_method_decl->name))
       {
-	struct FunctionType *method_type =
-	  o_cast (method_decl->type, FunctionType ());
-	fprintf (out, "O_IMPLEMENT_IF_BINDING (");
-	O_CALL (class_decl->name, generate);
-	fprintf (out, ", ");
-	O_CALL (method_type->return_type, generate);
-	fprintf (out, ", ");
-	O_CALL (method_decl->name, generate);
-	fprintf (out, ", (void *_self");
-	O_CALL (method_decl->formal_arguments, map,
-		ObjectTypeDeclaration_generate_method_arguments);
-	fprintf (out, "), (_self");
-	O_CALL (method_decl->formal_arguments, map,
-		ObjectTypeDeclaration_generate_method_argument_names);
-	fprintf (out, "));\n");
+	method_decl = O_BRANCH_CAST (O_CALL_IF (IScope, class_decl->member_scope, lookup, if_method_decl->name), FunctionDeclaration ());
+      }
+    if (if_method_decl->body && (method_decl && !method_decl->body))
+      {
+	if (!method_decl->binding_generated)
+	  {
+	    struct FunctionType *method_type =
+	      o_cast (if_method_decl->type, FunctionType ());
+	    fprintf (out, "O_IMPLEMENT_IF_BINDING (");
+	    O_CALL (class_decl->name, generate);
+	    fprintf (out, ", ");
+	    O_CALL (method_type->return_type, generate);
+	    fprintf (out, ", ");
+	    O_CALL (if_method_decl->name, generate);
+	    fprintf (out, ", (void *_self");
+	    O_CALL (if_method_decl->formal_arguments, map,
+		    ObjectTypeDeclaration_generate_method_arguments);
+	    fprintf (out, "), (_self");
+	    O_CALL (if_method_decl->formal_arguments, map,
+		    ObjectTypeDeclaration_generate_method_argument_names);
+	    fprintf (out, "));\n");
+	    method_decl->binding_generated = true;
+	  }
       }
   }
 
@@ -518,7 +491,7 @@ O_IMPLEMENT_IF(GenerateSourceVisitor, void, visitFunctionDeclaration, (void *_se
     }
   else
     {
-      if (self->scope->type != GLOBAL_SCOPE)
+      if (O_CALL_IF (IScope, self->scope, get_type) != GLOBAL_SCOPE)
 	{
 	  return;
 	}
@@ -546,7 +519,7 @@ O_IMPLEMENT_IF(GenerateSourceVisitor, void, visitVariableDeclaration, (void *_se
   struct BaseCompileObjectVisitor *visitor = O_CAST(_self, BaseCompileObjectVisitor());
   struct VariableDeclaration *self = O_CAST(_object, VariableDeclaration());
 
-  if (self->scope && self->scope->type != GLOBAL_SCOPE)
+  if (self->scope && O_CALL_IF (IScope, self->scope, get_type) != GLOBAL_SCOPE)
     {
       // only generate global declarations
       return;

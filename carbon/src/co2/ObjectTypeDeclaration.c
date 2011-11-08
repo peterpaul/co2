@@ -23,6 +23,7 @@
 #include "co2/ConstructorDeclaration.h"
 #include "co2/DestructorDeclaration.h"
 #include "co2/InterfaceDeclaration.h"
+#include "co2/InterfaceMethodDefinition.h"
 #include "co2/Type.h"
 #include "co2/ObjectType.h"
 #include "co2/Token.h"
@@ -30,7 +31,7 @@
 #include "co2/FunctionType.h"
 #include "co2/io.h"
 #include "co2/Statement.h"
-#include "co2/Scope.h"
+#include "co2/IScope.h"
 #include "co2/PrimitiveType.h"
 #include "grammar.h"
 
@@ -79,15 +80,26 @@ ObjectTypeDeclaration_generate_method_registration_2 (void *_method_decl,
   struct ObjectTypeDeclaration *class_decl =
     O_CAST (va_arg (*app, struct ObjectTypeDeclaration *),
 	    ObjectTypeDeclaration ());
-  if (!method_decl->body)
+  if (method_decl->body)
     {
-      return;
+      fprintf (out, "O_OBJECT_METHOD (");
+      O_CALL (class_decl->name, generate);
+      fprintf (out, ", ");
+      O_CALL (method_decl->name, generate);
+      fprintf (out, ");\n");
     }
-  fprintf (out, "O_OBJECT_METHOD (");
-  O_CALL (class_decl->name, generate);
-  fprintf (out, ", ");
-  O_CALL (method_decl->name, generate);
-  fprintf (out, ");\n");
+  else
+    {
+      if (method_decl->implemented_methods && method_decl->implemented_methods->length > 0)
+	{
+	  struct InterfaceMethodDefinition *imd = O_CALL (method_decl->implemented_methods, get, 0);
+	  fprintf (out, "O_OBJECT_METHOD (");
+	  O_CALL (imd->interface_name, generate);
+	  fprintf (out, ", ");
+	  O_CALL (method_decl->name, generate);
+	  fprintf (out, ");\n");
+	}
+    }
 }
 
 O_OBJECT (ObjectTypeDeclaration, Declaration);

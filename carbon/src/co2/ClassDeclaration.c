@@ -23,6 +23,7 @@
 #include "co2/ConstructorDeclaration.h"
 #include "co2/DestructorDeclaration.h"
 #include "co2/InterfaceDeclaration.h"
+#include "co2/InterfaceMethodDefinition.h"
 #include "co2/Type.h"
 #include "co2/ObjectType.h"
 #include "co2/Token.h"
@@ -30,7 +31,7 @@
 #include "co2/FunctionType.h"
 #include "co2/io.h"
 #include "co2/Statement.h"
-#include "co2/Scope.h"
+#include "co2/IScope.h"
 #include "co2/PrimitiveType.h"
 #include "grammar.h"
 
@@ -69,7 +70,7 @@ new_constructor_filter (void *_constructor)
     O_CAST (_constructor, ConstructorDeclaration ());
   if (strcmp (constructor->name->name->data, "ctor") != 0)
     {
-      return O_BRANCH_CALL (constructor->scope->parent,
+      return O_BRANCH_CALL_IF (IScope, O_CALL_IF (IScope, constructor->scope, get_parent),
 			    find_type, constructor->name,
 			    ConstructorDeclaration ()) == NULL;
     }
@@ -98,7 +99,69 @@ O_IMPLEMENT (ClassDeclaration, void, type_check, (void *_self))
    * 2. foreach interface, methods already exists in other interface (including interfaces from superclasses), if so: fail
    * 3. class (including superclasses) implements all methods of all interfaces, if not: fail
    */
+
+  void type_check_interfaces (void *_interface_name)
+  {
+    struct Token * interface_name = O_CAST (_interface_name, Token ());
+    void * _interface_decl = O_CALL_IF (IScope, global_scope, lookup, interface_name);
+    
+    if (o_is_of (_interface_decl, InterfaceDeclaration ()))
+      {
+	struct InterfaceDeclaration * interface_decl = O_CAST (_interface_decl, InterfaceDeclaration ());
+
+	void type_check_interface_members (void *_if_method_decl)
+	{
+	  if (o_is_of (_if_method_decl, FunctionDeclaration ()))
+	    {
+	      struct FunctionDeclaration * if_method_decl = O_CAST (_if_method_decl, FunctionDeclaration ());
+
+	      if (if_method_decl->body)
+		{
+		  if (!O_CALL_IF (IScope, self->member_scope, exists_in_this_scope, if_method_decl->name))
+		    {
+		      struct FunctionDeclaration * method_decl = O_CALL_CLASS (FunctionDeclaration (), new, if_method_decl->name, if_method_decl->type, if_method_decl->formal_arguments, NULL);
+		      
+		      method_decl->implemented_methods = O_CALL_CLASS (RefList (), new, 8, InterfaceMethodDefinition ());
+		      struct InterfaceMethodDefinition * imd = O_CALL_CLASS (InterfaceMethodDefinition (), new, interface_name, if_method_decl->name);
+		      imd->interface_decl = O_CALL (interface_decl, retain);
+		      imd->method_decl = O_CALL (if_method_decl, retain);
+		      O_CALL (method_decl->implemented_methods, append, imd);
+		      
+		      O_CALL_IF (IScope, self->member_scope, declare, (struct Declaration *) method_decl);
+		      O_CALL (self->members, append, method_decl);
+		    } 
+		  else
+		    {
+		      struct FunctionDeclaration * method_decl = O_CAST (O_CALL_IF (IScope, self->member_scope, lookup_in_this_scope, if_method_decl->name), FunctionDeclaration ());
+		      
+		      struct InterfaceMethodDefinition * imd = O_CALL_CLASS (InterfaceMethodDefinition (), new, interface_name, if_method_decl->name);
+		      imd->interface_decl = O_CALL (interface_decl, retain);
+		      imd->method_decl = O_CALL (if_method_decl, retain);
+		      O_CALL (method_decl->implemented_methods, append, imd);
+
+		      // O_CALL (self->members, append, method_decl);
+		    }
+		}
+	    }
+	  else
+	    {
+	      struct Declaration * member_decl = O_CAST (_if_method_decl, Declaration ());
+	      error (interface_name, "Not a method: '%s'\n", member_decl->name->name->data);
+	    }
+	}
+
+	O_CALL (interface_decl->members, map, type_check_interface_members);
+      }
+    else
+      {
+	error (interface_name, "Not an interface: '%s'\n", interface_name->name->data);
+      }
+  }
+
+  O_BRANCH_CALL (self->interfaces, map, type_check_interfaces);
+
   O_CALL (self->members, map, CompileObject_type_check);
+
   O_BRANCH_CALL (current_context, remove_last);
 }
 
@@ -112,7 +175,7 @@ O_IMPLEMENT (ClassDeclaration, bool, is_compatible,
       while (other && other->superclass && self != other)
 	{
 	  other =
-	    (struct ClassDeclaration *) O_CALL (global_scope, lookup,
+	    (struct ClassDeclaration *) O_CALL_IF (IScope, global_scope, lookup,
 						other->superclass);
 	}
       return self == other;
@@ -140,7 +203,7 @@ O_IMPLEMENT (ClassDeclaration, void *, find_common_base, (void *_self, void *_ot
       if (self->superclass)
 	{
 	  self =
-	    (struct ClassDeclaration *) O_CALL (global_scope, lookup,
+	    (struct ClassDeclaration *) O_CALL_IF (IScope, global_scope, lookup,
 						self->superclass);
 	}
       else

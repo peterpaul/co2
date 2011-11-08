@@ -26,7 +26,7 @@ O_IMPLEMENT(CatchStatement, void *, ctor, (void *_self, va_list *app))
 {
   struct CatchStatement * self = O_CAST(_self, CatchStatement());
   self = O_SUPER->ctor(self, app);
-  self->scope = O_CAST (va_arg (*app, struct Scope *), Scope ());
+  self->scope = O_GET_ARG_IF (IScope);
   self->argument = O_RETAIN_ARG (ArgumentDeclaration);
   self->body = O_RETAIN_ARG (Statement);
   return self;

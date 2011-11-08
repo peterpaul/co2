@@ -143,9 +143,9 @@ static void Interface_depends_on (const void *_self, va_list *app)
     }
   else
     {
-      if (O_CALL (global_scope, exists, self))
+      if (O_CALL_IF (IScope, global_scope, exists, self))
 	{
-	  struct Declaration *super_decl = O_BRANCH_CALL (global_scope, lookup, self);
+	  struct Declaration *super_decl = O_BRANCH_CALL_IF (IScope, global_scope, lookup, self);
 	  if (o_is_of (super_decl, InterfaceDeclaration ()))
 	    {
 	      if (InterfaceDeclaration_1_depends_on_2 ((struct InterfaceDeclaration *) super_decl, decl2))
@@ -201,9 +201,9 @@ static bool ClassDeclaration_1_depends_on_2 (const struct ClassDeclaration * dec
 	{
 	  return true;
 	}
-      if (O_CALL (global_scope, exists, decl1->superclass))
+      if (O_CALL_IF (IScope, global_scope, exists, decl1->superclass))
 	{
-	  struct Declaration *super_decl = O_BRANCH_CALL (global_scope, lookup, decl1->superclass);
+	  struct Declaration *super_decl = O_BRANCH_CALL_IF (IScope, global_scope, lookup, decl1->superclass);
 	  if (o_is_of (super_decl, ClassDeclaration ()))
 	    {
 	      return ClassDeclaration_1_depends_on_2 ((struct ClassDeclaration *) super_decl, decl2);

@@ -47,7 +47,7 @@ O_IMPLEMENT (ObjectType, void, type_check, (void *_self))
   struct ObjectType *self = O_CAST (_self, ObjectType ());
   if (self->decl == NULL)
     {
-      self->decl = (struct ObjectTypeDeclaration *) O_CALL (global_scope, lookup, self->token);
+      self->decl = (struct ObjectTypeDeclaration *) O_CALL_IF (IScope, global_scope, lookup, self->token);
       O_CAST(self->decl, ObjectTypeDeclaration ());
     }
 }

@@ -31,7 +31,7 @@ O_METHOD_DEF (ObjectTypeDeclaration, bool, is_compatible,
 #define ObjectTypeDeclaration_Attr		\
   Declaration_Attr;				\
   struct RefList * members;			\
-  struct Scope * member_scope
+  struct IScope * member_scope
 
 O_CLASS (ObjectTypeDeclaration, Declaration);
 

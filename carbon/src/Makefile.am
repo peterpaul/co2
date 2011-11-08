@@ -16,6 +16,7 @@ libcarbon_SOURCES=\
 		co2/CompileObject.c\
 		co2/CompileObjectVisitor.c\
 		co2/CompoundStatement.c\
+		co2/CompositeScope.c\
 		co2/ConditionalBinaryExpression.c\
 		co2/ConditionalExpression.c\
 		co2/ConstructorDeclaration.c\
@@ -46,6 +47,7 @@ libcarbon_SOURCES=\
 		co2/IncludeStack.c\
 		co2/InterfaceDeclaration.c\
 		co2/io.c\
+		co2/IScope.c\
 		co2/IsOfExpression.c\
 		co2/NewExpression.c\
 		co2/NestedExpression.c\

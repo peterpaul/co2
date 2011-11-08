@@ -192,8 +192,8 @@ O_IMPLEMENT (NewExpression, void, type_check, (void *_self))
 
 	  O_CALL (token_expr, set_scope, class_decl->member_scope);
 	  /* check whether the token "ctor" is defined */
-	  if (O_CALL (token_expr->scope, exists, token_expr->token) ||
-	      O_CALL (global_scope, exists, token_expr->token))
+	  if (O_CALL_IF (IScope, token_expr->scope, exists, token_expr->token) ||
+	      O_CALL_IF (IScope, global_scope, exists, token_expr->token))
 	    {
 	      O_CALL (token_expr, type_check);
 	      NewExpression_type_check_arguments (token_expr,

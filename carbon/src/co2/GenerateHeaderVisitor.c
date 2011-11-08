@@ -55,30 +55,43 @@ ClassDeclaration_generate_constructor_registration (void *_constructor_decl,
 }
 
 static void
+ObjectTypeDeclaration_generate_method_registration (void *_ot_decl, void *_method_decl, struct Hash *map)
+{
+  struct ObjectTypeDeclaration * ot_decl = O_CAST (_ot_decl, ObjectTypeDeclaration());
+  struct FunctionDeclaration * method_decl =  O_CAST (_method_decl, FunctionDeclaration());
+  if (O_CALL (map, get, method_decl->name->name->data) == NULL)
+    {
+      O_CALL (map, add, method_decl->name->name->data, method_decl);
+      fprintf (out, "; \\\n O_METHOD (");
+      O_CALL (ot_decl->name, generate);
+      fprintf (out, ", ");
+      O_CALL (method_decl->name, generate);
+      fprintf (out, ")");
+    }
+}
+
+static void
 ClassDeclaration_generate_method_registration (void *_method_decl,
 					       va_list * app)
 {
   struct FunctionDeclaration *method_decl =
     O_CAST (_method_decl, FunctionDeclaration ());
   struct ClassDeclaration *class_decl = O_GET_ARG (ClassDeclaration);
-  fprintf (out, "; \\\n O_METHOD (");
-  O_CALL (class_decl->name, generate);
-  fprintf (out, ", ");
-  O_CALL (method_decl->name, generate);
-  fprintf (out, ")");
+  struct Hash *map = O_GET_ARG (Hash);
+  ObjectTypeDeclaration_generate_method_registration (class_decl, method_decl, map);
 }
 
 static void
 ClassDeclaration_generate_attribute_registration (void *_method_decl,
 						  va_list * app)
 {
-  struct VariableDeclaration *method_decl =
+  struct VariableDeclaration *var_decl =
     O_CAST (_method_decl, VariableDeclaration ());
   struct ClassDeclaration *class_decl = O_GET_ARG (ClassDeclaration);
   fprintf (out, "; \\\n ");
-  O_CALL (method_decl->type, generate);
+  O_CALL (var_decl->type, generate);
   fprintf (out, " ");
-  O_CALL (method_decl->name, generate);
+  O_CALL (var_decl->name, generate);
 }
 
 static void
@@ -87,14 +100,10 @@ InterfaceDeclaration_generate_method_registration (void *_method_decl,
 {
   struct FunctionDeclaration *method_decl =
     O_CAST (_method_decl, FunctionDeclaration ());
-  struct InterfaceDeclaration *class_decl =
-    O_CAST (va_arg (*app, struct InterfaceDeclaration *),
-	    InterfaceDeclaration ());
-  fprintf (out, "; \\\n O_METHOD (");
-  O_CALL (class_decl->name, generate);
-  fprintf (out, ", ");
-  O_CALL (method_decl->name, generate);
-  fprintf (out, ")");
+  struct InterfaceDeclaration *interface_decl =
+    O_GET_ARG (InterfaceDeclaration);
+  struct Hash *map = O_GET_ARG (Hash);
+  ObjectTypeDeclaration_generate_method_registration (interface_decl, method_decl, map);
 }
 
 static void ClassDeclaration_generate_mixin_registration (void *_interface_name, va_list *app)
@@ -102,28 +111,24 @@ static void ClassDeclaration_generate_mixin_registration (void *_interface_name,
   struct Token *interface_name =
     O_CAST (_interface_name, Token ());
   struct ClassDeclaration *class_decl = O_GET_ARG (ClassDeclaration);
+  struct Hash *map = O_GET_ARG (Hash);
 
-  struct Declaration * decl = O_CALL (global_scope, lookup_in_this_scope, interface_name);
+  struct Declaration * decl = O_CALL_IF (IScope, global_scope, lookup_in_this_scope, interface_name);
   struct InterfaceDeclaration * interface_decl = O_CAST (decl, InterfaceDeclaration ());
 
   void ClassDeclaration_generate_mixin_method_registration_2 (void *_method_decl)
   {
     struct FunctionDeclaration *method_decl = O_CAST (_method_decl, FunctionDeclaration ());
     
-    if (method_decl->body && !O_CALL (class_decl->member_scope, exists, method_decl->name))
+    if (method_decl->body && !O_CALL_IF (IScope, class_decl->member_scope, exists, method_decl->name))
       {
-	fprintf (out, "; \\\n O_METHOD (");
-	O_CALL (interface_decl->name, generate);
-	fprintf (out, ", ");
-	O_CALL (method_decl->name, generate);
-	fprintf (out, ")");
+        ObjectTypeDeclaration_generate_method_registration(interface_decl, method_decl, map);
       }
   }
 
   O_CALL (interface_decl->members, map, ClassDeclaration_generate_mixin_method_registration_2);
 
-  O_BRANCH_CALL (interface_decl->interfaces, map_args, ClassDeclaration_generate_mixin_registration, class_decl);
-
+  O_BRANCH_CALL (interface_decl->interfaces, map_args, ClassDeclaration_generate_mixin_registration, class_decl, map);
 }
 
 #define O_SUPER BaseCompileObjectVisitor()
@@ -182,11 +187,13 @@ O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitClassDeclaration, (void *_self,
   fprintf (out, "Class_Attr\\\n ");
   generate_superclass (self);
   fprintf (out, "Class_Attr");
+  struct Hash * map = O_CALL_CLASS (Hash (), new);
   O_CALL (new_constructors, map_args,
 	  ClassDeclaration_generate_constructor_registration, self);
   O_CALL (new_methods, map_args,
-	  ClassDeclaration_generate_method_registration, self);
-  O_CALL (self->interfaces, map_args, ClassDeclaration_generate_mixin_registration, self);
+	  ClassDeclaration_generate_method_registration, self, map);
+  O_CALL (self->interfaces, map_args, ClassDeclaration_generate_mixin_registration, self, map);
+  O_CALL (map, delete);
   fprintf (out, "\n\n");
 
   fprintf (out, "#define ");
@@ -332,8 +339,10 @@ O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitInterfaceDeclaration, (void *_s
   O_CALL (self->name, generate);
   fprintf (out, "_Attr\\\n ");
   fprintf (out, "Interface_Attr");
+  struct Hash * map = O_CALL_CLASS (Hash (), new);
   O_CALL (new_methods, map_args,
-	  InterfaceDeclaration_generate_method_registration, self);
+	  InterfaceDeclaration_generate_method_registration, self, map);
+  O_CALL (map, delete);
   fprintf (out, "\n\n");
 
   fprintf (out, "O_CLASS (");
@@ -385,7 +394,7 @@ O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitVariableDeclaration, (void *_se
   struct BaseCompileObjectVisitor *visitor = O_CAST(_self, BaseCompileObjectVisitor());
   struct VariableDeclaration *self = O_CAST(_object, VariableDeclaration());
 
-  if (self->scope && self->scope->type != GLOBAL_SCOPE)
+  if (self->scope && O_CALL_IF (IScope, self->scope, get_type) != GLOBAL_SCOPE)
     {
       // only generate global declarations
       return;

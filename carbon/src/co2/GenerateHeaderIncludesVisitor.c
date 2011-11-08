@@ -58,7 +58,7 @@ O_IMPLEMENT(GenerateHeaderIncludesVisitor, void *, dtor, (void *_self))
 void handle_interface (void *_token, va_list *app)
 {
   struct Token * token = O_CAST (_token, Token ());
-  struct Declaration * decl = O_CALL (global_scope, lookup, token);
+  struct Declaration * decl = O_CALL_IF (IScope, global_scope, lookup, token);
   struct GenerateHeaderIncludesVisitor * visitor = O_GET_ARG (GenerateHeaderIncludesVisitor);
   if (decl)
     {
@@ -78,7 +78,7 @@ O_IMPLEMENT_IF(GenerateHeaderIncludesVisitor, void, visitClassDeclaration, (void
   
   if (self->superclass) 
     {
-      struct Declaration *super = O_CALL (global_scope, lookup, self->superclass);
+      struct Declaration *super = O_CALL_IF (IScope, global_scope, lookup, self->superclass);
       if (super->file && super->file != main_file)
 	{
 	  struct String * filename = O_CALL_CLASS (String (), new, "\"%s.h\"", super->file->name->data);
@@ -98,7 +98,7 @@ O_IMPLEMENT_IF(GenerateHeaderIncludesVisitor, void, visitDeclaration, (void *_se
       O_CALL(visitor->map, set, self->include_file->name->data, self->include_file->name);
       return;
     }
-  if (self->scope && self->scope->type != GLOBAL_SCOPE)
+  if (self->scope && O_CALL_IF (IScope, self->scope, get_type) != GLOBAL_SCOPE)
     {
       // only generate global declarations
       return;

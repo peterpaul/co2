@@ -22,6 +22,8 @@
 #include "co2/CompileObject.h"
 #include "co2/Token.h"
 
+// TODO add new constructor with decls
+
 #define InterfaceMethodDefinitionClass_Attr	\
   CompileObjectClass_Attr
 

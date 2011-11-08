@@ -76,7 +76,10 @@
 #include "co2/io.h"
 #include "co2/Path.h"
 #include "co2/RefList.h"
+#include "co2/List.h"
+#include "co2/IScope.h"
 #include "co2/Scope.h"
+#include "co2/CompositeScope.h"
 #include "co2/Token.h"
 
   extern char *yytext;
@@ -97,7 +100,7 @@
   struct Statement * statement;
   struct Token * token;
   struct Type * type;
-  struct Scope * scope;
+  struct IScope * scope;
 }
 
 %token <token> BREAK
@@ -276,8 +279,8 @@ declaration_list_content
 |	definition_declaration
 |	function_header ';'
 {
-  O_CALL(current_scope, leave);
-  O_CALL(current_scope, declare, $1);
+  O_CALL_IF(IScope, current_scope, leave);
+  O_CALL_IF(IScope, current_scope, declare, $1);
   $$ = O_CALL_CLASS(RefList(), new, 8, Declaration()); 
   O_CALL($$, append, $1); 
 }
@@ -286,25 +289,25 @@ declaration_list_content
 declaration
 :	function_declaration
 {
-  O_CALL(current_scope, declare, $1);
+  O_CALL_IF(IScope, current_scope, declare, $1);
 }
 |	struct_declaration
 |	class_declaration
 |	interface_declaration
 {
-  O_CALL(current_scope, declare, $1);
+  O_CALL_IF(IScope, current_scope, declare, $1);
 }
 |	constructor_declaration
 {
-  O_CALL(current_scope, declare, $1);
+  O_CALL_IF(IScope, current_scope, declare, $1);
 }
 |	destructor_declaration
 {
-  O_CALL(current_scope, declare, $1);
+  O_CALL_IF(IScope, current_scope, declare, $1);
 }
 |	type_declaration
 {
-  O_CALL(current_scope, declare, $1);
+  O_CALL_IF(IScope, current_scope, declare, $1);
 }
 ;
 
@@ -353,8 +356,8 @@ definition_list
 definition
 :	function_header ';'
 {
-  O_CALL(current_scope, leave);
-  O_CALL(current_scope, declare, $1);
+  O_CALL_IF(IScope, current_scope, leave);
+  O_CALL_IF(IScope, current_scope, declare, $1);
   $$ = O_CALL_CLASS(RefList(), new, 8, Declaration());
   O_CALL($$, append, $1);
 }
@@ -397,27 +400,40 @@ variable_declaration_id
 :	IDENTIFIER
 {
   $$ = O_CALL_CLASS(VariableDeclaration(), new, $1, NULL);
-  O_CALL(current_scope, declare, $$);
+  O_CALL_IF(IScope, current_scope, declare, $$);
 }
 |	CLASS
 {
   $$ = O_CALL_CLASS(VariableDeclaration(), new, $1, NULL);
-  O_CALL(current_scope, declare, $$);
+  O_CALL_IF(IScope, current_scope, declare, $$);
 }
 |	IDENTIFIER '=' expression
 {
   $$ = O_CALL_CLASS(VariableDeclaration(), new, $1, $3);
-  O_CALL(current_scope, declare, $$);
+  O_CALL_IF(IScope, current_scope, declare, $$);
 }
 ;
 
 function_declaration
-:	function_header implemented_interface_methods statement
+:	function_header statement
 {
   struct FunctionDeclaration * decl = O_CAST($1, FunctionDeclaration());
-  decl->implemented_methods = O_CALL($2, retain);
-  decl->body = O_CALL($3, retain);
-  O_CALL(current_scope, leave);
+  decl->body = O_CALL($2, retain);
+  O_CALL_IF(IScope, current_scope, leave);
+}
+;
+
+function_header
+:	type IDENTIFIER '(' 
+{ 
+  O_CALL_CLASS(Scope(), new, ARGUMENT_SCOPE, $2); 
+}
+formal_argument_list_var ')' implemented_interface_methods
+{
+  struct FunctionType * type = O_CALL_CLASS(FunctionType(), new_ctor, _FunctionType_ctor_from_decl, $1, $5);
+  struct FunctionDeclaration * decl = O_CALL_CLASS(FunctionDeclaration(), new, $2, type, $5, NULL);
+  decl->implemented_methods = O_CALL($7, retain);
+  $$ = decl;
 }
 ;
 
@@ -440,18 +456,6 @@ implemented_interface_method
 |	',' TYPE_IDENTIFIER '.' IDENTIFIER
 {
   $$ = O_CALL_CLASS (InterfaceMethodDefinition (), new, $2, $4);
-}
-;
-
-function_header
-:	type IDENTIFIER '(' 
-{ 
-  O_CALL_CLASS(Scope(), new, ARGUMENT_SCOPE, $2); 
-}
-formal_argument_list_var ')'
-{
-  struct FunctionType * type = O_CALL_CLASS(FunctionType(), new_ctor, _FunctionType_ctor_from_decl, $1, $5);
-  $$ = O_CALL_CLASS(FunctionDeclaration(), new, $2, type, $5, NULL);
 }
 ;
 
@@ -496,7 +500,7 @@ formal_argument
 :	type IDENTIFIER
 {
   $$ = O_CALL_CLASS(ArgumentDeclaration(), new, $2, $1);
-  O_CALL(current_scope, declare, $$);
+  O_CALL_IF(IScope, current_scope, declare, $$);
 }
 ;
 
@@ -507,9 +511,9 @@ struct_declaration
 }
 '{' struct_declaration_body '}'
 {
-  O_CALL (current_scope, leave);
+  O_CALL_IF (IScope, current_scope, leave);
   $$ = O_CALL_CLASS (StructDeclaration (), new, $2, $<scope>3, $5);
-  O_CALL (current_scope, declare, $$);
+  O_CALL_IF (IScope, current_scope, declare, $$);
 }
 ;
 
@@ -532,17 +536,18 @@ struct_declaration_body
 class_declaration
 :	class_header 
 {
-  O_CALL(current_scope, declare, $1);
+  O_CALL_IF(IScope, current_scope, declare, $1);
   struct ClassDeclaration * decl = O_CAST($1, ClassDeclaration());
   decl->member_scope = O_CALL_CLASS(Scope(), new, CLASS_SCOPE, decl->name);
+  decl->member_scope = O_CALL_CLASS (CompositeScope (), new, decl->member_scope);
 }
 '{' declaration_list '}'
 {
-  O_CALL(current_scope, leave);
+  O_CALL_IF(IScope, current_scope, leave);
   struct ClassDeclaration * decl = O_CAST($1, ClassDeclaration());
   decl->members = O_CALL($4, retain);
   O_CALL(decl->members, map_args, Declaration_set_class_decl, decl);
-  decl->member_scope->parent = NULL;
+  O_CALL_IF (IScope, decl->member_scope, set_parent, NULL);
   $$ =(struct Declaration *) decl;
 }
 ;
@@ -595,7 +600,7 @@ compound_statement
 }
 compound_content_list '}'
 {
-  O_CALL(current_scope, leave);
+  O_CALL_IF(IScope, current_scope, leave);
   $$ = O_CALL_CLASS(CompoundStatement(), new, $3);
 }
 ;
@@ -659,7 +664,7 @@ catch_statement
 }
 '(' formal_argument ')' statement
 {
-  O_CALL (current_scope, leave);
+  O_CALL_IF (IScope, current_scope, leave);
   $$ = O_CALL_CLASS (CatchStatement (), new, $<scope>2, $4, $6);
 }
 ;
@@ -799,10 +804,12 @@ interface_declaration
 {
   struct InterfaceDeclaration * decl = O_CAST($1, InterfaceDeclaration());
   decl->member_scope = O_CALL_CLASS(Scope(), new, INTERFACE_SCOPE, decl->name);
+  decl->member_scope = O_CALL_CLASS (CompositeScope (), new, decl->member_scope);
+
 }
 '{' interface_method_declaration_list '}'
 {
-  O_CALL(current_scope, leave);
+  O_CALL_IF(IScope, current_scope, leave);
   struct InterfaceDeclaration * decl = O_CAST($1, InterfaceDeclaration());
   decl->members = O_CALL($4, retain);
 }
@@ -818,13 +825,13 @@ interface_header
 interface_method_declaration_list
 :	interface_method_declaration_list function_header ';'
 {
-  O_CALL(current_scope, leave);
-  O_CALL(current_scope, declare, $2);
+  O_CALL_IF(IScope, current_scope, leave);
+  O_CALL_IF(IScope, current_scope, declare, $2);
   O_CALL($1, append, $2);
 }
 |	interface_method_declaration_list function_declaration
 {
-  O_CALL(current_scope, declare, $2);
+  O_CALL_IF(IScope, current_scope, declare, $2);
   O_CALL($1, append, $2);
 }
 |	/* empty */
@@ -1016,7 +1023,7 @@ constructor_declaration
 formal_argument_list_var ')' statement
 {
   $$ = O_CALL_CLASS(ConstructorDeclaration(), new, $<token>3, $1, $4, $6);
-  O_CALL(current_scope, leave);
+  O_CALL_IF(IScope, current_scope, leave);
 }
 |	TYPE_IDENTIFIER '.' IDENTIFIER '(' 
 { 
@@ -1025,7 +1032,7 @@ formal_argument_list_var ')' statement
 formal_argument_list_var ')' statement
 {
   $$ = O_CALL_CLASS(ConstructorDeclaration(), new, $3, $1, $6, $8);
-  O_CALL(current_scope, leave);
+  O_CALL_IF(IScope, current_scope, leave);
 }
 ;
 
@@ -1046,10 +1053,11 @@ int parse()
 {
   global_scope = O_CALL_CLASS(Scope(), new, GLOBAL_SCOPE, NULL);
   int result = yyparse();
-  O_CALL(current_scope, leave);
+  O_CALL_IF(IScope, current_scope, leave);
   if(result == 0)
     {
-      assertTrue(current_scope == NULL, "current_scope(%d) is not NULL", current_scope->type);
+      ScopeType scope_type = O_BRANCH_CALL_IF (IScope, current_scope, get_type);
+      assertTrue(current_scope == NULL, "current_scope(%d) is not NULL", scope_type);
       // O_CALL(parsed_file, parse_imports);
     }
   return result;

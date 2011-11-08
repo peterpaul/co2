@@ -38,6 +38,7 @@ O_IMPLEMENT (FunctionDeclaration, void *, ctor, (void *_self, va_list * app))
   self->type = O_RETAIN_ARG (FunctionType);
   self->formal_arguments = O_RETAIN_ARG (RefList);
   self->body = O_BRANCH_RETAIN_ARG (Statement);
+  self->binding_generated = false;
   return self;
 }
 
@@ -45,6 +46,7 @@ O_IMPLEMENT (FunctionDeclaration, void *, dtor, (void *_self))
 {
   struct FunctionDeclaration *self = O_CAST (_self, FunctionDeclaration ());
   O_CALL (self->formal_arguments, release);
+  O_BRANCH_CALL (self->implemented_methods, release);
   O_BRANCH_CALL (self->body, release);
   return O_SUPER->dtor (self);
 }
@@ -114,30 +116,30 @@ void FunctionDeclaration_generateFunction (struct FunctionDeclaration *self)
 }
 
 static void
-FunctionDeclaration_find_in_interface (void *_self, va_list * app)
+FunctionDeclaration_find_in_interface (void *_interface_name, va_list * app)
 {
-  struct Token *self = O_CAST (_self, Token ());
+  struct Token *interface_name = O_CAST (_interface_name, Token ());
   struct FunctionDeclaration *function_decl =
     O_CAST (va_arg (*app, struct FunctionDeclaration *),
 	    FunctionDeclaration ());
-  if (O_CALL (global_scope, exists_in_this_scope, self))
+  if (O_CALL_IF (IScope, global_scope, exists_in_this_scope, interface_name))
     {
       struct Declaration *_decl =
-	O_CALL (global_scope, lookup_in_this_scope, self);
+	O_CALL_IF (IScope, global_scope, lookup_in_this_scope, interface_name);
       if (o_is_of (_decl, InterfaceDeclaration ()))
 	{
 	  struct InterfaceDeclaration * interface_decl =
 	    O_CAST (_decl, InterfaceDeclaration ());
-	  if (O_CALL (interface_decl->member_scope, exists,
+	  if (O_CALL_IF (IScope, interface_decl->member_scope, exists,
 		      function_decl->name))
 	    {
 	      if (function_decl->body)
 		{
-		  struct InterfaceMethodDefinition * implementation = O_CALL_CLASS (InterfaceMethodDefinition (), new, interface_decl->name, function_decl->name);
-		  implementation->interface_decl = O_CALL (interface_decl, retain);
-		  implementation->method_decl = O_CALL (interface_decl->member_scope, lookup, function_decl->name);
-		  O_CALL (implementation->method_decl, retain);
-		  O_CALL (function_decl->implemented_methods, append, implementation);
+		  struct InterfaceMethodDefinition * imd = O_CALL_CLASS (InterfaceMethodDefinition (), new, interface_decl->name, function_decl->name);
+		  imd->interface_decl = O_CALL (interface_decl, retain);
+		  imd->method_decl = (struct FunctionDeclaration *) O_CALL_IF (IScope, interface_decl->member_scope, lookup, function_decl->name);
+		  O_CALL (imd->method_decl, retain);
+		  O_CALL (function_decl->implemented_methods, append, imd);
 		}
 	    }
 	  O_BRANCH_CALL (interface_decl->interfaces, map_args, FunctionDeclaration_find_in_interface, function_decl);
@@ -151,38 +153,43 @@ FunctionDeclaration_find_in_interface (void *_self, va_list * app)
 }
 
 static void
-FunctionDeclaration_find_in_interface_ (void *_self, ...)
+FunctionDeclaration_find_in_interface_ (void *_interface_name, ...)
 {
   va_list ap;
-  va_start (ap, _self);
-  FunctionDeclaration_find_in_interface (_self, &ap);
+  va_start (ap, _interface_name);
+  FunctionDeclaration_find_in_interface (_interface_name, &ap);
   va_end (ap);
 }
 
-static void FunctionDeclaration_type_check_implemented_methods (void *_implemented_method, va_list *app)
+static void FunctionDeclaration_type_check_implemented_methods (void *_imd, va_list *app)
 {
-  struct InterfaceMethodDefinition * implemented_method = O_CAST (_implemented_method, InterfaceMethodDefinition ());
+  struct InterfaceMethodDefinition * imd = O_CAST (_imd, InterfaceMethodDefinition ());
   struct FunctionDeclaration * fun_decl = O_GET_ARG (FunctionDeclaration);
 
-  struct Declaration *_interface_decl = O_CALL (global_scope, lookup, implemented_method->interface_name);
-  if (!o_is_of(_interface_decl, InterfaceDeclaration ()))
+  if (!imd->interface_decl)
     {
-      error (implemented_method->interface_name, "Not an interface: '%s'\n", implemented_method->interface_name->name->data);
-      return;
+      struct Declaration *_interface_decl = O_CALL_IF (IScope, global_scope, lookup, imd->interface_name);
+      if (!o_is_of(_interface_decl, InterfaceDeclaration ()))
+	{
+	  error (imd->interface_name, "Not an interface: '%s'\n", imd->interface_name->name->data);
+	  return;
+	}
+      imd->interface_decl = O_CAST (O_CALL (_interface_decl, retain), InterfaceDeclaration ());
     }
-  implemented_method->interface_decl = O_CAST (O_CALL (_interface_decl, retain), InterfaceDeclaration ());
-
-  if (implemented_method->method_name == NULL)
+  if (!imd->method_decl)
     {
-      implemented_method->method_name = O_CALL (fun_decl->name, retain);
+      if (imd->method_name == NULL)
+	{
+	  imd->method_name = O_CALL (fun_decl->name, retain);
+	}
+      struct Declaration *_method_decl = O_CALL_IF (IScope, imd->interface_decl->member_scope, lookup, imd->method_name);
+      if (!o_is_of(_method_decl, FunctionDeclaration ()))
+	{
+	  error (imd->method_name, "Not a function: '%s'\n", imd->method_name->name->data);
+	  return;
+	}
+      imd->method_decl = O_CAST (O_CALL (_method_decl, retain), FunctionDeclaration ());
     }
-  struct Declaration *_method_decl = O_CALL (implemented_method->interface_decl->member_scope, lookup, implemented_method->method_name);
-  if (!o_is_of(_method_decl, FunctionDeclaration ()))
-    {
-      error (implemented_method->method_name, "Not a function: '%s'\n", implemented_method->method_name->name->data);
-      return;
-    }
-  implemented_method->method_decl = O_CAST (O_CALL (_method_decl, retain), FunctionDeclaration ());
 }
 
 O_IMPLEMENT (FunctionDeclaration, void, type_check, (void *_self))
@@ -199,20 +206,17 @@ O_IMPLEMENT (FunctionDeclaration, void, type_check, (void *_self))
     O_BRANCH_CALL (current_context, find, ClassDeclaration ());
   struct InterfaceDeclaration *interface_decl =
     O_BRANCH_CALL (current_context, find, InterfaceDeclaration ());
-  if (function_type->has_var_args)
+  if (function_type->has_var_args && class_decl == NULL && self->formal_arguments->length <= 1)
     {
-      if (class_decl == NULL && self->formal_arguments->length <= 1)
-	{
-	  error (self->name,
-		 "variable argument list only supported on functions with at least one fixed argument.\n");
-	}
+      error (self->name,
+	     "variable argument list only supported on functions with at least one fixed argument.\n");
     }
-  if (class_decl && class_decl->interfaces)
+  if (class_decl)
     {
-      O_CALL (class_decl->interfaces, map_args,
+      O_BRANCH_CALL (class_decl->interfaces, map_args,
 	      FunctionDeclaration_find_in_interface, self);
     }
-  else if (interface_decl)
+  if (interface_decl)
     {
       FunctionDeclaration_find_in_interface_ (interface_decl->name, self);
     }

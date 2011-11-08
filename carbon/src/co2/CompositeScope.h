@@ -16,23 +16,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef FUNDECLARATION_H
-#define FUNDECLARATION_H
+#ifndef CompositeScope_H
+#define CompositeScope_H
 
-#include "co2/Declaration.h"
+#include "co2/IScope.h"
+#include "co2/Object.h"
 
-#define FunctionDeclarationClass_Attr		\
-  DeclarationClass_Attr
+#define CompositeScopeClass_Attr		\
+  ObjectClass_Attr;				\
+  O_METHOD(IScope, get_parent);			\
+  O_METHOD(IScope, set_parent);			\
+  O_METHOD(IScope, get_type);			\
+  O_METHOD(IScope, declare);			\
+  O_METHOD(IScope, leave);			\
+  O_METHOD(IScope, lookup_in_this_scope);	\
+  O_METHOD(IScope, lookup);			\
+  O_METHOD(IScope, find_type_in_this_scope);	\
+  O_METHOD(IScope, find_type);			\
+  O_METHOD(IScope, exists_in_this_scope);	\
+  O_METHOD(IScope, exists)
 
-#define FunctionDeclaration_Attr		\
-  Declaration_Attr;				\
-  int binding_generated;			\
-  struct RefList * formal_arguments;		\
-  struct RefList * implemented_methods;		\
-  struct Statement * body
+#define CompositeScope_Attr			\
+  Object_Attr;					\
+  struct List * subscopes
 
-O_CLASS (FunctionDeclaration, Declaration);
+O_CLASS (CompositeScope, Object);
 
-void FunctionDeclaration_generateFunction (struct FunctionDeclaration *self);
-
-#endif /* FUNDECLARATION_H */
+#endif /* CompositeScope_H */

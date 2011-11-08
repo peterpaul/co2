@@ -78,7 +78,7 @@ O_IMPLEMENT (SuperExpression, void, type_check, (void *_self))
     }
 
   struct ClassDeclaration *super =
-    (struct ClassDeclaration *) O_CALL (global_scope, lookup,
+    (struct ClassDeclaration *) O_CALL_IF (IScope, global_scope, lookup,
 					self->class_context->superclass);
 
   if (o_is_of (self->method_context, ConstructorDeclaration ()))
@@ -91,8 +91,7 @@ O_IMPLEMENT (SuperExpression, void, type_check, (void *_self))
 	}
       O_CALL (ctor_name, retain);
       struct ConstructorDeclaration *ctor_decl =
-	(struct ConstructorDeclaration *) O_CALL (super->member_scope, lookup,
-						  ctor_name);
+	(struct ConstructorDeclaration *) O_CALL_IF (IScope, super->member_scope, lookup, ctor_name);
 
       if (self->actual_arguments->length <
 	  ctor_decl->formal_arguments->length)
@@ -118,8 +117,7 @@ O_IMPLEMENT (SuperExpression, void, type_check, (void *_self))
   else if (o_is_of (self->method_context, FunctionDeclaration ()))
     {
       struct FunctionDeclaration *function_decl =
-	(struct FunctionDeclaration *) O_CALL (super->member_scope, lookup,
-					       self->method_context->name);
+	(struct FunctionDeclaration *) O_CALL_IF (IScope, super->member_scope, lookup, self->method_context->name);
 
       if (self->actual_arguments->length <
 	  function_decl->formal_arguments->length)

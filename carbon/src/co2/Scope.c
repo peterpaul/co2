@@ -21,9 +21,6 @@
 
 #define O_SUPER Hash()
 
-struct Scope *current_scope = NULL;
-struct Scope *global_scope = NULL;
-
 O_IMPLEMENT (Scope, void *, ctor, (void *_self, va_list * app))
 {
   struct Scope *self = O_CAST (_self, Scope ());
@@ -42,8 +39,27 @@ O_IMPLEMENT (Scope, void *, dtor, (void *_self))
   return O_SUPER->dtor (self);
 }
 
-O_IMPLEMENT (Scope, struct Declaration *, declare,
-	     (void *_self, struct Declaration * decl))
+O_IMPLEMENT_IF (Scope, struct IScope *, get_parent, (void *_self), (_self))
+{
+  struct Scope *self = O_CAST (_self, Scope ());
+  return self->parent;
+}
+
+O_IMPLEMENT_IF (Scope, struct IScope *, set_parent, (void *_self, struct IScope *_parent_scope), (_self, _parent_scope))
+{
+  struct Scope *self = O_CAST (_self, Scope ());
+  self->parent = O_BRANCH_CAST_INTERFACE (_parent_scope, IScope ());
+  return self->parent;
+}
+
+O_IMPLEMENT_IF (Scope, ScopeType, get_type, (void *_self), (_self))
+{
+  struct Scope *self = O_CAST (_self, Scope ());
+  return self->type;
+}
+
+O_IMPLEMENT_IF (Scope, struct Declaration *, declare,
+		(void *_self, struct Declaration * decl), (_self, decl))
 {
   struct Scope *self = O_CAST (_self, Scope ());
   O_CALL (self, add, decl->name->name->data, decl);
@@ -51,7 +67,7 @@ O_IMPLEMENT (Scope, struct Declaration *, declare,
   return decl;
 }
 
-O_IMPLEMENT (Scope, void, leave, (void *_self))
+O_IMPLEMENT_IF (Scope, void, leave, (void *_self), (_self))
 {
   struct Scope *self = O_CAST (_self, Scope ());
   current_scope = self->parent;
@@ -65,15 +81,15 @@ O_IMPLEMENT (Scope, void, error_already_declared,
   error (decl->name, "'%s' already declared.\n", key);
 }
 
-O_IMPLEMENT (Scope, struct Declaration *, lookup_in_this_scope,
-	     (void *_self, struct Token * token))
+O_IMPLEMENT_IF (Scope, struct Declaration *, lookup_in_this_scope,
+		(void *_self, struct Token * token), (_self, token))
 {
   struct Scope *self = O_CAST (_self, Scope ());
   return O_CALL (self, get, token->name->data);
 }
 
-O_IMPLEMENT (Scope, struct Declaration *, lookup,
-	     (void *_self, struct Token * token))
+O_IMPLEMENT_IF (Scope, struct Declaration *, lookup,
+		(void *_self, struct Token * token), (_self, token))
 {
   struct Scope *self = O_CAST (_self, Scope ());
   struct Declaration *result = O_CALL (self, lookup_in_this_scope, token);
@@ -85,14 +101,14 @@ O_IMPLEMENT (Scope, struct Declaration *, lookup,
 	}
       else
 	{
-	  result = O_CALL (self->parent, lookup, token);
+	  result = O_CALL_IF (IScope, self->parent, lookup, token);
 	}
     }
   return result;
 }
 
-O_IMPLEMENT (Scope, struct Declaration *, find_type_in_this_scope,
-	     (void *_self, struct Token * token, void *_type))
+O_IMPLEMENT_IF (Scope, struct Declaration *, find_type_in_this_scope,
+		(void *_self, struct Token * token, void *_type), (_self, token, _type))
 {
   struct Scope *self = O_CAST (_self, Scope ());
   struct Class *type = O_IS_CLASS (_type);
@@ -107,8 +123,8 @@ O_IMPLEMENT (Scope, struct Declaration *, find_type_in_this_scope,
     }
 }
 
-O_IMPLEMENT (Scope, struct Declaration *, find_type,
-	     (void *_self, struct Token * token, void *_type))
+O_IMPLEMENT_IF (Scope, struct Declaration *, find_type,
+		(void *_self, struct Token * token, void *_type), (_self, token, _type))
 {
   struct Scope *self = O_CAST (_self, Scope ());
   struct Class *type = O_IS_CLASS (_type);
@@ -116,28 +132,25 @@ O_IMPLEMENT (Scope, struct Declaration *, find_type,
     O_CALL (self, find_type_in_this_scope, token, type);
   if (result == NULL)
     {
-      if (self->parent != NULL)
-	{
-	  result = O_CALL (self->parent, find_type, token, type);
-	}
+      result = O_BRANCH_CALL_IF (IScope, self->parent, find_type, token, type);
     }
   return result;
 }
 
-O_IMPLEMENT (Scope, bool, exists_in_this_scope,
-	     (void *_self, struct Token * token))
+O_IMPLEMENT_IF (Scope, bool, exists_in_this_scope,
+		(void *_self, struct Token * token), (_self, token))
 {
   struct Scope *self = O_CAST (_self, Scope ());
   return O_CALL (self, get, token->name->data) != NULL;
 }
 
-O_IMPLEMENT (Scope, bool, exists, (void *_self, struct Token * token))
+O_IMPLEMENT_IF (Scope, bool, exists, (void *_self, struct Token * token), (_self, token))
 {
   struct Scope *self = O_CAST (_self, Scope ());
   bool result = O_CALL (self, exists_in_this_scope, token);
-  if (result == false && self->parent != NULL)
+  if (result == false)
     {
-      return O_CALL (self->parent, exists, token);
+      return O_BRANCH_CALL_IF (IScope, self->parent, exists, token);
     }
   return result;
 }
@@ -185,6 +198,9 @@ O_IMPLEMENT (Scope, struct String *, to_string, (void *_self))
 O_OBJECT (Scope, Hash);
 O_OBJECT_METHOD (Scope, ctor);
 O_OBJECT_METHOD (Scope, dtor);
+O_OBJECT_METHOD (Scope, get_parent);
+O_OBJECT_METHOD (Scope, set_parent);
+O_OBJECT_METHOD (Scope, get_type);
 O_OBJECT_METHOD (Scope, declare);
 O_OBJECT_METHOD (Scope, leave);
 O_OBJECT_METHOD (Scope, error_already_declared);
@@ -196,4 +212,17 @@ O_OBJECT_METHOD (Scope, find_type);
 O_OBJECT_METHOD (Scope, exists_in_this_scope);
 O_OBJECT_METHOD (Scope, exists);
 O_OBJECT_METHOD (Scope, to_string);
+O_OBJECT_IF (IScope);
+O_OBJECT_IF_METHOD (Scope, get_parent);
+O_OBJECT_IF_METHOD (Scope, set_parent);
+O_OBJECT_IF_METHOD (Scope, get_type);
+O_OBJECT_IF_METHOD (Scope, declare);
+O_OBJECT_IF_METHOD (Scope, leave);
+O_OBJECT_IF_METHOD (Scope, lookup_in_this_scope);
+O_OBJECT_IF_METHOD (Scope, lookup);
+O_OBJECT_IF_METHOD (Scope, find_type_in_this_scope);
+O_OBJECT_IF_METHOD (Scope, find_type);
+O_OBJECT_IF_METHOD (Scope, exists_in_this_scope);
+O_OBJECT_IF_METHOD (Scope, exists);
+O_OBJECT_IF_END
 O_END_OBJECT

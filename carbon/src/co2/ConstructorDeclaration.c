@@ -39,7 +39,7 @@ O_IMPLEMENT (ConstructorDeclaration, void *, ctor,
   self->formal_arguments = O_RETAIN_ARG (RefList);
   self->body = O_BRANCH_RETAIN_ARG (Statement);
 
-  struct Declaration * class_decl = O_CALL (global_scope, lookup, self->class_name);
+  struct Declaration * class_decl = O_CALL_IF (IScope, global_scope, lookup, self->class_name);
   if (class_decl)
     {
       self->type =

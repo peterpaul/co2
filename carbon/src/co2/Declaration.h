@@ -20,7 +20,7 @@
 #define Declaration_H
 
 #include "co2/CompileObject.h"
-#include "co2/Scope.h"
+#include "co2/IScope.h"
 
 O_METHOD_DEF (Declaration, void, set_scope, (void *_self, void *scope));
 O_METHOD_DEF (Declaration, void, set_class_decl,
@@ -37,7 +37,7 @@ O_METHOD_DEF (Declaration, void, set_include_file,
 #define Declaration_Attr			\
   CompileObject_Attr;				\
   struct Token * name;				\
-  struct Scope * scope;				\
+  struct IScope * scope;				\
   struct Type * type;				\
   struct Token * include_file;			\
   struct ClassDeclaration * class_decl;		\

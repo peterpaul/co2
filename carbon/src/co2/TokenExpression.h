@@ -31,7 +31,7 @@ O_METHOD_DEF (TokenExpression, void, lookup, (void *_self));
 #define TokenExpression_Attr				\
   Expression_Attr;					\
   struct Token * token;					\
-  struct Scope * scope;					\
+  struct IScope * scope;					\
   struct Declaration * decl;				\
   bool check_global_scope
 

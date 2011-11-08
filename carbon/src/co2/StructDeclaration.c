@@ -19,7 +19,7 @@
 #include "co2/StructDeclaration.h"
 #include "co2/TypeDeclaration.h"
 #include "co2/ObjectType.h"
-#include "co2/Scope.h"
+#include "co2/IScope.h"
 #include "co2/io.h"
 
 #define O_SUPER ObjectTypeDeclaration()
@@ -28,7 +28,7 @@ O_IMPLEMENT(StructDeclaration, void *, ctor, (void *_self, va_list *app))
 {
   struct StructDeclaration * self = O_CAST(_self, StructDeclaration());
   self = O_SUPER->ctor(self, app);
-  self->member_scope = O_BRANCH_GET_ARG (Scope);
+  self->member_scope = O_BRANCH_GET_ARG_IF (IScope);
   self->members = O_BRANCH_RETAIN_ARG (RefList);
   return self;
 }

@@ -87,12 +87,12 @@ O_IMPLEMENT (VariableDeclaration, void, type_check, (void *_self))
       O_CALL (self->type, assert_compatible, self->expr->type);
     }
 
-  if (self->scope->parent != NULL &&
-      O_CALL (self->scope->parent, exists, self->name))
+  struct IScope *parent = O_CALL_IF (IScope, self->scope, get_parent);
+  if (O_BRANCH_CALL_IF (IScope, parent, exists, self->name))
     {
       struct Declaration *first_decl =
-	O_CALL (self->scope->parent, lookup, self->name);
-      if (self->scope->type == first_decl->scope->type && first_decl->scope->type == CLASS_SCOPE)
+	O_CALL_IF (IScope, parent, lookup, self->name);
+      if (O_CALL_IF (IScope, self->scope, get_type) == O_CALL_IF (IScope, first_decl->scope, get_type) && O_CALL_IF (IScope, first_decl->scope, get_type) == CLASS_SCOPE)
 	{
 	  error (self->name, "'%s' already declared at %s:%d\n",
 		 self->name->name->data, first_decl->name->file->name->data,

@@ -75,7 +75,7 @@ O_IMPLEMENT (FunctionCallExpression, void, generate, (void *_self))
 	{
 	  struct FunctionDeclaration *fun_decl =
 	    (struct FunctionDeclaration *) function->decl;
-	  switch (fun_decl->scope->type) {
+	  switch (O_CALL_IF (IScope, fun_decl->scope, get_type)) {
 	  case CLASS_SCOPE:
 	    {
 	      fprintf (out, "O_CALL ");
@@ -92,20 +92,21 @@ O_IMPLEMENT (FunctionCallExpression, void, generate, (void *_self))
 	    {
 	      fprintf (out, "O_CALL_IF ");
 	      fprintf (out, "(");
-	      if (!fun_decl->implemented_methods)
+	      if (!fun_decl->implemented_methods || fun_decl->implemented_methods->length == 0)
 		{
 		  struct InterfaceDeclaration *interface_decl = O_CALL (current_context, find, InterfaceDeclaration ());
 		  O_CALL (interface_decl->name, generate);		  
 		}
 	      else if (fun_decl->implemented_methods->length == 1)
 		{
-		  struct InterfaceMethodDefinition *method_def = O_CAST (O_CALL (fun_decl->implemented_methods, get, 0), InterfaceMethodDefinition ());
-		  struct InterfaceDeclaration *interface_decl = method_def->interface_decl;
-		  O_CALL (interface_decl->name, generate);
+		  struct InterfaceMethodDefinition *imd = O_CAST (O_CALL (fun_decl->implemented_methods, get, 0), InterfaceMethodDefinition ());
+		  O_CALL (imd->interface_decl->name, generate);
 		}
 	      else
 		{
-		  error (function->token, "ambiguous method name: %s\n", function->token->name->data);
+		  warning (function->token, "ambiguous method name: %s\n", function->token->name->data);
+		  struct InterfaceMethodDefinition *imd = O_CAST (O_CALL (fun_decl->implemented_methods, get, 0), InterfaceMethodDefinition ());
+		  O_CALL (imd->interface_decl->name, generate);
 		}
 	      bool is_first_arg = false;
 	      fprintf (out, ", self, ");
@@ -116,9 +117,8 @@ O_IMPLEMENT (FunctionCallExpression, void, generate, (void *_self))
 	      return;
 	    }
 	  default:
-	    {
-	      O_CALL (function->token, generate);
-	    }
+		  O_CALL (function->token, generate);
+	    break;
 	  }
 	}
       else
