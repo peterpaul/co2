@@ -256,6 +256,13 @@
 #define O_BRANCH_GET_ARG(type)				\
   O_BRANCH_CAST(va_arg(*app, struct type *), type())
 
+#define O_GET_ARG_IF(type)				\
+  O_CAST_INTERFACE(va_arg(*app, struct type *), type())
+
+#define O_BRANCH_GET_ARG_IF(type)				\
+  O_BRANCH_CAST_INTERFACE(va_arg(*app, struct type *), type())
+
+
 /* Functions */
 void *o_cast(const void *_object, const void *_class);
 void *o_branch_cast(const void *_object, const void *_class);
