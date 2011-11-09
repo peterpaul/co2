@@ -1,3 +1,12 @@
+libco2 (0.1.2-1) oneiric; urgency=low
+
+  * Add o_branch_cast_interface function, and macros O_CAST_INTERFACE and O_BRANCH_CAST_INTERFACE.
+  * Extract O_IMPLEMENT_IF_BINDING macro from O_IMPLEMENT_IF
+  * More verifications in O_CALL_IF and O_BRANCH_CALL_IF when O_DEBUG is defined
+  * Add O_GET_ARG_IF and O_BRANCH_GET_ARG_IF macros to obtain interface arguments from va_arg.
+
+ -- Peterpaul Taekele Klein Haneveld <peterpaul@peterpaul-dm1z>  Wed, 09 Nov 2011 21:28:07 +0100
+
 libco2 (0.1.1-1) natty; urgency=low
 
   * Add O_BRANCH_CALL_IF macro
