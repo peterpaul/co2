@@ -86,7 +86,7 @@ libcarbon_1_0_la_CPPFLAGS=-DO_DEBUG
 grammar.h: grammar.c
 
 bin_PROGRAMS=carbon
-carbon_SOURCES=co2/Compiler.c
+carbon_SOURCES=co2/Compiler.c co2/Compiler.h
 carbon_LDADD=libcarbon-1.0.la
 carbon_LDFLAGS=$(CO2_LIBS)
 
