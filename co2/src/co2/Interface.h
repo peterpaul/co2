@@ -28,12 +28,15 @@
 		return interface->name act_args;			\
 	}
 
-#define O_IMPLEMENT_IF(klass,type,name,args,act_args)			\
+#define O_IMPLEMENT_IF_BINDING(klass,type,name,args,act_args)		\
 	static O_FUNCTION_DEF(klass,type,name##_impl,args) {		\
 		struct klass * self = O_CAST(_self, klass());		\
 		return self->class->name act_args;			\
 	}								\
-	static O_FUNCTION_DEF(_##klass,type,name,args)
+
+#define O_IMPLEMENT_IF(klass,type,name,args,act_args)			\
+	O_IMPLEMENT_IF_BINDING(klass,type,name,args,act_args)		\
+	O_FUNCTION_DEF(_##klass,type,name,args)
 
 #define O_OBJECT_IF(IF)							\
 	{								\
@@ -43,6 +46,9 @@
 #define O_OBJECT_IF_METHOD(klass,method)		\
 	interface->method = klass##_##method##_impl
 
+#define O_OBJECT_IF_METHOD_BINDING(klass,if_method,method)	\
+	interface->if_method = klass##_##method##_impl
+
 #define O_OBJECT_IF_END				\
 	}
 
@@ -50,13 +56,18 @@
 #define O_CALL_IF(interface,o,msg,...)					\
   ({typeof(o) _tmp = o;							\
     struct interface * _if = o_get_interface(_tmp, interface());	\
+    assertTrue(_if,"runtime error: %s at %p doesn't implement %s.",	\
+	       _tmp->class->name, (void *)_tmp, __STRING(interface));	\
     assertTrue(_if->msg,"runtime error: %s at %p doesn't respond to %s.", \
 	       _tmp->class->class_name, (void *)_tmp, __STRING(msg));		\
     _if->msg(_tmp,##__VA_ARGS__);})
 #define O_BRANCH_CALL_IF(interface,o,msg,...)				\
   ({typeof(o) _tmp = o;							\
     struct interface * _if = _tmp ? o_get_interface(_tmp, interface()) : NULL; \
-    assertTrue(_tmp == (typeof(_tmp))0 || _if->msg,			\
+    assertTrue(_tmp ? _if : true,					\
+	       "runtime error: %s at %p doesn't implement %s.",		\
+	       _tmp->class->name, (void *)_tmp, __STRING(interface));	\
+    assertTrue(_tmp ? _if->msg : true,					\
 	       "runtime error: %s at %p doesn't respond to %s.",	\
 	       _tmp->class->name, (void *)_tmp, __STRING(msg));		\
     _tmp ? _if->msg(_tmp,##__VA_ARGS__) : (typeof(_if->msg(_tmp,##__VA_ARGS__)))0;})
@@ -70,20 +81,6 @@
     struct interface * _if = _tmp ? o_get_interface(_tmp, interface()) : NULL; \
     _tmp ? _if->msg(_tmp,##__VA_ARGS__) : (typeof(_if->msg(_tmp,##__VA_ARGS__)))0;})
 #endif /* O_DEBUG */
-
-/*
-#define O_CALL_IF(interface,o,msg,...)					\
-  ({typeof(o) _tmp = o;							\
-    struct interface * _if;						\
-    struct Class * _if_class = _if->class;				\
-    do {								\
-      _if = o_get_interface_of_class(_if_class, interface());		\
-      _if_class = _if_class->super;					\
-    } while ((!_if || !_if->msg) && _if_class != Object ());		\
-    assertTrue(_if && _if->msg,"runtime error: %s at %p doesn't respond to %s.", \
-	       _tmp->class->class_name, (void *)_tmp, __STRING(msg));		\
-    _if->msg(_tmp,##__VA_ARGS__);})
-*/
 
 /* Interface */
 #define InterfaceClass_Attr			\

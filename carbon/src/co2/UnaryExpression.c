@@ -81,6 +81,7 @@ O_IMPLEMENT (UnaryExpression, void, type_check, (void *_self))
       break;
     default:
       self->type = O_CALL(self->operand->type, retain);
+      break;
     }
 }
 

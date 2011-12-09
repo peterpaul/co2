@@ -26,7 +26,7 @@
 
 #define CatchStatement_Attr				\
   Statement_Attr;					\
-  struct Scope * scope;					\
+  struct IScope * scope;					\
   struct ArgumentDeclaration * argument;		\
   struct Statement * body
 

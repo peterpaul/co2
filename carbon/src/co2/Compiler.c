@@ -175,6 +175,25 @@ int mainImpl(const char * output_file)
   return errors;
 }
 
+int mainImplDepend (const char * output_file)
+{
+  /* syntax analysis */
+  parse ();
+  if (main_file == NULL || errors != 0)
+    {
+      return 1;
+    }
+
+  // sort members
+  O_CALL (main_file, sort);
+
+  printf ("%s:", output_file);
+  O_CALL (main_file, generateDepend);
+  printf ("\n");
+
+  return errors;
+}
+
 void
 version ()
 {
@@ -194,9 +213,10 @@ usage ()
   fprintf (stdout, "        C_OUTPUT_FILE:  filename of c output\n");
   fprintf (stdout, "\n");
   fprintf (stdout, "OPTIONS:\n");
-  fprintf (stdout, "        -P INCLUDE_DIR: include directory to add to search path\n");
+  fprintf (stdout, "        -I INCLUDE_DIR: include directory to add to search path\n");
   fprintf (stdout, "        -h,--help:      show this help\n");
   fprintf (stdout, "        -V,--version:   show version\n");
+  fprintf (stdout, "        -d,--depend:    show dependencies\n");
   fprintf (stdout, "\n");
 }
 
@@ -210,6 +230,7 @@ main (int argc, char **argv)
 
   int arg = 1;
   bool nextIsOption = false;
+  bool showDependencies = false;
   while (arg < argc)
     {
       if (argv[arg][0] == '-')
@@ -218,7 +239,7 @@ main (int argc, char **argv)
 	    {
 	      switch (argv[arg][1])
 		{
-		case 'P':
+		case 'I':
 		  nextIsOption = true;
 		  break;
 		case 'h':
@@ -227,8 +248,12 @@ main (int argc, char **argv)
 		case 'V':
 		  version ();
 		  return 0;
+		case 'd':
+		  showDependencies = true;
+		  break;
 		default:
 		  error (NULL, "invalid option: %s\n", argv[arg]);
+		  break;
 		}
 	    }
 	  else if (strcmp (argv[arg], "--help") == 0)
@@ -240,6 +265,10 @@ main (int argc, char **argv)
 	    {
 	      version ();
 	      return 0;
+	    }
+	  else if (strcmp (argv[arg], "--depend") == 0)
+	    {
+	      showDependencies = true;
 	    }
 	  else
 	    {
@@ -272,7 +301,7 @@ main (int argc, char **argv)
 
   if (nextIsOption)
     {
-      error (NULL, "-P takes one argument\n");
+      error (NULL, "-I takes one argument\n");
     }
 
   if (errors != 0)
@@ -296,7 +325,15 @@ main (int argc, char **argv)
     }
   current_file = O_CALL (main_file, retain);
 
-  int retval = mainImpl (output_file);
+  int retval;
+  if (showDependencies)
+    {
+      retval = mainImplDepend (output_file);
+    }
+  else
+    {
+      retval = mainImpl (output_file);
+    }
 
   O_CALL (main_file, release);
   O_CALL (file_path, release);

@@ -31,6 +31,7 @@
 #include "co2/RefList.h"
 #include "co2/ConditionalBinaryExpression.h"
 #include "co2/io.h"
+#include "co2/InterfaceMethodDefinition.h"
 
 #define O_SUPER Expression()
 
@@ -74,7 +75,8 @@ O_IMPLEMENT (FunctionCallExpression, void, generate, (void *_self))
 	{
 	  struct FunctionDeclaration *fun_decl =
 	    (struct FunctionDeclaration *) function->decl;
-	  if (fun_decl->scope->type == CLASS_SCOPE)
+	  switch (O_CALL_IF (IScope, fun_decl->scope, get_type)) {
+	  case CLASS_SCOPE:
 	    {
 	      fprintf (out, "O_CALL ");
 	      fprintf (out, "(");
@@ -86,10 +88,38 @@ O_IMPLEMENT (FunctionCallExpression, void, generate, (void *_self))
 	      fprintf (out, ")");
 	      return;
 	    }
-	  else
+	  case INTERFACE_SCOPE:
 	    {
+	      fprintf (out, "O_CALL_IF ");
+	      fprintf (out, "(");
+	      if (!fun_decl->implemented_methods || fun_decl->implemented_methods->length == 0)
+		{
+		  struct InterfaceDeclaration *interface_decl = O_CALL (current_context, find, InterfaceDeclaration ());
+		  O_CALL (interface_decl->name, generate);		  
+		}
+	      else if (fun_decl->implemented_methods->length == 1)
+		{
+		  struct InterfaceMethodDefinition *imd = O_CAST (O_CALL (fun_decl->implemented_methods, get, 0), InterfaceMethodDefinition ());
+		  O_CALL (imd->interface_decl->name, generate);
+		}
+	      else
+		{
+		  warning (function->token, "ambiguous method name: %s\n", function->token->name->data);
+		  struct InterfaceMethodDefinition *imd = O_CAST (O_CALL (fun_decl->implemented_methods, get, 0), InterfaceMethodDefinition ());
+		  O_CALL (imd->interface_decl->name, generate);
+		}
+	      bool is_first_arg = false;
+	      fprintf (out, ", self, ");
 	      O_CALL (function->token, generate);
+	      O_CALL (self->actual_arguments, map_args,
+		      Expression_generate_actual_argument, &is_first_arg);
+	      fprintf (out, ")");
+	      return;
 	    }
+	  default:
+		  O_CALL (function->token, generate);
+	    break;
+	  }
 	}
       else
 	{

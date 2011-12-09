@@ -54,7 +54,7 @@ O_IMPLEMENT (PrimitiveType, struct Token *, get_token, (void *_self))
 O_IMPLEMENT (PrimitiveType, struct String *, to_string, (void *_self))
 {
   struct PrimitiveType *self = O_CAST (_self, PrimitiveType ());
-  return O_CALL_CLASS (String (), new, "%s", self->token->name->data);;
+  return O_CALL_CLASS (String (), new, "%s", self->token->name->data);
 }
 
 O_IMPLEMENT (PrimitiveType, bool, is_compatible, (void *_self, void *_other))

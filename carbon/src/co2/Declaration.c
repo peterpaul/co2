@@ -38,7 +38,8 @@ Declaration_new_member_filter (void *_member, va_list * app)
   struct Declaration *member = O_CAST (_member, Declaration ());
   struct Class *_type = va_arg (*app, struct Class *);
   struct Class *type = O_IS_CLASS (_type);
-  return O_BRANCH_CALL (member->scope->parent, find_type,
+  struct IScope *parent_scope = O_CALL_IF (IScope, member->scope, get_parent);
+  return O_BRANCH_CALL_IF (IScope, parent_scope, find_type,
 			member->name, type) == NULL;
 }
 
@@ -64,7 +65,7 @@ O_IMPLEMENT (Declaration, void *, dtor, (void *_self))
 O_IMPLEMENT (Declaration, void, set_scope, (void *_self, void *_scope))
 {
   struct Declaration *self = O_CAST (_self, Declaration ());
-  self->scope = o_cast (_scope, Scope ());
+  self->scope = o_cast_interface (_scope, IScope ());
 }
 
 O_IMPLEMENT (Declaration, void, set_class_decl,

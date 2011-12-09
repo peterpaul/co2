@@ -47,7 +47,7 @@ O_IMPLEMENT (ObjectType, void, type_check, (void *_self))
   struct ObjectType *self = O_CAST (_self, ObjectType ());
   if (self->decl == NULL)
     {
-      self->decl = (struct ObjectTypeDeclaration *) O_CALL (global_scope, lookup, self->token);
+      self->decl = (struct ObjectTypeDeclaration *) O_CALL_IF (IScope, global_scope, lookup, self->token);
       O_CAST(self->decl, ObjectTypeDeclaration ());
     }
 }
@@ -83,7 +83,7 @@ O_IMPLEMENT (ObjectType, struct Token *, get_token, (void *_self))
 O_IMPLEMENT (ObjectType, struct String *, to_string, (void *_self))
 {
   struct ObjectType *self = O_CAST (_self, ObjectType ());
-  return O_CALL_CLASS (String (), new, "%s", self->token->name->data);;
+  return O_CALL_CLASS (String (), new, "%s", self->token->name->data);
 }
 
 O_IMPLEMENT (ObjectType, bool, is_compatible, (void *_self, void *_other))

@@ -208,6 +208,10 @@
   o_cast(o,c)
 #define O_BRANCH_CAST(o,c)			\
   o_branch_cast(o,c)
+#define O_CAST_INTERFACE(o,i)						\
+  o_cast_interface(o,i)
+#define O_BRANCH_CAST_INTERFACE(o,i)					\
+  o_branch_cast_interface(o,i)
 #define O_CALL(o,msg,...)						\
 	({typeof(o) _o_tmp_##msg = o;						\
 		assertTrue(_o_tmp_##msg->class->msg,				\
@@ -231,6 +235,10 @@
   (void *) o
 #define O_BRANCH_CAST(o,c)			\
   (void *) o
+#define O_CAST_INTERFACE(o,i)						\
+  (void *) o
+#define O_BRANCH_CAST_INTERFACE(o,i)					\
+  (void *) o
 #define O_CALL(o,msg,...)						\
 	({typeof(o) _o_tmp_##msg = o;						\
 		_o_tmp_##msg->class->msg(_o_tmp_##msg,##__VA_ARGS__);})
@@ -248,10 +256,18 @@
 #define O_BRANCH_GET_ARG(type)				\
   O_BRANCH_CAST(va_arg(*app, struct type *), type())
 
+#define O_GET_ARG_IF(type)				\
+  O_CAST_INTERFACE(va_arg(*app, struct type *), type())
+
+#define O_BRANCH_GET_ARG_IF(type)				\
+  O_BRANCH_CAST_INTERFACE(va_arg(*app, struct type *), type())
+
+
 /* Functions */
 void *o_cast(const void *_object, const void *_class);
 void *o_branch_cast(const void *_object, const void *_class);
 void *o_cast_interface(const void *_object, const void *_interface);
+void *o_branch_cast_interface(const void *_object, const void *_interface);
 int o_is_a(const void *_self, const void *_class);
 int o_is_of(const void *_self, const void *_class);
 int o_implements(const void *_self, const void *_interface);

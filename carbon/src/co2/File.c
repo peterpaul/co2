@@ -143,9 +143,9 @@ static void Interface_depends_on (const void *_self, va_list *app)
     }
   else
     {
-      if (O_CALL (global_scope, exists, self))
+      if (O_CALL_IF (IScope, global_scope, exists, self))
 	{
-	  struct Declaration *super_decl = O_BRANCH_CALL (global_scope, lookup, self);
+	  struct Declaration *super_decl = O_BRANCH_CALL_IF (IScope, global_scope, lookup, self);
 	  if (o_is_of (super_decl, InterfaceDeclaration ()))
 	    {
 	      if (InterfaceDeclaration_1_depends_on_2 ((struct InterfaceDeclaration *) super_decl, decl2))
@@ -188,9 +188,9 @@ static int InterfaceDeclaration_compare_Class (const struct InterfaceDeclaration
   O_BRANCH_CALL (decl2->interfaces, map_args, Token_equals_callback, decl1->name, &depends);
   if (depends)
     {
-      fprintf (stderr, "%s depends on %s\n", decl2->name->name->data, decl1->name->name->data);
       return -1;
     }
+  return 0;
 }
 
 static bool ClassDeclaration_1_depends_on_2 (const struct ClassDeclaration * decl1, const struct ClassDeclaration * decl2)
@@ -201,9 +201,9 @@ static bool ClassDeclaration_1_depends_on_2 (const struct ClassDeclaration * dec
 	{
 	  return true;
 	}
-      if (O_CALL (global_scope, exists, decl1->superclass))
+      if (O_CALL_IF (IScope, global_scope, exists, decl1->superclass))
 	{
-	  struct Declaration *super_decl = O_BRANCH_CALL (global_scope, lookup, decl1->superclass);
+	  struct Declaration *super_decl = O_BRANCH_CALL_IF (IScope, global_scope, lookup, decl1->superclass);
 	  if (o_is_of (super_decl, ClassDeclaration ()))
 	    {
 	      return ClassDeclaration_1_depends_on_2 ((struct ClassDeclaration *) super_decl, decl2);
@@ -408,6 +408,22 @@ O_IMPLEMENT (File, void, generate, (void *_self))
   O_CALL (declarations, release);
 }
 
+static void
+File_generateDepend_callback (void *_object)
+{
+  struct File *object = O_CAST (_object, File ());
+
+  O_CALL (object, generateDepend);
+}
+
+O_IMPLEMENT (File, void, generateDepend, (void *_self))
+{
+  struct File *self = O_CAST (_self, File ());
+
+  printf (" \\\n %s", self->absolute_path->data);
+  O_CALL (self->file_dependencies, map, File_generateDepend_callback);
+}
+
 O_OBJECT (File, CompileObject);
 O_OBJECT_METHOD (File, ctor);
 O_OBJECT_METHOD (File, dtor);
@@ -415,6 +431,7 @@ O_OBJECT_METHOD (File, sort);
 O_OBJECT_METHOD (File, type_check);
 O_OBJECT_METHOD (File, optimize);
 O_OBJECT_METHOD (File, generate);
+O_OBJECT_METHOD (File, generateDepend);
 O_OBJECT_METHOD (File, accept);
 O_OBJECT_METHOD (File, accept_all_files);
 O_END_OBJECT

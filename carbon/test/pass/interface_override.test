@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
+["stdio.h"] int printf(char * format, ...);
 
 interface A {
 	int aa (int a, int b);
@@ -29,20 +29,20 @@ interface B {
 }
 
 class C {
-	int aa (int a, int b) return a + b;
-	int bb (int a, int b) return a + b;
-	int ca (int a, int b) return a + b;	
+	int aa (int a, int b) return a + b + 1;
+	int bb (int a, int b) return a + b + 2;
+	int ca (int a, int b) return a + b + 3;	
 }
 
 class D : C, A, B {
-	int aa (int a, int b) return super (a, b);
-	int bb (int a, int b) return super (a, b);
+	int aa (int a, int b) return super (a, b) + 4;
+	int bb (int a, int b) return super (a, b) + 5;
 
-	int ab (int a, int b) return a + b;
-	int ba (int a, int b) return a + b;
+	int ab (int a, int b) return a + b + 6;
+	int ba (int a, int b) return a + b + 7;
 
-	int ca (int a, int b) return super (a, b);
-	int da (int a, int b) return a + b;
+	int ca (int a, int b) return super (a, b) + 8;
+	int da (int a, int b) return a + b + 9;
 }
 
 int main () {
@@ -50,16 +50,16 @@ int main () {
 	A a = (A) d;
 	B b = (B) d;
 	C c = (C) d;
-	d.aa(4, 5);
-	a.aa(4, 5);
-	d.ab(4, 5);
-	a.ab(4, 5);
-	d.ba(4, 5);
-	b.ba(4, 5);
-	d.bb(4, 5);
-	b.bb(4, 5);
-	d.ca(4, 5);
-	c.ca(4, 5);
-	d.da(4, 5);
+	printf ("%d\n", d.aa(4, 5));
+	printf ("%d\n", a.aa(4, 5));
+	printf ("%d\n", d.ab(4, 5));
+	printf ("%d\n", a.ab(4, 5));
+	printf ("%d\n", d.ba(4, 5));
+	printf ("%d\n", b.ba(4, 5));
+	printf ("%d\n", d.bb(4, 5));
+	printf ("%d\n", b.bb(4, 5));
+	printf ("%d\n", d.ca(4, 5));
+	printf ("%d\n", c.ca(4, 5));
+	printf ("%d\n", d.da(4, 5));
 	return 0;
 }

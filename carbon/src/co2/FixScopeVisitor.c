@@ -45,13 +45,13 @@ O_IMPLEMENT_IF (FixScopeVisitor, void, visitClassDeclaration, (void *_self, void
   if (self->superclass)
     {
       struct Declaration *_super_class =
-	O_CALL (self->scope, lookup, self->superclass);
+	O_CALL_IF (IScope, self->scope, lookup, self->superclass);
       if (_super_class)
 	{
 	  /* TODO raise error when decl != ClassDeclaration () */
 	  struct ClassDeclaration *super_class =
 	    O_CAST (_super_class, ClassDeclaration ());
-	  self->member_scope->parent = super_class->member_scope;
+	  O_CALL_IF (IScope, self->member_scope, set_parent, super_class->member_scope);
 	  fprintf (stderr, "fix scope: %s -> %s\n", self->name->name->data, super_class->name->name->data);
 	}
       else

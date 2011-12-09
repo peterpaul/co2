@@ -54,7 +54,7 @@ O_IMPLEMENT(TypeDeclaration, void, type_check, (void *_self))
   if (self->is_struct)
     {
       struct PrimitiveType * type = O_CAST (self->type, PrimitiveType ());
-      struct Declaration * decl = O_CALL (global_scope, lookup, type->token);
+      struct Declaration * decl = O_CALL_IF (IScope, global_scope, lookup, type->token);
       if (decl)
 	{
 	  self->type = O_CALL_CLASS (ObjectType (), new, type->token, decl);

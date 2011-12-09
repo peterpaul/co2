@@ -45,7 +45,7 @@ O_IMPLEMENT(ReleasePoolItem, void *, remove, (void *_self, void *_item))
   if (self->item == item)
     {
       struct ReleasePoolItem *result = self->next;
-      O_CALL(self, delete);;
+      O_CALL(self, delete);
       return result;
     }
   else
@@ -63,7 +63,7 @@ O_IMPLEMENT(ReleasePoolItem, void, clear_list, (void *_self))
   struct ReleasePoolItem *self = O_CAST(_self, ReleasePoolItem());
   O_BRANCH_CALL(self->next, clear_list);
   O_CALL(self->item, delete);
-  O_CALL(self, delete);;
+  O_CALL(self, delete);
 }
 
 O_OBJECT(ReleasePoolItem, Object);

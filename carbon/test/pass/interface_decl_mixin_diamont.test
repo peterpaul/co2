@@ -1,0 +1,44 @@
+["stdio.h"] int printf(char * format, ...);
+
+interface Foo {
+	int foo () {
+		return 2;
+	}
+}
+
+interface Bar, Foo {
+	int bar () {
+		return foo () + 1;
+	}
+}
+
+interface Baz, Foo {
+	int baz () {
+		return foo () + 2;
+	}
+}
+
+class FooBar, Bar, Baz {
+}
+
+int main () {
+	FooBar fooBar = new FooBar ();
+
+	Foo foo = (Foo) fooBar;
+	Bar bar = (Bar) fooBar;
+	Baz baz = (Baz) fooBar;
+
+	printf ("foo.foo () = %d\n", foo.foo ());
+	printf ("bar.foo () = %d\n", bar.foo ());
+	printf ("bar.bar () = %d\n", bar.bar ());
+	printf ("baz.foo () = %d\n", baz.foo ());
+	printf ("baz.baz () = %d\n", baz.baz ());
+
+	printf ("fooBar.foo () = %d\n", fooBar.foo ());
+	printf ("fooBar.foo () = %d\n", fooBar.foo ());
+	printf ("fooBar.bar () = %d\n", fooBar.bar ());
+	printf ("fooBar.foo () = %d\n", fooBar.foo ());
+	printf ("fooBar.baz () = %d\n", fooBar.baz ());
+
+	return 0;
+}

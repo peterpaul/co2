@@ -16,21 +16,29 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _TESTINTERFACE_H
-#define _TESTINTERFACE_H
+#include "co2/MyInterfaceImpl.h"
 
-/* This object implements MyInterface */
-#include "co2/MyInterface.h"
+#define O_SUPER Object()
 
-/* Implement interface method */
-#define TestInterfaceClass_Attr \
-	ObjectClass_Attr; \
-	O_METHOD(MyInterface, getValue)
+O_IMPLEMENT(MyInterfaceImpl, void *, ctor, (void *_self, va_list * argp))
+{
+	struct MyInterfaceImpl *self = o_cast(_self, MyInterfaceImpl());
+	self = O_SUPER->ctor(self, argp);
+	self->value = va_arg(*argp, int);
+	return self;
+}
 
-#define TestInterface_Attr \
-	Object_Attr; \
-	int value
+O_IMPLEMENT_IF(MyInterfaceImpl, int, getValue, (void *_self), (_self))
+{
+	struct MyInterfaceImpl *self = O_CAST(_self, MyInterfaceImpl());
+	return self->value;
+}
 
-O_CLASS(TestInterface, Object);
-
-#endif				/* _TESTINTERFACE_H */
+O_OBJECT(MyInterfaceImpl, Object);
+O_OBJECT_METHOD(MyInterfaceImpl, ctor);
+O_OBJECT_METHOD(MyInterfaceImpl, getValue);
+/* implement MyInterface */
+O_OBJECT_IF(MyInterface);
+O_OBJECT_IF_METHOD(MyInterfaceImpl, getValue);
+O_OBJECT_IF_END
+O_END_OBJECT

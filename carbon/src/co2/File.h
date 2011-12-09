@@ -23,11 +23,13 @@
 #include "co2/Hash.h"
 #include "co2/BaseCompileObjectVisitor.h"
 
+O_METHOD_DEF (File, void, generateDepend, (void *_self));
 O_METHOD_DEF (File, void, sort, (void *_self));
 O_METHOD_DEF (File, void, accept_all_files, (void *_self, struct BaseCompileObjectVisitor *visitor));
 
 #define FileClass_Attr				\
   CompileObjectClass_Attr;			\
+  O_METHOD (File, generateDepend);		\
   O_METHOD (File, sort);			\
   O_METHOD (File, accept_all_files)
 

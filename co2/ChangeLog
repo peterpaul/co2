@@ -1,3 +1,9 @@
+0.1.2: 
+	* Add o_branch_cast_interface function, and macros O_CAST_INTERFACE and O_BRANCH_CAST_INTERFACE.
+	* Extract O_IMPLEMENT_IF_BINDING macro from O_IMPLEMENT_IF
+	* More verifications in O_CALL_IF and O_BRANCH_CALL_IF when O_DEBUG is defined
+	* Add O_GET_ARG_IF and O_BRANCH_GET_ARG_IF macros to obtain interface arguments from va_arg.
+
 0.1.1: Add O_BRANCH_CALL_IF macro
 
 0.1.0: Initial release

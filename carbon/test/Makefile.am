@@ -45,6 +45,7 @@ pass/expr_conditional_expr.sh\
 pass/external_definition.sh\
 pass/function_call.sh\
 pass/function_definitions.sh\
+pass/function_nested.sh\
 pass/function_types_def.sh\
 pass/function_types.sh\
 pass/fun_decl.sh\
@@ -55,6 +56,9 @@ pass/import.sh\
 pass/include_subfolder.sh\
 pass/include_variable_and_function.sh\
 pass/interface_cast.sh\
+pass/interface_decl_diamont.sh\
+pass/interface_decl_mixin_diamont.sh\
+pass/interface_decl_mixin.sh\
 pass/interface_decl.sh\
 pass/interface_implementation.sh\
 pass/interface_multiple.sh\

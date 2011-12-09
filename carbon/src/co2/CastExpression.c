@@ -98,7 +98,7 @@ O_IMPLEMENT(CastExpression, void, generate, (void *_self))
       struct ObjectType * object_type = O_CAST(self->cast_type, ObjectType());
       if (o_is_of(object_type->decl, ClassDeclaration()))
 	{
-	  fprintf(out, "O_CAST (");
+	  fprintf(out, "O_BRANCH_CAST (");
 	  O_CALL(self->expression, generate);
 	  fprintf(out, ", ");
 	  O_CALL(object_type->token, generate);
@@ -106,7 +106,7 @@ O_IMPLEMENT(CastExpression, void, generate, (void *_self))
 	}
       else if (o_is_of(object_type->decl, InterfaceDeclaration()))
 	{
-	  fprintf(out, "o_cast_interface (");
+	  fprintf(out, "O_BRANCH_CAST_INTERFACE (");
 	  O_CALL(self->expression, generate);
 	  fprintf(out, ", ");
 	  O_CALL(object_type->token, generate);

@@ -30,4 +30,7 @@
 
 O_CLASS (InterfaceDeclaration, ObjectTypeDeclaration);
 
+bool interface_implements (struct InterfaceDeclaration *first,
+			   struct InterfaceDeclaration *second);
+
 #endif /* InterfaceDeclaration_H */

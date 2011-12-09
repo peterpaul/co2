@@ -32,7 +32,7 @@ echo "CFLAGS=${CFLAGS}" >> ${LOGFILE}
 echo "LDFLAGS=${LDFLAGS}" >> ${LOGFILE}
 echo "LD=${LD}" >> ${LOGFILE}
 
-CFLAGS="${CFLAGS} -O0 -g3 -Wall -I../${SRCDIR}/pass -I."
+CFLAGS="${CFLAGS} -DO_DEBUG -O0 -g3 -Wall -I../${SRCDIR}/pass -I."
 
 function compile_library_test {
     local TEST=$1
@@ -47,8 +47,8 @@ function compile_library_test {
     local TARGETNAME=${TARGET}/${DIRNAME}/${BASENAME}
     mkdir -p ${TARGET}/${DIRNAME}
     # Compile the testcase
-    echo "Command: ${COMPILER} -P ${SRCDIR}/pass ${SRCDIR}/${TEST} ${TARGETNAME}.c" >> ${LOGFILE}
-    ${COMPILER} -P ${SRCDIR}/pass ${SRCDIR}/${TEST} ${TARGETNAME}.c >> ${LOGFILE} 2>&1
+    echo "Command: ${COMPILER} -I ${SRCDIR}/pass ${SRCDIR}/${TEST} ${TARGETNAME}.c" >> ${LOGFILE}
+    ${COMPILER} -I ${SRCDIR}/pass ${SRCDIR}/${TEST} ${TARGETNAME}.c >> ${LOGFILE} 2>&1
     if [[ "$?" != "0" ]]
     then
 	echo "ERROR: ${TEST} failed: Compiler error" >> ${LOGFILE}
@@ -113,6 +113,11 @@ function run_pass_test {
     if [[ ! -f ${TESTOUTPUT} ]]; then touch ${TESTOUTPUT}; fi
     # Run program with input, and compare the output with the expected output.
     cat  ${TESTINPUT} | ${TARGETNAME}.bin > ${TARGETNAME}.out
+    # if [[ "$?" != "0" ]]
+    # then
+    # 	echo "ERROR: ${TEST} failed: execution error" >> ${LOGFILE}
+    # 	return 1
+    # fi
     diff ${TESTOUTPUT} ${TARGETNAME}.out
     if [[ "$?" != "0" ]]
     then

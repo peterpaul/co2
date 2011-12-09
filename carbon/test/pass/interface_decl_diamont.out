@@ -1,0 +1,4 @@
+foo.baz () = 5
+bar.baz () = 7
+foo.baz () = 6
+bar.baz () = 6
