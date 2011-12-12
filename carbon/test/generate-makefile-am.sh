@@ -58,3 +58,5 @@ generate_makefile_am_header | tee Makefile.am
 
 generate_testcases pass "${pass_cases}" | tee -a Makefile.am
 generate_testcases fail "${fail_cases}" | tee -a Makefile.am
+# newline to cleanup commandline output
+echo

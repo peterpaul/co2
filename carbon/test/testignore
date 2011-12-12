@@ -1,4 +1,5 @@
 pass/MyObject.sh
+pass/scope_override_declaration_order.sh
 fail/interface_method_in_two_interfaces.sh
 fail/interface_not_implemented.sh
 fail/cast_expression.sh
