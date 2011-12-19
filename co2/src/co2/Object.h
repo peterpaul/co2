@@ -167,6 +167,18 @@
 	 O_ASSERT_CLASS(((struct Object *)(x))->class),			\
 	 (x))
 
+/**
+ * Asserts o implements _if
+ *
+ * @param o Object
+ * @param _if Interface
+ */
+#define O_IS_IMPLEMENTATION(o,_if)					\
+  {typeof(o) _tmp = o;							\
+    assertTrue(o_implements (_tmp, _if),				\
+	       "runtime error: %s at %p does not respond to %s.",	\
+	       _tmp->class->name, (void *)_tmp, _if->name);}
+
 #define O_OBJECT(klass,supper)						\
 	struct Class * klass##Class() {					\
 		static struct Class _self;				\
