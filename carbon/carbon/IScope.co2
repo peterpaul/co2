@@ -1,0 +1,52 @@
+include co2/Enum
+include Token
+include Declaration
+
+int scope_initialized = false;
+
+class ScopeType : Enum {
+	ScopeType () {
+		super ();
+		if (!scope_initialized) {
+			scope_initialized = true;
+			global_scope_type = createPrivateScopeType (1, "global_scope_type");
+			variable_scope_type = createPrivateScopeType (2, "variable_scope_type");
+			class_scope_type = createPrivateScopeType (3, "class_scope_type");
+			argument_scope_type = createPrivateScopeType (4, "argument_scope_type");
+			compound_scope_type = createPrivateScopeType (5, "compound_scope_type");
+			interface_scope_type = createPrivateScopeType (6, "interface_scope_type");
+			struct_scope_type = createPrivateScopeType (7, "struct_scope_type");
+			catch_scope_type = createPrivateScopeType (7, "catch_scope_type");
+		}
+		name = null;
+		value = 0;
+	}
+
+	ScopeType.private (int v, char * n) {
+		super.private (v, n);
+	}
+}
+
+ScopeType createPrivateScopeType (int v, char * n)
+{
+	ScopeType l = new ScopeType.private (v, n);
+	l.retain ();
+	return l;
+}
+
+ScopeType global_scope_type, variable_scope_type, class_scope_type, argument_scope_type, compound_scope_type, interface_scope_type, struct_scope_type, catch_scope_type;
+
+IScope current_scope = null;
+IScope global_scope = null;
+
+interface IScope {
+	Declaration declare (Declaration decl);
+	void leave ();
+	Declaration lookup_in_this_scope (Token token);
+	Declaration lookup (Token token);
+	Declaration find_type_in_this_scope (Token token, Class type);
+	Declaration find_type (Token token, Class type);
+	Bool exists_in_this_scope (Token token);
+	Bool exists (Token token);
+	ScopeType get_type ();
+}

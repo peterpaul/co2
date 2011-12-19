@@ -1,48 +1,9 @@
-include co2/Enum
 include co2/HashMap
 include co2/RefObject
-include Token
-include Declaration
+include IScope
 include error
 
-int scope_initialized = false;
-
-class ScopeType : Enum {
-	ScopeType () {
-		super ();
-		if (!scope_initialized) {
-			scope_initialized = true;
-			global_scope_type = createPrivateScopeType (1, "global_scope_type");
-			variable_scope_type = createPrivateScopeType (2, "variable_scope_type");
-			class_scope_type = createPrivateScopeType (3, "class_scope_type");
-			argument_scope_type = createPrivateScopeType (4, "argument_scope_type");
-			compound_scope_type = createPrivateScopeType (5, "compound_scope_type");
-			interface_scope_type = createPrivateScopeType (6, "interface_scope_type");
-			struct_scope_type = createPrivateScopeType (7, "struct_scope_type");
-			catch_scope_type = createPrivateScopeType (7, "catch_scope_type");
-		}
-		name = null;
-		value = 0;
-	}
-
-	ScopeType.private (int v, char * n) {
-		super.private (v, n);
-	}
-}
-
-ScopeType createPrivateScopeType (int v, char * n)
-{
-	ScopeType l = new ScopeType.private (v, n);
-	l.retain ();
-	return l;
-}
-
-ScopeType global_scope_type, variable_scope_type, class_scope_type, argument_scope_type, compound_scope_type, interface_scope_type, struct_scope_type, catch_scope_type;
-
-Scope current_scope = null;
-Scope global_scope = null;
-
-class Scope : RefObject {
+class Scope : RefObject, IScope {
 	ScopeType type;
 	Token name;
 	Scope parent;

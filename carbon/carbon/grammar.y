@@ -424,37 +424,37 @@ function_declaration
 function_header
 :	type IDENTIFIER '(' 
 /* { 
-  O_CALL_CLASS(Scope(), new, ARGUMENT_SCOPE, $2); 
+  O_CALL_CLASS(Scope(), new, argument_scope_type, $2); 
 } */
 formal_argument_list_var ')' implemented_interface_methods
-{
+/* {
   struct FunctionType * type = O_CALL_CLASS(FunctionType(), new_ctor, _FunctionType_ctor_from_decl, $1, $5);
   struct FunctionDeclaration * decl = O_CALL_CLASS(FunctionDeclaration(), new, $2, type, $5, NULL);
   decl->implemented_methods = O_CALL($7, retain);
   $$ = decl;
-}
+} */
 ;
 
 implemented_interface_methods
 :	implemented_interface_methods implemented_interface_method
-{
+/* {
   O_CALL ($1, append, $2);
-}
+} */
 |	/* empty */
-{
+/* {
   $$ = O_CALL_CLASS (RefList (), new, 8, InterfaceMethodDefinition ());
-}
+} */
 ;
 
 implemented_interface_method
 :	',' TYPE_IDENTIFIER
-{
+/* {
   $$ = O_CALL_CLASS (InterfaceMethodDefinition (), new, $2, NULL);
-}
+} */
 |	',' TYPE_IDENTIFIER '.' IDENTIFIER
-{
+/* {
   $$ = O_CALL_CLASS (InterfaceMethodDefinition (), new, $2, $4);
-}
+} */
 ;
 
 formal_argument_list_var
@@ -1057,7 +1057,7 @@ int parse()
   O_CALL_IF(IScope, current_scope, leave);
   if(result == 0)
     {
-      ScopeType scope_type = O_BRANCH_CALL_IF (IScope, current_scope, get_type);
+      struct ScopeType *scope_type = O_BRANCH_CALL_IF (IScope, current_scope, get_type);
       assertTrue(current_scope == NULL, "current_scope(%d) is not NULL", scope_type);
       // O_CALL(parsed_file, parse_imports);
     }

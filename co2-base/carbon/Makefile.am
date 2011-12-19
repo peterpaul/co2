@@ -69,18 +69,16 @@ libco2_base_1_0_la_CPPFLAGS=-O0 -g3 -DO_DEBUG
 CARBON_FLAGS=-I .
 
 %.c: %.co2
-	-rm -f $@
-	carbon $(CARBON_FLAGS) $< $@
-	indent $@
+	if test "$(CARBON)" == "no"; then echo "please install carbon first"; else rm -f $@ | true; $(CARBON) $(CARBON_FLAGS) $< $@; indent $@; fi
 
 %.h: %.c
 
 %.d: %.co2
 	-rm -f $@
 	echo -n "`echo $@ | sed 's/\.d/.c/g'` " > $@
-	carbon --depend $(CARBON_FLAGS) $< $@ >> $@
+	if test "$(CARBON)" == "no"; then echo ": " $< >> $@; else $(CARBON) --depend $(CARBON_FLAGS) $< $@ >> $@; fi
 
 clean-local:
-	-rm -f $(GENERATED_CHEADERS) $(GENERATED_CSOURCES) $(GENERATED_CO2DEPEND)
+	if test "$(CARBON)" == "no"; then rm -f $(GENERATED_CO2DEPEND); else rm -f $(GENERATED_CHEADERS) $(GENERATED_CSOURCES) $(GENERATED_CO2DEPEND); fi
 
 include $(GENERATED_CO2DEPEND)

@@ -21,6 +21,7 @@ ClassDeclaration.co2\
 CompileObject.co2\
 CompileObjectVisitor.co2\
 CompoundStatement.co2\
+CompositeScope.co2\
 ConditionalBinaryExpression.co2\
 ConditionalExpression.co2\
 ConstructorDeclaration.co2\
@@ -49,6 +50,7 @@ HelloWorldVisitor.co2\
 IfStatement.co2\
 InterfaceDeclaration.co2\
 io.co2\
+IScope.co2\
 IsOfExpression.co2\
 MacroDeclaration.co2\
 NestedExpression.co2\
@@ -106,16 +108,14 @@ $(GENERATED_CHEADERS)
 CARBON_FLAGS=$(CO2_BASE_PATH) $(CO2_BASE_PATH)/co2
 
 %.c: %.co2
-	-rm -f $@
-	carbon $(CARBON_FLAGS) $< $@
-	indent $@
+	if test "$(CARBON)" == "no"; then echo "please install carbon first"; else rm -f $@ | true; $(CARBON) $(CARBON_FLAGS) $< $@; indent $@; fi
 
 %.h: %.c
 
 %.d: %.co2
 	-rm -f $@
 	echo -n "`echo $@ | sed 's/\.d/.c/g'` " > $@
-	carbon --depend $(CARBON_FLAGS) $< $@ >> $@
+	if test "$(CARBON)" == "no"; then echo ": " $< >> $@; else $(CARBON) --depend $(CARBON_FLAGS) $< $@ >> $@; fi
 
 grammar.h: grammar.c
 
@@ -135,6 +135,6 @@ distclean-local:
 
 clean-local:
 	-rm -f grammar.c grammar.h lex.c
-	-rm -f $(GENERATED_CHEADERS) $(GENERATED_CSOURCES) $(GENERATED_CO2DEPEND)
+	if test "$(CARBON)" == "no"; then rm -f $(GENERATED_CO2DEPEND); else rm -f $(GENERATED_CHEADERS) $(GENERATED_CSOURCES) $(GENERATED_CO2DEPEND); fi
 
 include $(GENERATED_CO2DEPEND)

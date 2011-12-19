@@ -57,7 +57,7 @@
   ({typeof(o) _tmp = o;							\
     struct interface * _if = o_get_interface(_tmp, interface());	\
     assertTrue(_if,"runtime error: %s at %p doesn't implement %s.",	\
-	       _tmp->class->name, (void *)_tmp, __STRING(interface));	\
+	       _tmp->class->class_name, (void *)_tmp, __STRING(interface));	\
     assertTrue(_if->msg,"runtime error: %s at %p doesn't respond to %s.", \
 	       _tmp->class->class_name, (void *)_tmp, __STRING(msg));		\
     _if->msg(_tmp,##__VA_ARGS__);})
@@ -66,10 +66,10 @@
     struct interface * _if = _tmp ? o_get_interface(_tmp, interface()) : NULL; \
     assertTrue(_tmp ? _if : true,					\
 	       "runtime error: %s at %p doesn't implement %s.",		\
-	       _tmp->class->name, (void *)_tmp, __STRING(interface));	\
+	       _tmp->class->class_name, (void *)_tmp, __STRING(interface));	\
     assertTrue(_tmp ? _if->msg : true,					\
 	       "runtime error: %s at %p doesn't respond to %s.",	\
-	       _tmp->class->name, (void *)_tmp, __STRING(msg));		\
+	       _tmp->class->class_name, (void *)_tmp, __STRING(msg));		\
     _tmp ? _if->msg(_tmp,##__VA_ARGS__) : (typeof(_if->msg(_tmp,##__VA_ARGS__)))0;})
 #else
 #define O_CALL_IF(interface,o,msg,...)					\
