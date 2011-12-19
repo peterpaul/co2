@@ -1,0 +1,15 @@
+include Type
+include Token
+
+class PrimitiveType : Type {
+	Token token;
+
+	PrimitiveType (Token token) {
+		super ();
+		self.token = (Token) token.retain ();
+	}
+
+	~PrimitiveType () {
+		token.release ();
+	}
+}

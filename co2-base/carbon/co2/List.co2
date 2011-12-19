@@ -7,5 +7,15 @@ interface List, Collection {
 	RefObject set (unsigned index, RefObject item);
 	RefObject add (RefObject item);
 	List addAll (List list);
+	List merge (List list) {
+		List retval = addAll (list);
+		if (list is_of RefObject) {
+			((RefObject) list).release ();
+		} else {
+			delete list;
+		}
+		return retval;
+	}
+
 	RefObject removeLast ();
 }

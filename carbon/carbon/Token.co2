@@ -2,8 +2,6 @@ include co2/String
 include CompileObject
 include File
 
-int _VA_ARG;
-
 class Token : CompileObject {
 	String name;
 	File file;

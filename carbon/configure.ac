@@ -9,6 +9,9 @@ AM_SILENT_RULES([yes])
 AC_CONFIG_SRCDIR([carbon/Compiler.co2])
 AC_CONFIG_HEADERS([carbon/config.h])
 
+AC_DEFUN([AC_PROG_CARBON],
+	[AC_PATH_PROG(CARBON, carbon, no)])
+
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_AWK
@@ -23,6 +26,7 @@ AC_PROG_RANLIB
 AC_PROG_LEX
 AC_PROG_MKDIR_P
 AC_PROG_YACC
+AC_PROG_CARBON
 
 # Checks for libraries.
 AC_CHECK_LIB([pthread], [pthread_create])

@@ -1,7 +1,83 @@
 include CompileObject
+include TypeDeclaration
+include ObjectType
+include ArrayType
+include PrimitiveType
 
 class Type : CompileObject {
 	Type () {
 		super ();
+	}
+
+	~Type () {
+	}
+
+	Type get_declared_type () {
+		if (self is_of ObjectType) {
+			ObjectType o_type = (ObjectType) self;
+			if (o_type.decl && o_type.decl is_of TypeDeclaration) {
+				TypeDeclaration o_type_decl = (TypeDeclaration) o_type.decl;
+				return o_type_decl.type;
+			}
+		}
+		return self;
+	}
+
+	Bool is_compatible (Type other) {
+		if (other) {
+			other = other.get_declared_type ();
+			return other is_of get_declared_type ().class;
+		} else {
+			return false;
+		}
+	}
+
+	void assert_compatible (Type other) {
+		if (!is_compatible (other)) {
+			if (other) {
+				Token token = get_token ();
+				String self_string = toString ();
+				String other_string = other.toString ();
+				error (token, "incompatible types: %s and %s\n", self_string.data, other_string.data);
+				delete self_string;
+				delete other_string;
+			} else {
+				Token token = get_token ();
+				String self_string = toString ();
+				error (token, "incompatible types: %s and %s\n", self_string.data, null);
+				delete self_string;
+			}
+		}
+	}
+
+	void assume_compatible (Type other) {
+		if (!is_compatible (other)) {
+			if (other) {
+				Token token = get_token ();
+				String self_string = toString ();
+				String other_string = other.toString ();
+				warning (token, "incompatible types: %s and %s\n", self_string.data, other_string.data);
+				delete self_string;
+				delete other_string;
+			} else {
+				Token token = get_token ();
+				String self_string = toString ();
+				warning (token, "incompatible types: %s and %s\n", self_string.data, null);
+				delete self_string;
+			}
+		}
+	}
+
+	Bool is_void_ptr () {
+		if (self is_of ArrayType) {
+			ArrayType array_type = (ArrayType) self;
+			if (array_type.base_type is_of PrimitiveType) {
+				PrimitiveType primitive_type = (PrimitiveType) array_type.base_type;
+				if (primitive_type.token.type == _VOID) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 }

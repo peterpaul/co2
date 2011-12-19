@@ -1,8 +1,21 @@
 include Declaration
 include Token
+include Scope
+include co2/List
 
 class ObjectTypeDeclaration : Declaration {
+	List members;
+	Scope member_scope;
+
 	ObjectTypeDeclaration (Token name) {
 		super (name);
 	}
+
+	~ObjectTypeDeclaration () {
+		((RefObject) members)?.release ();
+		member_scope.release ();
+		
+	}
+
+	Bool is_compatible (ObjectTypeDeclaration other);
 }

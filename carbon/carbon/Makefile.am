@@ -3,8 +3,6 @@ ACLOCAL_AMFLAGS=-I m4
 
 AM_YFLAGS=-d
 
-CO2_BASE_PATH=$(shell pkg-config co2-base-1.0 --cflags | sed 's/-I/-I /g' | sed 's/[ \t]*$$//g' )
-
 lib_LTLIBRARIES=libcarbon-1.0.la
 libcarbon_1_0_ladir=$(includedir)/carbon-1.0
 
@@ -45,6 +43,7 @@ GenerateHeaderIncludesVisitor.co2\
 GenerateHeaderVisitor.co2\
 GenerateSourceIncludesVisitor.co2\
 GenerateSourceVisitor.co2\
+Grammar.co2\
 Hash.co2\
 HelloWorldVisitor.co2\
 IfStatement.co2\
@@ -105,6 +104,10 @@ libcarbon_1_0_la_HEADERS=\
 $(libcarbon_1_0_la_CO2SOURCES)\
 $(GENERATED_CHEADERS)
 
+libcarbon_1_0_la_CPPFLAGS=-O0 -g3 -DO_DEBUG
+
+CO2_BASE_PATH=$(shell pkg-config co2-base-1.0 --cflags | sed 's/-I/-I /g' | sed 's/[ \t]*$$//g' )
+
 CARBON_FLAGS=$(CO2_BASE_PATH) $(CO2_BASE_PATH)/co2
 
 %.c: %.co2
@@ -114,6 +117,7 @@ CARBON_FLAGS=$(CO2_BASE_PATH) $(CO2_BASE_PATH)/co2
 
 %.d: %.co2
 	-rm -f $@
+	set -x
 	echo -n "`echo $@ | sed 's/\.d/.c/g'` " > $@
 	if test "$(CARBON)" == "no"; then echo ": " $< >> $@; else $(CARBON) --depend $(CARBON_FLAGS) $< $@ >> $@; fi
 

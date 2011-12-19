@@ -1,6 +1,7 @@
 include co2/RefObject
 include Token
 include CompileObjectVisitor
+include Grammar
 
 class CompileObject : RefObject {
 	CompileObject () {

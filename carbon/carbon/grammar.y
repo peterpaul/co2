@@ -101,49 +101,49 @@
   struct IScope * scope;
 }
 
-%token <token> BREAK
-%token <token> CASE
-%token <token> CATCH
-%token <token> CHAR
-%token <token> CHAR_CONSTANT
-%token <token> CLASS
-%token <token> CONTINUE
-%token <token> DEFAULT
-%token <token> DO
-%token <token> DOUBLE
-%token <token> DELETE
-%token <token> ELSE
-%token <token> FINALLY
-%token <token> FLOAT
-%token <token> FLOAT_CONSTANT
-%token <token> FOR
- /* %token <token> FOREACH */
-%token <token> GET_VA_ARG
-%token <token> IDENTIFIER
-%token <token> IF
-%token <token> IMPORT
-%token <token> INT
-%token <token> INT_CONSTANT
-%token <token> INTERFACE
-%token <token> NEW
-%token <token> NULL_
-%token <token> RETURN
-%token <token> SELF
-%token <token> SIZEOF
-%token <token> STRING_CONSTANT
-%token <token> STRUCT
-%token <token> SUPER
-%token <token> SWITCH
-%token <token> THROW
-%token <token> TRY
-%token <token> TYPEDEF
-%token <token> TYPE_IDENTIFIER
-%token <token> UNSIGNED
+%token <token> _BREAK
+%token <token> _CASE
+%token <token> _CATCH
+%token <token> _CHAR
+%token <token> _CHAR_CONSTANT
+%token <token> _CLASS
+%token <token> _CONTINUE
+%token <token> _DEFAULT
+%token <token> _DO
+%token <token> _DOUBLE
+%token <token> _DELETE
+%token <token> _ELSE
+%token <token> _FINALLY
+%token <token> _FLOAT
+%token <token> _FLOAT_CONSTANT
+%token <token> _FOR
+ /* %token <token> _FOREACH */
+%token <token> _GET_VA_ARG
+%token <token> _IDENTIFIER
+%token <token> _IF
+%token <token> _IMPORT
+%token <token> _INT
+%token <token> _INT_CONSTANT
+%token <token> _INTERFACE
+%token <token> _NEW
+%token <token> _NULL_
+%token <token> _RETURN
+%token <token> _SELF
+%token <token> _SIZEOF
+%token <token> _STRING_CONSTANT
+%token <token> _STRUCT
+%token <token> _SUPER
+%token <token> _SWITCH
+%token <token> _THROW
+%token <token> _TRY
+%token <token> _TYPEDEF
+%token <token> _TYPE_IDENTIFIER
+%token <token> _UNSIGNED
  /* '...' */
-%token <token> VA_ARG
-%token <token> VA_LIST
-%token <token> VOID
-%token <token> WHILE
+%token <token> _VA_ARG
+%token <token> _VA_LIST__
+%token <token> _VOID
+%token <token> _WHILE
 
  /* Declarations */
 %type	<declaration>	class_declaration
@@ -213,29 +213,29 @@
 %type	<token>		identifier
 
  /* Solve shift-reduce conflict for if-else */
-%nonassoc	IFX
-%nonassoc	ELSE
+%nonassoc	_IFX
+%nonassoc	_ELSE
 
  /* Solve shift-reduce conflict for constructor, in combination with '(' */
-%nonassoc	CONSTRUCTX
+%nonassoc	_CONSTRUCTX
 
-%nonassoc	CATCHX
-%nonassoc	CATCH
-%nonassoc	FINALLY
+%nonassoc	_CATCHX
+%nonassoc	_CATCH
+%nonassoc	_FINALLY
 
 %left		<token>	','
-%right		<token>	'=' INCREASE DECREASE MULTIPLY DIVIDE POWER REMINDER AND_IS OR_IS XOR_IS
-%left		<token>	OR '|' 
-%left		<token>	AND '&'
-%left		<token>	EQ NEQ IS_OF
-%nonassoc	<token>	'<' LEQ '>' GEQ
-%left		<token> XOR '#'
-%left		<token>	SHIFTL SHIFTR
+%right		<token>	'=' _INCREASE _DECREASE _MULTIPLY _DIVIDE _POWER _REMINDER _AND_IS _OR_IS _XOR_IS
+%left		<token>	_OR '|' 
+%left		<token>	_AND '&'
+%left		<token>	_EQ _NEQ _IS_OF
+%nonassoc	<token>	'<' _LEQ '>' _GEQ
+%left		<token> _XOR '#'
+%left		<token>	_SHIFTL _SHIFTR
 %left		<token>	'+' '-'
 %left		<token>	'*' '/' '%' '^'
-%right		<token>	'!' UNARY_MINUS UNARY_PLUS ADDRESS_OF DEREFERENCE
+%right		<token>	'!' _UNARY_MINUS _UNARY_PLUS _ADDRESS_OF _DEREFERENCE
  /* Solve shift-reduce conflict for casts */
-%right	CASTX
+%right		_CASTX
 %left		<token> ':' '?'
 %left		<token>	'(' '[' '.'
 
@@ -310,20 +310,20 @@ declaration
 ;
 
 type_declaration
-:	TYPEDEF TYPE_IDENTIFIER '=' type ';'
+:	_TYPEDEF _TYPE_IDENTIFIER '=' type ';'
 /* {
   $$ = O_CALL_CLASS (TypeDeclaration (), new, $2, $4, false);
 } */
-|	TYPEDEF TYPE_IDENTIFIER '=' STRUCT type ';'
+|	_TYPEDEF _TYPE_IDENTIFIER '=' _STRUCT type ';'
 /* {
   $$ = O_CALL_CLASS (TypeDeclaration (), new, $2, $5, true);
 } */
-|	TYPEDEF TYPE_IDENTIFIER '=' IDENTIFIER ';'
+|	_TYPEDEF _TYPE_IDENTIFIER '=' _IDENTIFIER ';'
 /* {
   struct Type * type = O_CALL_CLASS (PrimitiveType (), new, $4);
   $$ = O_CALL_CLASS (TypeDeclaration (), new, $2, type, false);
 } */
-|	TYPEDEF TYPE_IDENTIFIER '=' STRUCT IDENTIFIER ';'
+|	_TYPEDEF _TYPE_IDENTIFIER '=' _STRUCT _IDENTIFIER ';'
 /* {
   struct Type * type = O_CALL_CLASS (PrimitiveType (), new, $5);
   $$ = O_CALL_CLASS (TypeDeclaration (), new, $2, type, true);
@@ -368,7 +368,7 @@ definition
 ;
 
 header_file
-:	'[' STRING_CONSTANT ']'
+:	'[' _STRING_CONSTANT ']'
 /* {
   $$ = $2;
 } */
@@ -395,17 +395,17 @@ variable_declaration_id_list
 ;
 
 variable_declaration_id
-:	IDENTIFIER
+:	_IDENTIFIER
 /* {
   $$ = O_CALL_CLASS(VariableDeclaration(), new, $1, NULL);
   O_CALL_IF(IScope, current_scope, declare, $$);
 } */
-|	CLASS
+|	_CLASS
 /* {
   $$ = O_CALL_CLASS(VariableDeclaration(), new, $1, NULL);
   O_CALL_IF(IScope, current_scope, declare, $$);
 } */
-|	IDENTIFIER '=' expression
+|	_IDENTIFIER '=' expression
 /* {
   $$ = O_CALL_CLASS(VariableDeclaration(), new, $1, $3);
   O_CALL_IF(IScope, current_scope, declare, $$);
@@ -422,7 +422,7 @@ function_declaration
 ;
 
 function_header
-:	type IDENTIFIER '(' 
+:	type _IDENTIFIER '(' 
 /* { 
   O_CALL_CLASS(Scope(), new, argument_scope_type, $2); 
 } */
@@ -447,25 +447,25 @@ implemented_interface_methods
 ;
 
 implemented_interface_method
-:	',' TYPE_IDENTIFIER
+:	',' _TYPE_IDENTIFIER
 /* {
   $$ = O_CALL_CLASS (InterfaceMethodDefinition (), new, $2, NULL);
 } */
-|	',' TYPE_IDENTIFIER '.' IDENTIFIER
+|	',' _TYPE_IDENTIFIER '.' _IDENTIFIER
 /* {
   $$ = O_CALL_CLASS (InterfaceMethodDefinition (), new, $2, $4);
 } */
 ;
 
 formal_argument_list_var
-:	formal_argument_list ',' VA_ARG
+:	formal_argument_list ',' _VA_ARG
 /* {
   struct Type * type = O_CALL_CLASS(PrimitiveType(), new, $3);
   struct ArgumentDeclaration * arg = O_CALL_CLASS(ArgumentDeclaration(), new, $3, type);
   O_CALL($$, append, arg);
 } */
 |	opt_formal_argument_list
-|	VA_ARG
+|	_VA_ARG
 /* {
   $$ = O_CALL_CLASS(RefList(), new, 8, ArgumentDeclaration());
   struct Type * type = O_CALL_CLASS(PrimitiveType(), new, $1);
@@ -495,7 +495,7 @@ formal_argument_list
 ;
 
 formal_argument
-:	type IDENTIFIER
+:	type _IDENTIFIER
 /* {
   $$ = O_CALL_CLASS(ArgumentDeclaration(), new, $2, $1);
   O_CALL_IF(IScope, current_scope, declare, $$);
@@ -503,9 +503,9 @@ formal_argument
 ;
 
 struct_declaration
-:	STRUCT identifier
+:	_STRUCT identifier
 /* {
-  $<scope>$ = O_CALL_CLASS (Scope (), new, STRUCT_SCOPE, $2);
+  $<scope>$ = O_CALL_CLASS (Scope (), new, _STRUCT_SCOPE, $2);
 } */
 '{' struct_declaration_body '}'
 /* {
@@ -516,8 +516,8 @@ struct_declaration
 ;
 
 identifier
-: TYPE_IDENTIFIER
-| IDENTIFIER
+: _TYPE_IDENTIFIER
+| _IDENTIFIER
 ;
 
 struct_declaration_body
@@ -551,12 +551,12 @@ class_declaration
 ;
 
 class_header
-:	CLASS TYPE_IDENTIFIER ':' TYPE_IDENTIFIER interface_list
+:	_CLASS _TYPE_IDENTIFIER ':' _TYPE_IDENTIFIER interface_list
 /* {
   O_CALL ($1, delete);
   $$ = O_CALL_CLASS(ClassDeclaration(), new, $2, $4, $5);
 } */
-|	CLASS TYPE_IDENTIFIER interface_list
+|	_CLASS _TYPE_IDENTIFIER interface_list
 /* {
   O_CALL ($1, delete);
   $$ = O_CALL_CLASS(ClassDeclaration(), new, $2, NULL, $3);
@@ -564,7 +564,7 @@ class_header
 ;
 
 interface_list
-:	interface_list ',' TYPE_IDENTIFIER
+:	interface_list ',' _TYPE_IDENTIFIER
 /* {
   O_CALL($$, append, $3);
 } */
@@ -633,11 +633,11 @@ compound_content
 ;
 
 try_statement
-:	TRY statement catch_statement_list %prec CATCHX
+:	_TRY statement catch_statement_list %prec _CATCHX
 /* {
   $$ = O_CALL_CLASS (TryStatement (), new, $2, $3, NULL);
 } */
-|	TRY statement catch_statement_list FINALLY statement
+|	_TRY statement catch_statement_list _FINALLY statement
 /* {
   struct Statement * final = O_CALL_CLASS (FinallyStatement (), new, $5);
   $$ = O_CALL_CLASS (TryStatement (), new, $2, $3, final);
@@ -656,9 +656,9 @@ catch_statement_list
 ;
 
 catch_statement
-:	CATCH 
+:	_CATCH 
 /* {
-  $<scope>$ = O_CALL_CLASS (Scope (), new, CATCH_SCOPE, NULL);
+  $<scope>$ = O_CALL_CLASS (Scope (), new, _CATCH_SCOPE, NULL);
 } */
 '(' formal_argument ')' statement
 /* {
@@ -668,18 +668,18 @@ catch_statement
 ;
 
 throw_statement
-:	THROW expression ';'
+:	_THROW expression ';'
 /* {
   $$ = O_CALL_CLASS (ThrowStatement (), new, $2);
 } */
 ;
 
 if_statement
-:	IF '(' expression ')' statement %prec IFX
+:	_IF '(' expression ')' statement %prec _IFX
 /* {
   $$ = O_CALL_CLASS(IfStatement(), new, $3, $5, NULL);
 } */
-|	IF '(' expression ')' statement ELSE statement
+|	_IF '(' expression ')' statement _ELSE statement
 /* {
   $$ = O_CALL_CLASS(IfStatement(), new, $3, $5, $7);
 } */
@@ -693,60 +693,60 @@ expression_statement
 ;
 
 do_statement
-:	DO statement WHILE expression ';'
+:	_DO statement _WHILE expression ';'
 /* {
   $$ = O_CALL_CLASS(DoStatement(), new, $2, $4);
 } */
 ;
 
 while_statement
-:	WHILE '(' expression ')' statement
+:	_WHILE '(' expression ')' statement
 /* {
   $$ = O_CALL_CLASS(WhileStatement(), new, $3, $5);
 } */
 ;
 
 for_statement
-:	FOR '(' expression ';' expression ';' expression ')' statement
+:	_FOR '(' expression ';' expression ';' expression ')' statement
 /* {
   $$ = O_CALL_CLASS(ForStatement(), new, $3, $5, $7, $9);
 } */
 ;
 
 return_statement
-:	RETURN expression ';'
+:	_RETURN expression ';'
 /* {
   $$ = O_CALL_CLASS(ReturnStatement(), new, $2);
 } */
-|	RETURN ';'
+|	_RETURN ';'
 /* {
   $$ = O_CALL_CLASS(ReturnStatement(), new, NULL);
 } */
 ;
 
 delete_statement
-:	DELETE expression ';'
+:	_DELETE expression ';'
 /* {
   $$ = O_CALL_CLASS(DeleteStatement(), new, $2);
 } */
 ;
 
 break_statement
-:	BREAK ';'
+:	_BREAK ';'
 /* {
   $$ = O_CALL_CLASS(BreakStatement(), new);
 } */
 ;
 
 continue_statement
-:	CONTINUE ';'
+:	_CONTINUE ';'
 /* {
   $$ = O_CALL_CLASS(ContinueStatement(), new);
 } */
 ;
 
 switch_statement
-:	SWITCH '(' expression ')' '{' case_statement_list_with_default '}'
+:	_SWITCH '(' expression ')' '{' case_statement_list_with_default '}'
 /* {
   $$ = O_CALL_CLASS (SwitchStatement (), new, $3, $6);
 } */
@@ -773,7 +773,7 @@ case_statement_list
 ;
 
 case_statement
-:	CASE constant ':' case_content_list
+:	_CASE constant ':' case_content_list
 /* {
   $$ = O_CALL_CLASS (CaseStatement (), new, $2, $4);
 } */
@@ -791,7 +791,7 @@ case_content_list
 ;
 
 default_case
-:	DEFAULT ':' case_content_list
+:	_DEFAULT ':' case_content_list
 /* {
   $$ = O_CALL_CLASS (CaseStatement (), new, NULL, $3);
 } */
@@ -813,7 +813,7 @@ interface_declaration
 ;
 
 interface_header
-:	INTERFACE TYPE_IDENTIFIER interface_list 
+:	_INTERFACE _TYPE_IDENTIFIER interface_list 
 /* {
   $$ = O_CALL_CLASS(InterfaceDeclaration(), new, $2, $3);
 } */
@@ -838,27 +838,27 @@ interface_method_declaration_list
 ;
 
 type
-:	TYPE_IDENTIFIER %prec CONSTRUCTX
+:	_TYPE_IDENTIFIER %prec _CONSTRUCTX
 /* {
   $$ = O_CALL_CLASS(ObjectType(), new, $1, NULL);
 } */
-|	INT
+|	_INT
 /* {
   $$ = O_CALL_CLASS(PrimitiveType(), new, $1);
 } */
-|	UNSIGNED
+|	_UNSIGNED
 /* {
   $$ = O_CALL_CLASS(PrimitiveType(), new, $1);
 } */
-|	FLOAT
+|	_FLOAT
 /* {
   $$ = O_CALL_CLASS(PrimitiveType(), new, $1);
 } */
-|	DOUBLE
+|	_DOUBLE
 /* {
   $$ = O_CALL_CLASS(PrimitiveType(), new, $1);
 } */
-|	CHAR
+|	_CHAR
 /* {
   $$ = O_CALL_CLASS(PrimitiveType(), new, $1);
 } */
@@ -870,11 +870,11 @@ type
 /* {
   $$ = O_CALL_CLASS(ArrayType(), new, $1);
 } */
-|	VA_LIST
+|	_VA_LIST__
 /* {
   $$ = O_CALL_CLASS(PrimitiveType(), new, $1);
 } */
-|	VOID
+|	_VOID
 /* {
   $$ = O_CALL_CLASS(PrimitiveType(), new, $1);
 } */
@@ -906,10 +906,10 @@ type_list
 
 expression
 :	constant
-|	IDENTIFIER /* { $$ = O_CALL_CLASS(TokenExpression(), new, $1); } */
-|	CLASS /* { $$ = O_CALL_CLASS(TokenExpression(), new, $1); } */
-|	SELF /* { $$ = O_CALL_CLASS(TokenExpression(), new, $1); } */
-|	VA_ARG /* { $$ = O_CALL_CLASS(TokenExpression(), new, $1); } */
+|	_IDENTIFIER /* { $$ = O_CALL_CLASS(TokenExpression(), new, $1); } */
+|	_CLASS /* { $$ = O_CALL_CLASS(TokenExpression(), new, $1); } */
+|	_SELF /* { $$ = O_CALL_CLASS(TokenExpression(), new, $1); } */
+|	_VA_ARG /* { $$ = O_CALL_CLASS(TokenExpression(), new, $1); } */
 |	expression '(' opt_actual_argument_list ')' /* { $$ = O_CALL_CLASS(FunctionCallExpression(), new, $1, $3); } */
 |	expression '[' expression ']' /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
 |	expression '.' expression /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
@@ -924,61 +924,61 @@ expression
 |	expression '|' expression /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
 |	expression '#' expression /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
 |	expression '=' expression /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
-|	expression AND expression /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
-|	expression OR expression /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
-|	expression XOR expression /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
-|	expression EQ expression /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
-|	expression NEQ expression /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
+|	expression _AND expression /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
+|	expression _OR expression /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
+|	expression _XOR expression /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
+|	expression _EQ expression /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
+|	expression _NEQ expression /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
 |	expression '<' expression /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
 |	expression '>' expression /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
-|	expression LEQ expression /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
-|	expression GEQ expression /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
-|	expression SHIFTR expression /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
-|	expression SHIFTL expression /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
-|	expression INCREASE expression /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
-|	expression DECREASE expression /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
-|	expression MULTIPLY expression /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
-|	expression DIVIDE expression /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
-|	expression POWER expression /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
-|	expression REMINDER expression /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
-|	expression AND_IS expression /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
-|	expression OR_IS expression /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
-|	expression XOR_IS expression /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
-|	'-' expression %prec UNARY_MINUS /* { $$ = O_CALL_CLASS(UnaryExpression(), new, $1, $2); } */
-|	'+' expression %prec UNARY_PLUS /* { $$ = O_CALL_CLASS(UnaryExpression(), new, $1, $2); } */
+|	expression _LEQ expression /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
+|	expression _GEQ expression /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
+|	expression _SHIFTR expression /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
+|	expression _SHIFTL expression /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
+|	expression _INCREASE expression /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
+|	expression _DECREASE expression /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
+|	expression _MULTIPLY expression /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
+|	expression _DIVIDE expression /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
+|	expression _POWER expression /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
+|	expression _REMINDER expression /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
+|	expression _AND_IS expression /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
+|	expression _OR_IS expression /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
+|	expression _XOR_IS expression /* { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); } */
+|	'-' expression %prec _UNARY_MINUS /* { $$ = O_CALL_CLASS(UnaryExpression(), new, $1, $2); } */
+|	'+' expression %prec _UNARY_PLUS /* { $$ = O_CALL_CLASS(UnaryExpression(), new, $1, $2); } */
 |	'!' expression /* { $$ = O_CALL_CLASS(UnaryExpression(), new, $1, $2); } */
-|	'&' expression %prec ADDRESS_OF /* { $$ = O_CALL_CLASS(UnaryExpression(), new, $1, $2); } */
-|	'*' expression %prec DEREFERENCE /* { $$ = O_CALL_CLASS(UnaryExpression(), new, $1, $2); } */
+|	'&' expression %prec _ADDRESS_OF /* { $$ = O_CALL_CLASS(UnaryExpression(), new, $1, $2); } */
+|	'*' expression %prec _DEREFERENCE /* { $$ = O_CALL_CLASS(UnaryExpression(), new, $1, $2); } */
 |	'(' expression ')' /* { $$ = O_CALL_CLASS(NestedExpression(), new, $2); } */
-|	NEW type '[' expression ']' /* { $$ = O_CALL_CLASS(NewExpression(), new, $2, $4); } */
-|	NEW type '(' opt_actual_argument_list ')' /* { $$ = O_CALL_CLASS(NewExpression(), new, $2, $4); } */
-|	NEW type '.' IDENTIFIER '(' opt_actual_argument_list ')' 
+|	_NEW type '[' expression ']' /* { $$ = O_CALL_CLASS(NewExpression(), new, $2, $4); } */
+|	_NEW type '(' opt_actual_argument_list ')' /* { $$ = O_CALL_CLASS(NewExpression(), new, $2, $4); } */
+|	_NEW type '.' _IDENTIFIER '(' opt_actual_argument_list ')' 
 /* {
   struct TokenExpression * token_expr = O_CALL_CLASS(TokenExpression(), new, $4);
   struct NewExpression * new_expr = O_CALL_CLASS(NewExpression(), new, $2, $6);
   O_CALL(new_expr, set_ctor_name, token_expr);
   $$ =(struct Expression *) new_expr;
 } */
-|	SUPER '(' opt_actual_argument_list ')' /* { $$ = O_CALL_CLASS(SuperExpression(), new, $1, NULL, $3); } */
-|	SUPER '.' IDENTIFIER '(' opt_actual_argument_list ')' /* { $$ = O_CALL_CLASS(SuperExpression(), new, $1, $3, $5); } */
-|	GET_VA_ARG '(' type ')' /* { $$ = O_CALL_CLASS(VarArgExpression(), new, $3, NULL); } */
-|	GET_VA_ARG '(' expression ',' type ')' /* { $$ = O_CALL_CLASS(VarArgExpression(), new, $5, $3); } */
-|	SIZEOF '(' type ')' /* { $$ = O_CALL_CLASS(SizeExpression(), new, $3); } */
-|	'(' type ')' expression %prec CASTX /* { $$ = O_CALL_CLASS(CastExpression(), new, $2, $4); } */
+|	_SUPER '(' opt_actual_argument_list ')' /* { $$ = O_CALL_CLASS(SuperExpression(), new, $1, NULL, $3); } */
+|	_SUPER '.' _IDENTIFIER '(' opt_actual_argument_list ')' /* { $$ = O_CALL_CLASS(SuperExpression(), new, $1, $3, $5); } */
+|	_GET_VA_ARG '(' type ')' /* { $$ = O_CALL_CLASS(VarArgExpression(), new, $3, NULL); } */
+|	_GET_VA_ARG '(' expression ',' type ')' /* { $$ = O_CALL_CLASS(VarArgExpression(), new, $5, $3); } */
+|	_SIZEOF '(' type ')' /* { $$ = O_CALL_CLASS(SizeExpression(), new, $3); } */
+|	'(' type ')' expression %prec _CASTX /* { $$ = O_CALL_CLASS(CastExpression(), new, $2, $4); } */
 |	expression '?' expression ':' expression /* { $$ = O_CALL_CLASS(ConditionalExpression (), new, $1, $3, $5); } */
-|	expression IS_OF TYPE_IDENTIFIER /* {
+|	expression _IS_OF _TYPE_IDENTIFIER /* {
   struct TokenExpression * expr = O_CALL_CLASS(TokenExpression(), new, $3);
   $$ = O_CALL_CLASS(IsOfExpression (), new, $1, expr);
 } */
-|	expression IS_OF expression /* { $$ = O_CALL_CLASS(IsOfExpression (), new, $1, $3); } */
+|	expression _IS_OF expression /* { $$ = O_CALL_CLASS(IsOfExpression (), new, $1, $3); } */
 ;
 
 constant
-:	CHAR_CONSTANT /* { $$ = O_CALL_CLASS(TokenExpression(), new, $1); } */
-|	FLOAT_CONSTANT /* { $$ = O_CALL_CLASS(TokenExpression(), new, $1); } */
-|	INT_CONSTANT /* { $$ = O_CALL_CLASS(TokenExpression(), new, $1); } */
+:	_CHAR_CONSTANT /* { $$ = O_CALL_CLASS(TokenExpression(), new, $1); } */
+|	_FLOAT_CONSTANT /* { $$ = O_CALL_CLASS(TokenExpression(), new, $1); } */
+|	_INT_CONSTANT /* { $$ = O_CALL_CLASS(TokenExpression(), new, $1); } */
 |	string_constant /* { $$ = O_CALL_CLASS(TokenExpression(), new, $1); } */
-|	NULL_ /* { $$ = O_CALL_CLASS(NullExpression(), new, $1); } */
+|	_NULL_ /* { $$ = O_CALL_CLASS(NullExpression(), new, $1); } */
 ;
 
 opt_actual_argument_list
@@ -1002,18 +1002,18 @@ actual_argument_list
 ;
 
 string_constant
-:	string_constant STRING_CONSTANT
+:	string_constant _STRING_CONSTANT
 /* {
   O_CALL($1->name, append, $2->name);
   O_CALL($2, delete);
 } */
-|	STRING_CONSTANT
+|	_STRING_CONSTANT
 ;
 
 constructor_declaration
-:	TYPE_IDENTIFIER '(' 
+:	_TYPE_IDENTIFIER '(' 
 /* { 
-  $<token>$ = O_CALL_CLASS(Token(), new_ctor, _Token_ctor_from_token, $1, "ctor", IDENTIFIER);
+  $<token>$ = O_CALL_CLASS(Token(), new_ctor, _Token_ctor_from_token, $1, "ctor", _IDENTIFIER);
   O_CALL_CLASS(Scope(), new, ARGUMENT_SCOPE, $<token>$);
 } */
 formal_argument_list_var ')' statement
@@ -1021,7 +1021,7 @@ formal_argument_list_var ')' statement
   $$ = O_CALL_CLASS(ConstructorDeclaration(), new, $<token>3, $1, $4, $6);
   O_CALL_IF(IScope, current_scope, leave);
 } */
-|	TYPE_IDENTIFIER '.' IDENTIFIER '(' 
+|	_TYPE_IDENTIFIER '.' _IDENTIFIER '(' 
 /* { 
   O_CALL_CLASS(Scope(), new, ARGUMENT_SCOPE, $3); 
 } */
@@ -1033,9 +1033,9 @@ formal_argument_list_var ')' statement
 ;
 
 destructor_declaration
-:	'~' TYPE_IDENTIFIER '(' ')' statement
+:	'~' _TYPE_IDENTIFIER '(' ')' statement
 /* {
-  struct Token * dtor_name = O_CALL_CLASS(Token(), new_ctor, _Token_ctor_from_token, $2, "dtor", IDENTIFIER);
+  struct Token * dtor_name = O_CALL_CLASS(Token(), new_ctor, _Token_ctor_from_token, $2, "dtor", _IDENTIFIER);
   $$ = O_CALL_CLASS(DestructorDeclaration(), new, dtor_name, $2, $5);
 } */
 ;
