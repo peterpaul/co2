@@ -399,9 +399,9 @@ void GenerateSourceVisitor_visitFunctionDeclaration_generateImplementation(struc
   if (o_is_of (parent_decl, InterfaceDeclaration ()))
     {
       fprintf (out, "struct Object * self = O_CAST (_self, Object ());\n");
-      fprintf (out, "assertTrue (o_implements (self, ");
+      fprintf (out, "O_IS_IMPLEMENTATION (self, ");
       O_CALL (parent_decl->name, generate);
-      fprintf (out, " ()), \"runtime error: %%s at %%p does not implement %s.\", self->class->name, (void *)self);\n", parent_decl->name->name->data);
+      fprintf (out, " ());\n");
     }
   else
     {
