@@ -32,11 +32,11 @@ TESTS=TestObject
 
 TestObject_SOURCES=co2/TestObject.c
 TestObject_CPPFLAGS=-I$(top_srcdir)/src
-TestObject_LDADD=libtest.a ../src/libco2-1.0.la
+TestObject_LDADD=libtest.a $(top_builddir)/src/libco2-1.0.la
 
 TestIterator_SOURCES=co2/TestIterator.c
 TestIterator_CPPFLAGS=-I$(top_srcdir)/src
-TestIterator_LDADD=libtest.a ../src/libco2-1.0.la
+TestIterator_LDADD=libtest.a $(top_builddir)/src/libco2-1.0.la
 
 distclean-local:
 	-rm -r ${bin_PROGRAMS}
