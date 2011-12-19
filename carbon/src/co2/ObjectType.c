@@ -21,6 +21,7 @@
 #include "co2/ObjectTypeDeclaration.h"
 #include "co2/StructDeclaration.h"
 #include "co2/TypeDeclaration.h"
+#include "co2/InterfaceDeclaration.h"
 #include "co2/io.h"
 
 #define O_SUPER Type()
@@ -65,6 +66,10 @@ O_IMPLEMENT (ObjectType, void, generate, (void *_self))
       struct TypeDeclaration * decl = O_CAST (self->decl, TypeDeclaration ());
       // O_CALL (decl->type, generate);
       O_CALL (self->token, generate);
+    }
+  else if (o_is_of (self->decl, InterfaceDeclaration ()))
+    {
+      fprintf (out, "struct Object*");
     }
   else
     {

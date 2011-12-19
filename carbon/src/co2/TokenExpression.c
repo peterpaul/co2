@@ -41,6 +41,13 @@ O_IMPLEMENT (TokenExpression, void *, ctor, (void *_self, va_list * app))
       self->scope = current_scope;
     }
   self->check_global_scope = true;
+
+  // TODO this is not a final solution, as it might not resolve the right var
+  if (O_BRANCH_CALL_IF (IScope, current_scope, exists, self->token))
+    {
+      self->decl = O_CALL_IF (IScope, current_scope, lookup, self->token);
+      O_CALL (self->decl, retain);
+    }
   return self;
 }
 
@@ -88,7 +95,7 @@ O_IMPLEMENT (TokenExpression, void, set_scope, (void *_self, void *_scope))
 O_IMPLEMENT (TokenExpression, void, type_check, (void *_self))
 {
   struct TokenExpression *self = O_CAST (_self, TokenExpression ());
-  if (self->token->type == IDENTIFIER || self->token->type == TYPE_IDENTIFIER || self->token->type == CLASS)
+  if (!self->decl && (self->token->type == IDENTIFIER || self->token->type == TYPE_IDENTIFIER || self->token->type == CLASS))
     {
       if (self->scope && O_CALL_IF (IScope, self->scope, exists, self->token))
 	{
