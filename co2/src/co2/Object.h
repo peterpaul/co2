@@ -174,10 +174,11 @@
  * @param _if Interface
  */
 #define O_IS_IMPLEMENTATION(o,_if)					\
-  {typeof(o) _tmp = o;							\
-    assertTrue(o_implements (_tmp, _if),				\
-	       "runtime error: %s at %p does not respond to %s.",	\
-	       _tmp->class->name, (void *)_tmp, _if->name);}
+  { typeof(o) _tmp_o = o;						\
+    typeof(_if) _tmp_if = _if;						\
+    assertTrue(o_implements (_tmp_o, _tmp_if),				\
+	       "runtime error: %s at %p does not implement %s.",	\
+	       _tmp_o->class->class_name, (void *)_tmp_o, _tmp_if->class_name);}
 
 #define O_OBJECT(klass,supper)						\
 	struct Class * klass##Class() {					\
