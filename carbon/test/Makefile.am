@@ -71,6 +71,7 @@ pass/scope_override_declaration.sh\
 pass/scope_override.sh\
 pass/scope_simple.sh\
 pass/scope.sh\
+pass/self.sh\
 pass/size_expression.sh\
 pass/struct_decl.sh\
 pass/switch_case_statement.sh\
@@ -99,6 +100,7 @@ fail/function_decl.sh\
 fail/function_decl_vararg.sh\
 fail/import.sh\
 fail/scope.sh\
+fail/self.sh\
 fail/type_compat_int_float_1.sh\
 fail/type_compat_int_float_2.sh\
 fail/type_compat_int_float_3.sh\
