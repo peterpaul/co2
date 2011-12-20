@@ -1,0 +1,7 @@
+include co2/ArrayList
+
+class RefList : ArrayList {
+	RefObject append (RefObject item) {
+		return add (item);
+	}
+}

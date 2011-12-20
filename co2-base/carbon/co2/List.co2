@@ -18,4 +18,16 @@ interface List, Collection {
 	}
 
 	RefObject removeLast ();
+
+	List mapArgs (void (*)(RefObject, va_list *) fun, ...) {
+		int i;
+		unsigned length = size ();
+		for (i = 0; i < length; i += 1) {
+			va_list aq;
+			va_copy (aq, ...);
+			fun (get (i), &aq);
+			va_end (aq);
+		}
+		return self;
+	}
 }
