@@ -1,0 +1,6 @@
+include Expression
+
+class IsOfExpression : Expression {
+	Expression expr_to_check;
+	Expression class_expr;
+}

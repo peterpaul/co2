@@ -1,0 +1,7 @@
+include Statement
+include Expression
+
+class WhileStatement : Statement {
+	Expression condition;
+	Statement body;
+}

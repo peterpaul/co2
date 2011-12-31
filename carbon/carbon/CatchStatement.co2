@@ -1,0 +1,9 @@
+include Statement
+include IScope
+include ArgumentDeclaration
+
+class CatchStatement : Statement {
+	IScope scope;
+	ArgumentDeclaration argument;
+	Statement body;
+}

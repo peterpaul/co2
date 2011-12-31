@@ -26,6 +26,7 @@
 #include "DestructorDeclaration.h"
 #include "FunctionDeclaration.h"
 #include "InterfaceDeclaration.h"
+#include "InterfaceMethodDefinition.h"
 #include "MacroDeclaration.h"
 #include "StructDeclaration.h"
 #include "TypeDeclaration.h"
@@ -79,6 +80,7 @@
 #include "Scope.h"
 #include "CompositeScope.h"
 #include "Token.h"
+#include "co2/String.h"
 
   extern char *yytext;
   extern void yyerror(const char *);
@@ -334,12 +336,12 @@ definition_declaration
 :	header_file definition
 {
   $$ = $2;
-  O_CALL($$, mapArgs, Declaration_list_set_include_header, $1);
+  O_CALL($$, mapArgs, declaration_list_set_include_header, $1);
 }
 |	header_file '{' definition_list '}'
 {
   $$ = $3;
-  O_CALL($$, mapArgs, Declaration_list_set_include_header, $1);
+  O_CALL($$, mapArgs, declaration_list_set_include_header, $1);
 }
 ;
 
@@ -505,7 +507,7 @@ formal_argument
 struct_declaration
 :	_STRUCT identifier
 {
-  $<scope>$ = O_CALL_CLASS (Scope (), new, _STRUCT_SCOPE, $2);
+  $<scope>$ = O_CALL_CLASS (Scope (), new, struct_scope_type, $2);
 }
 '{' struct_declaration_body '}'
 {
@@ -536,7 +538,7 @@ class_declaration
 {
   O_CALL_IF(IScope, current_scope, declare, $1);
   struct ClassDeclaration * decl = O_CAST($1, ClassDeclaration());
-  decl->member_scope = O_CALL_CLASS(Scope(), new, CLASS_SCOPE, decl->name);
+  decl->member_scope = O_CALL_CLASS(Scope(), new, class_scope_type, decl->name);
   decl->member_scope = O_CALL_CLASS (CompositeScope (), new, decl->member_scope);
 }
 '{' declaration_list '}'
@@ -594,7 +596,7 @@ statement
 compound_statement
 :	'{' 
 {
-  O_CALL_CLASS(Scope(), new, COMPOUND_SCOPE, NULL);
+  O_CALL_CLASS(Scope(), new, compound_scope_type, NULL);
 }
 compound_content_list '}'
 {
@@ -658,7 +660,7 @@ catch_statement_list
 catch_statement
 :	_CATCH 
 {
-  $<scope>$ = O_CALL_CLASS (Scope (), new, _CATCH_SCOPE, NULL);
+  $<scope>$ = O_CALL_CLASS (Scope (), new, catch_scope_type, NULL);
 }
 '(' formal_argument ')' statement
 {
@@ -801,7 +803,7 @@ interface_declaration
 :	interface_header 
 {
   struct InterfaceDeclaration * decl = O_CAST($1, InterfaceDeclaration());
-  decl->member_scope = O_CALL_CLASS(Scope(), new, INTERFACE_SCOPE, decl->name);
+  decl->member_scope = O_CALL_CLASS(Scope(), new, interface_scope_type, decl->name);
   decl->member_scope = O_CALL_CLASS (CompositeScope (), new, decl->member_scope);
 }
 '{' interface_method_declaration_list '}'
@@ -1013,8 +1015,8 @@ string_constant
 constructor_declaration
 :	_TYPE_IDENTIFIER '(' 
 { 
-  $<token>$ = O_CALL_CLASS(Token(), new_ctor, _Token_ctor_from_token, $1, "ctor", _IDENTIFIER);
-  O_CALL_CLASS(Scope(), new, ARGUMENT_SCOPE, $<token>$);
+  $<token>$ = O_CALL_CLASS(Token(), new_ctor, _Token_ctor_fromToken, $1, "ctor", _IDENTIFIER);
+  O_CALL_CLASS(Scope(), new, argument_scope_type, $<token>$);
 }
 formal_argument_list_var ')' statement
 {
@@ -1023,7 +1025,7 @@ formal_argument_list_var ')' statement
 }
 |	_TYPE_IDENTIFIER '.' _IDENTIFIER '(' 
 { 
-  O_CALL_CLASS(Scope(), new, ARGUMENT_SCOPE, $3); 
+  O_CALL_CLASS(Scope(), new, argument_scope_type, $3); 
 }
 formal_argument_list_var ')' statement
 {
@@ -1035,7 +1037,7 @@ formal_argument_list_var ')' statement
 destructor_declaration
 :	'~' _TYPE_IDENTIFIER '(' ')' statement
 {
-  struct Token * dtor_name = O_CALL_CLASS(Token(), new_ctor, _Token_ctor_from_token, $2, "dtor", _IDENTIFIER);
+  struct Token * dtor_name = O_CALL_CLASS(Token(), new_ctor, _Token_ctor_fromToken, $2, "dtor", _IDENTIFIER);
   $$ = O_CALL_CLASS(DestructorDeclaration(), new, dtor_name, $2, $5);
 }
 ;

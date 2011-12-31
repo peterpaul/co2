@@ -1,0 +1,6 @@
+include Statement
+include co2/List
+
+class CompoundStatement : Statement {
+	List body;
+}

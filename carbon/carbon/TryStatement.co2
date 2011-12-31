@@ -1,0 +1,8 @@
+include Statement
+include co2/List
+
+class TryStatement : Statement {
+	Statement try_clause;
+	List catch_clause;
+	Statement finally_clause;
+}

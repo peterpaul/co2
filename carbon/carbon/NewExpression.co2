@@ -1,0 +1,13 @@
+include Expression
+include Type
+include TokenExpression
+include co2/List
+
+class NewExpression : Expression {
+	Type new_type;
+	TokenExpression ctor_name;
+	Expression array_size;
+	List ctor_arguments;
+
+	void set_ctor_name (TokenExpression ctor_name);
+}

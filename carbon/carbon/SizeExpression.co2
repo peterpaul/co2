@@ -1,0 +1,6 @@
+include Expression
+include Type
+
+class SizeExpression : Expression {
+	Type param;
+}

@@ -19,7 +19,7 @@ void file_type_check (CompileObject object) {
 	if (object is_of Declaration) {
 		current_context = new Context();
 		current_context.retain ();
-		object.type_check();
+		object.type_check ();
 		current_context.release ();
 		current_context = null;
 	} else {
@@ -34,12 +34,21 @@ class File : CompileObject {
 	}
 
 	String name, absolute_path;
-	List file_dependencies, declarations;
+	RefList file_dependencies, declarations;
 
 	File (String name, String absolute_path) {
 		self.name = (String) name.retain ();
 		self.absolute_path = (String) absolute_path.retain ();
+		declarations = new RefList (8);
+		declarations.retain ();
+		file_dependencies = new RefList (8);
+		file_dependencies.retain ();
 	}
 
-
+	~File () {
+		name.release ();
+		absolute_path.release ();
+		declarations.release ();
+		file_dependencies.release ();
+	}
 }

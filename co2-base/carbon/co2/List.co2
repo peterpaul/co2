@@ -19,15 +19,25 @@ interface List, Collection {
 
 	RefObject removeLast ();
 
-	List mapArgs (void (*)(RefObject, va_list *) fun, ...) {
+	List map (void (*)(RefObject) fun) {
 		int i;
 		unsigned length = size ();
 		for (i = 0; i < length; i += 1) {
-			va_list aq;
-			va_copy (aq, ...);
-			fun (get (i), &aq);
-			va_end (aq);
+			fun (get (i));
 		}
 		return self;
+	}
+
+	List filter (int (*)(RefObject) fun) {
+		int i;
+		unsigned length = size ();
+		ArrayList result = new ArrayList ();
+		for (i = 0; i < length; i += 1) {
+			RefObject item = get (i);
+			if (fun (item)) {
+				result.add (item);
+			}
+		}
+		return result;
 	}
 }

@@ -1,7 +1,23 @@
 include co2/ArrayList
 
 class RefList : ArrayList {
+	RefList (unsigned max) {
+		super.withSize (max);
+	}
+
 	RefObject append (RefObject item) {
 		return add (item);
+	}
+
+	RefObject mapArgs (void (*)(RefObject, va_list *) fun, ...) {
+		int i;
+		unsigned length = self.length;
+		for (i = 0; i < length; i += 1) {
+			va_list aq;
+			va_copy (aq, ...);
+			fun (get (i), &aq);
+			va_end (aq);
+		}
+		return self;
 	}
 }

@@ -1,0 +1,10 @@
+include Declaration
+include Token
+include Statement
+include co2/List
+
+class ConstructorDeclaration : Declaration {
+	Token class_name;
+	List formal_arguments;
+	Statement body;
+}

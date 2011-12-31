@@ -1,0 +1,8 @@
+include Statement
+include Expression
+
+class IfStatement : Statement {
+	Expression condition;
+	Statement then_clause;
+	Statement else_clause;
+}

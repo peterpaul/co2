@@ -1,0 +1,14 @@
+include Statement
+include FunctionDeclaration
+include TryStatement
+include CatchStatement
+include FinallyStatement
+include Expression
+
+class ReturnStatement : Statement {
+	Expression expr;
+	FunctionDeclaration function_context;
+	TryStatement try_context;
+	CatchStatement catch_context;
+	FinallyStatement finally_context;
+}

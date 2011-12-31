@@ -1,0 +1,6 @@
+include Statement
+include Expression
+
+class DeleteStatement : Statement {
+	Expression expr;
+}

@@ -1,10 +1,10 @@
 include Declaration
 include Token
 include Scope
-include co2/List
+include RefList
 
 class ObjectTypeDeclaration : Declaration {
-	List members;
+	RefList members;
 	Scope member_scope;
 
 	ObjectTypeDeclaration (Token name) {
@@ -12,7 +12,7 @@ class ObjectTypeDeclaration : Declaration {
 	}
 
 	~ObjectTypeDeclaration () {
-		((RefObject) members)?.release ();
+		members?.release ();
 		member_scope.release ();
 		
 	}

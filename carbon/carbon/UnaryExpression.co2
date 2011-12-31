@@ -1,0 +1,7 @@
+include Expression
+include Token
+
+class UnaryExpression : Expression {
+	Token operator;
+	Expression operand;
+}

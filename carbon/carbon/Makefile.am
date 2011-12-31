@@ -48,6 +48,7 @@ Hash.co2\
 HelloWorldVisitor.co2\
 IfStatement.co2\
 InterfaceDeclaration.co2\
+InterfaceMethodDefinition.co2\
 io.co2\
 IScope.co2\
 IsOfExpression.co2\

@@ -26,6 +26,7 @@
 #include "co2/List.h"
 #include "co2/Map.h"
 #include "File.h"
+#include "RefList.h"
 #include "error.h"
 #include <limits.h>
 #include <stdlib.h>

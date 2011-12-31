@@ -40,6 +40,8 @@ IScope current_scope = null;
 IScope global_scope = null;
 
 interface IScope {
+	IScope get_parent ();
+	IScope set_parent (IScope parent_scope);
 	Declaration declare (Declaration decl);
 	void leave ();
 	Declaration lookup_in_this_scope (Token token);

@@ -1,0 +1,11 @@
+include CompileObject
+include Token
+include InterfaceDeclaration
+include FunctionDeclaration
+
+class InterfaceMethodDefinition : CompileObject {
+	Token interface_name;
+	Token method_name;
+	InterfaceDeclaration interface_decl;
+	FunctionDeclaration method_decl;
+}

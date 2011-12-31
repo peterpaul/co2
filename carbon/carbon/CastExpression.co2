@@ -1,0 +1,7 @@
+include Expression
+include Type
+
+class CastExpression : Expression {
+	Type cast_type;
+	Expression expression;
+}

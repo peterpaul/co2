@@ -39,3 +39,9 @@ class Declaration : CompileObject {
 		include_file = (Token) an_include_file.retain ();
 	}
 }
+
+void declaration_list_set_include_header (Declaration decl, va_list *app) {
+	Token header_file = (Token) va_arg (app, void *);
+	decl.set_include_file (header_file);
+}
+	

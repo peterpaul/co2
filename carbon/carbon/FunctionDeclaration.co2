@@ -1,0 +1,10 @@
+include Declaration
+include co2/List
+include Statement
+
+class FunctionDeclaration : Declaration {
+	int binding_generated;
+	List formal_arguments;
+	List implemented_methods;
+	Statement body;
+}
