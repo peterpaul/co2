@@ -1,7 +1,11 @@
 include ObjectTypeDeclaration
 include Token
+include RefList
 
 class ClassDeclaration : ObjectTypeDeclaration {
+	Token superclass;
+	RefList interfaces;
+
 	ClassDeclaration (Token name) {
 		super (name);
 	}

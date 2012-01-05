@@ -7,6 +7,7 @@ class CompileObject : RefObject {
 	CompileObject () {
 		super ();
 	}
+
 	void type_check ();
 	void optimize ();
 	void generate (FILE *fp);
@@ -18,3 +19,26 @@ class CompileObject : RefObject {
 }
 
 typedef Bool = int;
+
+int type_filter (Object member, va_list *app) {
+	Object klass = (Object) va_arg (*app, void *);
+	return member is_of klass;
+}
+
+int not_type_filter (Object member, va_list *app) {
+	return !type_filter (member, app);
+}
+
+void compileobject_type_check (CompileObject object) {
+	object.type_check ();
+}
+
+void compileobject_generate (CompileObject object, va_list *app) {
+	FILE *fp = va_arg (*app, FILE *);
+	object.generate (fp);
+}
+
+void compileobject_accept (CompileObject object, va_list *app) {
+	CompileObjectVisitor visitor = (CompileObjectVisitor) va_arg (*app, void *);
+	object.accept (visitor);
+}
