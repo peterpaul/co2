@@ -1,0 +1,29 @@
+["stdio.h"] int printf(char * format, ...);
+
+class Test {
+	int foo;
+
+	Test () {
+		foo = 1;
+	}
+
+	int test (int par) {
+		int baz = 1;
+		int bar (int foobar) {
+			return foo + par + baz + foobar;
+		}
+
+		return bar (1);
+	}
+}
+
+int main () {
+	Test t = new Test ();
+
+	printf ("t.test (1) = %d\n", t.test (1));
+	printf ("t.test (2) = %d\n", t.test (2));
+	printf ("t.test (3) = %d\n", t.test (3));
+	printf ("t.test (4) = %d\n", t.test (4));
+
+	return 0;
+}

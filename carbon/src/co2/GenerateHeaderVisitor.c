@@ -256,6 +256,12 @@ O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitDeclaration, (void *_self, void
 
 O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitFunctionDeclaration, (void *_self, void *_object), (_self, _object))
 {
+  // Don't generate for nested functions
+  if (O_CALL (current_context, find_nth_instance, FunctionDeclaration (), 2))
+    {
+      return;
+    }
+
   struct BaseCompileObjectVisitor *visitor = O_CAST(_self, BaseCompileObjectVisitor());
   struct FunctionDeclaration *self = O_CAST(_object, FunctionDeclaration ());
   struct ClassDeclaration *class_decl = O_CALL (current_context, find, ClassDeclaration ());
