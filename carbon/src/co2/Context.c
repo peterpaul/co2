@@ -48,13 +48,25 @@ O_IMPLEMENT (Context, void, add, (void *_self, void *_item))
 O_IMPLEMENT (Context, void *, find, (void *_self, void *_class))
 {
   struct Context *self = O_CAST (_self, Context ());
+  return O_CALL (self, find_nth_instance, _class, 1);
+}
+
+O_IMPLEMENT (Context, void *, find_nth_instance, (void *_self, void *_class, unsigned n))
+{
+  struct Context *self = O_CAST (_self, Context ());
+  assertTrue (n > 0, "''n' can not be zero");
   int i;
+  unsigned found_count = 0;
   for (i = self->stack->length - 1; i >= 0; i--)
     {
       void *item = O_CALL (self->stack, get, i);
       if (o_is_of (item, _class))
 	{
-	  return item;
+	  found_count++;
+	  if (found_count == n)
+	    {
+	      return item;
+	    }
 	}
     }
   return NULL;
@@ -71,5 +83,6 @@ O_OBJECT_METHOD (Context, ctor);
 O_OBJECT_METHOD (Context, dtor);
 O_OBJECT_METHOD (Context, add);
 O_OBJECT_METHOD (Context, find);
+O_OBJECT_METHOD (Context, find_nth_instance);
 O_OBJECT_METHOD (Context, remove_last);
 O_END_OBJECT

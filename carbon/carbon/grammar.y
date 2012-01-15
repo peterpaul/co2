@@ -225,6 +225,8 @@
 %nonassoc	_CATCH
 %nonassoc	_FINALLY
 
+%nonassoc	CLASSX
+
 %left		<token>	','
 %right		<token>	'=' _INCREASE _DECREASE _MULTIPLY _DIVIDE _POWER _REMINDER _AND_IS _OR_IS _XOR_IS
 %left		<token>	_OR '|' 
@@ -909,6 +911,7 @@ type_list
 expression
 :	constant
 |	_IDENTIFIER { $$ = O_CALL_CLASS(TokenExpression(), new, $1); }
+|	_TYPE_IDENTIFIER '.' _CLASS { $$ = O_CALL_CLASS(TokenExpression(), new, $1); }
 |	_CLASS { $$ = O_CALL_CLASS(TokenExpression(), new, $1); }
 |	_SELF { $$ = O_CALL_CLASS(TokenExpression(), new, $1); }
 |	_VA_ARG { $$ = O_CALL_CLASS(TokenExpression(), new, $1); }
@@ -968,7 +971,11 @@ expression
 |	_SIZEOF '(' type ')' { $$ = O_CALL_CLASS(SizeExpression(), new, $3); }
 |	'(' type ')' expression %prec _CASTX { $$ = O_CALL_CLASS(CastExpression(), new, $2, $4); }
 |	expression '?' expression ':' expression { $$ = O_CALL_CLASS(ConditionalExpression (), new, $1, $3, $5); }
+<<<<<<< HEAD
 |	expression _IS_OF _TYPE_IDENTIFIER {
+=======
+|	expression IS_OF TYPE_IDENTIFIER %prec CLASSX {
+>>>>>>> master
   struct TokenExpression * expr = O_CALL_CLASS(TokenExpression(), new, $3);
   $$ = O_CALL_CLASS(IsOfExpression (), new, $1, expr);
 }

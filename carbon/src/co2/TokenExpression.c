@@ -110,8 +110,6 @@ O_IMPLEMENT (TokenExpression, void, type_check, (void *_self))
   switch (self->token->type)
     {
     case TYPE_IDENTIFIER:
-      warning (self->token, "Handling TokenExpression: '%s'\n",
-	       self->token->name->data);
       if (!self->decl || !self->check_global_scope)
 	{
 	  O_CALL (self, lookup);
@@ -120,7 +118,9 @@ O_IMPLEMENT (TokenExpression, void, type_check, (void *_self))
 	{
 	  return;
 	}
-      self->type = O_CALL_CLASS (ObjectType (), new, self->token, self->decl);
+      struct Token * token = O_CALL_CLASS (Token (), new_ctor, _Token_ctor_from_token, self->token, "void", VOID);
+      self->type = O_CALL_CLASS (PrimitiveType (), new, token);
+      self->type = O_CALL_CLASS (ArrayType (), new, self->type);
       self->type = O_CALL (self->type, retain);
       break;
     case CLASS:
@@ -137,10 +137,15 @@ O_IMPLEMENT (TokenExpression, void, type_check, (void *_self))
       break;
     case SELF:
       {
-	struct ClassDeclaration *class_decl =
-	  O_BRANCH_CALL (current_context, find, ClassDeclaration ());
+	struct ClassDeclaration *decl =
+	  O_BRANCH_CALL (current_context, find, ObjectTypeDeclaration ());
+	if (!decl)
+	  {
+	    error (self->token, "Cannot use 'self' outside of class or interface context.");
+	    return;
+	  }
 	self->type =
-	  O_CALL_CLASS (ObjectType (), new, class_decl->name, class_decl);
+	  O_CALL_CLASS (ObjectType (), new, decl->name, decl);
 	O_CALL (self->type, retain);
       }
       break;

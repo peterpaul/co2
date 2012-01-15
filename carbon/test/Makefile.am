@@ -37,6 +37,7 @@ pass/class_decl_object_vars.sh\
 pass/class_decl_self.sh\
 pass/class_decl_super.sh\
 pass/class_decl.sh\
+pass/class_expression.sh\
 pass/class_intergrated.sh\
 pass/class_is_of.sh\
 pass/class_type_def_order.sh\
@@ -45,6 +46,7 @@ pass/expr_conditional_expr.sh\
 pass/external_definition.sh\
 pass/function_call.sh\
 pass/function_definitions.sh\
+pass/function_nested_class.sh\
 pass/function_nested.sh\
 pass/function_types_def.sh\
 pass/function_types.sh\
@@ -71,6 +73,7 @@ pass/scope_override_declaration.sh\
 pass/scope_override.sh\
 pass/scope_simple.sh\
 pass/scope.sh\
+pass/self.sh\
 pass/size_expression.sh\
 pass/struct_decl.sh\
 pass/switch_case_statement.sh\
@@ -99,6 +102,7 @@ fail/function_decl.sh\
 fail/function_decl_vararg.sh\
 fail/import.sh\
 fail/scope.sh\
+fail/self.sh\
 fail/type_compat_int_float_1.sh\
 fail/type_compat_int_float_2.sh\
 fail/type_compat_int_float_3.sh\

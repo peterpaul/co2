@@ -443,6 +443,12 @@ void GenerateSourceVisitor_visitFunctionDeclaration_generateImplementation(struc
 
 O_IMPLEMENT_IF(GenerateSourceVisitor, void, visitFunctionDeclaration, (void *_self, void *_object), (_self, _object))
 {
+  // Don't generate for nested functions
+  if (O_CALL (current_context, find_nth_instance, FunctionDeclaration (), 2))
+    {
+      return;
+    }
+
   struct BaseCompileObjectVisitor *visitor = O_CAST(_self, BaseCompileObjectVisitor());
   struct FunctionDeclaration *self = O_CAST(_object, FunctionDeclaration ());
 
