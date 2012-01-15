@@ -37,6 +37,7 @@ pass/class_decl_object_vars.sh\
 pass/class_decl_self.sh\
 pass/class_decl_super.sh\
 pass/class_decl.sh\
+pass/class_expression.sh\
 pass/class_intergrated.sh\
 pass/class_is_of.sh\
 pass/class_type_def_order.sh\

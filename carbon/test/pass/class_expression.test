@@ -1,0 +1,51 @@
+/*
+ * carbon Compiler and programming language for libco2
+ *
+ * Copyright (C) 2011 Peterpaul Taekele Klein Haneveld
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+["stdio.h"] int printf(char * format, ...);
+
+["co2/Object.h"] {
+	class Object {
+		Class klass;
+	}
+
+	class Class : Object {
+	}
+}
+
+class Foo : Object {
+}
+
+class Bar : Object {
+}
+
+int instance_of (Class type, Object object) {
+	return object is_of type;
+}
+
+int main () {
+	Foo foo = new Foo ();
+	Bar bar = new Bar ();
+
+	printf ("instance_of (Foo.class, foo) = %d\n", instance_of (Foo.class, foo));
+	printf ("instance_of (Foo.class, bar) = %d\n", instance_of (Foo.class, bar));
+	printf ("instance_of (Bar.class, foo) = %d\n", instance_of (Bar.class, foo));
+	printf ("instance_of (Bar.class, bar) = %d\n", instance_of (Bar.class, bar));
+
+	return 0;
+}

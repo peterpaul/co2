@@ -225,6 +225,8 @@
 %nonassoc	CATCH
 %nonassoc	FINALLY
 
+%nonassoc	CLASSX
+
 %left		<token>	','
 %right		<token>	'=' INCREASE DECREASE MULTIPLY DIVIDE POWER REMINDER AND_IS OR_IS XOR_IS
 %left		<token>	OR '|' 
@@ -910,6 +912,7 @@ type_list
 expression
 :	constant
 |	IDENTIFIER { $$ = O_CALL_CLASS(TokenExpression(), new, $1); }
+|	TYPE_IDENTIFIER '.' CLASS { $$ = O_CALL_CLASS(TokenExpression(), new, $1); }
 |	CLASS { $$ = O_CALL_CLASS(TokenExpression(), new, $1); }
 |	SELF { $$ = O_CALL_CLASS(TokenExpression(), new, $1); }
 |	VA_ARG { $$ = O_CALL_CLASS(TokenExpression(), new, $1); }
@@ -969,7 +972,7 @@ expression
 |	SIZEOF '(' type ')' { $$ = O_CALL_CLASS(SizeExpression(), new, $3); }
 |	'(' type ')' expression %prec CASTX { $$ = O_CALL_CLASS(CastExpression(), new, $2, $4); }
 |	expression '?' expression ':' expression { $$ = O_CALL_CLASS(ConditionalExpression (), new, $1, $3, $5); }
-|	expression IS_OF TYPE_IDENTIFIER {
+|	expression IS_OF TYPE_IDENTIFIER %prec CLASSX {
   struct TokenExpression * expr = O_CALL_CLASS(TokenExpression(), new, $3);
   $$ = O_CALL_CLASS(IsOfExpression (), new, $1, expr);
 }

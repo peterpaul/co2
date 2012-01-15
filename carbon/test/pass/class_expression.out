@@ -1,0 +1,4 @@
+instance_of (Foo.class, foo) = 1
+instance_of (Foo.class, bar) = 0
+instance_of (Bar.class, foo) = 0
+instance_of (Bar.class, bar) = 1
