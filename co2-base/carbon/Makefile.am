@@ -9,6 +9,7 @@ co2/Array.co2\
 co2/ArrayIterator.co2\
 co2/ArrayList.co2\
 co2/BaseObject.co2\
+co2/ClassCastException.co2\
 co2/Collection.co2\
 co2/Comparable.co2\
 co2/ConsoleHandler.co2\
