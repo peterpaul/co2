@@ -42,5 +42,7 @@ int main() {
 	printf ("a is_of b.class: expected: 0, actual: %d\n", a is_of b.class);
 	printf ("b is_of a.class: expected: 1, actual: %d\n", b is_of a.class);
 
+	printf ("!a is_of B, expected: 1, actual: %d\n", !a is_of B);
+
 	return 0;
 }

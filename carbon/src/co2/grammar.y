@@ -231,13 +231,14 @@
 %right		<token>	'=' INCREASE DECREASE MULTIPLY DIVIDE POWER REMINDER AND_IS OR_IS XOR_IS
 %left		<token>	OR '|' 
 %left		<token>	AND '&'
-%left		<token>	EQ NEQ IS_OF
+%left		<token>	EQ NEQ
 %nonassoc	<token>	'<' LEQ '>' GEQ
 %left		<token> XOR '#'
 %left		<token>	SHIFTL SHIFTR
 %left		<token>	'+' '-'
 %left		<token>	'*' '/' '%' '^'
 %right		<token>	'!' UNARY_MINUS UNARY_PLUS ADDRESS_OF DEREFERENCE
+%nonassoc	<token> IS_OF
  /* Solve shift-reduce conflict for casts */
 %right	CASTX
 %left		<token> ':' '?'
