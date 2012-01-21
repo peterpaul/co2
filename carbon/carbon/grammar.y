@@ -231,13 +231,14 @@
 %right		<token>	'=' _INCREASE _DECREASE _MULTIPLY _DIVIDE _POWER _REMINDER _AND_IS _OR_IS _XOR_IS
 %left		<token>	_OR '|' 
 %left		<token>	_AND '&'
-%left		<token>	_EQ _NEQ _IS_OF
+%left		<token>	_EQ _NEQ
 %nonassoc	<token>	'<' _LEQ '>' _GEQ
 %left		<token> _XOR '#'
 %left		<token>	_SHIFTL _SHIFTR
 %left		<token>	'+' '-'
 %left		<token>	'*' '/' '%' '^'
 %right		<token>	'!' _UNARY_MINUS _UNARY_PLUS _ADDRESS_OF _DEREFERENCE
+%nonassoc	<token>	_IS_OF
  /* Solve shift-reduce conflict for casts */
 %right		_CASTX
 %left		<token> ':' '?'
