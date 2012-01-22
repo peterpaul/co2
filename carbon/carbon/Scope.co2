@@ -22,6 +22,14 @@ class Scope : RefObject, IScope {
 		name?.release ();
 	}
 
+	IScope get_parent () {
+		return parent;
+	}
+
+	IScope set_parent (IScope parent_scope) {
+		return parent = parent_scope;
+	}
+
 	Declaration declare (Declaration decl) {
 		map.put (decl.name, decl);
 		decl.set_scope (self);

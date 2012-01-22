@@ -1,7 +1,7 @@
 include Expression
-include co2/List
+include RefList
 
 class FunctionCallExpression : Expression {
 	Expression function;
-	List actual_arguments;
+	RefList actual_arguments;
 }

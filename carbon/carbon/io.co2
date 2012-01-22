@@ -1,12 +1,12 @@
 include co2/String
-include co2/List
+include RefList
 
 FILE *out;
 
 String base_dir;
 String file_path;
 
-List path;
+RefList path;
 
 String analyze_file_name (char *filename) {
 	String path;

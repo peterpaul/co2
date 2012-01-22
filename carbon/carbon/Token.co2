@@ -16,10 +16,11 @@ class Token : CompileObject {
 		self.line = line;
 	}
 
-	Token.fromToken (Token token) {
+	Token.fromToken (Token token, char * name, int type) {
 		super ();
-		self.name = (String) token.name.retain ();
-		self.type = token.type;
+		self.name = new String ("%s", name);
+		self.name.retain ();
+		self.type = type;
 		self.file = token.file; // don't retain, this is a weak reference
 		self.line = token.line;
 	}

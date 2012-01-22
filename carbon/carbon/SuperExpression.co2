@@ -1,12 +1,12 @@
 include Expression
 include Token
 include ClassDeclaration
-include co2/List
+include RefList
 
 class SuperExpression : Expression {
 	Token super_name;
 	Token ctor_name;
 	ClassDeclaration class_context;
 	Declaration method_context;
-	List actual_arguments;
+	RefList actual_arguments;
 }

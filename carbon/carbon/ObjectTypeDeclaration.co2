@@ -14,8 +14,38 @@ class ObjectTypeDeclaration : Declaration {
 	~ObjectTypeDeclaration () {
 		members?.release ();
 		member_scope.release ();
-		
 	}
 
 	Bool is_compatible (ObjectTypeDeclaration other);
+}
+
+void objecttypedeclaration_generate_method_arguments(FILE *fp, ArgumentDeclaration arg) {
+	fprintf (fp, ", ");
+	arg.generate (fp);
+}
+
+void objecttypedeclaration_generate_method_argument_names(FILE *fp, ArgumentDeclaration arg) {
+	fprintf (fp, ", ");
+	arg.name.generate (fp);
+}
+
+void objecttypedeclaration_generate_method_registration_2 (FunctionDeclaration method_decl, va_list *app) {
+	FILE * fp = va_arg (*app, FILE *);
+	ObjectTypeDeclaration class_decl = (ObjectTypeDeclaration) va_arg (*app, void *);
+	if (method_decl.body) {
+		fprintf (fp, "O_OBJECT_METHOD (");
+		class_decl.name.generate (fp);
+		fprintf (fp, ", ");
+		method_decl.name.generate (fp);
+		fprintf (fp, ");\n");
+	} else {
+		if (method_decl.implemented_methods && method_decl.implemented_methods.length > 0) {
+			InterfaceMethodDefinition imd = (InterfaceMethodDefinition) method_decl.implemented_methods.get (0);
+			fprintf (fp, "O_OBJECT_METHOD (");
+			imd.interface_name.generate (fp);
+			fprintf (fp, ", ");
+			method_decl.name.generate (fp);
+			fprintf (fp, ");\n");
+		}
+	}
 }

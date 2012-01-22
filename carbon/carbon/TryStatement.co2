@@ -1,8 +1,8 @@
 include Statement
-include co2/List
+include RefList
 
 class TryStatement : Statement {
 	Statement try_clause;
-	List catch_clause;
+	RefList catch_clause;
 	Statement finally_clause;
 }

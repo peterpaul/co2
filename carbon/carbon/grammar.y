@@ -339,12 +339,12 @@ definition_declaration
 :	header_file definition
 {
   $$ = $2;
-  O_CALL($$, mapArgs, declaration_list_set_include_header, $1);
+  O_CALL($$, map_args, declaration_list_set_include_header, $1);
 }
 |	header_file '{' definition_list '}'
 {
   $$ = $3;
-  O_CALL($$, mapArgs, declaration_list_set_include_header, $1);
+  O_CALL($$, map_args, declaration_list_set_include_header, $1);
 }
 ;
 
@@ -382,7 +382,7 @@ header_file
 variable_declaration_list
 :	type variable_declaration_id_list ';' 
 {
-  O_CALL($2, mapArgs, VariableDeclaration_set_type, $1);
+  O_CALL($2, map_args, VariableDeclaration_set_type, $1);
   $$ = $2;
 }
 ;
@@ -549,7 +549,7 @@ class_declaration
   O_CALL_IF(IScope, current_scope, leave);
   struct ClassDeclaration * decl = O_CAST($1, ClassDeclaration());
   decl->members = O_CALL($4, retain);
-  O_CALL(decl->members, mapArgs, Declaration_set_class_decl, decl);
+  O_CALL(decl->members, map_args, Declaration_set_class_decl, decl);
   O_CALL_IF (IScope, decl->member_scope, set_parent, NULL);
   $$ =(struct Declaration *) decl;
 }
@@ -972,11 +972,7 @@ expression
 |	_SIZEOF '(' type ')' { $$ = O_CALL_CLASS(SizeExpression(), new, $3); }
 |	'(' type ')' expression %prec _CASTX { $$ = O_CALL_CLASS(CastExpression(), new, $2, $4); }
 |	expression '?' expression ':' expression { $$ = O_CALL_CLASS(ConditionalExpression (), new, $1, $3, $5); }
-<<<<<<< HEAD
-|	expression _IS_OF _TYPE_IDENTIFIER {
-=======
-|	expression IS_OF TYPE_IDENTIFIER %prec CLASSX {
->>>>>>> master
+|	expression _IS_OF _TYPE_IDENTIFIER %prec CLASSX {
   struct TokenExpression * expr = O_CALL_CLASS(TokenExpression(), new, $3);
   $$ = O_CALL_CLASS(IsOfExpression (), new, $1, expr);
 }
@@ -1068,7 +1064,7 @@ int parse()
   if(result == 0)
     {
       struct ScopeType *scope_type = O_BRANCH_CALL_IF (IScope, current_scope, get_type);
-      assertTrue(current_scope == NULL, "current_scope(%d) is not NULL", scope_type);
+      assertTrue(current_scope == NULL, "current_scope(%d) is not NULL", scope_type->value);
       // O_CALL(parsed_file, parse_imports);
     }
   return result;

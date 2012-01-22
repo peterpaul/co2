@@ -1,6 +1,6 @@
 include Statement
-include co2/List
+include RefList
 
 class CompoundStatement : Statement {
-	List body;
+	RefList body;
 }

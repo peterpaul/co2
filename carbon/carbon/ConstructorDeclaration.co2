@@ -1,10 +1,10 @@
 include Declaration
 include Token
 include Statement
-include co2/List
+include RefList
 
 class ConstructorDeclaration : Declaration {
 	Token class_name;
-	List formal_arguments;
+	RefList formal_arguments;
 	Statement body;
 }

@@ -1,15 +1,20 @@
 include co2/ArrayList
+include co2/ClassCastException
 
 class RefList : ArrayList {
-	RefList (unsigned max) {
+
+	Class type;
+
+	RefList (unsigned max, Class type) {
 		super.withSize (max);
+		self.type = type;
 	}
 
 	RefObject append (RefObject item) {
 		return add (item);
 	}
 
-	RefObject mapArgs (void (*)(RefObject, va_list *) fun, ...) {
+	RefObject map_args (void (*)(RefObject, va_list *) fun, ...) {
 		int i;
 		unsigned length = self.length;
 		for (i = 0; i < length; i += 1) {
@@ -19,5 +24,19 @@ class RefList : ArrayList {
 			va_end (aq);
 		}
 		return self;
+	}
+
+	RefObject set (unsigned index, RefObject item) {
+		if (!item is_of type) {
+			throw new ClassCastException ();
+		}
+		return super (index, item);
+	}
+
+	RefObject add (RefObject item) {
+		if (!item is_of type) {
+			throw new ClassCastException ();
+		}
+		return super (item);
 	}
 }

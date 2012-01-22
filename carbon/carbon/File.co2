@@ -25,9 +25,9 @@ class File : CompileObject {
 	File (String name, String absolute_path) {
 		self.name = (String) name.retain ();
 		self.absolute_path = (String) absolute_path.retain ();
-		declarations = new RefList (8);
+		declarations = new RefList (8, Declaration.class);
 		declarations.retain ();
-		file_dependencies = new RefList (8);
+		file_dependencies = new RefList (8, File.class);
 		file_dependencies.retain ();
 	}
 
@@ -49,7 +49,7 @@ class File : CompileObject {
 
 	void accept (BaseCompileObjectVisitor visitor) {
 		current_context?.add (self);
-		self.declarations.mapArgs (compileobject_accept, visitor);
+		self.declarations.map_args (compileobject_accept, visitor);
 		visitor.visit (self);
 		current_context?.remove_last ();
 	}
@@ -146,7 +146,7 @@ void interface_depends_on (Token myself, va_list *app) {
 
 Bool interfacedeclaration_1_depends_on_2 (InterfaceDeclaration decl1, Declaration decl2) {
 	Bool depends = false;
-	decl1.interfaces?.mapArgs (interface_depends_on, decl2, &depends);
+	decl1.interfaces?.map_args (interface_depends_on, decl2, &depends);
 	return depends;
 }
 
@@ -244,36 +244,36 @@ int classdeclaration_compare (Declaration _decl1, Declaration _decl2) {
 	return -1;
 }
 
-int simpledeclaration_compare (Declaration _decl1, Declaration _decl2) {
-	if (strcmp (_decl1.name.name.data, "main") == 0) {
+int simpledeclaration_compare (Declaration decl1, Declaration decl2) {
+	if (strcmp (decl1.name.name.data, "main") == 0) {
 		return 1;
 	}
-	if (_decl2 is_of Declaration) {
-		if (strcmp (_decl2.name.name.data, "main") == 0) {
+	if (decl2 is_of Declaration) {
+		if (strcmp (decl2.name.name.data, "main") == 0) {
 			return -1;
 		} else {
-			return strcmp (_decl1.name.name.data, _decl2.name.name.data);
+			return strcmp (decl1.name.name.data, decl2.name.name.data);
 		}
 	}
-	return -declaration_compare (_decl2, _decl1);
+	return -declaration_compare (decl2, decl1);
 }
 
-int declaration_compare (Declaration _decl1, Declaration _decl2) {
-	if (_decl1 is_of InterfaceDeclaration) {
-		return interfacedeclaration_compare (_decl1, _decl2);
-	} else if (_decl1 is_of ClassDeclaration) {
-		return classdeclaration_compare (_decl1, _decl2);
-	} else if (_decl1 is_of TypeDeclaration) {
-		return typedeclaration_compare (_decl1, _decl2);
-	} else if (_decl1 is_of FunctionDeclaration) {
-		return simpledeclaration_compare (_decl1, _decl2);
-	} else if (_decl1 is_of VariableDeclaration) {
-		return simpledeclaration_compare (_decl1, _decl2);
+int declaration_compare (Declaration decl1, Declaration decl2) {
+	if (decl1 is_of InterfaceDeclaration) {
+		return interfacedeclaration_compare (decl1, decl2);
+	} else if (decl1 is_of ClassDeclaration) {
+		return classdeclaration_compare (decl1, decl2);
+	} else if (decl1 is_of TypeDeclaration) {
+		return typedeclaration_compare (decl1, decl2);
+	} else if (decl1 is_of FunctionDeclaration) {
+		return simpledeclaration_compare (decl1, decl2);
+	} else if (decl1 is_of VariableDeclaration) {
+		return simpledeclaration_compare (decl1, decl2);
 	}
 	return 0;
 }
 
-int typedeclaration_compare (Declaration _decl1, Declaration _decl2) {
+int typedeclaration_compare (Declaration _decl1, Declaration decl2) {
 	TypeDeclaration decl1 = (TypeDeclaration) _decl1;
 	if (decl1.type is_of ObjectType) {
 		ObjectType type = (ObjectType) decl1.type;
@@ -281,7 +281,7 @@ int typedeclaration_compare (Declaration _decl1, Declaration _decl2) {
 			type.type_check ();
 		}
 		if (type.decl) {
-			declaration_compare (type.decl, _decl2);
+			declaration_compare (type.decl, decl2);
 		}
 	}
 	return 0;
