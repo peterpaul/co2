@@ -55,12 +55,7 @@ O_IMPLEMENT (CompoundStatement, void, generate, (void *_self))
 O_IMPLEMENT (CompoundStatement, void, type_check, (void *_self))
 {
   struct CompoundStatement *self = O_CAST (_self, CompoundStatement ());
-  struct RefList *declarations =
-    O_CALL (self->body, filter_args, type_filter, Declaration ());
-  struct RefList *expressions =
-    O_CALL (self->body, filter_args, not_type_filter, Declaration ());
-  O_CALL (declarations, map, CompileObject_type_check);
-  O_CALL (expressions, map, CompileObject_type_check);
+  O_CALL (self->body, map, CompileObject_type_check);
 }
 
 O_OBJECT (CompoundStatement, Statement);
