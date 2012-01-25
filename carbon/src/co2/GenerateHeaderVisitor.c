@@ -82,11 +82,11 @@ ClassDeclaration_generate_method_registration (void *_method_decl,
 }
 
 static void
-ClassDeclaration_generate_attribute_registration (void *_method_decl,
+ClassDeclaration_generate_attribute_registration (void *_var_decl,
 						  va_list * app)
 {
   struct VariableDeclaration *var_decl =
-    O_CAST (_method_decl, VariableDeclaration ());
+    O_CAST (_var_decl, VariableDeclaration ());
   struct ClassDeclaration *class_decl = O_GET_ARG (ClassDeclaration);
   fprintf (out, "; \\\n ");
   O_CALL (var_decl->type, generate);
@@ -116,7 +116,7 @@ static void ClassDeclaration_generate_mixin_registration (void *_interface_name,
   struct Declaration * decl = O_CALL_IF (IScope, global_scope, lookup_in_this_scope, interface_name);
   struct InterfaceDeclaration * interface_decl = O_CAST (decl, InterfaceDeclaration ());
 
-  void ClassDeclaration_generate_mixin_method_registration_2 (void *_method_decl)
+  void generate_mixin_registration_callback (void *_method_decl)
   {
     struct FunctionDeclaration *method_decl = O_CAST (_method_decl, FunctionDeclaration ());
     
@@ -126,7 +126,7 @@ static void ClassDeclaration_generate_mixin_registration (void *_interface_name,
       }
   }
 
-  O_CALL (interface_decl->members, map, ClassDeclaration_generate_mixin_method_registration_2);
+  O_CALL (interface_decl->members, map, generate_mixin_registration_callback);
 
   O_BRANCH_CALL (interface_decl->interfaces, map_args, ClassDeclaration_generate_mixin_registration, class_decl, map);
 }
@@ -153,22 +153,22 @@ O_IMPLEMENT(GenerateHeaderVisitor, void *, dtor, (void *_self))
 
 O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitClassDeclaration, (void *_self, void *_object), (_self, _object))
 {
-  struct BaseCompileObjectVisitor *visitor = O_CAST(_self, BaseCompileObjectVisitor());
-  struct ClassDeclaration *self = O_CAST(_object, ClassDeclaration ());
+  struct BaseCompileObjectVisitor *self = O_CAST(_self, BaseCompileObjectVisitor());
+  struct ClassDeclaration *decl = O_CAST(_object, ClassDeclaration ());
 
   /* filter the members */
   struct RefList *attributes =
-    O_CALL (self->members, filter_args, type_filter, VariableDeclaration ());
+    O_CALL (decl->members, filter_args, type_filter, VariableDeclaration ());
   O_CALL (attributes, retain);
   struct RefList *methods =
-    O_CALL (self->members, filter_args, type_filter, FunctionDeclaration ());
+    O_CALL (decl->members, filter_args, type_filter, FunctionDeclaration ());
   O_CALL (methods, retain);
   struct RefList *constructors =
-    O_CALL (self->members, filter_args, type_filter,
+    O_CALL (decl->members, filter_args, type_filter,
 	    ConstructorDeclaration ());
   O_CALL (constructors, retain);
   struct RefList *destructors =
-    O_CALL (self->members, filter_args, type_filter,
+    O_CALL (decl->members, filter_args, type_filter,
 	    DestructorDeclaration ());
   O_CALL (destructors, retain);
 
@@ -183,32 +183,32 @@ O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitClassDeclaration, (void *_self,
 
   /* generate the class */
   fprintf (out, "#define ");
-  O_CALL (self->name, generate);
+  O_CALL (decl->name, generate);
   fprintf (out, "Class_Attr\\\n ");
-  generate_superclass (self);
+  generate_superclass (decl);
   fprintf (out, "Class_Attr");
   struct Hash * map = O_CALL_CLASS (Hash (), new);
   O_CALL (new_constructors, map_args,
-	  ClassDeclaration_generate_constructor_registration, self);
+	  ClassDeclaration_generate_constructor_registration, decl);
   O_CALL (new_methods, map_args,
-	  ClassDeclaration_generate_method_registration, self, map);
-  O_CALL (self->interfaces, map_args, ClassDeclaration_generate_mixin_registration, self, map);
+	  ClassDeclaration_generate_method_registration, decl, map);
+  O_CALL (decl->interfaces, map_args, ClassDeclaration_generate_mixin_registration, decl, map);
   O_CALL (map, delete);
   fprintf (out, "\n\n");
 
   fprintf (out, "#define ");
-  O_CALL (self->name, generate);
+  O_CALL (decl->name, generate);
   fprintf (out, "_Attr\\\n ");
-  generate_superclass (self);
+  generate_superclass (decl);
   fprintf (out, "_Attr");
   O_CALL (attributes, map_args,
-	  ClassDeclaration_generate_attribute_registration, self);
+	  ClassDeclaration_generate_attribute_registration, decl);
   fprintf (out, "\n\n");
 
   fprintf (out, "O_CLASS (");
-  O_CALL (self->name, generate);
+  O_CALL (decl->name, generate);
   fprintf (out, ", ");
-  generate_superclass (self);
+  generate_superclass (decl);
   fprintf (out, ");\n\n");
 
   O_CALL (attributes, release);
@@ -220,37 +220,37 @@ O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitClassDeclaration, (void *_self,
 
 O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitConstructorDeclaration, (void *_self, void *_object), (_self, _object))
 {
-  struct GenerateHeaderVisitor *visitor = O_CAST (_self, GenerateHeaderVisitor ());
-  struct ConstructorDeclaration *self =
+  struct GenerateHeaderVisitor *self = O_CAST (_self, GenerateHeaderVisitor ());
+  struct ConstructorDeclaration *decl =
     O_CAST (_object, ConstructorDeclaration ());
-  if (new_constructor_filter (self))
+  if (new_constructor_filter (decl))
     {
       struct ClassDeclaration *class_decl = O_CALL (current_context, find, ClassDeclaration ());
       fprintf (out, "O_METHOD_DEF (");
       O_CALL (class_decl->name, generate);
       fprintf (out, ", void *, ");
-      if (strcmp (self->name->name->data, "ctor") != 0)
+      if (strcmp (decl->name->name->data, "ctor") != 0)
 	{
 	  fprintf (out, "ctor_");
 	}
-      O_CALL (self->name, generate);
+      O_CALL (decl->name, generate);
       fprintf (out, ", (void *_self, va_list *app));\n\n");
     }
 }
 
 O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitDeclaration, (void *_self, void *_object), (_self, _object))
 {
-  struct GenerateHeaderVisitor *visitor = O_CAST (_self, GenerateHeaderVisitor ());
-  struct Declaration *self = O_CAST (_object, Declaration ());
-  if (self->include_file)
+  struct GenerateHeaderVisitor *self = O_CAST (_self, GenerateHeaderVisitor ());
+  struct Declaration *decl = O_CAST (_object, Declaration ());
+  if (decl->include_file)
     {
       return;
     }
   else
     {
-      O_SUPER->visitDeclaration(visitor, self);
-      self->defined = true;
-      self->declared = true;
+      O_SUPER->visitDeclaration(self, decl);
+      decl->defined = true;
+      decl->declared = true;
     }
 }
 
@@ -262,8 +262,8 @@ O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitFunctionDeclaration, (void *_se
       return;
     }
 
-  struct BaseCompileObjectVisitor *visitor = O_CAST(_self, BaseCompileObjectVisitor());
-  struct FunctionDeclaration *self = O_CAST(_object, FunctionDeclaration ());
+  struct BaseCompileObjectVisitor *self = O_CAST(_self, BaseCompileObjectVisitor());
+  struct FunctionDeclaration *decl = O_CAST(_object, FunctionDeclaration ());
   struct ClassDeclaration *class_decl = O_CALL (current_context, find, ClassDeclaration ());
   struct InterfaceDeclaration *interface_decl = O_CALL (current_context, find, InterfaceDeclaration ());
   if (class_decl)
@@ -274,15 +274,15 @@ O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitFunctionDeclaration, (void *_se
 	}
 
       struct FunctionType *method_type =
-	o_cast (self->type, FunctionType ());
+	o_cast (decl->type, FunctionType ());
       fprintf (out, "O_METHOD_DEF (");
       O_CALL (class_decl->name, generate);
       fprintf (out, ", ");
       O_CALL (method_type->return_type, generate);
       fprintf (out, ", ");
-      O_CALL (self->name, generate);
+      O_CALL (decl->name, generate);
       fprintf (out, ", (void *_self");
-      O_CALL (self->formal_arguments, map,
+      O_CALL (decl->formal_arguments, map,
 	      ObjectTypeDeclaration_generate_method_arguments);
       fprintf (out, "));\n");
     }
@@ -293,27 +293,27 @@ O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitFunctionDeclaration, (void *_se
 	  return;
 	}
       struct FunctionType *method_type =
-	o_cast (self->type, FunctionType ());
+	o_cast (decl->type, FunctionType ());
       fprintf (out, "O_METHOD_DEF (");
       O_CALL (interface_decl->name, generate);
       fprintf (out, ", ");
       O_CALL (method_type->return_type, generate);
       fprintf (out, ", ");
-      O_CALL (self->name, generate);
+      O_CALL (decl->name, generate);
       fprintf (out, ", (void *_self");
-      O_CALL (self->formal_arguments, map,
+      O_CALL (decl->formal_arguments, map,
 	      ObjectTypeDeclaration_generate_method_arguments);
       fprintf (out, "));\n");
     }
   else
     {
       bool first_formal_arg = true;
-      struct FunctionType *function_type = o_cast (self->type, FunctionType ());
+      struct FunctionType *function_type = o_cast (decl->type, FunctionType ());
       O_CALL (function_type->return_type, generate);
       fprintf (out, " ");
-      O_CALL (self->name, generate);
+      O_CALL (decl->name, generate);
       fprintf (out, " (");
-      O_CALL (self->formal_arguments, map_args,
+      O_CALL (decl->formal_arguments, map_args,
 	      FunctionDeclaration_generate_formal_arg, &first_formal_arg);
       fprintf (out, ");\n");
     }
@@ -321,11 +321,11 @@ O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitFunctionDeclaration, (void *_se
 
 O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitInterfaceDeclaration, (void *_self, void *_object), (_self, _object))
 {
-  struct BaseCompileObjectVisitor *visitor = O_CAST(_self, BaseCompileObjectVisitor());
-  struct InterfaceDeclaration *self = O_CAST (_object, InterfaceDeclaration ());
+  struct BaseCompileObjectVisitor *self = O_CAST(_self, BaseCompileObjectVisitor());
+  struct InterfaceDeclaration *decl = O_CAST (_object, InterfaceDeclaration ());
   /* filter the members */
   struct RefList *methods =
-    O_CALL (self->members, filter_args, type_filter, FunctionDeclaration ());
+    O_CALL (decl->members, filter_args, type_filter, FunctionDeclaration ());
   O_CALL (methods, retain);
   struct RefList *new_methods =
     O_CALL (methods, filter_args, Declaration_new_member_filter,
@@ -336,108 +336,108 @@ O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitInterfaceDeclaration, (void *_s
 
   /* generate the class */
   fprintf (out, "#define ");
-  O_CALL (self->name, generate);
+  O_CALL (decl->name, generate);
   fprintf (out, "Class_Attr\\\n ");
   fprintf (out, "InterfaceClass_Attr");
   fprintf (out, "\n\n");
 
   fprintf (out, "#define ");
-  O_CALL (self->name, generate);
+  O_CALL (decl->name, generate);
   fprintf (out, "_Attr\\\n ");
   fprintf (out, "Interface_Attr");
   struct Hash * map = O_CALL_CLASS (Hash (), new);
   O_CALL (new_methods, map_args,
-	  InterfaceDeclaration_generate_method_registration, self, map);
+	  InterfaceDeclaration_generate_method_registration, decl, map);
   O_CALL (map, delete);
   fprintf (out, "\n\n");
 
   fprintf (out, "O_CLASS (");
-  O_CALL (self->name, generate);
+  O_CALL (decl->name, generate);
   fprintf (out, ", Interface);\n\n");
 
 }
 
 O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitStructDeclaration, (void *_self, void *_object), (_self, _object))
 {
-  struct BaseCompileObjectVisitor *visitor = O_CAST(_self, BaseCompileObjectVisitor());
-  struct StructDeclaration *self = O_CAST (_object, StructDeclaration ());
+  struct BaseCompileObjectVisitor *self = O_CAST(_self, BaseCompileObjectVisitor());
+  struct StructDeclaration *decl = O_CAST (_object, StructDeclaration ());
   fprintf (out, "struct ");
-  O_CALL (self->name, generate);
+  O_CALL (decl->name, generate);
   fprintf (out, " {\n");
-  O_CALL (self->members, map, CompileObject_generate);
+  O_CALL (decl->members, map, CompileObject_generate);
   fprintf (out, "};\n\n");
 }
 
 O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitTypeDeclaration, (void *_self, void *_object), (_self, _object))
 {
-  struct BaseCompileObjectVisitor *visitor = O_CAST(_self, BaseCompileObjectVisitor());
-  struct TypeDeclaration *self = O_CAST(_object, TypeDeclaration());
+  struct BaseCompileObjectVisitor *self = O_CAST(_self, BaseCompileObjectVisitor());
+  struct TypeDeclaration *decl = O_CAST(_object, TypeDeclaration());
   fprintf (out, "#ifndef TYPEDEF_");
-  O_CALL (self->name, generate);
+  O_CALL (decl->name, generate);
   fprintf (out, "\n#define TYPEDEF_");
-  O_CALL (self->name, generate);
+  O_CALL (decl->name, generate);
   fprintf (out, "\n");
   fprintf (out, "typedef ");
-  if (o_is_of (self->type, FunctionType ()))
+  if (o_is_of (decl->type, FunctionType ()))
     {
-      struct FunctionType * function_type = O_CAST (self->type, FunctionType ());
-      O_CALL (function_type, generate_named, self->name);
+      struct FunctionType * function_type = O_CAST (decl->type, FunctionType ());
+      O_CALL (function_type, generate_named, decl->name);
     }
   else
     {
-      O_CALL (self->type, generate);
+      O_CALL (decl->type, generate);
       fprintf (out, " ");
-      O_CALL (self->name, generate);
+      O_CALL (decl->name, generate);
     }
   fprintf (out, ";\n");
   fprintf (out, "#endif /* TYPEDEF_");
-  O_CALL (self->name, generate);
+  O_CALL (decl->name, generate);
   fprintf (out, " */\n");
 }
 
 O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitVariableDeclaration, (void *_self, void *_object), (_self, _object))
 {
-  struct BaseCompileObjectVisitor *visitor = O_CAST(_self, BaseCompileObjectVisitor());
-  struct VariableDeclaration *self = O_CAST(_object, VariableDeclaration());
+  struct BaseCompileObjectVisitor *self = O_CAST(_self, BaseCompileObjectVisitor());
+  struct VariableDeclaration *decl = O_CAST(_object, VariableDeclaration());
 
-  if (self->scope && O_CALL_IF (IScope, self->scope, get_type) != GLOBAL_SCOPE)
+  if (decl->scope && O_CALL_IF (IScope, decl->scope, get_type) != GLOBAL_SCOPE)
     {
       // only generate global declarations
       return;
     }
   fprintf (out, "extern ");
-  if (o_is_of (self->type, FunctionType ()))
+  if (o_is_of (decl->type, FunctionType ()))
     {
-      struct FunctionType * function_type = O_CAST (self->type, FunctionType ());
-      O_CALL (function_type, generate_named, self->name);
+      struct FunctionType * function_type = O_CAST (decl->type, FunctionType ());
+      O_CALL (function_type, generate_named, decl->name);
     }
   else
     {
-      O_CALL (self->type, generate);
+      O_CALL (decl->type, generate);
       fprintf (out, " ");
-      O_CALL (self->name, generate);
+      O_CALL (decl->name, generate);
     }
   fprintf (out, ";\n");
 }
 
 O_IMPLEMENT_IF(GenerateHeaderVisitor, void, visitObjectType, (void *_self, void *_object), (_self, _object))
 {
-  struct BaseCompileObjectVisitor *visitor = O_CAST(_self, BaseCompileObjectVisitor());
-  struct ObjectType *self = O_CAST (_object, ObjectType ());
+  struct BaseCompileObjectVisitor *self = O_CAST(_self, BaseCompileObjectVisitor());
+  struct ObjectType *type = O_CAST (_object, ObjectType ());
 
-  if (self->decl && !self->decl->defined)
+  if (type->decl && !type->decl->defined)
     {
-      if (o_is_of (self->decl, TypeDeclaration ()) && !((struct TypeDeclaration *) self->decl)->is_struct)
+      if (o_is_of (type->decl, TypeDeclaration ()) && !((struct TypeDeclaration *) type->decl)->is_struct)
 	{
-	  O_CALL (visitor, visit, self->decl);
+	  O_CALL (self, visit, type->decl);
 	}
       else
 	{
 	  fprintf (out, "struct ");
-	  O_CALL (self->token, generate);
+	  O_CALL (type->token, generate);
 	  fprintf (out, ";\n");
 	}
-      self->decl->defined = true;
+      type->decl->defined = true;
     }
 }
 
