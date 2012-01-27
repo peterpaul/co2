@@ -68,6 +68,10 @@ class Type : CompileObject {
 		}
 	}
 
+	void type_check () {
+		// intentionally empty
+	}
+
 	Bool is_void_ptr () {
 		if (self is_of ArrayType) {
 			ArrayType array_type = (ArrayType) self;

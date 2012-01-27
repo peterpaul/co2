@@ -86,6 +86,7 @@ GENERATED_CSOURCES=\
 $(libcarbon_1_0_la_CO2SOURCES:.co2=.c)
 
 GENERATED_CHEADERS=\
+IncludeStack.h\
 $(libcarbon_1_0_la_CO2SOURCES:.co2=.h)
 
 GENERATED_CO2DEPEND=\
@@ -136,10 +137,10 @@ IncludeStack.h: IncludeStack.co2
 	carbon $(CARBON_FLAGS) $< IncludeStack.c
 
 distclean-local:
-	-rm -r ${bin_PROGRAMS}
+	-rm -r ${bin_PROGRAMS} $(GENERATED_CO2DEPEND)
 
 clean-local:
 	-rm -f grammar.c grammar.h lex.c
-	if test "$(CARBON)" == "no"; then rm -f $(GENERATED_CO2DEPEND); else rm -f $(GENERATED_CHEADERS) $(GENERATED_CSOURCES) $(GENERATED_CO2DEPEND); fi
+	if ! test "$(CARBON)" == "no"; then rm -f $(GENERATED_CHEADERS) $(GENERATED_CSOURCES); fi
 
 include $(GENERATED_CO2DEPEND)

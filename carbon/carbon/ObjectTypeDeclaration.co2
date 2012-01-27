@@ -19,12 +19,14 @@ class ObjectTypeDeclaration : Declaration {
 	Bool is_compatible (ObjectTypeDeclaration other);
 }
 
-void objecttypedeclaration_generate_method_arguments(FILE *fp, ArgumentDeclaration arg) {
+void objecttypedeclaration_generate_method_arguments(ArgumentDeclaration arg, va_list *app) {
+	FILE * fp = va_arg (*app, FILE *);
 	fprintf (fp, ", ");
 	arg.generate (fp);
 }
 
-void objecttypedeclaration_generate_method_argument_names(FILE *fp, ArgumentDeclaration arg) {
+void objecttypedeclaration_generate_method_argument_names(ArgumentDeclaration arg, va_list *app) {
+	FILE * fp = va_arg (*app, FILE *);
 	fprintf (fp, ", ");
 	arg.name.generate (fp);
 }

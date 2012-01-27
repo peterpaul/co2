@@ -20,12 +20,12 @@ class CompileObject : RefObject {
 
 typedef Bool = int;
 
-int type_filter (Object member, va_list *app) {
-	Object klass = (Object) va_arg (*app, void *);
+int type_filter (RefObject member, va_list *app) {
+	Class klass = (Class) va_arg (*app, void *);
 	return member is_of klass;
 }
 
-int not_type_filter (Object member, va_list *app) {
+int not_type_filter (RefObject member, va_list *app) {
 	return !type_filter (member, app);
 }
 

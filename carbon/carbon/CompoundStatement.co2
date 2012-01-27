@@ -3,4 +3,28 @@ include RefList
 
 class CompoundStatement : Statement {
 	RefList body;
+
+	CompoundStatement (RefList body) {
+		super ();
+		self.body = (RefList) body.retain ();
+	}
+
+	~CompoundStatement () {
+		body.release ();
+	}
+
+	void accept (CompileObjectVisitor visitor) {
+		body.map_args (compileobject_accept, visitor);
+		visitor.visit (self);
+	}
+
+	void generate (FILE * fp) {
+		fprintf (fp, "{\n");
+		body.map_args (compileobject_generate, fp);
+		fprintf (fp, "}\n");
+	}
+
+	void type_check () {
+		body.map (compileobject_type_check);
+	}
 }

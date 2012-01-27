@@ -26,6 +26,35 @@ class RefList : ArrayList {
 		return self;
 	}
 
+	RefList filter_args (int (*)(RefObject, va_list *) fun, ...) {
+		int i;
+		unsigned length = size ();
+		RefList result = new RefList (length, type);
+		for (i = 0; i < length; i += 1) {
+			RefObject item = get (i);
+			va_list aq;
+			va_copy (aq, ...);
+			if (fun (item, &aq)) {
+				result.add (item);
+			}
+			va_end (aq);
+		}
+		return result;
+	}
+
+	RefList filter (int (*)(RefObject) fun) {
+		int i;
+		unsigned length = size ();
+		RefList result = new RefList (length, type);
+		for (i = 0; i < length; i += 1) {
+			RefObject item = get (i);
+			if (fun (item)) {
+				result.add (item);
+			}
+		}
+		return result;
+	}
+
 	RefObject set (unsigned index, RefObject item) {
 		if (!item is_of type) {
 			throw new ClassCastException ();
