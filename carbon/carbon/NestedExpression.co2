@@ -1,5 +1,0 @@
-include Expression
-
-class NestedExpression : Expression {
-	Expression expr;
-}

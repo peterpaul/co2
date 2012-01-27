@@ -1,0 +1,6 @@
+include co2/ObjectTypeDeclaration
+include co2/RefList
+
+class InterfaceDeclaration : ObjectTypeDeclaration {
+	RefList interfaces;
+}

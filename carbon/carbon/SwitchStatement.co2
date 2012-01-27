@@ -1,4 +1,0 @@
-include Statement
-
-class SwitchStatement : Statement {
-}

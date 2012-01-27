@@ -1,9 +1,0 @@
-include ObjectTypeDeclaration
-include Token
-
-class TypeDeclaration : ObjectTypeDeclaration {
-	Bool is_struct;
-	TypeDeclaration (Token name) {
-		super (name);
-	}
-}

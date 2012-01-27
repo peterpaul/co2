@@ -1,0 +1,72 @@
+include co2/ObjectTypeDeclaration
+include co2/Token
+include co2/RefList
+include co2/ConstructorDeclaration
+
+class ClassDeclaration : ObjectTypeDeclaration {
+	Token superclass;
+	RefList interfaces;
+
+	ClassDeclaration (Token name, Token superclass, RefList interfaces) {
+		super (name);
+		self.superclass = (Token) superclass?.retain ();
+		self.interfaces = (RefList) interfaces?.retain ();
+	}
+
+	~ClassDeclaration () {
+		superclass?.release ();
+		interfaces?.release ();
+	}
+
+	void accept (BaseCompileObjectVisitor visitor) {
+		current_context?.add (self);
+		members.map_args (compileobject_accept, visitor);
+		visitor.visit (self);
+		current_context?.remove_last ();
+	}
+
+	void type_check () {
+		current_context?.add (self);
+		/* TODO check whether:
+		 * 1. superclasses already implement interfaces, if so: fail
+		 * 2. foreach interface, methods already exists in other interface (including interfaces from superclasses), if so: fail
+		 * 3. class (including superclasses) implements all methods of all interfaces, if not: fail
+		 */
+
+		void type_check_interfaces (Token interface_name) {
+			Declaration _interface_decl = global_scope.lookup (interface_name);
+			if (_interface_decl is_of InterfaceDeclaration) {
+				InterfaceDeclaration interface_decl = (InterfaceDeclaration) _interface_decl;
+				void type_check_interface_members (Declaration _if_method_decl) {
+					if (_if_method_decl is_of FunctionDeclaration) {
+						FunctionDeclaration if_method_decl = (FunctionDeclaration) _if_method_decl;
+						if (if_method_decl.body) {
+							if (member_scope.exists_in_this_scope (if_method_decl.name)) {
+								FunctionDeclaration method_decl = new FunctionDeclaration (if_method_decl.name, (FunctionType) if_method_decl.type, if_method_decl.formal_arguments, null);
+
+								method_decl.implemented_methods = new RefList (8, InterfaceMethodDefinition.class);
+								InterfaceMethodDefinition imd = new InterfaceMethodDefinition (interface_name, if_method_decl.name);
+								// TODO here was i been
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+Bool new_constructor_filter (ConstructorDeclaration constructor) {
+	if (strcmp (constructor.name.name.data, "ctor") != 0) {
+		return constructor.scope.get_parent ().find_type (constructor.name, ConstructorDeclaration.class) == null;
+	}
+	return false;
+}
+
+void generate_superclass (FILE * fp, ClassDeclaration myself) {
+	if (myself.superclass) {
+		myself.superclass.generate (fp);
+	} else {
+		fprintf (fp, "Object");
+	}
+}

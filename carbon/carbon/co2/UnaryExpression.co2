@@ -1,0 +1,7 @@
+include co2/Expression
+include co2/Token
+
+class UnaryExpression : Expression {
+	Token operator;
+	Expression operand;
+}

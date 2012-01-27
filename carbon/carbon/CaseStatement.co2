@@ -1,4 +1,0 @@
-include Statement
-
-class CaseStatement : Statement {
-}

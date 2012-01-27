@@ -1,0 +1,7 @@
+include co2/Expression
+include co2/Type
+
+class CastExpression : Expression {
+	Type cast_type;
+	Expression expression;
+}

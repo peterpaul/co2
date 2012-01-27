@@ -1,0 +1,6 @@
+include co2/Statement
+include co2/Expression
+
+class DeleteStatement : Statement {
+	Expression expr;
+}

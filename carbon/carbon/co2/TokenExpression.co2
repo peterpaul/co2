@@ -1,0 +1,12 @@
+include co2/Expression
+include co2/Token
+include co2/IScope
+
+class TokenExpression : Expression {
+	Token token;
+	IScope scope;
+	Declaration decl;
+	Bool check_global_scope;
+
+	void lookup ();
+}

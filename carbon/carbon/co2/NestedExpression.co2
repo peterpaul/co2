@@ -1,0 +1,5 @@
+include co2/Expression
+
+class NestedExpression : Expression {
+	Expression expr;
+}

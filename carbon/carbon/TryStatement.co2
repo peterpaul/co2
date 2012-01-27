@@ -1,8 +1,0 @@
-include Statement
-include RefList
-
-class TryStatement : Statement {
-	Statement try_clause;
-	RefList catch_clause;
-	Statement finally_clause;
-}

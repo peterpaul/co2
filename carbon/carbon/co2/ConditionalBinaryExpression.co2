@@ -1,0 +1,4 @@
+include co2/BinaryExpression
+
+class ConditionalBinaryExpression : BinaryExpression {
+}

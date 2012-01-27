@@ -1,6 +1,0 @@
-include Statement
-include Expression
-
-class ExpressionStatement : Statement {
-	Expression expr;
-}

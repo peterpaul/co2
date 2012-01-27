@@ -1,0 +1,4 @@
+include co2/CompileObject
+
+class Statement : CompileObject {
+}

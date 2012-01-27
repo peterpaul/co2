@@ -4,12 +4,12 @@ include co2/ReleasePool
 int main () {
 	new ReleasePool ();
 	Logger logger = new Logger ();
-	logger.log (finest, "hello %s", "world");
-	logger.log (finer, "hello %s", "Peterpaul");
-	logger.log (fine, "hello %s", "world");
-	logger.log (warning, "hello %s", "Peterpaul");
-	logger.log (error, "hello %s", "Peterpaul");
-	logger.log (fatal, "hello %s", "Peterpaul");
+	logger.log (finest_level, "hello %s", "world");
+	logger.log (finer_level, "hello %s", "Peterpaul");
+	logger.log (fine_level, "hello %s", "world");
+	logger.log (warning_level, "hello %s", "Peterpaul");
+	logger.log (error_level, "hello %s", "Peterpaul");
+	logger.log (fatal_level, "hello %s", "Peterpaul");
 	delete current_release_pool;
 	return 0;
 }

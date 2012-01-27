@@ -1,7 +1,0 @@
-include Expression
-include RefList
-
-class FunctionCallExpression : Expression {
-	Expression function;
-	RefList actual_arguments;
-}

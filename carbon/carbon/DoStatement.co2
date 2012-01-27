@@ -1,7 +1,0 @@
-include Statement
-include Expression
-
-class DoStatement : Statement {
-	Expression condition;
-	Statement body;
-}

@@ -1,6 +1,0 @@
-include ObjectTypeDeclaration
-include RefList
-
-class InterfaceDeclaration : ObjectTypeDeclaration {
-	RefList interfaces;
-}

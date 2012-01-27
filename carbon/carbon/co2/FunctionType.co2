@@ -1,0 +1,157 @@
+include co2/Type
+include co2/RefList
+include co2/FunctionCallExpression
+include co2/TokenGenerator
+
+class FunctionType : Type {
+	Bool has_var_args;
+	Type return_type;
+	RefList parameters;
+	Token generated_name;
+
+	FunctionType (Type return_type, RefList parameters) {
+		super ();
+		self.return_type = (Type) return_type.retain ();
+		self.parameters = (RefList) parameters.retain ();
+		has_var_args = false;
+		self.parameters.map_args (functiontype_check_var_args, self);
+	}
+
+	FunctionType.from_decl (Type return_type, RefList formal_arguments) {
+		super ();
+		self.return_type = (Type) return_type.retain ();
+		parameters = new RefList (formal_arguments.length, Type.class);
+		parameters.retain ();
+		formal_arguments.map_args (functiontype_ctor_get_parameter_type_from_decl, parameters);
+		has_var_args = false;
+		parameters.map_args (functiontype_check_var_args, self);
+	}
+
+	FunctionType.from_expr (FunctionCallExpression expr) {
+		super ();
+		return_type = (Type) expr.type.retain ();
+		parameters = new RefList (expr.actual_arguments.length, Type.class);
+		parameters.retain ();
+		expr.actual_arguments.map_args (functiontype_ctor_get_parameter_type_from_expr, parameters);
+		has_var_args = false;
+		parameters.map_args (functiontype_check_var_args, self);
+	}
+
+	~FunctionType () {
+		return_type.release ();
+		parameters.release ();
+		generated_name?.release ();
+	}
+
+	void accept (CompileObjectVisitor visitor) {
+		return_type.accept (visitor);
+		parameters.map_args (compileobject_accept, visitor);
+		visitor.visit (self);
+	}
+
+	String toString () {
+		String string = return_type.toString ();
+		Bool first_arg = true;
+		string.append_str ("(*)(");
+		parameters.map_args (functiontype_parameter_toString, string, &first_arg);
+		string.append_str (")");
+		return string;
+	}
+
+	void generate_named (FILE *fp, Token name) {
+		Bool first_arg = true;
+		return_type.generate (fp);
+		fprintf (fp, "(*");
+		name.generate (fp);
+		fprintf (fp, ")(");
+		parameters.map_args (functiontype_generate_parameter, fp, &first_arg);
+		fprintf (fp, ")");
+	}
+
+	void generate (FILE *fp) {
+		/* TODO This only works when the type should be generated for a declaration first.
+		 * when this is called in code it will fail.
+		 * Perhaps generating the typedef in the header file will solve any problems
+		 */
+		if (generated_name == null) {
+			TokenGenerator generator = new TokenGenerator ();
+			Token token = get_token ();
+			generated_name = generator.create (token);
+			generated_name.retain ();
+		}
+		generate_named (fp, generated_name);
+	}
+
+	Bool is_compatible (Type _other) {
+		if (super (_other)) {
+			FunctionType other = (FunctionType) _other;
+			Bool result = true;
+			Bool tmp_result = return_type.is_compatible (other.return_type);
+			result = tmp_result ? result : tmp_result;
+			if (parameters.length != other.parameters.length) {
+				return false;
+			}
+			int i;
+			for (i = 0; i < parameters.length; i += 1) {
+				Type parameter_self = (Type) parameters.get (i);
+				Type parameter_other = (Type) other.parameters.get (i);
+				tmp_result = parameter_self.is_compatible (parameter_other);
+				result = tmp_result ? result : tmp_result;
+			}
+			return result;
+		}
+		return false;
+	}
+
+	Token get_token () {
+		return return_type.get_token ();
+	}
+
+	void type_check () {
+		return_type.type_check ();
+		parameters.map (compileobject_type_check);
+	}
+}
+
+void functiontype_check_var_args (Type type, va_list * app) {
+	FunctionType myself = (FunctionType) va_arg (*app, void *);
+	if (type is_of PrimitiveType
+		&& ((PrimitiveType) type).token.type == _VA_ARG) {
+		myself.has_var_args = true;
+	}
+}
+
+void functiontype_ctor_get_parameter_type_from_decl (Declaration decl, va_list * app) {
+	RefList list = (RefList) va_arg (*app, void *);
+	list.append (decl.type);
+}
+
+void functiontype_ctor_get_parameter_type_from_expr (Expression expr, va_list * app) {
+	RefList list = (RefList) va_arg (*app, void *);
+	list.append (expr.type);
+}
+
+void functiontype_generate_parameter (Type parameter, va_list * app) {
+	FILE * fp = va_arg (*app, FILE *);
+	Bool * first_arg = va_arg (*app, Bool *);
+	if (!*first_arg) {
+		fprintf (fp, ", ");
+	} else {
+		*first_arg = false;
+	}
+	parameter.generate (fp);
+}
+
+void functiontype_parameter_toString (Type parameter, va_list * app) {
+	String string = (String) va_arg (*app, void *);
+	Bool * first_arg = va_arg (*app, Bool *);
+	if (!*first_arg) {
+		string.append_str (", ");
+	} else {
+		*first_arg = false;
+	}
+	String parameter_string = parameter.toString ();
+	string.append (parameter_string);
+	delete parameter_string;
+}
+

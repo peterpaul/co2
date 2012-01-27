@@ -13,7 +13,7 @@ class Logger : BaseObject {
 		LogFormatter formatter = new SimpleFormatter ();
 		handler = new ConsoleHandler (formatter);
 		/* Initialize Level constants */
-		if (finest == null) {
+		if (finest_level == null) {
 			Level l = new Level ();
 			delete l;
 		}

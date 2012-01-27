@@ -1,0 +1,54 @@
+include co2/CompileObject
+include co2/Token
+include co2/IScope
+include co2/Type
+include co2/ClassDeclaration
+include co2/File
+
+class Declaration : CompileObject {
+	Token name;
+	IScope scope;
+	Type type;
+	Token include_file;
+	ClassDeclaration class_decl;
+	File file;
+	Bool declared, defined;
+
+	Declaration (Token a_name) {
+		super ();
+		name = (Token) a_name.retain ();
+		file = current_file;
+	}
+
+	~Declaration () {
+		name.release();
+		type?.release();
+		include_file?.release();
+		class_decl?.release();
+		((RefObject) scope)?.release();
+	}
+
+	void set_scope (IScope a_scope) {
+		scope = (IScope) ((RefObject) a_scope).retain ();
+	}
+
+	void set_class_decl (ClassDeclaration a_class_decl) {
+		class_decl = (ClassDeclaration) a_class_decl.retain ();
+	}
+
+	void set_include_file (Token an_include_file) {
+		include_file = (Token) an_include_file.retain ();
+	}
+}
+
+void declaration_list_set_include_header (Declaration decl, va_list *app) {
+	Token header_file = (Token) va_arg (app, void *);
+	decl.set_include_file (header_file);
+}
+
+int declaration_new_member_filter (Declaration member, va_list *app) {
+	Class type = (Class) va_arg (*app, void *);
+	IScope parent_scope = member.scope.get_parent ();
+	return parent_scope?.find_type (member.name, type) == null;
+}
+

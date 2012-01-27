@@ -1,0 +1,12 @@
+include co2/Expression
+include co2/Token
+include co2/ClassDeclaration
+include co2/RefList
+
+class SuperExpression : Expression {
+	Token super_name;
+	Token ctor_name;
+	ClassDeclaration class_context;
+	Declaration method_context;
+	RefList actual_arguments;
+}

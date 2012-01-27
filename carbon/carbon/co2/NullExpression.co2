@@ -1,0 +1,4 @@
+include co2/TokenExpression
+
+class NullExpression : TokenExpression {
+}

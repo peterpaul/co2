@@ -1,0 +1,9 @@
+include co2/Statement
+include co2/Expression
+
+class ForStatement : Statement {
+	Expression initialization;
+	Expression condition;
+	Expression iteration;
+	Statement body;
+}

@@ -1,0 +1,14 @@
+include co2/Statement
+include co2/FunctionDeclaration
+include co2/TryStatement
+include co2/CatchStatement
+include co2/FinallyStatement
+include co2/Expression
+
+class ReturnStatement : Statement {
+	Expression expr;
+	FunctionDeclaration function_context;
+	TryStatement try_context;
+	CatchStatement catch_context;
+	FinallyStatement finally_context;
+}

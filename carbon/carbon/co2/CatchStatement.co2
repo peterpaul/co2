@@ -1,0 +1,9 @@
+include co2/Statement
+include co2/IScope
+include co2/ArgumentDeclaration
+
+class CatchStatement : Statement {
+	IScope scope;
+	ArgumentDeclaration argument;
+	Statement body;
+}

@@ -1,0 +1,35 @@
+include co2/String
+include co2/CompileObject
+include co2/File
+
+class Token : CompileObject {
+	String name;
+	File file;
+	int type, line;
+
+	Token (char *name, int type, File file, int line) {
+		super ();
+		self.name = new String ("%s", name);
+		self.name.retain ();
+		self.type = type;
+		self.file = (File) file; // don't retain, this is a weak reference
+		self.line = line;
+	}
+
+	Token.fromToken (Token token, char * name, int type) {
+		super ();
+		self.name = new String ("%s", name);
+		self.name.retain ();
+		self.type = type;
+		self.file = token.file; // don't retain, this is a weak reference
+		self.line = token.line;
+	}
+
+	~Token () {
+		name.release ();
+	}
+
+	void generate (FILE *fp) {
+		name.fprint (fp);
+	}
+}

@@ -1,0 +1,5 @@
+include co2/Statement
+
+class FinallyStatement : Statement {
+	Statement body;
+}

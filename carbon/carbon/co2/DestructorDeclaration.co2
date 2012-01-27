@@ -1,0 +1,8 @@
+include co2/Declaration
+include co2/Token
+include co2/Statement
+
+class DestructorDeclaration : Declaration {
+	Token class_name;
+	Statement body;
+}

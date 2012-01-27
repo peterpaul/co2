@@ -1,9 +1,0 @@
-include Statement
-include Expression
-
-class ForStatement : Statement {
-	Expression initialization;
-	Expression condition;
-	Expression iteration;
-	Statement body;
-}

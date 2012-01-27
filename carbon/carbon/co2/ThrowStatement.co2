@@ -1,0 +1,12 @@
+include co2/Statement
+include co2/Expression
+include co2/CatchStatement
+include co2/TryStatement
+include co2/FinallyStatement
+
+class ThrowStatement : Statement {
+	Expression expr;
+	CatchStatement catch_context;
+	TryStatement try_context;
+	FinallyStatement finally_context;
+}

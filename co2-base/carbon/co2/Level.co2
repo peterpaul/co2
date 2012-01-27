@@ -7,13 +7,13 @@ class Level : Enum {
 		super ();
 		if (!initialized) {
 			initialized = true;
-			finest = createPrivateLevel (1, "finest");
-			finer = createPrivateLevel (2, "finer");
-			fine = createPrivateLevel (3, "fine");
-			info = createPrivateLevel (4, "info");
-			warning = createPrivateLevel (5, "warning");
-			error = createPrivateLevel (6, "error");
-			fatal = createPrivateLevel (7, "fatal");
+			finest_level = createPrivateLevel (1, "finest");
+			finer_level = createPrivateLevel (2, "finer");
+			fine_level = createPrivateLevel (3, "fine");
+			info_level = createPrivateLevel (4, "info");
+			warning_level = createPrivateLevel (5, "warning");
+			error_level = createPrivateLevel (6, "error");
+			fatal_level = createPrivateLevel (7, "fatal");
 		}
 		name = null;
 		value = 0;
@@ -31,4 +31,4 @@ Level createPrivateLevel (int v, char * n)
 	return l;
 }
 
-Level finest, finer, fine, info, warning, error, fatal;
+Level finest_level, finer_level, fine_level, info_level, warning_level, error_level, fatal_level;

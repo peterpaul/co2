@@ -1,7 +1,0 @@
-include Expression
-include Type
-
-class VarArgExpression : Expression {
-	Expression va_arg_expr;
-	Type va_arg_type;
-}

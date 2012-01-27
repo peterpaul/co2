@@ -1,0 +1,7 @@
+include co2/Expression
+
+class ConditionalExpression : Expression {
+	Expression condition;
+	Expression then_expr;
+	Expression else_expr;
+}

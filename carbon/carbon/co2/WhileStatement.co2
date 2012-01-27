@@ -1,0 +1,7 @@
+include co2/Statement
+include co2/Expression
+
+class WhileStatement : Statement {
+	Expression condition;
+	Statement body;
+}

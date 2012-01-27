@@ -1,4 +1,0 @@
-include TokenExpression
-
-class NullExpression : TokenExpression {
-}

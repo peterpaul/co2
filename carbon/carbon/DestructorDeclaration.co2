@@ -1,8 +1,0 @@
-include Declaration
-include Token
-include Statement
-
-class DestructorDeclaration : Declaration {
-	Token class_name;
-	Statement body;
-}

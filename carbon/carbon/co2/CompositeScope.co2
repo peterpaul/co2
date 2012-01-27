@@ -1,0 +1,145 @@
+include co2/IScope
+include co2/RefList
+include co2/RefObject
+
+class CompositeScope : RefObject, IScope {
+	RefList subscopes;
+
+	CompositeScope (IScope scope) {
+		super ();
+		subscopes = new RefList (8, Object.class);
+		subscopes.append ((RefObject) scope);
+		current_scope = self;
+	}
+
+	~CompositeScope () {
+		delete subscopes;
+	}
+
+	IScope get_parent () {
+		IScope scope = (IScope) subscopes.get (0);
+		return scope.get_parent ();
+	}
+
+	IScope set_parent (IScope parent_scope) {
+		IScope scope = (IScope) subscopes.get (0);
+		return scope.set_parent (parent_scope);
+	}
+
+	ScopeType get_type () {
+		IScope scope = (IScope) subscopes.get (0);
+		return scope.get_type ();
+	}
+
+	Declaration declare (Declaration decl) {
+		IScope scope = (IScope) subscopes.get (0);
+		scope.declare (decl);
+	}
+
+	void leave () {
+		IScope scope = (IScope) subscopes.get (0);
+		scope.leave ();
+	}
+
+	Declaration lookup_in_this_scope (Token token) {
+		Declaration decl = null;
+
+		void lookup_in_this_scope_callback (RefObject _scope) {
+			IScope scope = (IScope) _scope;
+			if (decl == null) {
+				if (scope.exists_in_this_scope (token)) {
+					decl = scope.lookup_in_this_scope (token);
+				}
+			}
+		}
+
+		subscopes.map (lookup_in_this_scope_callback);
+
+		if (decl == null) {
+			error (token, "'%s' not declared.\n", token.name.data);
+		}
+
+		return decl;
+	}
+
+	Declaration lookup (Token token) {
+		Declaration decl = null;
+
+		void lookup_callback (RefObject _scope) {
+			IScope scope = (IScope) _scope;
+			if (decl == null) {
+				if (scope.exists (token)) {
+					decl = scope.lookup (token);
+				}
+			}
+		}
+
+		subscopes.map (lookup_callback);
+
+		if (decl == null) {
+			error (token, "'%s' not declared.\n", token.name.data);
+		}
+
+		return decl;
+	}
+
+	Declaration find_type_in_this_scope (Token token, Class type) {
+		Declaration decl = null;
+
+		void find_type_in_this_scope_callback (RefObject _scope) {
+			IScope scope = (IScope) _scope;
+			if (decl == null) {
+				decl = scope.find_type_in_this_scope (token, type);
+			}
+		}
+
+		subscopes.map (find_type_in_this_scope_callback);
+
+		return decl;
+	}
+
+	Declaration find_type (Token token, Class type) {
+		Declaration decl = null;
+
+		void find_type_callback (RefObject _scope) {
+			IScope scope = (IScope) _scope;
+			if (decl == null) {
+				decl = scope.find_type (token, type);
+			}
+		}
+
+		subscopes.map (find_type_callback);
+
+		return decl;
+	}
+
+	Bool exists_in_this_scope (Token token) {
+		Bool result = false;
+
+		void exists_in_this_scope_callback (RefObject _scope) {
+			IScope scope = (IScope) _scope;
+			if (result == false) {
+				result = scope.exists_in_this_scope (token);
+			}
+		}
+
+		subscopes.map (exists_in_this_scope_callback);
+
+		return result;
+	}
+
+	Bool exists (Token token) {
+		Bool result = false;
+
+		void exists_callback (RefObject _scope) {
+			IScope scope = (IScope) _scope;
+			if (result == false) {
+				result = scope.exists (token);
+			}
+		}
+
+		subscopes.map (exists_callback);
+
+		return result;
+	}
+}

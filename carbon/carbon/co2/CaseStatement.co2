@@ -1,0 +1,4 @@
+include co2/Statement
+
+class CaseStatement : Statement {
+}

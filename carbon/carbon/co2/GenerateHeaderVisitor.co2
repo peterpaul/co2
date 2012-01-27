@@ -1,0 +1,293 @@
+include co2/BaseCompileObjectVisitor
+include co2/DestructorDeclaration
+
+class GenerateHeaderVisitor : BaseCompileObjectVisitor {
+	GenerateHeaderVisitor (FILE * fp) {
+		super (fp);
+		current_context = new Context ();
+		current_context.retain ();
+	}
+
+	~GenerateHeaderVisitor () {
+		current_context.release ();
+		current_context = null;
+	}
+
+	void visitClassDeclaration (ClassDeclaration decl) {
+		RefList attributes = decl.members.filter_args (type_filter, VariableDeclaration.class);
+		attributes.retain ();
+		RefList methods = decl.members.filter_args (type_filter, FunctionDeclaration.class);
+		methods.retain ();
+		RefList constructors = decl.members.filter_args (type_filter, ConstructorDeclaration.class);
+		constructors.retain ();
+		RefList destructors = decl.members.filter_args (type_filter, DestructorDeclaration.class);
+		destructors.retain ();
+
+		RefList new_methods = methods.filter_args (declaration_new_member_filter, FunctionDeclaration.class);
+		new_methods.retain ();
+
+		RefList new_constructors = constructors.filter (new_constructor_filter);
+		new_constructors.retain ();
+
+		fprintf (fp, "#define ");
+		decl.name.generate (fp);
+		fprintf (fp, "Class_Attr\\\n ");
+		generate_superclass (fp, decl);
+		fprintf (fp, "Class_Attr");
+
+		HashMap map = new HashMap (127);
+		new_constructors.map_args (classdeclaration_generate_constructor_registration, fp, decl);
+		new_methods.map_args (classdeclaration_generate_method_registration, fp, decl, map);
+		decl.interfaces.map_args (classdeclaration_generate_mixin_registration, fp, decl, map);
+		delete map;
+		fprintf (fp, "\n\n");
+
+		fprintf (fp, "#define ");
+		decl.name.generate (fp);
+		fprintf (fp, "_Attr\\\n ");
+		generate_superclass (fp, decl);
+		fprintf (fp, "_Attr");
+		attributes.map_args (classdeclaration_generate_attribute_registration, fp, decl);
+		fprintf (fp, "\n\n");
+
+		fprintf (fp, "O_CLASS (");
+		decl.name.generate (fp);
+		fprintf (fp, ", ");
+		generate_superclass (fp, decl);
+		fprintf (fp, ");\n\n");
+
+		attributes.release ();
+		methods.release ();
+		new_methods.release ();
+		constructors.release ();
+		destructors.release ();
+	}
+
+	void visitConstructorDeclaration (ConstructorDeclaration decl) {
+		if (new_constructor_filter (decl)) {
+			ClassDeclaration class_decl = (ClassDeclaration) current_context.find (ClassDeclaration.class);
+			fprintf (fp, "O_METHOD_DEF (");
+			class_decl.name.generate (fp);
+			fprintf (fp, "void *, ");
+			if (strcmp (decl.name.name.data, "ctor") != 0) {
+				fprintf (fp, "ctor_");
+			}
+			decl.name.generate (fp);
+			fprintf (fp, ", (void *_self, va_list * app));\n\n");
+		}
+	}
+
+	void visitDeclaration (Declaration decl) {
+		if (decl.include_file) {
+			return;
+		} else {
+			super (decl);
+			decl.defined = true;
+			decl.declared = true;
+		}
+	}
+
+	void visitFunctionDeclaration (FunctionDeclaration decl) {
+		// Don't generate for nested functions
+		if (current_context.find_nth_instance (FunctionDeclaration.class, 2)) {
+			return;
+		}
+		ClassDeclaration class_decl = (ClassDeclaration) current_context.find (ClassDeclaration.class);
+		InterfaceDeclaration interface_decl = (InterfaceDeclaration) current_context.find (InterfaceDeclaration.class);
+		if (class_decl) {
+			if (class_decl.include_file) {
+				return;
+			}
+
+			FunctionType method_type = (FunctionType) decl.type;
+			fprintf (fp, "O_METHOD_DEF (");
+			class_decl.name.generate (fp);
+			fprintf (fp, ", ");
+			method_type.return_type.generate (fp);
+			fprintf (fp, ", ");
+			decl.name.generate (fp);
+			fprintf (fp, ", (void *_self");
+			decl.formal_arguments.map_args (objecttypedeclaration_generate_method_arguments, fp);
+			fprintf (fp, "));\n");
+		} else if (interface_decl) {
+			if (interface_decl.include_file) {
+				return;
+			}
+			FunctionType method_type = (FunctionType) decl.type;
+			fprintf (fp, "O_METHOD_DEF (");
+			interface_decl.name.generate (fp);
+			fprintf (fp, ", ");
+			method_type.return_type.generate (fp);
+			fprintf (fp, ", ");
+			decl.name.generate (fp);
+			fprintf (fp, ", (void *_self");
+			decl.formal_arguments.map_args (objecttypedeclaration_generate_method_arguments, fp);
+			fprintf (fp, "));\n");
+		} else {
+			Bool first_formal_arg = true;
+			FunctionType function_type = (FunctionType) decl.type;
+			function_type.return_type.generate (fp);
+			fprintf (fp, " ");
+			decl.name.generate (fp);
+			fprintf (fp, " (");
+			decl.formal_arguments.map_args (functiondeclaration_generate_formal_arg, fp, &first_formal_arg);
+			fprintf (fp, ");\n");
+		}
+	}
+
+	void visitInterfaceDeclaration (InterfaceDeclaration decl) {
+		RefList methods = decl.members.filter_args (type_filter, FunctionDeclaration.class);
+		methods.retain ();
+		RefList new_methods = methods.filter_args (declaration_new_member_filter, FunctionDeclaration.class);
+		new_methods.retain ();
+
+		fprintf (fp, "#include co2/\"co2/Interface.h\"\n");
+
+		fprintf (fp, "#define ");
+		decl.name.generate (fp);
+		fprintf (fp, "Class_Attr\\\n ");
+		fprintf (fp, "InterfaceClass_Attr");
+		fprintf (fp, "\n\n");
+
+		fprintf (fp, "#define ");
+		decl.name.generate (fp);
+		fprintf (fp, "_Attr\\\n ");
+		fprintf (fp, "Interface_Attr");
+		HashMap map = new HashMap (127);
+		new_methods.map_args (interfacedeclaration_generate_method_registration, fp, decl, map);
+		delete map;
+		fprintf (fp, "\n\n");
+
+		fprintf (fp, "O_CLASS (");
+		decl.name.generate (fp);
+		fprintf (fp, ", Interface);\n\n");
+	}
+
+	void visitStructDeclaration (StructDeclaration decl) {
+		fprintf (fp, "struct ");
+		decl.name.generate (fp);
+		fprintf (fp, " {\n");
+		decl.members.map_args (compileobject_generate, fp);
+		fprintf (fp, "};\n\n");
+	}
+
+	void visitTypeDeclaration (TypeDeclaration decl) {
+		fprintf (fp, "#ifndef TYPEDEF_");
+		decl.name.generate (fp);
+		fprintf (fp, "\n#define TYPEDEF_");
+		decl.name.generate (fp);
+		fprintf (fp, "\n");
+		fprintf (fp, "typedef ");
+		if (decl.type is_of FunctionType) {
+			FunctionType function_type = (FunctionType) decl.type;
+			function_type.generate_named (fp, decl.name);
+		} else {
+			decl.type.generate (fp);
+			fprintf (fp, " ");
+			decl.name.generate (fp);
+		}
+		fprintf (fp, ";\n");
+		fprintf (fp, "#endif /* TYPEDEF_");
+		decl.name.generate (fp);
+		fprintf (fp, " */\n");
+	}
+
+	void visitVariableDeclaration (VariableDeclaration decl) {
+		if (decl.scope && decl.scope.get_type () != global_scope_type) {
+			// only generate global declarations
+			return ;
+		}
+		fprintf (fp, "extern ");
+		if (decl.type is_of FunctionType) {
+			FunctionType function_type = (FunctionType) decl.type;
+			function_type.generate_named (fp, decl.name);
+		} else {
+			decl.type.generate (fp);
+			fprintf (fp, " ");
+			decl.name.generate (fp);
+		}
+		fprintf (fp, ";\n");
+	}
+
+	void visitObjectType (ObjectType type) {
+		if (type.decl && !type.decl.defined) {
+			if (type.decl is_of TypeDeclaration &&
+				!((TypeDeclaration) type.decl).is_struct) {
+				visit (type.decl);
+			} else {
+				fprintf (fp, "struct ");
+				type.token.generate (fp);
+				fprintf (fp, ";\n");
+			}
+			type.decl.defined = true;
+		}
+	}
+}
+
+void classdeclaration_generate_constructor_registration (ConstructorDeclaration constructor_decl, va_list *app) {
+	FILE *fp = va_arg (*app, FILE *);
+	ClassDeclaration class_decl = (ClassDeclaration) va_arg (*app, void *);
+	fprintf (fp, "; \\\n O_METHOD (");
+	class_decl.name.generate (fp);
+	fprintf (fp, ", ");
+	if (strcmp (constructor_decl.name.name.data, "ctor") != 0) {
+		fprintf (fp, "ctor_");
+	}
+	constructor_decl.name.generate (fp);
+	fprintf (fp, ")");
+}
+
+// TODO use HashSet instead of HashMap?
+void objecttypedeclaration_generate_method_registration (FILE * fp, ObjectTypeDeclaration ot_decl, FunctionDeclaration method_decl, HashMap map) {
+	if (map.get (method_decl.name.name) == null) {
+		map.put (method_decl.name.name, method_decl);
+		fprintf (fp, "; \\\n O_METHOD (");
+		ot_decl.name.generate (fp);
+		fprintf (fp, ", ");
+		method_decl.name.generate (fp);
+		fprintf (fp, ")");
+	}
+}
+
+void classdeclaration_generate_method_registration (FunctionDeclaration method_decl, va_list * app) {
+	FILE * fp = va_arg (*app, FILE *);
+	ClassDeclaration class_decl = (ClassDeclaration) va_arg (*app, void *);
+	HashMap map = (HashMap) va_arg (*app, void *);
+	objecttypedeclaration_generate_method_registration (fp, class_decl, method_decl, map);
+}
+
+void classdeclaration_generate_attribute_registration (VariableDeclaration var_decl, va_list * app) {
+	FILE * fp = va_arg (*app, FILE *);
+	ClassDeclaration class_decl = (ClassDeclaration) va_arg (*app, void *);
+	fprintf (fp, "; \\\n ");
+	var_decl.type.generate (fp);
+	fprintf (fp, " ");
+	var_decl.name.generate (fp);
+}
+
+void interfacedeclaration_generate_method_registration (FunctionDeclaration method_decl, va_list * app) {
+	FILE * fp = va_arg (*app, FILE *);
+	InterfaceDeclaration interface_decl = (InterfaceDeclaration) va_arg (*app, void *);
+	HashMap map = (HashMap) va_arg (*app, void *);
+	objecttypedeclaration_generate_method_registration (fp, interface_decl, method_decl, map);
+}
+
+void classdeclaration_generate_mixin_registration (Token interface_name, va_list * app) {
+	FILE * fp = va_arg (*app, FILE *);
+	ClassDeclaration class_decl = (ClassDeclaration) va_arg (*app, void *);
+	HashMap map = (HashMap) va_arg (*app, void *);
+
+	Declaration decl = global_scope.lookup_in_this_scope (interface_name);
+	InterfaceDeclaration interface_decl = (InterfaceDeclaration) decl;
+
+	void generate_mixin_method_registration_2 (FunctionDeclaration method_decl) {
+		if (method_decl.body && !class_decl.member_scope.exists (method_decl.name)) {
+			objecttypedeclaration_generate_method_registration (fp, interface_decl, method_decl, map);
+		}
+	}
+
+	interface_decl.members.map (generate_mixin_method_registration_2);
+
+	interface_decl.interfaces?.map_args (classdeclaration_generate_mixin_registration, fp, class_decl, map);
+}
+

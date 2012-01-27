@@ -1,0 +1,6 @@
+include co2/Expression
+include co2/Type
+
+class SizeExpression : Expression {
+	Type param;
+}

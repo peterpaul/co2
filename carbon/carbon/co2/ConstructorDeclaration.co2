@@ -1,0 +1,10 @@
+include co2/Declaration
+include co2/Token
+include co2/Statement
+include co2/RefList
+
+class ConstructorDeclaration : Declaration {
+	Token class_name;
+	RefList formal_arguments;
+	Statement body;
+}

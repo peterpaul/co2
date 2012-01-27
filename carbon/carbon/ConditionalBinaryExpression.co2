@@ -1,4 +1,0 @@
-include BinaryExpression
-
-class ConditionalBinaryExpression : BinaryExpression {
-}

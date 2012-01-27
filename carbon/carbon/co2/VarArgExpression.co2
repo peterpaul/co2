@@ -1,0 +1,7 @@
+include co2/Expression
+include co2/Type
+
+class VarArgExpression : Expression {
+	Expression va_arg_expr;
+	Type va_arg_type;
+}

@@ -1,0 +1,5 @@
+include co2/CompileObject
+
+interface CompileObjectVisitor {
+	void visit (CompileObject object);
+}

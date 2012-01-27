@@ -1,0 +1,47 @@
+include co2/Type
+include co2/Token
+
+class PrimitiveType : Type {
+	Token token;
+
+	PrimitiveType (Token token) {
+		super ();
+		self.token = (Token) token.retain ();
+	}
+
+	~PrimitiveType () {
+		token.release ();
+	}
+
+	Token get_token () {
+		return token;
+	}
+
+	String toString () {
+		return new String ("%s", token.name.data);
+	}
+
+	Bool is_compatible (Type _other) {
+		if (super (_other)) {
+			if (_other is_of ObjectType) {
+				ObjectType other = (ObjectType) _other;
+				return other.is_compatible (self);
+			}
+			PrimitiveType other = (PrimitiveType) _other;
+			Token name_self = get_token ();
+			Token name_other = other.get_token ();
+			if ((name_self.type == _INT || name_self.type == _UNSIGNED) &&
+				(name_other.type == _INT || name_other.type == _UNSIGNED) ||
+				(name_self.type == _FLOAT || name_self.type == _DOUBLE) &&
+				(name_other.type == _FLOAT || name_other.type == _DOUBLE)) {
+				if (name_self.type != name_other.type) {
+					warning (name_self, "possible data loss while converting %s to %s\n", name_other.name.data, name_self.name.data);
+				}
+				return true;
+			} else {
+				return name_self.type == name_other.type;
+			}
+		}
+		return false;
+	}
+}

@@ -1,0 +1,20 @@
+include co2/BaseCompileObjectVisitor
+include co2/Context
+include co2/HashMap
+
+class GenerateSourceIncludesVisitor : BaseCompileObjectVisitor {
+	Map map;
+
+	GenerateSourceIncludesVisitor (FILE *fp) {
+		super (fp);
+		current_context = new Context ();
+		current_context.retain ();
+		map = new HashMap (127);
+	}
+
+	~GenerateSourceIncludesVisitor () {
+		current_context.release ();
+		delete map;
+	}
+
+}

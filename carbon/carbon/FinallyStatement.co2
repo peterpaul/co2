@@ -1,5 +1,0 @@
-include Statement
-
-class FinallyStatement : Statement {
-	Statement body;
-}

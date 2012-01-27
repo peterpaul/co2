@@ -1,0 +1,22 @@
+include co2/CompileObject
+include co2/Token
+include co2/InterfaceDeclaration
+include co2/FunctionDeclaration
+
+class InterfaceMethodDefinition : CompileObject {
+	Token interface_name;
+	Token method_name;
+	InterfaceDeclaration interface_decl;
+	FunctionDeclaration method_decl;
+
+	InterfaceMethodDefinition (Token i_name, Token m_name) {
+		super ();
+		interface_name = (Token) i_name.retain ();
+		method_name = (Token) m_name?.retain ();
+	}
+
+	~InterfaceMethodDefinition () {
+		interface_name.release ();
+		method_name?.release ();
+	}
+}
