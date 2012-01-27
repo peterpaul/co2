@@ -26,6 +26,7 @@
 #include "co2/DestructorDeclaration.h"
 #include "co2/StructDeclaration.h"
 #include "co2/TypeDeclaration.h"
+#include "co2/IsOfExpression.h"
 #include "co2/FunctionType.h"
 #include "co2/ObjectType.h"
 #include "co2/io.h"
@@ -129,10 +130,4 @@ O_OBJECT_METHOD (GenerateSourceIncludesVisitor, visitDeclaration);
 O_OBJECT_METHOD (GenerateSourceIncludesVisitor, visitTokenExpression);
 O_OBJECT_METHOD (GenerateSourceIncludesVisitor, visitObjectType);
 O_OBJECT_METHOD (GenerateSourceIncludesVisitor, visitFile);
-O_OBJECT_IF(CompileObjectVisitor);
-O_OBJECT_IF_METHOD (GenerateSourceIncludesVisitor, visitDeclaration);
-O_OBJECT_IF_METHOD (GenerateSourceIncludesVisitor, visitTokenExpression);
-O_OBJECT_IF_METHOD (GenerateSourceIncludesVisitor, visitObjectType);
-O_OBJECT_IF_METHOD (GenerateSourceIncludesVisitor, visitFile);
-O_OBJECT_IF_END
 O_END_OBJECT

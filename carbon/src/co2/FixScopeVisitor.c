@@ -65,7 +65,4 @@ O_OBJECT (FixScopeVisitor, BaseCompileObjectVisitor);
 O_OBJECT_METHOD (FixScopeVisitor, ctor);
 O_OBJECT_METHOD (FixScopeVisitor, dtor);
 O_OBJECT_METHOD (FixScopeVisitor, visitClassDeclaration);
-O_OBJECT_IF (CompileObjectVisitor);
-O_OBJECT_IF_METHOD (FixScopeVisitor, visitClassDeclaration);
-O_OBJECT_IF_END
 O_END_OBJECT

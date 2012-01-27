@@ -139,10 +139,4 @@ O_OBJECT_METHOD (GenerateHeaderIncludesVisitor, visitClassDeclaration);
 O_OBJECT_METHOD (GenerateHeaderIncludesVisitor, visitDeclaration);
 O_OBJECT_METHOD (GenerateHeaderIncludesVisitor, visitInterfaceDeclaration);
 O_OBJECT_METHOD (GenerateHeaderIncludesVisitor, visitFile);
-O_OBJECT_IF(CompileObjectVisitor);
-O_OBJECT_IF_METHOD (GenerateHeaderIncludesVisitor, visitClassDeclaration);
-O_OBJECT_IF_METHOD (GenerateHeaderIncludesVisitor, visitDeclaration);
-O_OBJECT_IF_METHOD (GenerateHeaderIncludesVisitor, visitInterfaceDeclaration);
-O_OBJECT_IF_METHOD (GenerateHeaderIncludesVisitor, visitFile);
-O_OBJECT_IF_END
 O_END_OBJECT

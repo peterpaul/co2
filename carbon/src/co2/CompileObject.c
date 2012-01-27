@@ -77,5 +77,5 @@ O_IMPLEMENT (CompileObject, void, accept, (void *_self, struct BaseCompileObject
 O_OBJECT (CompileObject, RefObject);
 O_OBJECT_METHOD (CompileObject, ctor);
 O_OBJECT_METHOD (CompileObject, dtor);
-O_OBJECT_METHOD (CompileObject, accept);
+//O_OBJECT_METHOD (CompileObject, accept);
 O_END_OBJECT
