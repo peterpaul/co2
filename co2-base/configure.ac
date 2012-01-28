@@ -13,7 +13,6 @@ AC_DEFUN([AC_PROG_CARBON],
 	[AC_PATH_PROG(CARBON, carbon, no)])
 
 # Checks for programs.
-AC_PROG_CXX
 AC_PROG_AWK
 AC_PROG_CC
 AM_PROG_CC_C_O
