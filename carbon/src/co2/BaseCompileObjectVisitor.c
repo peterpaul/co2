@@ -28,24 +28,31 @@
 #include "co2/TypeDeclaration.h"
 #include "co2/VariableDeclaration.h"
 
+#include "co2/BreakStatement.h"
+#include "co2/CaseStatement.h"
 #include "co2/CatchStatement.h"
 #include "co2/CompoundStatement.h"
 #include "co2/DeleteStatement.h"
 #include "co2/DoStatement.h"
 #include "co2/ExpressionStatement.h"
+#include "co2/FinallyStatement.h"
 #include "co2/ForEachStatement.h"
 #include "co2/ForStatement.h"
 #include "co2/IfStatement.h"
 #include "co2/ReturnStatement.h"
 #include "co2/Statement.h"
+#include "co2/SwitchStatement.h"
 #include "co2/ThrowStatement.h"
 #include "co2/TryStatement.h"
 #include "co2/WhileStatement.h"
 
 #include "co2/BinaryExpression.h"
 #include "co2/CastExpression.h"
+#include "co2/ConditionalBinaryExpression.h"
+#include "co2/ConditionalExpression.h"
 #include "co2/Expression.h"
 #include "co2/FunctionCallExpression.h"
+#include "co2/IsOfExpression.h"
 #include "co2/NestedExpression.h"
 #include "co2/NewExpression.h"
 #include "co2/NullExpression.h"
@@ -82,7 +89,7 @@ O_IMPLEMENT (BaseCompileObjectVisitor, void *, dtor, (void *_self))
   return O_SUPER->dtor (self);
 }
 
-O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitDeclaration, (void *_self, void *decl), (_self, decl))
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitDeclaration, (void *_self, void *decl))
 {
   struct BaseCompileObjectVisitor *self = O_CAST (_self, BaseCompileObjectVisitor ());
   if (o_is_of (decl, ArgumentDeclaration ()))
@@ -105,13 +112,18 @@ O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitDeclaration, (void *_self, 
     O_CALL (self, visitVariableDeclaration, decl);
   else
     {
+      assertTrue (false, "Unhandled branch: %s", ((struct Object *)decl)->class->name);
     }
 }
 
-O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitStatement, (void *_self, void *stat), (_self, stat))
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitStatement, (void *_self, void *stat))
 {
   struct BaseCompileObjectVisitor *self = O_CAST (_self, BaseCompileObjectVisitor ());
-  if (o_is_of (stat, CatchStatement ()))
+  if (o_is_of (stat, BreakStatement ()))
+    O_CALL (self, visitBreakStatement, stat);
+  else if (o_is_of (stat, CaseStatement ()))
+    O_CALL (self, visitCaseStatement, stat);
+  else if (o_is_of (stat, CatchStatement ()))
     O_CALL (self, visitCatchStatement, stat);
   else if (o_is_of (stat, CompoundStatement ()))
     O_CALL (self, visitCompoundStatement, stat);
@@ -121,6 +133,8 @@ O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitStatement, (void *_self, vo
     O_CALL (self, visitDoStatement, stat);
   else if (o_is_of (stat, ExpressionStatement ()))
     O_CALL (self, visitExpressionStatement, stat);
+  else if (o_is_of (stat, FinallyStatement ()))
+    O_CALL (self, visitFinallyStatement, stat);
   else if (o_is_of (stat, ForEachStatement ()))
     O_CALL (self, visitForEachStatement, stat);
   else if (o_is_of (stat, ForStatement ()))
@@ -129,6 +143,8 @@ O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitStatement, (void *_self, vo
     O_CALL (self, visitIfStatement, stat);
   else if (o_is_of (stat, ReturnStatement ()))
     O_CALL (self, visitReturnStatement, stat);
+  else if (o_is_of (stat, SwitchStatement ()))
+    O_CALL (self, visitSwitchStatement, stat);
   else if (o_is_of (stat, ThrowStatement ()))
     O_CALL (self, visitThrowStatement, stat);
   else if (o_is_of (stat, TryStatement ()))
@@ -137,18 +153,25 @@ O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitStatement, (void *_self, vo
     O_CALL (self, visitWhileStatement, stat);
   else
     {
+      assertTrue (false, "Unhandled branch: %s", ((struct Object *) stat)->class->name);
     }
 }
 
-O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitExpression, (void *_self, void *expr), (_self, expr))
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitExpression, (void *_self, void *expr))
 {
   struct BaseCompileObjectVisitor *self = O_CAST (_self, BaseCompileObjectVisitor ());
   if (o_is_of (expr, BinaryExpression ()))
     O_CALL (self, visitBinaryExpression, expr);
   else if (o_is_of (expr, CastExpression ()))
     O_CALL (self, visitCastExpression, expr);
+  else if (o_is_of (expr, ConditionalBinaryExpression ()))
+    O_CALL (self, visitConditionalBinaryExpression, expr);
+  else if (o_is_of (expr, ConditionalExpression ()))
+    O_CALL (self, visitConditionalExpression, expr);
   else if (o_is_of (expr, FunctionCallExpression ()))
     O_CALL (self, visitFunctionCallExpression, expr);
+  else if (o_is_of (expr, IsOfExpression ()))
+    O_CALL (self, visitIsOfExpression, expr);
   else if (o_is_of (expr, NestedExpression ()))
     O_CALL (self, visitNestedExpression, expr);
   else if (o_is_of (expr, NewExpression ()))
@@ -167,10 +190,11 @@ O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitExpression, (void *_self, v
     O_CALL (self, visitVarArgExpression, expr);
   else
     {
+      assertTrue (false, "Unhandled branch: %s", ((struct Object *) expr)->class->name);
     }
 }
 
-O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitType, (void *_self, void *type), (_self, type))
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitType, (void *_self, void *type))
 {
   struct BaseCompileObjectVisitor *self = O_CAST (_self, BaseCompileObjectVisitor ());
   if (o_is_of (type, ArrayType ()))
@@ -183,6 +207,7 @@ O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitType, (void *_self, void *t
     O_CALL (self, visitPrimitiveType, type);
   else
     {
+      assertTrue (false, "Unhandled branch: %s", ((struct Object *) type)->class->name);
     }
 }
 
@@ -199,48 +224,59 @@ O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visit, (void *_self, void *objec
     O_CALL (self, visitType, object);
   else if (o_is_of (object, File ()))
     O_CALL (self, visitFile, object);
+  else if (o_is_of (object, Token ()))
+    O_CALL (self, visitToken, object);
   else
     {
+      assertTrue (false, "Unhandled branch: %s", ((struct Object *) object)->class->name);
     }
 }
 
-O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitArgumentDeclaration, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitClassDeclaration, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitConstructorDeclaration, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitDestructorDeclaration, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitFunctionDeclaration, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitInterfaceDeclaration, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitStructDeclaration, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitTypeDeclaration, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitVariableDeclaration, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitCatchStatement, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitCompoundStatement, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitDeleteStatement, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitDoStatement, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitExpressionStatement, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitForEachStatement, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitForStatement, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitIfStatement, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitReturnStatement, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitThrowStatement, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitTryStatement, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitWhileStatement, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitBinaryExpression, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitCastExpression, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitFunctionCallExpression, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitNestedExpression, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitNewExpression, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitNullExpression, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitSizeExpression, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitSuperExpression, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitTokenExpression, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitUnaryExpression, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitVarArgExpression, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitArrayType, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitFunctionType, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitObjectType, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitPrimitiveType, (void *_self, void *_object), (_self, _object)) {}
-O_IMPLEMENT_IF (BaseCompileObjectVisitor, void, visitFile, (void *_self, void *file), (_self, file)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitArgumentDeclaration, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitClassDeclaration, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitConstructorDeclaration, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitDestructorDeclaration, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitFunctionDeclaration, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitInterfaceDeclaration, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitStructDeclaration, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitTypeDeclaration, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitVariableDeclaration, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitBreakStatement, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitCaseStatement, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitCatchStatement, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitCompoundStatement, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitDeleteStatement, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitDoStatement, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitExpressionStatement, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitFinallyStatement, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitForEachStatement, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitForStatement, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitIfStatement, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitReturnStatement, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitSwitchStatement, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitThrowStatement, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitTryStatement, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitWhileStatement, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitBinaryExpression, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitCastExpression, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitConditionalBinaryExpression, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitConditionalExpression, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitFunctionCallExpression, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitIsOfExpression, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitNestedExpression, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitNewExpression, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitNullExpression, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitSizeExpression, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitSuperExpression, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitTokenExpression, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitUnaryExpression, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitVarArgExpression, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitArrayType, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitFunctionType, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitObjectType, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitPrimitiveType, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitFile, (void *_self, void *_object)) {}
+O_IMPLEMENT (BaseCompileObjectVisitor, void, visitToken, (void *_self, void *_object)) {}
 
 O_OBJECT (BaseCompileObjectVisitor, RefObject);
 O_OBJECT_METHOD (BaseCompileObjectVisitor, ctor);
@@ -261,22 +297,29 @@ O_OBJECT_METHOD (BaseCompileObjectVisitor, visitStructDeclaration);
 O_OBJECT_METHOD (BaseCompileObjectVisitor, visitTypeDeclaration);
 O_OBJECT_METHOD (BaseCompileObjectVisitor, visitVariableDeclaration);
 
+O_OBJECT_METHOD (BaseCompileObjectVisitor, visitBreakStatement);
+O_OBJECT_METHOD (BaseCompileObjectVisitor, visitCaseStatement);
 O_OBJECT_METHOD (BaseCompileObjectVisitor, visitCatchStatement);
 O_OBJECT_METHOD (BaseCompileObjectVisitor, visitCompoundStatement);
 O_OBJECT_METHOD (BaseCompileObjectVisitor, visitDeleteStatement);
 O_OBJECT_METHOD (BaseCompileObjectVisitor, visitDoStatement);
 O_OBJECT_METHOD (BaseCompileObjectVisitor, visitExpressionStatement);
+O_OBJECT_METHOD (BaseCompileObjectVisitor, visitFinallyStatement);
 O_OBJECT_METHOD (BaseCompileObjectVisitor, visitForEachStatement);
 O_OBJECT_METHOD (BaseCompileObjectVisitor, visitForStatement);
 O_OBJECT_METHOD (BaseCompileObjectVisitor, visitIfStatement);
 O_OBJECT_METHOD (BaseCompileObjectVisitor, visitReturnStatement);
+O_OBJECT_METHOD (BaseCompileObjectVisitor, visitSwitchStatement);
 O_OBJECT_METHOD (BaseCompileObjectVisitor, visitThrowStatement);
 O_OBJECT_METHOD (BaseCompileObjectVisitor, visitTryStatement);
 O_OBJECT_METHOD (BaseCompileObjectVisitor, visitWhileStatement);
 
 O_OBJECT_METHOD (BaseCompileObjectVisitor, visitBinaryExpression);
 O_OBJECT_METHOD (BaseCompileObjectVisitor, visitCastExpression);
+O_OBJECT_METHOD (BaseCompileObjectVisitor, visitConditionalBinaryExpression);
+O_OBJECT_METHOD (BaseCompileObjectVisitor, visitConditionalExpression);
 O_OBJECT_METHOD (BaseCompileObjectVisitor, visitFunctionCallExpression);
+O_OBJECT_METHOD (BaseCompileObjectVisitor, visitIsOfExpression);
 O_OBJECT_METHOD (BaseCompileObjectVisitor, visitNestedExpression);
 O_OBJECT_METHOD (BaseCompileObjectVisitor, visitNewExpression);
 O_OBJECT_METHOD (BaseCompileObjectVisitor, visitNullExpression);
@@ -292,11 +335,9 @@ O_OBJECT_METHOD (BaseCompileObjectVisitor, visitObjectType);
 O_OBJECT_METHOD (BaseCompileObjectVisitor, visitPrimitiveType);
 
 O_OBJECT_METHOD (BaseCompileObjectVisitor, visitFile);
+
+O_OBJECT_METHOD (BaseCompileObjectVisitor, visitToken);
 O_OBJECT_IF (CompileObjectVisitor);
-O_OBJECT_IF_METHOD (BaseCompileObjectVisitor, visitDeclaration);
-O_OBJECT_IF_METHOD (BaseCompileObjectVisitor, visitStatement);
-O_OBJECT_IF_METHOD (BaseCompileObjectVisitor, visitExpression);
-O_OBJECT_IF_METHOD (BaseCompileObjectVisitor, visitType);
 O_OBJECT_IF_METHOD (BaseCompileObjectVisitor, visit);
 O_OBJECT_IF_END
 O_END_OBJECT

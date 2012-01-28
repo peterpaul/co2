@@ -64,4 +64,5 @@ O_OBJECT_METHOD (Token, ctor);
 O_OBJECT_METHOD (Token, ctor_from_token);
 O_OBJECT_METHOD (Token, dtor);
 O_OBJECT_METHOD (Token, generate);
+O_OBJECT_METHOD (CompileObject, accept);
 O_END_OBJECT

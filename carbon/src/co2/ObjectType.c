@@ -126,6 +126,16 @@ O_IMPLEMENT (ObjectType, bool, is_compatible, (void *_self, void *_other))
   return false;
 }
 
+O_IMPLEMENT (ObjectType, void, accept, (void *_self, struct BaseCompileObjectVisitor *visitor))
+{
+  struct ObjectType *self = O_CAST (_self, ObjectType ());
+  // don't visit decl from type, this introduces a loop
+  // O_BRANCH_CALL (self->decl, accept, visitor);
+  O_CALL (self->token, accept, visitor);
+  O_CALL (visitor, visit, self);
+}
+
+
 O_OBJECT (ObjectType, Type);
 O_OBJECT_METHOD (ObjectType, ctor);
 O_OBJECT_METHOD (ObjectType, dtor);
@@ -134,4 +144,5 @@ O_OBJECT_METHOD (ObjectType, type_check);
 O_OBJECT_METHOD (ObjectType, get_token);
 O_OBJECT_METHOD (ObjectType, to_string);
 O_OBJECT_METHOD (ObjectType, is_compatible);
+O_OBJECT_METHOD (ObjectType, accept);
 O_END_OBJECT

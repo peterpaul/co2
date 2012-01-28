@@ -560,13 +560,4 @@ O_OBJECT_METHOD (GenerateSourceVisitor, visitDestructorDeclaration);
 O_OBJECT_METHOD (GenerateSourceVisitor, visitFunctionDeclaration);
 O_OBJECT_METHOD (GenerateSourceVisitor, visitInterfaceDeclaration);
 O_OBJECT_METHOD (GenerateSourceVisitor, visitVariableDeclaration);
-O_OBJECT_IF(CompileObjectVisitor);
-O_OBJECT_IF_METHOD (GenerateSourceVisitor, visitClassDeclaration);
-O_OBJECT_IF_METHOD (GenerateSourceVisitor, visitConstructorDeclaration);
-O_OBJECT_IF_METHOD (GenerateSourceVisitor, visitDeclaration);
-O_OBJECT_IF_METHOD (GenerateSourceVisitor, visitDestructorDeclaration);
-O_OBJECT_IF_METHOD (GenerateSourceVisitor, visitFunctionDeclaration);
-O_OBJECT_IF_METHOD (GenerateSourceVisitor, visitInterfaceDeclaration);
-O_OBJECT_IF_METHOD (GenerateSourceVisitor, visitVariableDeclaration);
-O_OBJECT_IF_END
 O_END_OBJECT

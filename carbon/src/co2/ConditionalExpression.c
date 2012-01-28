@@ -95,9 +95,21 @@ O_IMPLEMENT(ConditionalExpression, void, generate, (void *_self))
   O_CALL (self->else_expr, generate);
 }
 
+O_IMPLEMENT (ConditionalExpression, void, accept, (void *_self, struct BaseCompileObjectVisitor *visitor))
+{
+  struct ConditionalExpression *self = O_CAST (_self, ConditionalExpression ());
+  O_BRANCH_CALL (current_context, add, self);
+  O_CALL (self->condition, accept, visitor);
+  O_CALL (self->then_expr, accept, visitor);
+  O_CALL (self->else_expr, accept, visitor);
+  O_CALL (visitor, visit, self);
+  O_BRANCH_CALL (current_context, remove_last);
+}
+
 O_OBJECT(ConditionalExpression, Expression);
 O_OBJECT_METHOD(ConditionalExpression, ctor);
 O_OBJECT_METHOD(ConditionalExpression, dtor);
 O_OBJECT_METHOD(ConditionalExpression, type_check);
 O_OBJECT_METHOD(ConditionalExpression, generate);
+O_OBJECT_METHOD(ConditionalExpression, accept);
 O_END_OBJECT

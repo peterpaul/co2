@@ -58,6 +58,8 @@ O_IMPLEMENT (ClassDeclaration, void, accept, (void *_self, struct BaseCompileObj
 {
   struct ClassDeclaration *self = O_CAST (_self, ClassDeclaration ());
   O_BRANCH_CALL (current_context, add, self);
+  O_BRANCH_CALL (self->superclass, accept, visitor);
+  O_BRANCH_CALL (self->interfaces, map_args, accept, visitor);
   O_CALL (self->members, map_args, accept, visitor);
   O_CALL (visitor, visit, self);
   O_BRANCH_CALL (current_context, remove_last);

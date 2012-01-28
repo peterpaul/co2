@@ -453,15 +453,4 @@ O_OBJECT_METHOD (GenerateHeaderVisitor, visitStructDeclaration);
 O_OBJECT_METHOD (GenerateHeaderVisitor, visitTypeDeclaration);
 O_OBJECT_METHOD (GenerateHeaderVisitor, visitVariableDeclaration);
 O_OBJECT_METHOD (GenerateHeaderVisitor, visitObjectType);
-O_OBJECT_IF(CompileObjectVisitor);
-O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitClassDeclaration);
-O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitConstructorDeclaration);
-O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitDeclaration);
-O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitFunctionDeclaration);
-O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitInterfaceDeclaration);
-O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitStructDeclaration);
-O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitTypeDeclaration);
-O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitVariableDeclaration);
-O_OBJECT_IF_METHOD (GenerateHeaderVisitor, visitObjectType);
-O_OBJECT_IF_END
 O_END_OBJECT

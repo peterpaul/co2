@@ -22,50 +22,108 @@
 #include "co2/RefObject.h"
 #include "co2/CompileObjectVisitor.h"
 
-#define BaseCompileObjectVisitorClass_Attr			\
-  RefObjectClass_Attr;						\
-  O_METHOD(CompileObjectVisitor, visit);			\
-  O_METHOD(CompileObjectVisitor, visitArgumentDeclaration);	\
-  O_METHOD(CompileObjectVisitor, visitClassDeclaration);	\
-  O_METHOD(CompileObjectVisitor, visitConstructorDeclaration);	\
-  O_METHOD(CompileObjectVisitor, visitDeclaration);		\
-  O_METHOD(CompileObjectVisitor, visitDestructorDeclaration);	\
-  O_METHOD(CompileObjectVisitor, visitFunctionDeclaration);	\
-  O_METHOD(CompileObjectVisitor, visitInterfaceDeclaration);	\
-  O_METHOD(CompileObjectVisitor, visitStructDeclaration);	\
-  O_METHOD(CompileObjectVisitor, visitTypeDeclaration);		\
-  O_METHOD(CompileObjectVisitor, visitVariableDeclaration);	\
-  O_METHOD(CompileObjectVisitor, visitCatchStatement);		\
-  O_METHOD(CompileObjectVisitor, visitCompoundStatement);	\
-  O_METHOD(CompileObjectVisitor, visitDeleteStatement);		\
-  O_METHOD(CompileObjectVisitor, visitDoStatement);		\
-  O_METHOD(CompileObjectVisitor, visitExpressionStatement);	\
-  O_METHOD(CompileObjectVisitor, visitForEachStatement);	\
-  O_METHOD(CompileObjectVisitor, visitForStatement);		\
-  O_METHOD(CompileObjectVisitor, visitIfStatement);		\
-  O_METHOD(CompileObjectVisitor, visitReturnStatement);		\
-  O_METHOD(CompileObjectVisitor, visitStatement);		\
-  O_METHOD(CompileObjectVisitor, visitThrowStatement);		\
-  O_METHOD(CompileObjectVisitor, visitTryStatement);		\
-  O_METHOD(CompileObjectVisitor, visitWhileStatement);		\
-  O_METHOD(CompileObjectVisitor, visitBinaryExpression);	\
-  O_METHOD(CompileObjectVisitor, visitCastExpression);		\
-  O_METHOD(CompileObjectVisitor, visitExpression);		\
-  O_METHOD(CompileObjectVisitor, visitFunctionCallExpression);	\
-  O_METHOD(CompileObjectVisitor, visitNestedExpression);	\
-  O_METHOD(CompileObjectVisitor, visitNewExpression);		\
-  O_METHOD(CompileObjectVisitor, visitNullExpression);		\
-  O_METHOD(CompileObjectVisitor, visitSizeExpression);		\
-  O_METHOD(CompileObjectVisitor, visitSuperExpression);		\
-  O_METHOD(CompileObjectVisitor, visitTokenExpression);		\
-  O_METHOD(CompileObjectVisitor, visitUnaryExpression);		\
-  O_METHOD(CompileObjectVisitor, visitVarArgExpression);	\
-  O_METHOD(CompileObjectVisitor, visitArrayType);		\
-  O_METHOD(CompileObjectVisitor, visitFunctionType);		\
-  O_METHOD(CompileObjectVisitor, visitObjectType);		\
-  O_METHOD(CompileObjectVisitor, visitPrimitiveType);		\
-  O_METHOD(CompileObjectVisitor, visitType);		\
-  O_METHOD(CompileObjectVisitor, visitFile)
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitDeclaration, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitStatement, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitExpression, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitType, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitArgumentDeclaration, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitClassDeclaration, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitConstructorDeclaration, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitDestructorDeclaration, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitFunctionDeclaration, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitInterfaceDeclaration, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitStructDeclaration, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitTypeDeclaration, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitVariableDeclaration, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitBreakStatement, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitCaseStatement, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitCatchStatement, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitCompoundStatement, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitDeleteStatement, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitDoStatement, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitExpressionStatement, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitFinallyStatement, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitForEachStatement, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitForStatement, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitIfStatement, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitReturnStatement, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitSwitchStatement, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitThrowStatement, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitTryStatement, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitWhileStatement, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitBinaryExpression, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitCastExpression, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitConditionalBinaryExpression, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitConditionalExpression, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitFunctionCallExpression, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitIsOfExpression, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitNestedExpression, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitNewExpression, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitNullExpression, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitSizeExpression, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitSuperExpression, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitTokenExpression, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitUnaryExpression, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitVarArgExpression, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitArrayType, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitFunctionType, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitObjectType, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitPrimitiveType, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitFile, (void *_self, void *_object));
+O_METHOD_DEF (BaseCompileObjectVisitor, void, visitToken, (void *_self, void *_object));
+
+#define BaseCompileObjectVisitorClass_Attr				\
+  RefObjectClass_Attr;							\
+  O_METHOD(CompileObjectVisitor, visit);				\
+  O_METHOD(BaseCompileObjectVisitor, visitArgumentDeclaration);		\
+  O_METHOD(BaseCompileObjectVisitor, visitClassDeclaration);		\
+  O_METHOD(BaseCompileObjectVisitor, visitConstructorDeclaration);	\
+  O_METHOD(BaseCompileObjectVisitor, visitDeclaration);			\
+  O_METHOD(BaseCompileObjectVisitor, visitDestructorDeclaration);	\
+  O_METHOD(BaseCompileObjectVisitor, visitFunctionDeclaration);		\
+  O_METHOD(BaseCompileObjectVisitor, visitInterfaceDeclaration);	\
+  O_METHOD(BaseCompileObjectVisitor, visitStructDeclaration);		\
+  O_METHOD(BaseCompileObjectVisitor, visitTypeDeclaration);		\
+  O_METHOD(BaseCompileObjectVisitor, visitVariableDeclaration);		\
+  O_METHOD(BaseCompileObjectVisitor, visitBreakStatement);		\
+  O_METHOD(BaseCompileObjectVisitor, visitCaseStatement);		\
+  O_METHOD(BaseCompileObjectVisitor, visitCatchStatement);		\
+  O_METHOD(BaseCompileObjectVisitor, visitCompoundStatement);		\
+  O_METHOD(BaseCompileObjectVisitor, visitDeleteStatement);		\
+  O_METHOD(BaseCompileObjectVisitor, visitDoStatement);			\
+  O_METHOD(BaseCompileObjectVisitor, visitExpressionStatement);		\
+  O_METHOD(BaseCompileObjectVisitor, visitFinallyStatement);		\
+  O_METHOD(BaseCompileObjectVisitor, visitForEachStatement);		\
+  O_METHOD(BaseCompileObjectVisitor, visitForStatement);		\
+  O_METHOD(BaseCompileObjectVisitor, visitIfStatement);			\
+  O_METHOD(BaseCompileObjectVisitor, visitReturnStatement);		\
+  O_METHOD(BaseCompileObjectVisitor, visitStatement);			\
+  O_METHOD(BaseCompileObjectVisitor, visitSwitchStatement);		\
+  O_METHOD(BaseCompileObjectVisitor, visitThrowStatement);		\
+  O_METHOD(BaseCompileObjectVisitor, visitTryStatement);		\
+  O_METHOD(BaseCompileObjectVisitor, visitWhileStatement);		\
+  O_METHOD(BaseCompileObjectVisitor, visitBinaryExpression);		\
+  O_METHOD(BaseCompileObjectVisitor, visitCastExpression);		\
+  O_METHOD(BaseCompileObjectVisitor, visitConditionalBinaryExpression);	\
+  O_METHOD(BaseCompileObjectVisitor, visitConditionalExpression);	\
+  O_METHOD(BaseCompileObjectVisitor, visitExpression);			\
+  O_METHOD(BaseCompileObjectVisitor, visitFunctionCallExpression);	\
+  O_METHOD(BaseCompileObjectVisitor, visitIsOfExpression);		\
+  O_METHOD(BaseCompileObjectVisitor, visitNestedExpression);		\
+  O_METHOD(BaseCompileObjectVisitor, visitNewExpression);		\
+  O_METHOD(BaseCompileObjectVisitor, visitNullExpression);		\
+  O_METHOD(BaseCompileObjectVisitor, visitSizeExpression);		\
+  O_METHOD(BaseCompileObjectVisitor, visitSuperExpression);		\
+  O_METHOD(BaseCompileObjectVisitor, visitTokenExpression);		\
+  O_METHOD(BaseCompileObjectVisitor, visitUnaryExpression);		\
+  O_METHOD(BaseCompileObjectVisitor, visitVarArgExpression);		\
+  O_METHOD(BaseCompileObjectVisitor, visitArrayType);			\
+  O_METHOD(BaseCompileObjectVisitor, visitFunctionType);		\
+  O_METHOD(BaseCompileObjectVisitor, visitObjectType);			\
+  O_METHOD(BaseCompileObjectVisitor, visitPrimitiveType);		\
+  O_METHOD(BaseCompileObjectVisitor, visitType);			\
+  O_METHOD(BaseCompileObjectVisitor, visitFile);			\
+  O_METHOD(BaseCompileObjectVisitor, visitToken)
 
 #define BaseCompileObjectVisitor_Attr		\
   RefObject_Attr

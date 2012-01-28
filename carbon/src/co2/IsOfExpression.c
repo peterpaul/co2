@@ -64,9 +64,20 @@ O_IMPLEMENT (IsOfExpression, void, generate, (void *_self))
   fprintf (out, ")");
 }
 
+O_IMPLEMENT (IsOfExpression, void, accept, (void *_self, struct BaseCompileObjectVisitor *visitor))
+{
+  struct IsOfExpression *self = O_CAST (_self, IsOfExpression ());
+  O_BRANCH_CALL (current_context, add, self);
+  O_CALL (self->expr_to_check, accept, visitor);
+  O_CALL (self->class_expr, accept, visitor);
+  O_CALL (visitor, visit, self);
+  O_BRANCH_CALL (current_context, remove_last);
+}
+
 O_OBJECT (IsOfExpression, Expression);
 O_OBJECT_METHOD (IsOfExpression, ctor);
 O_OBJECT_METHOD (IsOfExpression, dtor);
 O_OBJECT_METHOD (IsOfExpression, type_check);
 O_OBJECT_METHOD (IsOfExpression, generate);
+O_OBJECT_METHOD (IsOfExpression, accept);
 O_END_OBJECT

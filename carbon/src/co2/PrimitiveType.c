@@ -96,6 +96,13 @@ O_IMPLEMENT (PrimitiveType, bool, is_compatible, (void *_self, void *_other))
   return false;
 }
 
+O_IMPLEMENT (PrimitiveType, void, accept, (void *_self, struct BaseCompileObjectVisitor *visitor))
+{
+  struct PrimitiveType *self = O_CAST (_self, PrimitiveType ());
+  O_CALL (self->token, accept, visitor);
+  O_CALL (visitor, visit, self);
+}
+
 O_OBJECT (PrimitiveType, Type);
 O_OBJECT_METHOD (PrimitiveType, ctor);
 O_OBJECT_METHOD (PrimitiveType, dtor);
@@ -103,4 +110,5 @@ O_OBJECT_METHOD (PrimitiveType, generate);
 O_OBJECT_METHOD (PrimitiveType, get_token);
 O_OBJECT_METHOD (PrimitiveType, to_string);
 O_OBJECT_METHOD (PrimitiveType, is_compatible);
+O_OBJECT_METHOD (PrimitiveType, accept);
 O_END_OBJECT
