@@ -10,7 +10,6 @@ AC_CONFIG_SRCDIR([src/co2/Compiler.c])
 AC_CONFIG_HEADERS([src/config.h])
 
 # Checks for programs.
-AC_PROG_CXX
 AC_PROG_AWK
 AC_PROG_CC
 AC_PROG_LIBTOOL
