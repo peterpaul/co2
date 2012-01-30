@@ -4,7 +4,7 @@ include co2/Map
 include co2/HashMap
 include co2/Context
 include co2/Declaration
-include co2/BaseCompileObjectVisitor
+include co2/CompileObjectVisitor
 include co2/InterfaceDeclaration
 include co2/ObjectType
 include co2/ClassDeclaration
@@ -38,7 +38,7 @@ class File : CompileObject {
 		file_dependencies.release ();
 	}
 
-	void accept_all_files (BaseCompileObjectVisitor visitor) {
+	void accept_all_files (CompileObjectVisitor visitor) {
 		void accept_all_files_callback (File file) {
 			file.accept_all_files (visitor);
 		}
@@ -47,7 +47,7 @@ class File : CompileObject {
 		self.accept (visitor);
 	}
 
-	void accept (BaseCompileObjectVisitor visitor) {
+	void accept (CompileObjectVisitor visitor) {
 		current_context?.add (self);
 		self.declarations.map_args (compileobject_accept, visitor);
 		visitor.visit (self);

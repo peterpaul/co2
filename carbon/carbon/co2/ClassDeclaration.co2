@@ -18,7 +18,7 @@ class ClassDeclaration : ObjectTypeDeclaration {
 		interfaces?.release ();
 	}
 
-	void accept (BaseCompileObjectVisitor visitor) {
+	void accept (CompileObjectVisitor visitor) {
 		current_context?.add (self);
 		members.map_args (compileobject_accept, visitor);
 		visitor.visit (self);

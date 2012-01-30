@@ -27,7 +27,7 @@ class FunctionDeclaration : Declaration {
 		body.release ();
 	}
 
-	void accept (BaseCompileObjectVisitor visitor) {
+	void accept (CompileObjectVisitor visitor) {
 		current_context?.add (self);
 		type.accept (visitor);
 		formal_arguments.map_args (compileobject_accept, visitor);

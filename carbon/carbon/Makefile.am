@@ -118,9 +118,8 @@ CARBON_FLAGS=$(CO2_BASE_PATH) $(CO2_BASE_PATH)/co2 -I .
 
 %.d: %.co2
 	-rm -f $@
-	set -x
 	echo -n "`echo $@ | sed 's/\.d/.c/g'` " > $@
-	if test "$(CARBON)" == "no"; then echo ": " $< >> $@; else $(CARBON) --depend $(CARBON_FLAGS) $< $@ >> $@ | rm -f $@; fi
+	if test "$(CARBON)" == "no"; then echo ": " $< >> $@; else $(CARBON) --depend $(CARBON_FLAGS) $< $@ >> $@; fi
 
 grammar.h: grammar.c
 
