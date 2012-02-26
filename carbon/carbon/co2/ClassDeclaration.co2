@@ -46,19 +46,66 @@ class ClassDeclaration : ObjectTypeDeclaration {
 
 								method_decl.implemented_methods = new RefList (8, InterfaceMethodDefinition.class);
 								InterfaceMethodDefinition imd = new InterfaceMethodDefinition (interface_name, if_method_decl.name);
-								// TODO here was i been
+								imd.interface_decl = (InterfaceDeclaration) interface_decl.retain ();
+								imd.method_decl = (FunctionDeclaration) if_method_decl.retain ();
+								method_decl.implemented_methods.append (imd);
+
+								member_scope.declare (method_decl);
+								members.append (method_decl);
+							} else {
+								FunctionDeclaration method_decl = (FunctionDeclaration) member_scope.lookup_in_this_scope (if_method_decl.name);
+								InterfaceMethodDefinition imd = new InterfaceMethodDefinition (interface_name, if_method_decl.name);
+								imd.interface_decl = (InterfaceDeclaration) interface_decl.retain ();
+								imd.method_decl = (FunctionDeclaration) if_method_decl.retain ();
+								method_decl.implemented_methods.append (imd);
 							}
 						}
+					} else {
+						error (interface_name, "Not a method: '%s'\n", _if_method_decl.name.name.data);
 					}
 				}
+				interface_decl.members.map (type_check_interface_members);
+			} else {
+				error (interface_name, "Not an interface: '%s'\n", interface_name.name.data);
 			}
 		}
+		interfaces?.map (type_check_interfaces);
+		members.map (compileobject_type_check);
+		current_context?.remove_last ();
+	}
+
+	Bool is_compatible (Declaration _other) {
+		if (_other is_of ClassDeclaration) {
+			ClassDeclaration other = (ClassDeclaration) _other;
+			while (other && other.superclass && self != other) {
+				other = (ClassDeclaration) global_scope.lookup (other.superclass);
+			}
+			return self == other;
+		} else if (_other is_of InterfaceDeclaration) {
+			InterfaceDeclaration other = (InterfaceDeclaration) _other;
+			other.is_compatible (self);
+		} else {
+			return false;
+		}
+	}
+
+	Declaration find_common_base (ClassDeclaration other) {
+		// TODO find common base for interfaces
+		Declaration base = self;
+		while (base && !is_compatible (other)) {
+			if (superclass) {
+				base = global_scope.lookup (superclass);
+			} else {
+				base = null;
+			}
+		}
+		return base;
 	}
 }
 
 Bool new_constructor_filter (ConstructorDeclaration constructor) {
 	if (strcmp (constructor.name.name.data, "ctor") != 0) {
-		return constructor.scope.get_parent ().find_type (constructor.name, ConstructorDeclaration.class) == null;
+		return !constructor.scope.get_parent ().find_type (constructor.name, ConstructorDeclaration.class);
 	}
 	return false;
 }

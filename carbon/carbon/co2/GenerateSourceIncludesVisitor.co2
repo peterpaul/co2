@@ -14,6 +14,7 @@ class GenerateSourceIncludesVisitor : BaseCompileObjectVisitor {
 
 	~GenerateSourceIncludesVisitor () {
 		current_context.release ();
+		current_context = null;
 		delete map;
 	}
 

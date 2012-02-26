@@ -15,7 +15,7 @@ class Type : CompileObject {
 	Type get_declared_type () {
 		if (self is_of ObjectType) {
 			ObjectType o_type = (ObjectType) self;
-			if (o_type.decl && o_type.decl is_of TypeDeclaration) {
+			if (o_type.decl != null && o_type.decl is_of TypeDeclaration) {
 				TypeDeclaration o_type_decl = (TypeDeclaration) o_type.decl;
 				return o_type_decl.type;
 			}
@@ -24,7 +24,7 @@ class Type : CompileObject {
 	}
 
 	Bool is_compatible (Type other) {
-		if (other) {
+		if (other != null) {
 			other = other.get_declared_type ();
 			return other is_of get_declared_type ().class;
 		} else {
@@ -34,7 +34,7 @@ class Type : CompileObject {
 
 	void assert_compatible (Type other) {
 		if (!is_compatible (other)) {
-			if (other) {
+			if (other != null) {
 				Token token = get_token ();
 				String self_string = toString ();
 				String other_string = other.toString ();
@@ -52,7 +52,7 @@ class Type : CompileObject {
 
 	void assume_compatible (Type other) {
 		if (!is_compatible (other)) {
-			if (other) {
+			if (other != null) {
 				Token token = get_token ();
 				String self_string = toString ();
 				String other_string = other.toString ();

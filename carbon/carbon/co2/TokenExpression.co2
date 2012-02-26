@@ -8,5 +8,67 @@ class TokenExpression : Expression {
 	Declaration decl;
 	Bool check_global_scope;
 
+	TokenExpression (Token token) {
+		super ();
+		self.token = (Token) token.retain ();
+		if (token.type == _IDENTIFIER || token.type == _TYPE_IDENTIFIER || token.type == _CLASS) {
+			scope = current_scope;
+		}
+		check_global_scope = true;
+
+		// TODO this is not a final solution, as it might not resolve the right var
+		if (current_scope?.exists (token)) {
+			decl = current_scope.lookup (token);
+			decl.retain ();
+		}
+	}
+
+	~TokenExpression () {
+		token.release ();
+		decl?.release ();
+	}
+
+	void accept (CompileObjectVisitor visitor) {
+		token.accept (visitor);
+		visitor.visit (self);
+	}
+
+	void generate_left (FILE * fp, Bool left) {
+		if (token.type == _VA_ARG) {
+			fprintf (fp, "ap");
+			return;
+		}
+		if (left && decl?.class_decl != null) {
+			fprintf (fp, "self->");
+		}
+		token.generate (fp);
+		if (token.type == _TYPE_IDENTIFIER) {
+			fprintf (fp, " ()");
+		}
+	}
+
+	void set_scope (IScope scope) {
+		self.scope = scope;
+		check_global_scope = false;
+	}
+
+	void type_check () {
+		if (!decl && (token.type == _IDENTIFIER || token.type == _TYPE_IDENTIFIER || token.type == _CLASS)) {
+			if (scope?.exists (token)) {
+				decl = scope.lookup (token);
+			}
+			if (!decl && global_scope.exists (token)) {
+				decl = global_scope.lookup (token);
+			}
+			decl?.retain ();
+		}
+/*
+		switch (token.type) {
+		case _TYPE_IDENTIFIER:
+			break;
+		}
+*/
+	}
+
 	void lookup ();
 }

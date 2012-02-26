@@ -45,7 +45,7 @@ class FunctionDeclaration : Declaration {
 		FunctionType function_type = (FunctionType) self.type;
 		ClassDeclaration class_decl = (ClassDeclaration) current_context?.find (ClassDeclaration.class);
 		InterfaceDeclaration interface_decl = (InterfaceDeclaration) current_context?.find (InterfaceDeclaration.class);
-		if (function_type.has_var_args && class_decl == null && formal_arguments.length <= 1) {
+		if (function_type.has_var_args && !class_decl && formal_arguments.length <= 1) {
 			error (name, "variable argument list only supported on function with at least one fixed argument.\n");
 		}
 		if (class_decl) {
@@ -141,7 +141,7 @@ void functiondeclaration_type_check_implemented_methods (InterfaceMethodDefiniti
 		imd.interface_decl = (InterfaceDeclaration) _interface_decl.retain ();
 	}
 	if (!imd.method_decl) {
-		if (imd.method_name == null) {
+		if (!imd.method_name) {
 			imd.method_name = (Token) fun_decl.name.retain ();
 		}
 		Declaration _method_decl = imd.interface_decl.member_scope.lookup (imd.method_name);

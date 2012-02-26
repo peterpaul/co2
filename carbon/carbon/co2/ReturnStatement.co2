@@ -11,4 +11,70 @@ class ReturnStatement : Statement {
 	TryStatement try_context;
 	CatchStatement catch_context;
 	FinallyStatement finally_context;
+
+	ReturnStatement (Expression anExpression) {
+		super ();
+		expr = (Expression) anExpression?.retain ();
+	}
+
+	~ReturnStatement () {
+		expr?.release ();
+	}
+
+	void accept (CompileObjectVisitor visitor) {
+		current_context?.add (self);
+		expr.accept (visitor);
+		visitor.visit (self);
+		current_context?.remove_last ();
+	}
+
+	void generate (FILE *fp) {
+		FunctionType function_type = (FunctionType) function_context.type;
+		if (!try_context && !function_type.has_var_args) {
+			fprintf (fp, "return ");
+			expr?.generate (fp);
+			fprintf (fp, ";\n");
+			return;
+		}
+
+		fprintf (fp, "{\n");
+		if (expr) {
+			expr.type.generate (fp);
+			fprintf (fp, " __return_value = ");
+			expr.generate (fp);
+			fprintf (fp, ";\n");
+		}
+
+		if (try_context) {
+			fprintf (fp, "ex_pop ();\n");
+			if (try_context.finally_clause && finally_context) {
+				fprintf (fp, "do_finally;\n");
+			}
+		}
+
+		if (function_type.has_var_args) {
+			fprintf (fp, "va_end (ap);\n");
+		}
+
+		fprintf (fp, "return ");
+		if (expr) {
+			fprintf (fp, "__return_value");
+		}
+
+		fprintf (fp, ";\n");
+		fprintf (fp, "}\n");
+	}
+
+	void type_check () {
+		expr?.type_check ();
+		function_context = (FunctionDeclaration) current_context?.find (FunctionDeclaration.class);
+		FunctionType function_type = (FunctionType) function_context.type;
+		if (expr && expr.type) {
+			function_type.return_type.assert_compatible (expr.type);
+		}
+
+		try_context = (TryStatement) current_context?.find (TryStatement.class);
+		catch_context = (CatchStatement) current_context?.find (CatchStatement.class);
+		finally_context = (FinallyStatement) current_context?.find (FinallyStatement.class);
+	}
 }

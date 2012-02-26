@@ -1,8 +1,7 @@
 include co2/CompileObject
 include co2/Type
 
-/*
-void Expression_generate_actual_argument (Expression arg, va_list *app) {
+void expression_generate_actual_argument (Expression arg, va_list *app) {
 	FILE *fp = va_arg (*app, FILE *);
 	Bool *is_first_arg = va_arg (*app, Bool *);
 
@@ -13,7 +12,6 @@ void Expression_generate_actual_argument (Expression arg, va_list *app) {
 	}
 	arg.generate (fp);
 }
-*/
 
 class Expression : CompileObject {
 	Type type;

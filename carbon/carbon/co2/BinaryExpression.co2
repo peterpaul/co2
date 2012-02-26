@@ -1,4 +1,218 @@
 include co2/Expression
 
 class BinaryExpression : Expression {
+	Expression[] operand;
+	Token operator;
+
+	BinaryExpression (Expression op0, Token op, Expression op1) {
+		super ();
+		operand = new Expression[2];
+		operand[0] = (Expression) op0?.retain ();
+		operator = (Token) op?.retain ();
+		operand[1] = (Expression) op1?.retain ();
+	}
+
+	~BinaryExpression () {
+		operand[0]?.release ();
+		operand[1]?.release ();
+		operator?.release ();
+	}
+
+	Bool is_condition () {
+		switch (operator.type) {
+		case '>':
+		case '<':
+/* TODO remove comment markers
+		case _EQ:
+		case _NEQ:
+		case _AND:
+		case _OR:
+		case _XOR:
+		case _LEQ:
+		case _GEQ:
+*/
+			return true;
+		default:
+			return false;
+		}
+	}
+
+	void accept (CompileObjectVisitor visitor) {
+		operand[0]?.accept (visitor);
+		operator?.accept (visitor);
+		operand[1]?.accept (visitor);
+		visitor.visit (self);
+	}
+
+/* TODO remove comment markers
+	void generate (FILE *fp) {
+		switch (operator.type) {
+		case '.': {
+			ObjectType type = (ObjectType) operand[0].type;
+			operand[0].generate (fp);
+			if (type.decl is_of StructDeclaration) {
+				fprintf (fp, ".");
+			} else {
+				fprintf (fp, "->");
+			}
+			operand[1].generate_left (fp, false);
+			break;
+		}
+		case '[': {
+			operand[0].generate (fp);
+			operator.generate (fp);
+			operand[1].generate (fp);
+			fprintf (fp, "]");
+			break;
+		}
+		case '%': {
+			PrimitiveType type = (PrimitiveType) self.type;
+			switch (type.token.type) {
+			case _FLOAT: {
+				fprintf (fp, "fmodf (");
+				operand[0].generate (fp);
+				fprintf (fp, ", ");
+				operand[1].generate (fp);
+				fprintf (fp, ")");
+				break;
+			}
+			default: {
+				operand[0].generate (fp);
+				fprintf (fp, " ");
+				operator.generate (fp);
+				fprintf (fp, " ");
+				operand[1].generate (fp);
+				break;
+			}
+			}
+			break;
+		}
+		case _REMAINDER: {
+			PrimitiveType type = (PrimitiveType) self.type;
+			switch (type.token.type) {
+			case _FLOAT: {
+				operand[0].generate (fp);
+				fprintf (fp, " = fmodf (");
+				operand[0].generate (fp);
+				fprintf (fp, ", ");
+				operand[1].generate (fp);
+				fprintf (fp, ")");
+				break;
+			}
+			default: {
+				operand[0].generate (fp);
+				fprintf (fp, " ");
+				operator.generate (fp);
+				fprintf (fp, " ");
+				operand[1].generate (fp);
+				break;
+			}
+			}
+			break;
+		}
+		case '^': {
+			PrimitiveType type = (PrimitiveType) self.type;
+			switch (type.token.type) {
+			case _INT: {
+				fprintf (fp, "ipow (");
+				break;
+			}
+			case _UNSIGNED: {
+				fprintf (fp, "upow (");
+				break;
+			}
+			case _FLOAT: {
+				fprintf (fp, "powf (");
+				break;
+			}
+			}
+			operand[0].generate (fp);
+			fprintf (fp, ", ");
+			operand[1].generate (fp);
+			fprintf (fp, ")");
+			break;
+		}
+		case _POWER: {
+			PrimitiveType type = (PrimitiveType) self.type;
+			operand[0].generate (fp);
+			fprintf (fp, " = ");
+			switch (type.token.type) {
+			case _INT: {
+				fprintf (fp, "ipow (");
+				break;
+			}
+			case _UNSIGNED: {
+				fprintf (fp, "upow (");
+				break;
+			}
+			case _FLOAT: {
+				fprintf (fp, "powf (");
+				break;
+			}
+			}
+			operand[0].generate (fp);
+			fprintf (fp, ", ");
+			operand[1].generate (fp);
+			fprintf (fp, ")");
+			break;
+		}
+		default: {
+			operand[0].generate (fp);
+			fprintf (fp, " ");
+			operator.generate (fp);
+			fprintf (fp, " ");
+			operand[1].generate (fp);
+			break;
+		}
+		}
+	}
+*/
+
+	void type_check () {
+		switch (operator.type) {
+		case '.': {
+			operand[0].type_check ();
+			if (operand[0].type is_of ObjectType) {
+				error (operator, "Expected ObjectType\n");
+				return;
+			}
+			ObjectType object_type = (ObjectType) operand[0].type;
+			ObjectTypeDeclaration class_decl = (ObjectTypeDeclaration) object_type.decl;
+			operand[1].set_scope (class_decl.member_scope);
+			operand[1].type_check ();
+			type = (Type) operand[1].type?.retain ();
+			break;
+		}
+		case '[': {
+			operand[0].type_check ();
+			ArrayType array_type = (ArrayType) operand[0].type;
+			operand[1].type_check ();
+			type = (Type) array_type.base_type.retain ();
+			break;
+		}
+		default: {
+			operand[0].type_check ();
+			operand[1].type_check ();
+			if (is_condition ()) {
+				Token int_token = new Token.fromToken (operator, "int", _INT);
+				Type int_type = new PrimitiveType (int_token);
+				type = (Type) int_type.retain ();
+				operand[0].type?.assume_compatible (int_type);
+				operand[1].type?.assume_compatible (int_type);
+			} else if (operand[1].type) {
+				operand[0].type?.assert_compatible (operand[1].type);
+				type = (Type) operand[0].type?.retain ();
+			}
+			break;
+		}
+		}
+	}
+
+	void set_scope (IScope scope) {
+		operand[0].set_scope (scope);
+	}
+
+	Token get_token () {
+		return operand[1].get_token ();
+	}
 }

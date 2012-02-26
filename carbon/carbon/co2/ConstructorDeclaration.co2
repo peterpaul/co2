@@ -7,4 +7,6 @@ class ConstructorDeclaration : Declaration {
 	Token class_name;
 	RefList formal_arguments;
 	Statement body;
+
+	Bool has_var_args ();
 }

@@ -1,7 +1,168 @@
 include co2/Expression
 include co2/RefList
+include co2/TokenExpression
+include co2/BinaryExpression
+include co2/ConditionalBinaryExpression
 
 class FunctionCallExpression : Expression {
 	Expression function;
 	RefList actual_arguments;
+
+	FunctionCallExpression (Expression function, RefList args) {
+		super ();
+		self.function = (Expression) function.retain ();
+		actual_arguments = (RefList) args.retain ();
+	}
+
+	~FunctionCallExpression () {
+		function.release ();
+		actual_arguments.release ();
+	}
+
+	void accept (CompileObjectVisitor visitor) {
+		function.accept (visitor);
+		actual_arguments.map_args (compileobject_accept, visitor);
+		visitor.visit (self);
+	}
+
+	void generate (FILE *fp) {
+		if (function is_of TokenExpression) {
+			TokenExpression function = (TokenExpression) self.function;
+			if (function.decl && function.decl is_of FunctionDeclaration) {
+				FunctionDeclaration fun_decl = (FunctionDeclaration) function.decl;
+				ScopeType scope_type = fun_decl.scope.get_type ();
+				if (scope_type == class_scope_type) {
+					fprintf (fp, "O_CALL ");
+					fprintf (fp, "(");
+					Bool is_first_arg = false;
+					fprintf (fp, "self, ");
+					function.token.generate (fp);
+					actual_arguments.map_args (expression_generate_actual_argument, &is_first_arg);
+					fprintf (fp, ")");
+					return;
+				} else if (scope_type == interface_scope_type) {
+					fprintf (fp, "O_CALL_IF ");
+					fprintf (fp, "(");
+					if (!fun_decl.implemented_methods || fun_decl.implemented_methods.size () == 0) {
+						InterfaceDeclaration interface_decl = (InterfaceDeclaration) current_context.find (InterfaceDeclaration.class);
+						interface_decl.generate (fp);
+					} else if (fun_decl.implemented_methods.size () == 1) {
+						InterfaceMethodDefinition imd = (InterfaceMethodDefinition) fun_decl.implemented_methods.get (0);
+						imd.interface_decl.name.generate (fp);
+					} else {
+						warning (function.token, "ambiguous method name: %s\n", function.token.name.data);
+						InterfaceMethodDefinition imd = (InterfaceMethodDefinition) fun_decl.implemented_methods.get (0);
+						imd.interface_decl.name.generate (fp);
+					}
+					Bool is_first_arg = false;
+					fprintf (fp, ", self, ");
+					function.token.generate (fp);
+					actual_arguments.map_args (expression_generate_actual_argument, &is_first_arg);
+					fprintf (fp, ")");
+					return;
+				} else {
+					function.token.generate (fp);
+				}
+			} else {
+				function.token.generate (fp);
+			}
+		} else if (function is_of BinaryExpression) {
+			BinaryExpression function = (BinaryExpression) function;
+			ObjectType function_type = (ObjectType) function.operand[0].type;
+			if (function_type.decl is_of ClassDeclaration) {
+				if (self.function is_of ConditionalBinaryExpression) {
+					fprintf (fp, "O_BRANCH_CALL ");
+				} else {
+					fprintf (fp, "O_CALL ");
+				}
+				fprintf (fp, "(");
+				Bool is_first_arg = false;
+				function.operand[0].generate (fp);
+				fprintf (fp, ", ");
+				function.operand[1].generate_left (fp, false);
+				actual_arguments.map_args (expression_generate_actual_argument, &is_first_arg);
+				fprintf (fp, ")");
+				return;
+			} else if (function_type.decl is_of InterfaceDeclaration) {
+				if (self.function is_of ConditionalBinaryExpression) {
+					fprintf (fp, "O_BRANCH_CALL_IF ");
+				} else {
+					fprintf (fp, "O_CALL_IF ");
+				}
+				fprintf (fp, "(");
+				function_type.decl.name.generate (fp);
+				fprintf (fp, ", ");
+				Bool is_first_arg = false;
+				function.operand[0].generate (fp);
+				fprintf (fp, ", ");
+				function.operand[1].generate_left (fp, false);
+				actual_arguments.map_args (expression_generate_actual_argument, &is_first_arg);
+				fprintf (fp, ")");
+				return;
+			}
+		} else {
+			function.generate (fp);
+		}
+		fprintf (fp, " (");
+		Bool is_first_arg = true;
+		if (function is_of BinaryExpression) {
+			BinaryExpression function = (BinaryExpression) self.function;
+			if (function.operator.type == '.') {
+				function.operand[0].generate (fp);
+				is_first_arg = false;
+			}
+		}
+		actual_arguments.map_args (expression_generate_actual_argument, &is_first_arg);
+		fprintf (fp, ")");
+	}
+
+	Token get_token () {
+		return function.get_token ();
+	}
+
+	void argument_error (FunctionType function_type) {
+		Token token = get_token ();
+		// TODO determine the name of the function here
+		error (token, "'%s' needs %d arguments, but got %d.\n", "function", function_type.parameters.size (), actual_arguments.size ());
+	}
+
+	void type_check_arguments (FunctionType function_type) {
+		int expected_length = function_type.parameters.size ();
+		if (function_type.has_var_args) {
+			expected_length -= 1;
+			if (actual_arguments.size () < expected_length) {
+				argument_error (function_type);
+				return;
+			}
+		} else {
+			if (actual_arguments.size () != expected_length) {
+				argument_error (function_type);
+			}
+		}
+		int i;
+		for (i = 0; i < actual_arguments.size (); i += 1) {
+			if (i < expected_length) {
+				Type arg_type = (Type) function_type.parameters.get (i);
+				Expression arg_expr = (Expression) actual_arguments.get (i);
+
+				arg_expr.type_check ();
+				arg_type.type_check ();
+				arg_type.assert_compatible (arg_expr.type);
+			} else {
+				Expression arg_expr = (Expression) actual_arguments.get (i);
+
+				arg_expr.type_check ();
+			}
+		}				
+	}
+
+	void type_check () {
+		function.type_check ();
+		if (!function.type) {
+			return;
+		}
+		if (!function.type is_of FunctionType) {
+			// TODO here was I been
+		}
+	}
 }

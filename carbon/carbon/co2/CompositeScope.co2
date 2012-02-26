@@ -46,7 +46,7 @@ class CompositeScope : RefObject, IScope {
 
 		void lookup_in_this_scope_callback (RefObject _scope) {
 			IScope scope = (IScope) _scope;
-			if (decl == null) {
+			if (!decl) {
 				if (scope.exists_in_this_scope (token)) {
 					decl = scope.lookup_in_this_scope (token);
 				}
@@ -55,7 +55,7 @@ class CompositeScope : RefObject, IScope {
 
 		subscopes.map (lookup_in_this_scope_callback);
 
-		if (decl == null) {
+		if (!decl) {
 			error (token, "'%s' not declared.\n", token.name.data);
 		}
 
@@ -67,7 +67,7 @@ class CompositeScope : RefObject, IScope {
 
 		void lookup_callback (RefObject _scope) {
 			IScope scope = (IScope) _scope;
-			if (decl == null) {
+			if (!decl) {
 				if (scope.exists (token)) {
 					decl = scope.lookup (token);
 				}
@@ -76,7 +76,7 @@ class CompositeScope : RefObject, IScope {
 
 		subscopes.map (lookup_callback);
 
-		if (decl == null) {
+		if (!decl) {
 			error (token, "'%s' not declared.\n", token.name.data);
 		}
 
@@ -88,7 +88,7 @@ class CompositeScope : RefObject, IScope {
 
 		void find_type_in_this_scope_callback (RefObject _scope) {
 			IScope scope = (IScope) _scope;
-			if (decl == null) {
+			if (!decl) {
 				decl = scope.find_type_in_this_scope (token, type);
 			}
 		}
@@ -103,7 +103,7 @@ class CompositeScope : RefObject, IScope {
 
 		void find_type_callback (RefObject _scope) {
 			IScope scope = (IScope) _scope;
-			if (decl == null) {
+			if (!decl) {
 				decl = scope.find_type (token, type);
 			}
 		}

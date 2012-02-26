@@ -14,6 +14,7 @@ class GenerateHeaderIncludesVisitor : BaseCompileObjectVisitor {
 
 	~GenerateHeaderIncludesVisitor () {
 		current_context.release ();
+		current_context = null;
 		delete map;
 	}
 

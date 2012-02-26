@@ -112,7 +112,7 @@ CO2_BASE_PATH=$(shell pkg-config co2-base-1.0 --cflags | sed 's/-I/-I /g' | sed 
 CARBON_FLAGS=$(CO2_BASE_PATH) $(CO2_BASE_PATH)/co2 -I .
 
 %.c: %.co2
-	if test "$(CARBON)" == "no"; then echo "please install carbon first"; else rm -f $@ | true; $(CARBON) $(CARBON_FLAGS) $< $@; indent $@; fi
+	if test "$(CARBON)" == "no"; then echo "please install carbon first"; else rm -f $@ | true; $(CARBON) $(CARBON_FLAGS) $< $@ && indent $@; fi
 
 %.h: %.c
 

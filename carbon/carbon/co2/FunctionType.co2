@@ -73,7 +73,7 @@ class FunctionType : Type {
 		 * when this is called in code it will fail.
 		 * Perhaps generating the typedef in the header file will solve any problems
 		 */
-		if (generated_name == null) {
+		if (!generated_name) {
 			TokenGenerator generator = new TokenGenerator ();
 			Token token = get_token ();
 			generated_name = generator.create (token);

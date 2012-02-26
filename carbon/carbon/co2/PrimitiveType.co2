@@ -13,6 +13,10 @@ class PrimitiveType : Type {
 		token.release ();
 	}
 
+	void generate (FILE *fp) {
+		token.generate (fp);
+	}
+
 	Token get_token () {
 		return token;
 	}
@@ -43,5 +47,10 @@ class PrimitiveType : Type {
 			}
 		}
 		return false;
+	}
+
+	void accept (CompileObjectVisitor visitor) {
+		token.accept (visitor);
+		visitor.visit (self);
 	}
 }

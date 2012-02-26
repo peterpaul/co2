@@ -16,13 +16,13 @@ File main_file;
 
 char *extract_name (char *file) {
 	char * start = strrchr (file, '/');
-	if (start == null) {
+	if (!start) {
 		start = file;
 	} else {
 		start = &start[1];
 	}
 	char * end = strrchr (file, '.');
-	if (end == null) {
+	if (!end) {
 		end = &file[strlen(file)];
 	}
 	int size = 0;
@@ -47,7 +47,7 @@ char *get_header_file (char *c_file) {
 
 int mainImpl (char *output_file) {
 	parse ();
-	if (main_file == null || errors != 0) {
+	if (!main_file || errors != 0) {
 		return 1;
 	}
 
@@ -184,9 +184,9 @@ int main(int argc, char **argv) {
 				String dir = new String ("%s", argv[arg]);
 				path.add (dir);
 				next_is_option = false;
-			} else if (input_file == null) {
+			} else if (!input_file) {
 				input_file = argv[arg];
-			} else if (output_file == null) {
+			} else if (!output_file) {
 				output_file = argv[arg];
 			} else {
 				error (null, "Too many arguments (%s)\n", argv[arg]);

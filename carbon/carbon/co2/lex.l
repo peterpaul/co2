@@ -128,7 +128,7 @@ STRING_CONST	\"({CHAR_SYMBOL}|\')*\"
 "*="		yylval.token = O_CALL_CLASS(Token(), new, yytext, _MULTIPLY, current_file, linenumber); return yylval.token->type;
 "/="		yylval.token = O_CALL_CLASS(Token(), new, yytext, _DIVIDE, current_file, linenumber); return yylval.token->type;
 "^="		yylval.token = O_CALL_CLASS(Token(), new, yytext, _POWER, current_file, linenumber); return yylval.token->type;
-"%="		yylval.token = O_CALL_CLASS(Token(), new, yytext, _REMINDER, current_file, linenumber); return yylval.token->type;
+"%="		yylval.token = O_CALL_CLASS(Token(), new, yytext, _REMAINDER, current_file, linenumber); return yylval.token->type;
 "&="		yylval.token = O_CALL_CLASS(Token(), new, yytext, _AND_IS, current_file, linenumber); return yylval.token->type;
 "|="		yylval.token = O_CALL_CLASS(Token(), new, yytext, _OR_IS, current_file, linenumber); return yylval.token->type;
 "#="		yylval.token = O_CALL_CLASS(Token(), new, yytext, _XOR_IS, current_file, linenumber); return yylval.token->type;

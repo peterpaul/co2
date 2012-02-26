@@ -228,7 +228,7 @@
 %nonassoc	CLASSX
 
 %left		<token>	','
-%right		<token>	'=' _INCREASE _DECREASE _MULTIPLY _DIVIDE _POWER _REMINDER _AND_IS _OR_IS _XOR_IS
+%right		<token>	'=' _INCREASE _DECREASE _MULTIPLY _DIVIDE _POWER _REMAINDER _AND_IS _OR_IS _XOR_IS
 %left		<token>	_OR '|' 
 %left		<token>	_AND '&'
 %left		<token>	_EQ _NEQ
@@ -946,7 +946,7 @@ expression
 |	expression _MULTIPLY expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
 |	expression _DIVIDE expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
 |	expression _POWER expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
-|	expression _REMINDER expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
+|	expression _REMAINDER expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
 |	expression _AND_IS expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
 |	expression _OR_IS expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }
 |	expression _XOR_IS expression { $$ = O_CALL_CLASS(BinaryExpression(), new, $1, $<token>2, $3); }

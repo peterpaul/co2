@@ -18,7 +18,7 @@ class ObjectType : Type {
 	}
 
 	void type_check () {
-		if (decl == null) {
+		if (!decl) {
 			decl = (ObjectTypeDeclaration) global_scope.lookup (token);
 		}
 	}
@@ -29,6 +29,8 @@ class ObjectType : Type {
 			token.generate (fp);
 		} else if (decl is_of TypeDeclaration) {
 			token.generate (fp);
+		} else if (decl is_of InterfaceDeclaration) {
+			fprintf (fp, "struct Object*");
 		} else {
 			fprintf (fp, "struct ");
 			token.generate (fp);
@@ -48,10 +50,10 @@ class ObjectType : Type {
 		if (super (other)) {
 			if (other is_of ObjectType) {
 				ObjectType o_other = (ObjectType) other;
-				if (decl == null) {
+				if (!decl) {
 					type_check ();
 				}
-				if (o_other.decl == null) {
+				if (!o_other.decl) {
 					o_other.type_check ();
 				}
 				return decl.is_compatible (o_other.decl);
@@ -64,5 +66,10 @@ class ObjectType : Type {
 			}
 		}
 		return false;
+	}
+
+	void accept (CompileObjectVisitor visitor) {
+		token.accept (visitor);
+		visitor.visit (self);
 	}
 }

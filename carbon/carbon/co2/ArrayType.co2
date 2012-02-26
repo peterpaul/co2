@@ -11,4 +11,39 @@ class ArrayType : Type {
 	~ArrayType () {
 		base_type.release ();
 	}
+
+	void accept (CompileObjectVisitor visitor) {
+		base_type.accept (visitor);
+		visitor.visit (self);
+	}
+
+	void type_check () {
+		base_type.type_check ();
+	}
+
+	void generate (FILE *fp) {
+		base_type.generate (fp);
+		fprintf (fp, "*");
+	}
+
+	String toString () {
+		String string = base_type.toString ();
+		string.append_str ("*");
+		return string;
+	}
+
+	Token get_token () {
+		base_type.get_token ();
+	}
+
+	Bool is_compatible (Type _other) {
+		if (super (_other)) {
+			ArrayType other = (ArrayType) _other;
+			if (self.is_void_ptr () || other.is_void_ptr ()) {
+				return true;
+			}
+			return base_type.is_compatible (other.base_type);
+		}
+		return false;
+	}
 }

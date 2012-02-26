@@ -10,7 +10,7 @@ RefList path;
 
 String analyze_file_name (char *filename) {
 	String path;
-	if (filename == null) {
+	if (!filename) {
 		char *directory = getcwd (null, 0);
 		path = new String ("%s/", directory);
 		free (directory);

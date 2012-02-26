@@ -3,4 +3,26 @@ include co2/Expression
 
 class ExpressionStatement : Statement {
 	Expression expr;
+
+	ExpressionStatement (Expression expr) {
+		self.expr = (Expression) expr.retain ();
+	}
+
+	~ExpressionStatement () {
+		expr.release ();
+	}
+
+	void accept (CompileObjectVisitor visitor) {
+		expr.accept (visitor);
+		visitor.visit (self);
+	}
+
+	void generate (FILE *fp) {
+		expr.generate (fp);
+		fprintf (fp, ";\n");
+	}
+
+	void type_check () {
+		expr.type_check ();
+	}
 }

@@ -73,7 +73,7 @@ class File : CompileObject {
 		}
 
 		int file_declaration_filter (Declaration member) {
-			return member.include_file == null;
+			return !member.include_file;
 		}
 
 		List definitions = self.declarations.filter (file_definition_filter);
@@ -102,7 +102,7 @@ class File : CompileObject {
 
 Map file_hash_map = null;
 Map get_hash_map() {
-	if (file_hash_map == null) {
+	if (!file_hash_map) {
 		file_hash_map = new HashMap (127);
 	}
 	return file_hash_map;
@@ -215,7 +215,7 @@ int interfacedeclaration_compare (Declaration _decl1, Declaration _decl2) {
 			if (!type.decl) {
 				type.type_check ();
 			}
-			if (type.decl) {
+			if (type.decl != null) {
 				return interfacedeclaration_compare (decl1, type.decl);
 			}
 		}
@@ -236,7 +236,7 @@ int classdeclaration_compare (Declaration _decl1, Declaration _decl2) {
 			if (!type.decl) {
 				type.type_check ();
 			}
-			if (type.decl) {
+			if (type.decl != null) {
 				classdeclaration_compare (decl1, type.decl);
 			}
 		}
@@ -280,7 +280,7 @@ int typedeclaration_compare (Declaration _decl1, Declaration decl2) {
 		if (!type.decl) {
 			type.type_check ();
 		}
-		if (type.decl) {
+		if (type.decl != null) {
 			declaration_compare (type.decl, decl2);
 		}
 	}
