@@ -782,6 +782,11 @@ case_statement
 {
   $$ = O_CALL_CLASS (CaseStatement (), new, $2, $4);
 }
+|	_CASE _IDENTIFIER ':' case_content_list
+{
+  struct Expression * ident = O_CALL_CLASS(TokenExpression(), new, $2);
+  $$ = O_CALL_CLASS (CaseStatement (), new, ident, $4);
+}
 ;
 
 case_content_list
