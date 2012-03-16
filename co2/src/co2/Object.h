@@ -227,18 +227,21 @@
   o_branch_cast_interface(o,i)
 #define O_CALL(o,msg,...)						\
 	({typeof(o) _o_tmp_##msg = o;						\
+	  fprintf (stderr, "%s: %p: %s\n", _o_tmp_##msg->class->class_name, (void *)_o_tmp_##msg, __STRING(msg)); \
 		assertTrue(_o_tmp_##msg->class->msg,				\
 			   "runtime error: %s at %p doesn't respond to %s.", \
 			   _o_tmp_##msg->class->class_name, (void *)_o_tmp_##msg, __STRING(msg)); \
 		_o_tmp_##msg->class->msg(_o_tmp_##msg,##__VA_ARGS__);})
 #define O_BRANCH_CALL(o,msg,...)					\
   ({typeof(o) _o_tmp_##msg = o;							\
+    fprintf (stderr, "%s: %p: %s\n", _o_tmp_##msg?_o_tmp_##msg->class->class_name:NULL, (void *)_o_tmp_##msg, __STRING(msg)); \
     assertTrue(_o_tmp_##msg == (typeof(_o_tmp_##msg))0 || _o_tmp_##msg->class->msg,		\
 	       "runtime error: %s at %p doesn't respond to %s.",	\
 	       _o_tmp_##msg->class->class_name, (void *)_o_tmp_##msg, __STRING(msg));	\
     _o_tmp_##msg ? _o_tmp_##msg->class->msg(_o_tmp_##msg,##__VA_ARGS__) : (typeof(_o_tmp_##msg->class->msg(_o_tmp_##msg,##__VA_ARGS__)))0;})
 #define O_CALL_CLASS(o,msg,...)						\
 	({typeof(o) _o_tmp_##msg = o;						\
+	  fprintf (stderr, "%s: %p: %s %s\n", _o_tmp_##msg->class->class_name, (void *)_o_tmp_##msg, __STRING(msg), _o_tmp_##msg->class_name); \
 		assertTrue(_o_tmp_##msg->msg,					\
 			   "runtime error: %s at %p doesn't respond to %s.", \
 			   _o_tmp_##msg->class_name, (void *)_o_tmp_##msg, __STRING(msg));	\

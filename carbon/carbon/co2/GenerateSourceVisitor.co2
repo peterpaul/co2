@@ -1,4 +1,370 @@
 include co2/BaseCompileObjectVisitor
 
 class GenerateSourceVisitor : BaseCompileObjectVisitor {
+	GenerateSourceVisitor (FILE * fp) {
+		super (fp);
+		current_context = new Context ();
+		current_context.retain ();
+	}
+
+	~GenerateSourceVisitor () {
+		current_context.release ();
+		current_context = null;
+	}
+
+	void visitClassDeclaration (ClassDeclaration object) {
+		/* filter the members */
+		RefList methods = object.members.filter_args (type_filter, FunctionDeclaration.class);
+		methods.retain ();
+		RefList constructors = object.members.filter_args (type_filter, ConstructorDeclaration.class);
+		constructors.retain ();
+		RefList destructors = object.members.filter_args (type_filter, DestructorDeclaration.class);
+		destructors.retain ();
+
+		object.interfaces.map_args (classdeclaration_generate_interface_method_binding, fp, object);
+		fprintf (fp, "\n");
+
+		fprintf (fp, "#define O_SUPER ");
+		generate_superclass (fp, object);
+		fprintf (fp, " ()\n\n");
+
+		fprintf (fp, "O_OBJECT (");
+		object.name.generate (fp);
+		fprintf (fp, ", ");
+		generate_superclass (fp, object);
+		fprintf (fp, ");\n");
+
+		void generate_constructor_registration_2 (ConstructorDeclaration constructor_decl) {
+			fprintf (fp, "O_OBJECT_METHOD (");
+			object.name.generate (fp);
+			fprintf (fp, ", ");
+			if (strcmp (constructor_decl.name.name.data, "ctor") != 0) {
+				fprintf (fp, "ctor_");
+			}
+			constructor_decl.name.generate (fp);
+			fprintf (fp, ");\n");
+		}
+
+		constructors.map (generate_constructor_registration_2);
+
+		void generate_destructor_registration_2 (DestructorDeclaration destructor_decl) {
+			fprintf (fp, "O_OBJECT_METHOD (");
+			object.name.generate (fp);
+			fprintf (fp, ", dtor);\n");
+		}
+
+		destructors.map (generate_destructor_registration_2);
+		methods.map_args (objecttypedeclaration_generate_method_registration_2, fp, object);
+		object.interfaces?.map_args (classdeclaration_generate_method_implementation_2, fp, object);
+
+		fprintf (fp, "O_END_OBJECT\n\n");
+
+		fprintf (fp, "#undef O_SUPER\n\n");
+
+		methods.release ();
+		constructors.release ();
+		destructors.release ();
+	}
+
+	void visitConstructorDeclaration (ConstructorDeclaration object) {
+		ClassDeclaration class_decl = (ClassDeclaration) current_context.find (ClassDeclaration.class);
+		// don't generate for included classes
+		if (class_decl.include_file) {
+			return;
+		}
+		fprintf (fp, "O_IMPLEMENT (");
+		class_decl.name.generate (fp);
+		fprintf (fp, ", void *");
+		fprintf (fp, ", ");
+		if (strcmp (object.name.name.data, "ctor") != 0) {
+			fprintf (fp, "ctor_");
+		}
+		object.name.generate (fp);
+		fprintf (fp, ", (void *_self, va_list *app))\n");
+		fprintf (fp, "{\n");
+		fprintf (fp, "struct ");
+		class_decl.name.generate (fp);
+		fprintf (fp, "* self = O_CAST (_self, ");
+		class_decl.name.generate (fp);
+		fprintf (fp, " ());\n");
+		object.formal_arguments.map_args (classdeclaration_generate_constructor_arguments, fp);
+
+		object.body.generate (fp);
+		if (object.formal_arguments.length > 0) {
+			ArgumentDeclaration last_arg = (ArgumentDeclaration) object.formal_arguments.get (object.formal_arguments.length - 1);
+			if (last_arg.name.type == _VA_ARG) {
+				fprintf (fp, "va_end (ap);\n");
+			}
+		}
+		fprintf (fp, "return self;\n");
+		fprintf (fp, "}\n\n");
+	}
+
+	void visitDeclaration (Declaration object) {
+		if (object.include_file) {
+			// don't generate if external definition
+			return;
+		} else {
+			super (object);
+		}
+	}
+
+	void visitDestructorDeclaration (DestructorDeclaration object) {
+		ClassDeclaration class_decl = (ClassDeclaration) current_context.find (ClassDeclaration.class);
+		// don't generate for included classes
+		if (class_decl.include_file) {
+			return;
+		}
+
+		fprintf (fp, "O_IMPLEMENT (");
+		class_decl.name.generate (fp);
+		fprintf (fp, ", void *");
+		fprintf (fp, ", dtor, (void *_self))\n");
+		fprintf (fp, "{\n");
+		fprintf (fp, "struct ");
+		class_decl.name.generate (fp);
+		fprintf (fp, "* self = O_CAST (_self, ");
+		class_decl.name.generate (fp);
+		fprintf (fp, " ());\n");
+		object.body.generate (fp);
+		fprintf (fp, "return ");
+		if (class_decl.superclass) {
+			class_decl.superclass.generate (fp);
+		} else {
+			fprintf (fp, "Object");
+		}
+		fprintf (fp, " ()->dtor (self);\n");
+		fprintf (fp, "}\n\n");		
+	}
+
+	void visitFunctionDeclaration (FunctionDeclaration object) {
+		// don't generate for nested functions
+		if (current_context.find_nth_instance (FunctionDeclaration.class, 2)) {
+			return;
+		}
+
+		ClassDeclaration class_decl = (ClassDeclaration) current_context.find (ClassDeclaration.class);
+		InterfaceDeclaration interface_decl = (InterfaceDeclaration) current_context.find (InterfaceDeclaration.class);
+
+		if (class_decl) {
+			// don't generate for included classes
+			if (class_decl.include_file) {
+				return;
+			}
+			// don't generate for definitions
+			if (!object.body) {
+				return;
+			}
+			generatesourcevisitor_visitfunctiondeclaration_generateimplementation (fp, object, class_decl);
+		} else if (interface_decl) {
+			// don't generate for included classes
+			if (interface_decl.include_file) {
+				return;
+			}
+			FunctionType method_type = (FunctionType) object.type;
+			fprintf (fp, "O_METHOD_IF (");
+			interface_decl.name.generate (fp);
+			fprintf (fp, ", ");
+			method_type.return_type.generate (fp);
+			fprintf (fp, ", ");
+			object.name.generate (fp);
+			fprintf (fp, ", (void *_self");
+			object.formal_arguments.map_args (objecttypedeclaration_generate_method_arguments, fp);
+			fprintf (fp, "), (_self");
+			object.formal_arguments.map_args (objecttypedeclaration_generate_method_argument_names, fp);
+			fprintf (fp, "));\n");
+			if (object.body) {
+				generatesourcevisitor_visitfunctiondeclaration_generateimplementation (fp, object, interface_decl);
+			}
+		} else {
+			if (object.scope.get_type () != global_scope_type) {
+				return;
+			}
+			functiondeclaration_generateFunction (fp, object);
+		}
+	}
+
+	void visitInterfaceDeclaration (InterfaceDeclaration object) {
+		fprintf (fp, "#define O_SUPER Interface ()\n\n");
+
+		fprintf (fp, "O_OBJECT (");
+		object.name.generate (fp);
+		fprintf (fp, ", Interface);\n");
+		fprintf (fp, "O_END_OBJECT\n\n");
+
+		fprintf (fp, "#undef O_SUPER\n\n");
+	}
+
+	void visitVariableDeclaration (VariableDeclaration object) {
+		// only generate global declarations
+		if (object.scope?.get_type () != global_scope_type) {
+			return;
+		}
+
+		if (object.type is_of FunctionType) {
+			FunctionType function_type = (FunctionType) object.type;
+			function_type.generate_named (fp, object.name);
+		} else {
+			object.type.generate (fp);
+			fprintf (fp, " ");
+			object.name.generate (fp);
+		}
+		if (object.expr) {
+			fprintf (fp, " = ");
+			object.expr.generate (fp);
+		}
+		fprintf (fp, ";\n");
+	}
 }
+
+void generatesourcevisitor_visitfunctiondeclaration_generateimplementation (FILE *fp, FunctionDeclaration method_decl, Declaration parent_decl) {
+	FunctionType method_type = (FunctionType) method_decl.type;
+	if (method_decl.implemented_methods.length > 0
+		&& !current_context.find (InterfaceDeclaration.class)) {
+		fprintf (fp, "O_IMPLEMENT_IF (");
+	} else {
+		fprintf (fp, "O_IMPLEMENT (");
+	}
+	parent_decl.name.generate (fp);
+	fprintf (fp, ", ");
+	method_type.return_type.generate (fp);
+	fprintf (fp, ", ");
+	method_decl.name.generate (fp);
+	fprintf (fp, ", (void *_self");
+	method_decl.formal_arguments.map_args (objecttypedeclaration_generate_method_arguments, fp);
+	if (method_decl.implemented_methods.length > 0
+		&& !current_context.find (InterfaceDeclaration.class)) {
+		fprintf (fp, "), (_self");
+		method_decl.formal_arguments.map_args (objecttypedeclaration_generate_method_argument_names, fp);
+	}
+	fprintf (fp, "))\n");
+	fprintf (fp, "{\n");
+
+	if (parent_decl is_of InterfaceDeclaration) {
+		fprintf (fp, "struct Object * self = O_CAST (_self, Object ());\n");
+		fprintf (fp, "O_IS_IMPLEMENTATION (self, ");
+		parent_decl.name.generate (fp);
+		fprintf (fp, " ());\n");
+	} else {
+		fprintf (fp, "struct ");
+		parent_decl.name.generate (fp);
+		fprintf (fp, " * self = O_CAST (_self, ");
+		parent_decl.name.generate (fp);
+		fprintf (fp, " ());\n");
+	}
+	if (method_type.has_var_args) {
+		fprintf (fp, "va_list ap;\n");
+		fprintf (fp, "va_start (ap, ");
+		if (method_decl.formal_arguments.length == 1) {
+			fprintf (fp, "_self");
+		} else {
+			ArgumentDeclaration arg_decl = (ArgumentDeclaration) method_decl.formal_arguments.get (method_decl.formal_arguments.length - 2);
+			arg_decl.name.generate (fp);
+		}
+		fprintf (fp, ");\n");
+	}
+
+	method_decl.body.generate (fp);
+
+	if (method_type.has_var_args 
+		&& method_type.return_type is_of PrimitiveType.class
+		&& ((PrimitiveType) method_type.return_type).token.type == _VOID) {
+		fprintf (fp, "va_end (ap);\n");
+	}
+
+	fprintf (fp, "}\n\n");
+}
+
+void classdeclaration_generate_constructor_arguments (ArgumentDeclaration arg, va_list *app) {
+	FILE * fp = va_arg (*app, FILE *);
+	if (arg.name.type == _VA_ARG) {
+		fprintf (fp, "va_list ap;\n");
+		fprintf (fp, "va_copy (ap, *app);\n");
+	} else {
+		arg.generate (fp);
+		if (arg.type is_of ObjectType) {
+			ObjectType type = (ObjectType) arg.type;
+			if (type.decl is_of ClassDeclaration) {
+				fprintf (fp, " = O_BRANCH_CAST (va_arg (*app, ");
+				type.generate (fp);
+				fprintf (fp, "), ");
+				type.token.generate (fp);
+				fprintf (fp, " ());\n");
+				return;
+			}
+		}
+		fprintf (fp, " = va_arg (*app, ");
+		arg.type.generate (fp);
+		fprintf (fp, " ());\n");
+	}
+}
+
+void classdeclaration_generate_method_implementation_2 (Token interface_name, va_list *app) {
+	FILE * fp = va_arg (*app, FILE *);
+	ClassDeclaration class_decl = (ClassDeclaration) va_arg (*app, void *);
+	InterfaceDeclaration interface_decl = (InterfaceDeclaration) global_scope.lookup_in_this_scope (interface_name);
+
+	void generate_method_bindings_filter_1 (Declaration _decl) {
+		if (_decl is_of FunctionDeclaration) {
+			FunctionDeclaration method_decl = (FunctionDeclaration) _decl;
+			// Iterate over all implemented_methods to find the interface
+			void generate_method_bindings_filter_2 (InterfaceMethodDefinition imd) {
+				if (interface_implements (imd.interface_decl, interface_decl) && interface_decl.member_scope.exists (imd.method_decl.name)) {
+					fprintf (fp, "O_OBJECT_IF_METHOD_BINDING (");
+					class_decl.name.generate (fp);
+					fprintf (fp, ", ");
+					imd.method_name.generate (fp);
+					fprintf (fp, ", ");
+					method_decl.name.generate (fp);
+					fprintf (fp, ");\n");
+				}
+			}
+
+			method_decl.implemented_methods.map (generate_method_bindings_filter_2);
+		}
+	}
+
+	fprintf (fp, "O_OBJECT_IF (");
+	interface_name.generate (fp);
+	fprintf (fp, ");\n");
+
+	class_decl.members.map (generate_method_bindings_filter_1);
+
+	fprintf (fp, "O_OBJECT_IF_END\n");
+
+	interface_decl.interfaces?.map_args (classdeclaration_generate_method_implementation_2, fp, class_decl);
+}
+
+void classdeclaration_generate_interface_method_binding (Token interface_name, va_list *app) {
+	FILE * fp = va_arg (*app, FILE *);
+	ClassDeclaration class_decl = (ClassDeclaration) va_arg (*app, void *);
+	InterfaceDeclaration interface_decl = (InterfaceDeclaration) global_scope.lookup_in_this_scope (interface_name);
+
+	void generate_interface_method_binding_impl (FunctionDeclaration if_method_decl) {
+		FunctionDeclaration method_decl = null;
+		if (class_decl.member_scope.exists (if_method_decl.name)) {
+			method_decl = (FunctionDeclaration) class_decl.member_scope.lookup (if_method_decl.name);
+		}
+		if (if_method_decl.body &&
+			(method_decl && !method_decl.body)) {
+			if (!method_decl.binding_generated) {
+				FunctionType method_type = (FunctionType) if_method_decl.type;
+				fprintf (fp, "O_IMPLEMENT_IF_BINDING (");
+				class_decl.name.generate (fp);
+				fprintf (fp, ", ");
+				method_type.return_type.generate (fp);
+				fprintf (fp, ", ");
+				if_method_decl.name.generate (fp);
+				fprintf (fp, ", (void *_self");
+				if_method_decl.formal_arguments.map_args (objecttypedeclaration_generate_method_arguments, fp);
+				fprintf (fp, "), (_self");
+				if_method_decl.formal_arguments.map_args (objecttypedeclaration_generate_method_argument_names, fp);
+				fprintf (fp, "));\n");
+				method_decl.binding_generated = true;
+			}
+		}
+	}
+	interface_decl.members.map (generate_interface_method_binding_impl);
+	interface_decl.interfaces?.map_args (classdeclaration_generate_interface_method_binding, fp, class_decl);
+}
+

@@ -22,7 +22,6 @@ class BinaryExpression : Expression {
 		switch (operator.type) {
 		case '>':
 		case '<':
-/* TODO remove comment markers
 		case _EQ:
 		case _NEQ:
 		case _AND:
@@ -30,7 +29,6 @@ class BinaryExpression : Expression {
 		case _XOR:
 		case _LEQ:
 		case _GEQ:
-*/
 			return true;
 		default:
 			return false;
@@ -44,7 +42,6 @@ class BinaryExpression : Expression {
 		visitor.visit (self);
 	}
 
-/* TODO remove comment markers
 	void generate (FILE *fp) {
 		switch (operator.type) {
 		case '.': {
@@ -166,7 +163,6 @@ class BinaryExpression : Expression {
 		}
 		}
 	}
-*/
 
 	void type_check () {
 		switch (operator.type) {

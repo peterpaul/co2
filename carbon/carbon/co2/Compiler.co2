@@ -74,7 +74,7 @@ int mainImpl (char *output_file) {
 	char *header_name = extract_name (main_file.name.data);
 	fprintf (out, "#ifndef %s_H\n", header_name);
 	fprintf (out, "#define %s_H\n", header_name);
-	fprintf (out, "#include co2/\"co2/Object.h\"\n");
+	fprintf (out, "#include \"co2/Object.h\"\n");
 
 	CompileObjectVisitor include_visitor = new GenerateHeaderIncludesVisitor (out);
 	main_file.accept (include_visitor);
@@ -84,7 +84,7 @@ int mainImpl (char *output_file) {
 	main_file.accept (header_visitor);
 	delete header_visitor;
 
-	fprintf (out, "endif /* %s_H */\n", header_name);
+	fprintf (out, "#endif /* %s_H */\n", header_name);
 	free (header_name);
 
 	if (out != stdout) {
@@ -94,7 +94,7 @@ int mainImpl (char *output_file) {
 	if (output_file) {
 		open_output (output_file);
 		char *base = extract_name (output_file);
-		fprintf (out, "#include co2/\"%s.h\"\n", base);
+		fprintf (out, "#include \"%s.h\"\n", base);
 		free (base);
 	} else {
 		open_output (null);
@@ -136,7 +136,7 @@ void usage () {
 	fprintf (stdout, "        C_OUTPUT_FILE:  filename of c output\n");
 	fprintf (stdout, "\n");
 	fprintf (stdout, "OPTIONS:\n");
-	fprintf (stdout, "        -I INCLUDE_DIR: include co2/directory to add to search path\n");
+	fprintf (stdout, "        -I INCLUDE_DIR: include directory to add to search path\n");
 	fprintf (stdout, "        -h,--help:      show this help\n");
 	fprintf (stdout, "        -V,--version:   show version\n");
 	fprintf (stdout, "\n");

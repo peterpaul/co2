@@ -1,5 +1,6 @@
 ["grammar.h"] {
 	int 
+	_AND,
 	_BREAK,
 	_CASE,
 	_CATCH,
@@ -12,11 +13,13 @@
 	_DOUBLE,
 	_DELETE,
 	_ELSE,
+	_EQ,
 	_FINALLY,
 	_FLOAT,
 	_FLOAT_CONSTANT,
-	_FOR
- /* 	_FOREACH */,
+	_FOR,
+ /* 	_FOREACH, */
+	_GEQ,
 	_GET_VA_ARG,
 	_IDENTIFIER,
 	_IF,
@@ -24,8 +27,13 @@
 	_INT,
 	_INT_CONSTANT,
 	_INTERFACE,
+	_LEQ,
+	_NEQ,
 	_NEW,
 	_NULL_,
+	_OR,
+	_POWER,
+	_REMAINDER,
 	_RETURN,
 	_SELF,
 	_SIZEOF,
@@ -42,5 +50,6 @@
 	_VA_ARG,
 	_VA_LIST__,
 	_VOID,
-	_WHILE;
+	_WHILE,
+	_XOR;
 }

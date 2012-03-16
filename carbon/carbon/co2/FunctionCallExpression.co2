@@ -37,7 +37,7 @@ class FunctionCallExpression : Expression {
 					Bool is_first_arg = false;
 					fprintf (fp, "self, ");
 					function.token.generate (fp);
-					actual_arguments.map_args (expression_generate_actual_argument, &is_first_arg);
+					actual_arguments.map_args (expression_generate_actual_argument, fp, &is_first_arg);
 					fprintf (fp, ")");
 					return;
 				} else if (scope_type == interface_scope_type) {
@@ -57,7 +57,7 @@ class FunctionCallExpression : Expression {
 					Bool is_first_arg = false;
 					fprintf (fp, ", self, ");
 					function.token.generate (fp);
-					actual_arguments.map_args (expression_generate_actual_argument, &is_first_arg);
+					actual_arguments.map_args (expression_generate_actual_argument, fp, &is_first_arg);
 					fprintf (fp, ")");
 					return;
 				} else {
@@ -80,7 +80,7 @@ class FunctionCallExpression : Expression {
 				function.operand[0].generate (fp);
 				fprintf (fp, ", ");
 				function.operand[1].generate_left (fp, false);
-				actual_arguments.map_args (expression_generate_actual_argument, &is_first_arg);
+				actual_arguments.map_args (expression_generate_actual_argument, fp, &is_first_arg);
 				fprintf (fp, ")");
 				return;
 			} else if (function_type.decl is_of InterfaceDeclaration) {
@@ -96,7 +96,7 @@ class FunctionCallExpression : Expression {
 				function.operand[0].generate (fp);
 				fprintf (fp, ", ");
 				function.operand[1].generate_left (fp, false);
-				actual_arguments.map_args (expression_generate_actual_argument, &is_first_arg);
+				actual_arguments.map_args (expression_generate_actual_argument, fp, &is_first_arg);
 				fprintf (fp, ")");
 				return;
 			}
@@ -112,7 +112,7 @@ class FunctionCallExpression : Expression {
 				is_first_arg = false;
 			}
 		}
-		actual_arguments.map_args (expression_generate_actual_argument, &is_first_arg);
+		actual_arguments.map_args (expression_generate_actual_argument, fp, &is_first_arg);
 		fprintf (fp, ")");
 	}
 

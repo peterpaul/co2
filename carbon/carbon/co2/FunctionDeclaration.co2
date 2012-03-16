@@ -82,7 +82,7 @@ void functiondeclaration_generateFunction (FILE * fp, FunctionDeclaration myself
 	fprintf (fp, " ");
 	myself.name.generate (fp);
 	fprintf (fp, " (");
-	myself.formal_arguments.map_args (functiondeclaration_generate_formal_arg, &first_formal_arg);
+	myself.formal_arguments.map_args (functiondeclaration_generate_formal_arg, fp, &first_formal_arg);
 	fprintf (fp, ")\n");
 	fprintf (fp, "{\n");
 

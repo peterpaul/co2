@@ -86,4 +86,8 @@ class Scope : RefObject, IScope {
 	void error_not_found (Token token) {
 		error (token, "'%s' not declared.\n", token.name.data);
 	}
+
+	ScopeType get_type () {
+		return type;
+	}
 }

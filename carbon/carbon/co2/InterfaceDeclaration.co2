@@ -4,3 +4,20 @@ include co2/RefList
 class InterfaceDeclaration : ObjectTypeDeclaration {
 	RefList interfaces;
 }
+
+Bool interface_implements (InterfaceDeclaration first, InterfaceDeclaration second) {
+	if (second == first) {
+		return true;
+	}
+	Bool implements = false;
+
+	void interface_implements_callback (Token if_name) {
+		Declaration decl = global_scope.lookup (if_name);
+		if (!implements && decl && decl is_of InterfaceDeclaration) {
+			implements = interface_implements ((InterfaceDeclaration) decl, second);
+		}
+	}
+
+	first.interfaces?.map (interface_implements_callback);
+	return implements;
+}

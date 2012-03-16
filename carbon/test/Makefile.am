@@ -20,6 +20,8 @@ Makefile.am: $(srcdir)/generate-makefile-am.sh $(srcdir)/testignore
 	$(srcdir)/generate-makefile-am.sh
 
 TESTS=\
+pass/aa_hello_world_class.sh\
+pass/aa_hello_world.sh\
 pass/arithmetic_expressions.sh\
 pass/array.sh\
 pass/cast_expression.sh\

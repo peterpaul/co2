@@ -43,6 +43,10 @@ class BaseCompileObjectVisitor : RefObject, CompileObjectVisitor {
 			visitType ((Type) object);
 		} else if (object is_of File) {
 			visitFile ((File) object);
+		} else if (object is_of Token) {
+			visitToken ((Token) object);
+		} else {
+			error (object.get_token (), "Unsupported type: ", object.class.class_name);
 		}
 	}
 
@@ -65,6 +69,8 @@ class BaseCompileObjectVisitor : RefObject, CompileObjectVisitor {
 			visitTypeDeclaration (decl);
 		} else if (decl is_of VariableDeclaration) {
 			visitVariableDeclaration (decl);
+		} else {
+			error (decl.get_token (), "Unsupported type: ", decl.class.class_name);
 		}
 	}
 
@@ -91,6 +97,8 @@ class BaseCompileObjectVisitor : RefObject, CompileObjectVisitor {
 			visitTryStatement (stat);
 		} else if (stat is_of WhileStatement) {
 			visitWhileStatement (stat);
+		} else {
+			error (stat.get_token (), "Unsupported type: ", stat.class.class_name);
 		}
 	}
 
@@ -117,6 +125,8 @@ class BaseCompileObjectVisitor : RefObject, CompileObjectVisitor {
 			visitUnaryExpression (expr);
 		} else if (expr is_of VarArgExpression) {
 			visitVarArgExpression (expr);
+		} else {
+			error (expr.get_token (), "Unsupported type: ", expr.class.class_name);
 		}
 	}
 
@@ -129,6 +139,8 @@ class BaseCompileObjectVisitor : RefObject, CompileObjectVisitor {
 			visitObjectType (type);
 		} else if (type is_of PrimitiveType) {
 			visitPrimitiveType (type);
+		} else {
+			error (type.get_token (), "Unsupported type: ", type.class.class_name);
 		}
 	}
 
@@ -169,5 +181,5 @@ class BaseCompileObjectVisitor : RefObject, CompileObjectVisitor {
 	void visitObjectType (Type type) {}
 	void visitPrimitiveType (Type type) {}
 	void visitFile (File file) {}
-
+	void visitToken (Token token) {}
 }
