@@ -12,7 +12,7 @@ class Scope : RefObject, IScope {
 	Scope (ScopeType type, Token name) {
 		super ();
 		self.type = type;
-		self.name = name;
+		self.name = (Token) name?.retain ();
 		parent = current_scope;
 		map = new HashMap (127);
 		current_scope = self;
@@ -30,8 +30,19 @@ class Scope : RefObject, IScope {
 		return parent = parent_scope;
 	}
 
+	void _log (Token token, char *action) {
+		/*
+		if (type == global_scope_type) {
+			fprintf (stderr, "GLOBAL_SCOPE: %s.%s\t%s: %s\n", type.name.data, name ? name.name.data : null, action, token.name.data);
+		} else {
+			fprintf (stderr, "local scope: %s.%s\t%s: %s\n", type.name.data, name ? name.name.data : null, action, token.name.data);
+		}
+		*/
+	}
+
 	Declaration declare (Declaration decl) {
-		map.put (decl.name, decl);
+		_log (decl.name, "declare");
+		map.put (decl.name.name, decl);
 		decl.set_scope (self);
 	}
 
@@ -40,10 +51,12 @@ class Scope : RefObject, IScope {
 	}
 
 	Declaration lookup_in_this_scope (Token token) {
-		map.get (token);
+		_log (token, "lookup_in_this_scope");
+		map.get (token.name);
 	}
 
 	Declaration lookup (Token token) {
+		_log (token, "lookup");
 		Declaration result = lookup_in_this_scope (token);
 		if (!result) {
 			if (!parent) {
@@ -56,7 +69,7 @@ class Scope : RefObject, IScope {
 	}
 
 	Declaration find_type_in_this_scope (Token token, Class type) {
-		Declaration result = (Declaration) map.get (token);
+		Declaration result = (Declaration) map.get (token.name);
 		if (result != null && !(result is_of type)) {
 			!result;
 		}
@@ -72,7 +85,7 @@ class Scope : RefObject, IScope {
 	}
  
 	Bool exists_in_this_scope (Token token) {
-		return map.get (token) != null;
+		return map.get (token.name) != null;
 	}
 
 	Bool exists (Token token) {

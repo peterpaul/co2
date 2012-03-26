@@ -4,4 +4,78 @@ include co2/Type
 class CastExpression : Expression {
 	Type cast_type;
 	Expression expression;
+
+	CastExpression (Type type, Expression expr) {
+		super ();
+		cast_type = (Type) type.retain ();
+		expression = (Expression) expr.retain ();
+	}
+
+	~CastExpression () {
+		cast_type.release ();
+		expression.release ();
+	}
+
+	void accept (CompileObjectVisitor visitor) {
+		cast_type.accept (visitor);
+		expression.accept (visitor);
+		visitor.visit (self);
+	}
+
+	void warning_not_compatible () {
+		Token expr_token = expression.type.get_token ();
+		String expr_string = expression.type.toString ();
+		String type_string = cast_type.toString ();
+		warning (expr_token, "casting possibly incompatible types %s to %s\n", expr_string.data, type_string.data);
+		delete expr_string;
+		delete type_string;
+	}
+
+	void type_check () {
+		expression.type_check ();
+		if (!expression.type) {
+			return;
+		}
+		cast_type.type_check ();
+
+		if (cast_type is_of ObjectType && expression.type is_of ObjectType) {
+			if (!cast_type.is_compatible (expression.type)
+				&& !expression.type.is_compatible (cast_type)) {
+				warning_not_compatible ();
+			}
+		} else {
+			if (!cast_type.is_compatible (expression.type)) {
+				warning_not_compatible ();
+			}
+		}
+		type = (Type) cast_type.retain ();
+	}
+
+	void generate (FILE * fp) {
+		fprintf (fp, "(");
+		fprintf (fp, "(");
+		cast_type.generate (fp);
+		fprintf (fp, ")");
+		if (cast_type is_of ObjectType) {
+			ObjectType object_type = (ObjectType) cast_type;
+			if (object_type.decl is_of ClassDeclaration) {
+				fprintf (fp, "O_BRANCH_CAST (");
+				expression.generate (fp);
+				fprintf (fp, ", ");
+				object_type.token.generate (fp);
+				fprintf (fp, " ())");
+			} else if (object_type.decl is_of InterfaceDeclaration) {
+				fprintf (fp, "O_BRANCH_CAST_INTERFACE (");
+				expression.generate (fp);
+				fprintf (fp, ", ");
+				object_type.token.generate (fp);
+				fprintf (fp, " ())");
+			} else {
+				expression.generate (fp);
+			}
+		} else {
+			expression.generate (fp);
+		}
+		fprintf (fp, ")");
+	}
 }

@@ -162,7 +162,11 @@ class FunctionCallExpression : Expression {
 			return;
 		}
 		if (!function.type is_of FunctionType) {
-			// TODO here was I been
+			Token token = function.get_token ();
+			error (token, "'%s' is not a function\n", token.name.data);
 		}
+		FunctionType function_type = (FunctionType) function.type;
+		type = (Type) function_type.return_type.retain ();
+		type_check_arguments (function_type);
 	}
 }

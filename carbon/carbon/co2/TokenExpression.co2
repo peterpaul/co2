@@ -62,13 +62,94 @@ class TokenExpression : Expression {
 			}
 			decl?.retain ();
 		}
-/*
 		switch (token.type) {
-		case _TYPE_IDENTIFIER:
+		case _TYPE_IDENTIFIER: {
+			if (!decl || !check_global_scope) {
+				lookup ();
+			}
+			if (!decl) {
+				return;
+			}
+			Token token = new Token.fromToken (self.token, "void", _VOID);
+			type = new PrimitiveType (token);
+			type = new ArrayType (type);
+			type.retain ();
 			break;
 		}
-*/
+		case _CLASS:
+		case _IDENTIFIER:
+			if (!decl || !check_global_scope) {
+				lookup ();
+			}
+			if (!decl) {
+				return;
+			}
+			type = decl.type.get_declared_type ();
+			type.retain ();
+			break;
+		case _SELF: {
+			ClassDeclaration class_decl = (ClassDeclaration) current_context.find (ObjectTypeDeclaration.class);
+			if (!class_decl) {
+				error (token, "Cannot use 'self' outside of class or interface context.");
+				return;
+			}
+			type = new ObjectType (class_decl.name, class_decl);
+			type.retain ();
+			break;
+		}
+		case _INT_CONSTANT: {
+			Token token = new Token.fromToken (self.token, "int", _INT);
+			type = new PrimitiveType (token);
+			type.retain ();
+			break;
+		}
+		case _STRING_CONSTANT: {
+			Token token = new Token.fromToken (self.token, "char", _CHAR);
+			type = new PrimitiveType (token);
+			type = new ArrayType (type);
+			type.retain ();
+			break;
+		}
+		case _CHAR_CONSTANT: {
+			Token token = new Token.fromToken (self.token, "char", _CHAR);
+			type = new PrimitiveType (token);
+			type.retain ();
+			break;
+		}
+		case _FLOAT_CONSTANT: {
+			Token token = new Token.fromToken (self.token, "float", _FLOAT);
+			type = new PrimitiveType (token);
+			type.retain ();
+			break;
+		}
+		case _VA_ARG: {
+			Token token = new Token.fromToken (self.token, "va_list", _VA_LIST__);
+			type = new PrimitiveType (token);
+			type.retain ();
+			break;
+		}
+		default:
+			error (token, "Unhandled TokenExpression: '%s'\n", token.name.data);
+			break;
+		}
+		type.type_check ();
 	}
 
-	void lookup ();
+	void lookup () {
+		decl?.release ();
+		if (check_global_scope) {
+			if (scope.exists (token)) {
+				decl = scope.lookup (token);
+			} else {
+				decl = global_scope.lookup (token);
+			}
+		} else {
+			decl = scope.lookup (token);
+		}
+		decl?.retain ();
+	}
+
+	Token get_token () {
+		return token;
+	}
 }

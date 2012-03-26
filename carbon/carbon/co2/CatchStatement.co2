@@ -6,4 +6,37 @@ class CatchStatement : Statement {
 	IScope scope;
 	ArgumentDeclaration argument;
 	Statement body;
+
+	CatchStatement (IScope scope, ArgumentDeclaration argument, Statement body) {
+		super ();
+		self.scope = scope;
+		self.argument = (ArgumentDeclaration) argument.retain ();
+		self.body = (Statement) body.retain ();
+	}
+
+	~CatchStatement () {
+		delete scope;
+		argument.release ();
+		body.release ();
+	}
+
+	void accept (CompileObjectVisitor visitor) {
+		argument.accept (visitor);
+		body.accept (visitor);
+		visitor.visit (self);
+	}
+
+	void type_check () {
+		current_context?.add (self);
+		if (!argument.type is_of ObjectType) {
+			error (argument.name, "Expected class.\n");
+		}
+		argument.type_check ();
+		body.type_check ();
+		current_context?.remove_last ();
+	}
+
+	void generate (FILE *fp) {
+		body.generate (fp);
+	}
 }

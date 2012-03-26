@@ -4,4 +4,33 @@ include co2/Expression
 class WhileStatement : Statement {
 	Expression condition;
 	Statement body;
+
+	WhileStatement (Expression condition, Statement body) {
+		super ();
+		self.condition = (Expression) condition.retain ();
+		self.body = (Statement) body.retain ();
+	}
+
+	~WhileStatement () {
+		condition.release ();
+		body.release ();
+	}
+
+	void accept (CompileObjectVisitor visitor) {
+		condition.accept (visitor);
+		body.accept (visitor);
+		visitor.visit (self);
+	}
+
+	void type_check () {
+		condition.type_check ();
+		body.type_check ();
+	}
+
+	void generate (FILE *fp) {
+		fprintf (fp, "while (");
+		condition.generate (fp);
+		fprintf (fp, ")\n");
+		body.generate (fp);
+	}
 }

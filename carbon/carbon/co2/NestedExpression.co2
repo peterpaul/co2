@@ -2,4 +2,29 @@ include co2/Expression
 
 class NestedExpression : Expression {
 	Expression expr;
+
+	NestedExpression (Expression expr) {
+		super ();
+		self.expr = (Expression) expr.retain ();
+	}
+
+	~NestedExpression () {
+		expr.release ();
+	}
+
+	void accept (CompileObjectVisitor visitor) {
+		expr.accept (visitor);
+		visitor.visit (self);
+	}
+
+	void type_check () {
+		expr.type_check ();
+		type = (Type) expr.type.retain ();
+	}
+
+	void generate (FILE *fp) {
+		fprintf (fp, "(");
+		expr.generate (fp);
+		fprintf (fp, ")");
+	}
 }

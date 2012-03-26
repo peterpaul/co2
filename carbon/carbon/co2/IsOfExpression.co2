@@ -3,4 +3,40 @@ include co2/Expression
 class IsOfExpression : Expression {
 	Expression expr_to_check;
 	Expression class_expr;
+
+	IsOfExpression (Expression expr_to_check, Expression class_expr) {
+		super ();
+		self.expr_to_check = (Expression) expr_to_check.retain ();
+		self.class_expr = (Expression) class_expr.retain ();
+	}
+
+	~IsOfExpression () {
+		expr_to_check.release ();
+		class_expr.release ();
+	}
+
+	void accept (CompileObjectVisitor visitor) {
+		current_context?.add (self);
+		expr_to_check.accept (visitor);
+		class_expr.accept (visitor);
+		visitor.visit (self);
+		current_context?.remove_last ();
+	}
+
+	void type_check () {
+		expr_to_check.type_check ();
+		class_expr.type_check ();
+		Token expr_token = class_expr.get_token ();
+		Token int_token = new Token.fromToken (expr_token, "int", _INT);
+		type = new PrimitiveType (int_token);
+		type.retain ();
+	}
+
+	void generate (FILE *fp) {
+		fprintf (fp, "o_is_of (");
+		expr_to_check.generate (fp);
+		fprintf (fp, ", ");
+		class_expr.generate (fp);
+		fprintf (fp, ")");
+	}
 }

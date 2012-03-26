@@ -1,8 +1,77 @@
 include co2/ObjectTypeDeclaration
 include co2/RefList
+include co2/CompositeScope
 
 class InterfaceDeclaration : ObjectTypeDeclaration {
 	RefList interfaces;
+
+	InterfaceDeclaration (Token name, RefList interfaces) {
+		super (name);
+		self.interfaces = (RefList) interfaces?.retain ();
+	}
+
+	~InterfaceDeclaration () {
+		interfaces?.release ();
+	}
+
+	void accept (CompileObjectVisitor visitor) {
+		current_context?.add (self);
+		members.map_args (compileobject_accept, visitor);
+		visitor.visit (self);
+		current_context?.remove_last ();
+	}
+
+	void type_check () {
+		current_context?.add (self);
+
+		void add_to_scope (Token token) {
+			InterfaceDeclaration interface_decl = (InterfaceDeclaration) global_scope.lookup (token);
+			CompositeScope member_scope = (CompositeScope) self.member_scope;
+			member_scope.subscopes.append (interface_decl.member_scope);
+
+			// TODO only add if not already existing in implemented_methods
+			// TODO do this only while generating source code
+			void add_member_to_scope (Declaration decl) {
+				members.append (decl);
+			}
+
+			interface_decl.members.map (add_member_to_scope);
+		}
+
+		// Add all methods of super interfaces to this scope
+		interfaces?.map (add_to_scope);
+		members.map (compileobject_type_check);
+		current_context?.remove_last ();
+	}
+
+	Bool is_compatible (ObjectTypeDeclaration other) {
+		Bool found = false;
+
+		void is_compatible_with_class (Token token) {
+			if (strcmp (token.name.data, name.name.data) == 0) {
+				found = true;
+			}
+		}
+
+		ClassDeclaration get_super_class (ClassDeclaration decl) {
+			Token superclass = (Token) decl.superclass;
+			if (superclass && global_scope.exists (superclass)) {
+				return (ClassDeclaration) global_scope.lookup (superclass);
+			}
+			return null;
+		}
+
+		if (other is_of ClassDeclaration) {
+			ClassDeclaration class_decl = (ClassDeclaration) other;
+
+			do {
+				class_decl.interfaces?.map (is_compatible_with_class);
+			} while (!found && (class_decl = get_super_class (class_decl)));
+			return found;
+		} else {
+			return strcmp (name.name.data, other.name.name.data) == 0;
+		}
+	}
 }
 
 Bool interface_implements (InterfaceDeclaration first, InterfaceDeclaration second) {

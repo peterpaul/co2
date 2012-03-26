@@ -1,8 +1,74 @@
 include co2/Statement
 include co2/RefList
+include co2/CatchStatement
 
 class TryStatement : Statement {
 	Statement try_clause;
 	RefList catch_clause;
 	Statement finally_clause;
+
+	TryStatement (Statement try_clause, RefList catch_clause, Statement finally_clause) {
+		super ();
+		self.try_clause = (Statement) try_clause.retain ();
+		self.catch_clause = (RefList) catch_clause.retain ();
+		self.finally_clause = (Statement) finally_clause?.retain ();
+	}
+
+	~TryStatement () {
+		try_clause.release ();
+		catch_clause.release ();
+		finally_clause?.release ();
+	}
+
+	void accept (CompileObjectVisitor visitor) {
+		try_clause.accept (visitor);
+		catch_clause.map_args (compileobject_accept, visitor);
+		finally_clause?.accept (visitor);
+		visitor.visit (self);
+	}
+
+	void type_check () {
+		current_context?.add (self);
+		try_clause.type_check ();
+		catch_clause.map (compileobject_type_check);
+		finally_clause?.type_check ();
+		current_context?.remove_last ();
+	}
+
+	void generate (FILE *fp) {
+		fprintf (fp, "try {\n");
+		try_clause.generate (fp);
+		fprintf (fp, "ex_pop ();\n");
+		if (finally_clause) {
+			fprintf (fp, "do_finally;\n");
+		}
+		fprintf (fp, "}\n");
+
+		catch_clause.map_args (trystatement_generate_catch, fp, self);
+
+		if (finally_clause) {
+			fprintf (fp, "finally {\n");
+			finally_clause.generate (fp);
+			fprintf (fp, "throw (1, NULL, NULL, 0, NULL)\n");
+			fprintf (fp, "}\n");
+			fprintf (fp, "end_try_finally;\n");
+		} else {
+			fprintf (fp, "end_try;\n");
+		}
+	}
+}
+
+void trystatement_generate_catch (CatchStatement catch_statement, va_list *app) {
+	FILE *fp = va_arg (*app, FILE *);
+	TryStatement try_statement = (TryStatement) va_arg (*app, void *);
+	ObjectType type = (ObjectType) catch_statement.argument.type;
+	fprintf (fp, "catch (%s ()) {\n", type.token.name.data);
+	type.generate (fp);
+	fprintf (fp, ") ex_stack->ex_data;\n");
+	catch_statement.generate (fp);
+	fprintf (fp, "ex_pop ();\n");
+	if (try_statement.finally_clause) {
+		fprintf (fp, "do_finally;\n");
+	}
+	fprintf (fp, "}\n");
 }

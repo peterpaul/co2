@@ -4,4 +4,69 @@ class ConditionalExpression : Expression {
 	Expression condition;
 	Expression then_expr;
 	Expression else_expr;
+
+	ConditionalExpression (Expression condition, Expression then_expr, Expression else_expr) {
+		super ();
+		self.condition = (Expression) condition.retain ();
+		self.then_expr = (Expression) then_expr.retain ();
+		self.else_expr = (Expression) else_expr.retain ();
+	}
+
+	~ConditionalExpression () {
+		condition.release ();
+		then_expr.release ();
+		else_expr.release ();
+	}
+
+	void accept (CompileObjectVisitor visitor) {
+		current_context?.add (self);
+		condition.accept (visitor);
+		then_expr.accept (visitor);
+		else_expr.accept (visitor);
+		visitor.visit (self);
+		current_context?.remove_last ();
+	}
+
+	void type_check () {
+		condition.type_check ();
+		then_expr.type_check ();
+		else_expr.type_check ();
+		Bool then_compat_else = then_expr.type.is_compatible (else_expr.type);
+		Bool else_compat_then = else_expr.type.is_compatible (then_expr.type);
+		if (then_compat_else) {
+			type = (Type) then_expr.type.retain ();
+		} else if (else_compat_then) {
+			type = (Type) else_expr.type.retain ();
+		} else {
+			if (then_expr.type is_of ObjectType
+				&& else_expr.type is_of ObjectType) {
+				ObjectType then_type = (ObjectType) then_expr.type;
+				ObjectType else_type = (ObjectType) else_expr.type;
+				if (then_type.decl is_of ClassDeclaration
+					&& else_type.decl is_of ClassDeclaration) {
+					ClassDeclaration then_decl = (ClassDeclaration) then_type.decl;
+					ClassDeclaration else_decl = (ClassDeclaration) else_type.decl;
+					ClassDeclaration result = (ClassDeclaration) then_decl.find_common_base (else_decl);
+					if (result) {
+						type = new ObjectType (result.name, result);
+						type.retain ();
+						return;
+					}
+				}
+			}
+			// check whether objecttype, and if so find common base
+			then_expr.type.assert_compatible (else_expr.type);
+			else_expr.type.assert_compatible (then_expr.type);
+		}
+	}
+
+	void generate (FILE *fp) {
+		fprintf (fp, "(");
+		condition.generate (fp);
+		fprintf (fp, " ? ");
+		then_expr.generate (fp);
+		fprintf (fp, " : ");
+		else_expr.generate (fp);
+		fprintf (fp, ")");
+	}
 }

@@ -3,4 +3,35 @@ include co2/Expression
 
 class DeleteStatement : Statement {
 	Expression expr;
+
+	DeleteStatement (Expression expr) {
+		super ();
+		self.expr = (Expression) expr.retain ();
+	}
+
+	~DeleteStatement () {
+		expr.release ();
+	}
+
+	void accept (CompileObjectVisitor visitor) {
+		expr.accept (visitor);
+		visitor.visit (self);
+	}
+
+	void generate (FILE *fp) {
+		// TODO when expr.type == ArrayType, then free, else delete object
+		if (expr.type && expr.type is_of ObjectType) {
+			fprintf (fp, "O_CALL (");
+			expr.generate (fp);
+			fprintf (fp, ", delete);\n");
+		} else {
+			fprintf (fp, "free (");
+			expr.generate (fp);
+			fprintf (fp, ");\n");
+		}
+	}
+
+	void type_check () {
+		expr.type_check ();
+	}
 }

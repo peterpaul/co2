@@ -91,10 +91,10 @@ class ClassDeclaration : ObjectTypeDeclaration {
 
 	Declaration find_common_base (ClassDeclaration other) {
 		// TODO find common base for interfaces
-		Declaration base = self;
-		while (base && !is_compatible (other)) {
-			if (superclass) {
-				base = global_scope.lookup (superclass);
+		ClassDeclaration base = self;
+		while (base && !base.is_compatible (other)) {
+			if (base.superclass) {
+				base = (ClassDeclaration) global_scope.lookup (base.superclass);
 			} else {
 				base = null;
 			}
@@ -105,7 +105,7 @@ class ClassDeclaration : ObjectTypeDeclaration {
 
 Bool new_constructor_filter (ConstructorDeclaration constructor) {
 	if (strcmp (constructor.name.name.data, "ctor") != 0) {
-		return !constructor.scope.get_parent ().find_type (constructor.name, ConstructorDeclaration.class);
+		return !constructor.scope.get_parent ()?.find_type (constructor.name, ConstructorDeclaration.class);
 	}
 	return false;
 }

@@ -1,4 +1,41 @@
 include co2/Statement
 
 class CaseStatement : Statement {
+	Expression expr;
+	RefList statements;
+
+	CaseStatement (Expression expr, RefList statements) {
+		super ();
+		self.expr = (Expression) expr?.retain ();
+		self.statements = (RefList) statements.retain ();
+	}
+
+	~CaseStatement () {
+		expr?.release ();
+		statements.release ();
+	}
+
+	void accept (CompileObjectVisitor visitor) {
+		expr?.accept (visitor);
+		statements.map_args (compileobject_accept, visitor);
+		visitor.visit (self);
+	}
+
+	void type_check () {
+		current_context?.add (self);
+		expr?.type_check ();
+		statements.map (compileobject_type_check);
+		current_context?.remove_last ();
+	}
+
+	void generate (FILE *fp) {
+		if (expr) {
+			fprintf (fp, "case ");
+			expr.generate (fp);
+			fprintf (fp, ":\n");
+		} else {
+			fprintf (fp, "default:\n");
+		}
+		statements.map_args (compileobject_generate, fp);
+	}
 }

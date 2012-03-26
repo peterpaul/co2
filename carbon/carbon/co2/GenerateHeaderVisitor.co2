@@ -68,7 +68,7 @@ class GenerateHeaderVisitor : BaseCompileObjectVisitor {
 			ClassDeclaration class_decl = (ClassDeclaration) current_context.find (ClassDeclaration.class);
 			fprintf (fp, "O_METHOD_DEF (");
 			class_decl.name.generate (fp);
-			fprintf (fp, "void *, ");
+			fprintf (fp, ", void *, ");
 			if (strcmp (decl.name.name.data, "ctor") != 0) {
 				fprintf (fp, "ctor_");
 			}
@@ -141,7 +141,7 @@ class GenerateHeaderVisitor : BaseCompileObjectVisitor {
 		RefList new_methods = methods.filter_args (declaration_new_member_filter, FunctionDeclaration.class);
 		new_methods.retain ();
 
-		fprintf (fp, "#include co2/\"co2/Interface.h\"\n");
+		fprintf (fp, "#include \"co2/Interface.h\"\n");
 
 		fprintf (fp, "#define ");
 		decl.name.generate (fp);

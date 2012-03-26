@@ -1,4 +1,13 @@
 include co2/Statement
 
 class BreakStatement : Statement {
+	void accept (CompileObjectVisitor visitor) {
+		visitor.visit (self);
+	}
+
+	void type_check () {}
+
+	void generate (FILE *fp) {
+		fprintf (fp, "break;\n");
+	}
 }

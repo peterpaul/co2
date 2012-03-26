@@ -53,6 +53,7 @@ class NewExpression : Expression {
 			} else {
 				fprintf (fp, " (), new");
 				ctor_arguments.map_args (expression_generate_actual_argument, fp, &is_first_arg);
+				fprintf (fp, ")");
 			}
 		} else if (array_size != null) {
 			fprintf (fp, "calloc (");

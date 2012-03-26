@@ -55,7 +55,6 @@
 #ifdef O_DEBUG
 #define O_CALL_IF(interface,o,msg,...)					\
   ({typeof(o) _tmp = o;							\
-    fprintf (stderr, "%s: %p: %s.%s\n", _tmp->class->class_name, (void *)_tmp, __STRING(interface), __STRING(msg)); \
     struct interface * _if = o_get_interface(_tmp, interface());	\
     assertTrue(_if,"runtime error: %s at %p doesn't implement %s.",	\
 	       _tmp->class->class_name, (void *)_tmp, __STRING(interface));	\
@@ -64,7 +63,6 @@
     _if->msg(_tmp,##__VA_ARGS__);})
 #define O_BRANCH_CALL_IF(interface,o,msg,...)				\
   ({typeof(o) _tmp = o;							\
-    fprintf (stderr, "%s: %p: %s.%s\n", _tmp?_tmp->class->class_name:NULL, (void *)_tmp, __STRING(interface), __STRING(msg)); \
     struct interface * _if = _tmp ? o_get_interface(_tmp, interface()) : NULL; \
     assertTrue(_tmp ? _if : true,					\
 	       "runtime error: %s at %p doesn't implement %s.",		\

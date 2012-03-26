@@ -3,4 +3,32 @@ include co2/Type
 
 class SizeExpression : Expression {
 	Type param;
+
+	SizeExpression (Type param) {
+		super ();
+		self.param = (Type) param.retain ();
+	}
+
+	~SizeExpression () {
+		param.release ();
+	}
+
+	void accept (CompileObjectVisitor visitor) {
+		param.accept (visitor);
+		visitor.visit (self);
+	}
+
+	void type_check () {
+		param.type_check ();
+		Token type_token = param.get_token ();
+		Token int_token = new Token.fromToken (type_token, "int", _INT);
+		type = new PrimitiveType (int_token);
+		type.retain ();
+	}
+
+	void generate (FILE *fp) {
+		fprintf (fp, "sizeof (");
+		param.generate (fp);
+		fprintf (fp, ")");
+	}
 }

@@ -9,4 +9,40 @@ class ThrowStatement : Statement {
 	CatchStatement catch_context;
 	TryStatement try_context;
 	FinallyStatement finally_context;
+
+	ThrowStatement (Expression expr) {
+		super ();
+		self.expr = (Expression) expr.retain ();
+	}
+
+	~ThrowStatement () {
+		expr.release ();
+	}
+
+	void accept (CompileObjectVisitor visitor) {
+		expr.accept (visitor);
+		visitor.visit (self);
+	}
+
+	void type_check () {
+		catch_context = (CatchStatement) current_context?.find (CatchStatement.class);
+		try_context = (TryStatement) current_context?.find (TryStatement.class);
+		finally_context = (FinallyStatement) current_context?.find (FinallyStatement.class);
+		expr.type_check ();
+	}
+
+	void generate (FILE *fp) {
+		if (catch_context) {
+			fprintf (fp, "ex_pop ();\n");
+			if (try_context.finally_clause && !finally_context) {
+				fprintf (fp, "do_finally;\n");
+			}
+		}
+		if (finally_context) {
+			fprintf (fp, "ex_pop ();\n");
+		}
+		fprintf (fp, "throw (1, ");
+		expr.generate (fp);
+		fprintf (fp, ", __FILE__, __LINE__, __PRETTY_FUNCTION__);\n");
+	}
 }

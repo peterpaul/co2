@@ -1,4 +1,34 @@
 include co2/ObjectTypeDeclaration
 
 class StructDeclaration : ObjectTypeDeclaration {
+	StructDeclaration (Token name, IScope member_scope, RefList members) {
+		super (name);
+		self.member_scope = (IScope) member_scope;
+		self.members = (RefList) members?.retain ();
+	}
+
+	void accept (CompileObjectVisitor visitor) {
+		current_context?.add (self);
+		members.map_args (compileobject_accept, visitor);
+		visitor.visit (self);
+		current_context?.remove_last ();
+	}
+
+	void type_check () {
+		current_context?.add (self);
+		members.map (compileobject_type_check);
+		current_context?.remove_last ();
+	}
+
+	Bool is_compatible (ObjectTypeDeclaration other) {
+		StructDeclaration other_decl;
+		if (other is_of TypeDeclaration) {
+			TypeDeclaration type_decl = (TypeDeclaration) other;
+			ObjectType object_type = (ObjectType) type_decl.type;
+			other_decl = (StructDeclaration) object_type.decl;
+		} else {
+			other_decl = (StructDeclaration) other;
+		}
+		return self == other_decl;
+	}
 }

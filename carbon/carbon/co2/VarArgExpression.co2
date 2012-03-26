@@ -4,4 +4,41 @@ include co2/Type
 class VarArgExpression : Expression {
 	Expression va_arg_expr;
 	Type va_arg_type;
+
+	VarArgExpression (Type va_arg_type, Expression va_arg_expr) {
+		super ();
+		self.va_arg_type = (Type) va_arg_type.retain ();
+		self.va_arg_expr = (Expression) va_arg_expr?.retain ();
+	}
+
+	~VarArgExpression () {
+		va_arg_type.release ();
+		va_arg_expr?.release ();
+	}
+
+	void accept (CompileObjectVisitor visitor) {
+		va_arg_type.accept (visitor);
+		va_arg_expr?.accept (visitor);
+		visitor.visit (self);
+	}
+
+	void type_check () {
+		va_arg_type.type_check ();
+		va_arg_expr?.type_check ();
+		type = (Type) va_arg_type.retain ();
+	}
+
+	void generate (FILE *fp) {
+		if (va_arg_expr) {
+			fprintf (fp, "va_arg (");
+			va_arg_expr.generate (fp);
+			fprintf (fp, ", ");
+			va_arg_type.generate (fp);
+			fprintf (fp, ")");
+		} else {
+			fprintf (fp, "va_arg (ap, ");
+			va_arg_type.generate (fp);
+			fprintf (fp, ")");
+		}
+	}
 }

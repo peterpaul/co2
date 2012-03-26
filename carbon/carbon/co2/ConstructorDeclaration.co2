@@ -8,5 +8,55 @@ class ConstructorDeclaration : Declaration {
 	RefList formal_arguments;
 	Statement body;
 
-	Bool has_var_args ();
+	ConstructorDeclaration (Token name, Token class_name, RefList formal_arguments, Statement body) {
+		super (name);
+		self.class_name = (Token) class_name.retain ();
+		self.formal_arguments = (RefList) formal_arguments.retain ();
+		self.body = (Statement) body?.retain ();
+
+		Declaration class_decl = global_scope.lookup (class_name);
+		if (class_decl) {
+			type = new ObjectType (class_name, (ObjectTypeDeclaration) class_decl);
+			type.retain ();
+		}
+	}
+
+	~ConstructorDeclaration () {
+		class_name.release ();
+		formal_arguments.release ();
+		body?.release ();
+	}
+
+	void accept (CompileObjectVisitor visitor) {
+		current_context?.add (self);
+		formal_arguments.map_args (compileobject_accept, visitor);
+		body?.accept (visitor);
+		visitor.visit (self);
+		current_context?.remove_last ();
+	}
+
+	void type_check () {
+		type.type_check ();
+		current_context?.add (self);
+		Declaration class_decl = (Declaration) current_context?.find (ClassDeclaration.class);
+
+		if (!class_decl) {
+			error (class_name, "Constructors ('%s') are only allowed in class declarations\n", class_name.name.data);
+		} else if (strcmp (class_decl.name.name.data, class_name.name.data) != 0) {
+			error (class_name, "Constructor should be called '%s' instead of '%s'\n", class_decl.name.name.data, class_name.name.data);
+		}
+
+		body.type_check ();
+		current_context?.remove_last ();
+	}
+	
+	Bool has_var_args () {
+		if (formal_arguments.length > 0) {
+			ArgumentDeclaration last_arg = (ArgumentDeclaration) formal_arguments.get (formal_arguments.length - 1);
+			if (last_arg.name.type == _VA_ARG) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

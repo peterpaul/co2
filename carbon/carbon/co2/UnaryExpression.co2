@@ -4,4 +4,55 @@ include co2/Token
 class UnaryExpression : Expression {
 	Token operator;
 	Expression operand;
+
+	UnaryExpression (Token operator, Expression operand) {
+		super ();
+		self.operator = (Token) operator?.retain ();
+		self.operand = (Expression) operand?.retain ();
+	}
+
+	~UnaryExpression () {
+		operator?.release ();
+		operand?.release ();
+	}
+
+	void accept (CompileObjectVisitor visitor) {
+		operator?.accept (visitor);
+		operand?.accept (visitor);
+		visitor.visit (self);
+	}
+
+	void type_check () {
+		operand.type_check ();
+		switch (operator.type) {
+		case '&':
+			type = new ArrayType (operand.type);
+			type.retain ();
+			break;
+		case '*':
+			if (operand.type is_of ArrayType) {
+				ArrayType array_type = (ArrayType) operand.type;
+				type = (Type) array_type.base_type.retain ();
+			} else {
+				error (operand.type.get_token (), "Cannot dereference %c type.\n", operand.type.class.class.class_name);
+			}
+			break;
+		case '!': {
+			Token int_token = new Token.fromToken (operator, "int", _INT);
+			Type int_type = new PrimitiveType (int_token);
+			type = (Type) int_type.retain ();
+			operand.type?.assume_compatible (type);
+		}
+			break;
+		default:
+			type = (Type) operand.type.retain ();
+			break;
+		}
+	}
+
+	void generate (FILE *fp) {
+		operator.generate (fp);
+		fprintf (fp, " ");
+		operand.generate (fp);
+	}
 }

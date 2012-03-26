@@ -6,4 +6,45 @@ class ForStatement : Statement {
 	Expression condition;
 	Expression iteration;
 	Statement body;
+
+	ForStatement (Expression initialization, Expression condition, Expression iteration, Statement body) {
+		super ();
+		self.initialization = (Expression) initialization?.retain ();
+		self.condition = (Expression) condition?.retain ();
+		self.iteration = (Expression) iteration?.retain ();
+		self.body = (Statement) body?.retain ();
+	}
+
+	~ForStatement () {
+		initialization?.release ();
+		condition?.release ();
+		iteration?.release ();
+		body?.release ();
+	}
+
+	void accept (CompileObjectVisitor visitor) {
+		initialization?.accept (visitor);
+		condition?.accept (visitor);
+		iteration?.accept (visitor);
+		body?.accept (visitor);
+		visitor.visit (self);
+	}
+
+	void type_check () {
+		initialization?.type_check ();
+		condition?.type_check ();
+		iteration?.type_check ();
+		body?.type_check ();
+	}
+
+	void generate (FILE *fp) {
+		fprintf (fp, "for (");
+		initialization?.generate (fp);
+		fprintf (fp, "; ");
+		condition?.generate (fp);
+		fprintf (fp, "; ");
+		iteration?.generate (fp);
+		fprintf (fp, ")\n");
+		body?.generate (fp);
+	}
 }

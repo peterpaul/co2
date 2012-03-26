@@ -168,7 +168,7 @@ class BinaryExpression : Expression {
 		switch (operator.type) {
 		case '.': {
 			operand[0].type_check ();
-			if (operand[0].type is_of ObjectType) {
+			if (!operand[0].type is_of ObjectType) {
 				error (operator, "Expected ObjectType\n");
 				return;
 			}
@@ -193,12 +193,12 @@ class BinaryExpression : Expression {
 				Token int_token = new Token.fromToken (operator, "int", _INT);
 				Type int_type = new PrimitiveType (int_token);
 				type = (Type) int_type.retain ();
-				operand[0].type?.assume_compatible (int_type);
-				operand[1].type?.assume_compatible (int_type);
+				operand[0].type?.assume_compatible (type);
+				operand[1].type?.assume_compatible (type);
 			} else if (operand[1].type) {
 				operand[0].type?.assert_compatible (operand[1].type);
 				type = (Type) operand[0].type?.retain ();
-			}
+			}				
 			break;
 		}
 		}

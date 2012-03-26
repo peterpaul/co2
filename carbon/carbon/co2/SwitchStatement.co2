@@ -1,4 +1,38 @@
 include co2/Statement
 
 class SwitchStatement : Statement {
+	Expression expr;
+	RefList cases;
+
+	SwitchStatement (Expression expr, RefList cases) {
+		super ();
+		self.expr = (Expression) expr.retain ();
+		self.cases = (RefList) cases.retain ();
+	}
+
+	~SwitchStatement () {
+		expr.release ();
+		cases.release ();
+	}
+
+	void accept (CompileObjectVisitor visitor) {
+		expr.accept (visitor);
+		cases.map_args (compileobject_accept, visitor);
+		visitor.visit (self);
+	}
+
+	void type_check () {
+		current_context?.add (self);
+		expr.type_check ();
+		cases.map (compileobject_type_check);
+		current_context?.remove_last ();
+	}
+
+	void generate (FILE *fp) {
+		fprintf (fp, "switch (");
+		expr.generate (fp);
+		fprintf (fp, ") {\n");
+		cases.map_args (compileobject_generate, fp);
+		fprintf (fp, "}\n");
+	}
 }

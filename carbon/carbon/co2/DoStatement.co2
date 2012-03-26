@@ -4,4 +4,34 @@ include co2/Expression
 class DoStatement : Statement {
 	Expression condition;
 	Statement body;
+
+	DoStatement (Statement body, Expression condition) {
+		super ();
+		self.body = (Statement) body.retain ();
+		self.condition = (Expression) condition.retain ();
+	}
+
+	~DoStatement () {
+		body.release ();
+		condition.release ();
+	}
+
+	void accept (CompileObjectVisitor visitor) {
+		body.accept (visitor);
+		condition.accept (visitor);
+		visitor.visit (self);
+	}
+
+	void type_check () {
+		body.type_check ();
+		condition.type_check ();
+	}
+
+	void generate (FILE *fp) {
+		fprintf (fp, "do\n");
+		body.generate (fp);
+		fprintf (fp, "while (");
+		condition.generate (fp);
+		fprintf (fp, ");\n");
+	}
 }

@@ -2,4 +2,28 @@ include co2/Statement
 
 class FinallyStatement : Statement {
 	Statement body;
+
+	FinallyStatement (Statement body) {
+		super ();
+		self.body = (Statement) body.retain ();
+	}
+
+	~FinallyStatement () {
+		body.release ();
+	}
+
+	void accept (CompileObjectVisitor visitor) {
+		body.accept (visitor);
+		visitor.visit (self);
+	}
+
+	void type_check () {
+		current_context?.add (self);
+		body.type_check ();
+		current_context?.remove_last ();
+	}
+
+	void generate (FILE *fp) {
+		body.generate (fp);
+	}
 }

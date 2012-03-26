@@ -5,4 +5,28 @@ include co2/Statement
 class DestructorDeclaration : Declaration {
 	Token class_name;
 	Statement body;
+
+	DestructorDeclaration (Token name, Token class_name, Statement body) {
+		super (name);
+		self.class_name = (Token) class_name.retain ();
+		self.body = (Statement) body?.retain ();
+	}
+
+	~DestructorDeclaration () {
+		class_name.release ();
+		body?.release ();
+	}
+
+	void accept (CompileObjectVisitor visitor) {
+		current_context?.add (self);
+		body?.accept (visitor);
+		visitor.visit (self);
+		current_context?.remove_last ();
+	}
+
+	void type_check () {
+		current_context?.add (self);
+		body?.type_check ();
+		current_context?.remove_last ();
+	}
 }

@@ -5,4 +5,41 @@ class IfStatement : Statement {
 	Expression condition;
 	Statement then_clause;
 	Statement else_clause;
+
+	IfStatement (Expression condition, Statement then_clause, Statement else_clause) {
+		super ();
+		self.condition = (Expression) condition.retain ();
+		self.then_clause = (Statement) then_clause.retain ();
+		self.else_clause = (Statement) else_clause?.retain ();
+	}
+
+	~IfStatement () {
+		condition.release ();
+		then_clause.release ();
+		else_clause?.release ();
+	}
+
+	void accept (CompileObjectVisitor visitor) {
+		condition.accept (visitor);
+		then_clause.accept (visitor);
+		else_clause?.accept (visitor);
+		visitor.visit (self);
+	}
+
+	void type_check () {
+		condition.type_check ();
+		then_clause.type_check ();
+		else_clause?.type_check ();
+	}
+
+	void generate (FILE *fp) {
+		fprintf (fp, "if (");
+		condition.generate (fp);
+		fprintf (fp, ")\n");
+		then_clause.generate (fp);
+		if (else_clause) {
+			fprintf (fp, " else ");
+			else_clause.generate (fp);
+		}
+	}
 }
