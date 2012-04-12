@@ -34,6 +34,7 @@ co2/Expression.co2\
 co2/ExpressionStatement.co2\
 co2/File.co2\
 co2/FinallyStatement.co2\
+co2/FixScopeVisitor.co2\
 co2/ForEachStatement.co2\
 co2/ForStatement.co2\
 co2/FunctionCallExpression.co2\

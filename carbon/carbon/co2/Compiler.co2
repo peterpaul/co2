@@ -4,6 +4,7 @@ include co2/GenerateHeaderIncludesVisitor
 include co2/GenerateHeaderVisitor
 include co2/GenerateSourceIncludesVisitor
 include co2/GenerateSourceVisitor
+include co2/FixScopeVisitor
 include co2/File
 include co2/io
 include co2/Error
@@ -52,6 +53,10 @@ int mainImpl (char *output_file) {
 	}
 
 	main_file.sort ();
+
+	FixScopeVisitor fix_scope_visitor = new FixScopeVisitor ();
+	main_file.accept_all_files (fix_scope_visitor);
+	delete fix_scope_visitor;
 
 	main_file.type_check ();
 	if (errors != 0) {

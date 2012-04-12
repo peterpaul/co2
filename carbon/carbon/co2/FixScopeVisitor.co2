@@ -1,0 +1,27 @@
+include co2/BaseCompileObjectVisitor
+
+class FixScopeVisitor : BaseCompileObjectVisitor {
+	FixScopeVisitor () {
+		super (null);
+		current_context = new Context ();
+		current_context.retain ();
+	}
+
+	~FixScopeVisitor () {
+		current_context.release ();
+		current_context = null;
+	}
+
+	void visitClassDeclaration (ClassDeclaration decl) {
+		if (decl.superclass) {
+			Declaration _super_class = decl.scope.lookup (decl.superclass);
+			if (_super_class) {
+				// TODO raise error when decl != ClassDeclaration
+				ClassDeclaration super_class = (ClassDeclaration) _super_class;
+				decl.member_scope.set_parent (super_class.member_scope);
+			} else {
+				error (decl.name, "Could not find super_class: %s\n", decl.superclass.name.data);
+			}
+		}
+	}
+}
