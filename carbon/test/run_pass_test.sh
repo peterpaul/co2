@@ -3,7 +3,7 @@
 
 LD=gcc
 
-BASEDIR=$( pwd )
+BASEDIR=$(dirname $(readlink -f $(which $0)))
 COMPILER=${BASEDIR}/../carbon/carbon
 
 TARGET=${BASEDIR}/target
@@ -14,7 +14,8 @@ then
     rm -f ${LOGFILE}
 fi
 
-if [ "${SRCDIR-x}" == "x" ]; then
+if [[ "${SRCDIR-x}" == "x" ]]
+then
     echo "SRCDIR not defined"
     SRCDIR=.
 fi

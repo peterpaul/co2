@@ -88,12 +88,12 @@ class TokenExpression : Expression {
 			type.retain ();
 			break;
 		case _SELF: {
-			ClassDeclaration class_decl = (ClassDeclaration) current_context.find (ObjectTypeDeclaration.class);
-			if (!class_decl) {
+			ObjectTypeDeclaration object_type_decl = (ObjectTypeDeclaration) current_context.find (ObjectTypeDeclaration.class);
+			if (!object_type_decl) {
 				error (token, "Cannot use 'self' outside of class or interface context.");
 				return;
 			}
-			type = new ObjectType (class_decl.name, class_decl);
+			type = new ObjectType (object_type_decl.name, object_type_decl);
 			type.retain ();
 			break;
 		}

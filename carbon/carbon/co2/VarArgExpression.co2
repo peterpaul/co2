@@ -30,13 +30,13 @@ class VarArgExpression : Expression {
 
 	void generate (FILE *fp) {
 		if (va_arg_expr) {
-			fprintf (fp, "va_arg (");
+			fprintf (fp, "va_arg("); // TODO add space
 			va_arg_expr.generate (fp);
 			fprintf (fp, ", ");
 			va_arg_type.generate (fp);
 			fprintf (fp, ")");
 		} else {
-			fprintf (fp, "va_arg (ap, ");
+			fprintf (fp, "va_arg(ap, "); // TODO add space
 			va_arg_type.generate (fp);
 			fprintf (fp, ")");
 		}

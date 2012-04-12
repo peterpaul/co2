@@ -47,11 +47,12 @@ class SuperExpression : Expression {
 		ClassDeclaration super_decl = (ClassDeclaration) global_scope.lookup (class_context.superclass);
 
 		if (method_context is_of ConstructorDeclaration) {
-			if (!ctor_name) {
-				ctor_name = new Token.fromToken (super_name, "ctor", _IDENTIFIER);
-				ctor_name.retain ();
+			Token _ctor_name = ctor_name;
+			if (!_ctor_name) {
+				_ctor_name = new Token.fromToken (super_name, "ctor", _IDENTIFIER);
 			}
-			ConstructorDeclaration ctor_decl = (ConstructorDeclaration) super_decl.member_scope.lookup (ctor_name);
+			_ctor_name.retain ();
+			ConstructorDeclaration ctor_decl = (ConstructorDeclaration) super_decl.member_scope.lookup (_ctor_name);
 
 			if (actual_arguments.length < ctor_decl.formal_arguments.length) {
 				error (super_name, "'%s' needs %d arguments, but got %d.\n", ctor_decl.name.name.data, ctor_decl.formal_arguments.length, actual_arguments.length);
@@ -64,6 +65,7 @@ class SuperExpression : Expression {
 				arg_expr.type_check ();
 				arg_decl.type.assert_compatible (arg_expr.type);
 			}
+			_ctor_name.release ();
 		} else if (method_context is_of FunctionDeclaration) {
 			FunctionDeclaration function_decl = (FunctionDeclaration) super_decl.member_scope.lookup (method_context.name);
 

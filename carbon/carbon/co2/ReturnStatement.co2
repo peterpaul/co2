@@ -47,7 +47,7 @@ class ReturnStatement : Statement {
 
 		if (try_context) {
 			fprintf (fp, "ex_pop ();\n");
-			if (try_context.finally_clause && finally_context) {
+			if (try_context.finally_clause && !finally_context) {
 				fprintf (fp, "do_finally;\n");
 			}
 		}

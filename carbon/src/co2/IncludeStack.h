@@ -1,4 +1,4 @@
-1;2790;0c/*
+/*
  * carbon Compiler and programming language for libco2
  *
  * Copyright (C) 2011 Peterpaul Taekele Klein Haneveld

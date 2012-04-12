@@ -153,6 +153,7 @@ class BaseCompileObjectVisitor : RefObject, CompileObjectVisitor {
 	void visitStructDeclaration (Declaration decl) {}
 	void visitTypeDeclaration (Declaration decl) {}
 	void visitVariableDeclaration (Declaration decl) {}
+
 	void visitCatchStatement (Statement stat) {}
 	void visitCompoundStatement (Statement stat) {}
 	void visitDeleteStatement (Statement stat) {}
@@ -165,6 +166,7 @@ class BaseCompileObjectVisitor : RefObject, CompileObjectVisitor {
 	void visitThrowStatement (Statement stat) {}
 	void visitTryStatement (Statement stat) {}
 	void visitWhileStatement (Statement stat) {}
+
 	void visitBinaryExpression (Expression expr) {}
 	void visitCastExpression (Expression expr) {}
 	void visitFunctionCallExpression (Expression expr) {}
@@ -176,10 +178,13 @@ class BaseCompileObjectVisitor : RefObject, CompileObjectVisitor {
 	void visitTokenExpression (Expression expr) {}
 	void visitUnaryExpression (Expression expr) {}
 	void visitVarArgExpression (Expression expr) {}
+
 	void visitArrayType (Type type) {}
 	void visitFunctionType (Type type) {}
 	void visitObjectType (Type type) {}
 	void visitPrimitiveType (Type type) {}
+
 	void visitFile (File file) {}
+
 	void visitToken (Token token) {}
 }

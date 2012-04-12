@@ -1,4 +1,14 @@
 include co2/TokenExpression
 
 class NullExpression : TokenExpression {
+	void type_check () {
+		Token type_token = new Token.fromToken (token, "void", _VOID);
+		Type void_type = new PrimitiveType (type_token);
+		Type void_ptr_type = new ArrayType (void_type);
+		type = (Type) void_ptr_type.retain ();
+	}
+
+	void generate (FILE *fp) {
+		fprintf (fp, "NULL");
+	}
 }

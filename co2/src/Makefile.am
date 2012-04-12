@@ -14,4 +14,4 @@ libco2_1_0_la_SOURCES=\
 libco2_1_0_la_HEADERS=\
 $(libco2_1_0_la_SOURCES:.c=.h)
 
-libco2_1_0_la_CPPFLAGS=-DO_DEBUG
+libco2_1_0_la_CPPFLAGS=-O0 -g3 -DO_DEBUG

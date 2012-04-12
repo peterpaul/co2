@@ -55,7 +55,7 @@ class CastExpression : Expression {
 		fprintf (fp, "(");
 		fprintf (fp, "(");
 		cast_type.generate (fp);
-		fprintf (fp, ")");
+		fprintf (fp, ") ");
 		if (cast_type is_of ObjectType) {
 			ObjectType object_type = (ObjectType) cast_type;
 			if (object_type.decl is_of ClassDeclaration) {

@@ -73,7 +73,7 @@ class GenerateHeaderVisitor : BaseCompileObjectVisitor {
 				fprintf (fp, "ctor_");
 			}
 			decl.name.generate (fp);
-			fprintf (fp, ", (void *_self, va_list * app));\n\n");
+			fprintf (fp, ", (void *_self, va_list *app));\n\n");
 		}
 	}
 

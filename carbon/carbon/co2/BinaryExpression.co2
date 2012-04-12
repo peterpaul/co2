@@ -16,6 +16,7 @@ class BinaryExpression : Expression {
 		operand[0]?.release ();
 		operand[1]?.release ();
 		operator?.release ();
+		delete operand;
 	}
 
 	Bool is_condition () {

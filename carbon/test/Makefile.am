@@ -5,10 +5,8 @@ targetdir=target
 
 TESTS_ENVIRONMENT=CC="$(CC)" CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" LD="$(LD)" SRCDIR="$(srcdir)"
 
-distclean-local:
-	-rm -rf $(targetdir)
-
 clean-local:
+	-rm -rf $(targetdir)
 	-rm -f $(TESTS)
 	-cat $(srcdir)/testdonotcreate | xargs rm -f
 	-cat $(srcdir)/testignore | xargs rm -f

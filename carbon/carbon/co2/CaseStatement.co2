@@ -32,7 +32,7 @@ class CaseStatement : Statement {
 		if (expr) {
 			fprintf (fp, "case ");
 			expr.generate (fp);
-			fprintf (fp, ":\n");
+			fprintf (fp, " :\n"); // TODO remove space
 		} else {
 			fprintf (fp, "default:\n");
 		}

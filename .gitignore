@@ -60,3 +60,7 @@ carbon/test/fail/*.sh
 */carbon/co2/*.c
 */carbon/co2/*.d
 */carbon/co2/*.h
+
+co2-base/test/co2/*.c
+co2-base/test/co2/*.d
+co2-base/test/co2/*.h

@@ -61,12 +61,12 @@ class ConditionalExpression : Expression {
 	}
 
 	void generate (FILE *fp) {
-		fprintf (fp, "(");
+		// fprintf (fp, "(");
 		condition.generate (fp);
-		fprintf (fp, " ? ");
+		fprintf (fp, "?"); // TODO add spaces
 		then_expr.generate (fp);
-		fprintf (fp, " : ");
+		fprintf (fp, ":"); // TODO add spaces
 		else_expr.generate (fp);
-		fprintf (fp, ")");
+		// fprintf (fp, ")");
 	}
 }

@@ -1,21 +1,60 @@
 include co2/BaseCompileObjectVisitor
 include co2/Context
-include co2/HashMap
+include co2/HashSet
+include co2/Compiler
 
 class GenerateSourceIncludesVisitor : BaseCompileObjectVisitor {
-	Map map;
+	Set set;
 
 	GenerateSourceIncludesVisitor (FILE *fp) {
 		super (fp);
 		current_context = new Context ();
 		current_context.retain ();
-		map = new HashMap (127);
+		set = new HashSet (127);
 	}
 
 	~GenerateSourceIncludesVisitor () {
 		current_context.release ();
 		current_context = null;
-		delete map;
+		delete set;
 	}
 
+	void visitDeclaration (Declaration decl) {
+		if (decl.include_file) {
+			set.add (decl.include_file.name);
+		}
+		if (decl.file != main_file) {
+			String filename = new String ("\"%s.h\"", decl.file.name.data);
+			filename.retain ();
+			set.add (filename);
+		}
+	}
+
+	void visitTokenExpression (TokenExpression expr) {
+		if (expr.decl && expr.decl.file != main_file) {
+			String filename = new String ("\"%s.h\"", expr.decl.file.name.data);
+			filename.retain ();
+			set.add (filename);
+		}
+
+		if (expr.type && expr.type is_of ObjectType) {
+			visitObjectType ((ObjectType) expr.type);
+		}
+	}
+
+	void visitObjectType (ObjectType type) {
+		if (type.decl && type.decl.file != main_file) {
+			String filename = new String ("\"%s.h\"", type.decl.file.name.data);
+			filename.retain ();
+			set.add (filename);
+		}
+	}
+
+	void visitFile (File file) {
+		Iterator it = set.iterator ();
+		while (it.hasNext ()) {
+			String value = (String) it.getNext ();
+			fprintf (fp, "#include %s\n", value.data);
+		}
+	}
 }

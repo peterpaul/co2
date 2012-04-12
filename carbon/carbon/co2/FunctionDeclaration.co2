@@ -73,6 +73,7 @@ void functiondeclaration_generate_formal_arg (Declaration decl, va_list * app) {
 }
 
 void functiondeclaration_generateFunction (FILE * fp, FunctionDeclaration myself) {
+	// don't generate for definitions
 	if (!myself.body) {
 		return;
 	}

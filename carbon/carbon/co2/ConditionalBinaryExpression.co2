@@ -1,4 +1,36 @@
 include co2/BinaryExpression
 
 class ConditionalBinaryExpression : BinaryExpression {
+	void generate (FILE *fp) {
+		fprintf (fp, "({");
+		operand[0].type.generate (fp);
+		fprintf (fp, " __tmp__ = ");
+		operand[0].generate(fp);
+		fprintf (fp, "; __tmp__ ?");
+		switch (operator.type) {
+		case '.': {
+			ObjectType type = (ObjectType) operand[0].type;
+			fprintf (fp, "__tmp__");
+			if (type.decl is_of StructDeclaration) {
+				fprintf (fp, ".");
+			} else 	{
+				fprintf (fp, "->");
+			}
+			operand[1].generate_left (fp, false);
+		}
+			break;
+		case '[':
+			fprintf (fp, "__tmp__");
+			operator.generate (fp);
+			operand[1].generate (fp);
+			fprintf (fp, "]");
+			break;
+		default:
+			error (operator, "Unsupported operator '%s' for ConditionalBinraryExpression\n", operator.name.data);
+			break;
+		}
+		fprintf (fp, " : (");
+		type.generate (fp);
+		fprintf (fp, ") 0;})");
+	}
 }

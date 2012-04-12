@@ -39,10 +39,6 @@ co2/ForStatement.co2\
 co2/FunctionCallExpression.co2\
 co2/FunctionDeclaration.co2\
 co2/FunctionType.co2\
-co2/GenerateHeaderIncludesVisitor.co2\
-co2/GenerateHeaderVisitor.co2\
-co2/GenerateSourceIncludesVisitor.co2\
-co2/GenerateSourceVisitor.co2\
 co2/Grammar.co2\
 co2/Hash.co2\
 co2/HelloWorldVisitor.co2\
@@ -126,7 +122,13 @@ grammar.h: grammar.c
 libcarbon_1_0_la_CPPFLAGS=-O0 -g3 -DO_DEBUG
 
 bin_PROGRAMS=carbon
-carbon_SOURCES=co2/Compiler.co2 co2/Compiler.c
+carbon_CO2SOURCES=\
+co2/Compiler.co2\
+co2/GenerateHeaderIncludesVisitor.co2\
+co2/GenerateHeaderVisitor.co2\
+co2/GenerateSourceIncludesVisitor.co2\
+co2/GenerateSourceVisitor.co2
+carbon_SOURCES=$(carbon_CO2SOURCES) $(carbon_CO2SOURCES:.co2=.c)
 carbon_LDADD=libcarbon-1.0.la
 carbon_LDFLAGS=$(CO2_LIBS) $(CO2BASE_LIBS)
 
@@ -139,7 +141,7 @@ clean-local:
 	if ! test "$(CARBON)" == "no"; then rm -f $(GENERATED_CHEADERS) $(GENERATED_CSOURCES); fi
 
 distclean-local:
-	-rm -r ${bin_PROGRAMS} $(GENERATED_CO2DEPEND)
+	-rm -r $(bin_PROGRAMS) $(GENERATED_CO2DEPEND)
 
 
 include $(GENERATED_CO2DEPEND)

@@ -1,21 +1,68 @@
 include co2/BaseCompileObjectVisitor
 include co2/Context
-include co2/HashMap
+include co2/HashSet
+include co2/Compiler
 
 class GenerateHeaderIncludesVisitor : BaseCompileObjectVisitor {
-	Map map;
+	Set set;
 
 	GenerateHeaderIncludesVisitor (FILE *fp) {
 		super (fp);
 		current_context = new Context ();
 		current_context.retain ();
-		map = new HashMap (127);
+		set = new HashSet (127);
 	}
 
 	~GenerateHeaderIncludesVisitor () {
 		current_context.release ();
 		current_context = null;
-		delete map;
+		delete set;
 	}
 
+	void visitClassDeclaration (ClassDeclaration decl) {
+		if (decl.superclass) {
+			Declaration super_decl = global_scope.lookup (decl.superclass);
+			if (super_decl.file != main_file) {
+				String filename = new String ("\"%s.h\"", super_decl.file.name.data);
+				filename.retain ();
+				set.add (filename);
+			}
+		}
+		decl.interfaces.map_args (handle_interface, self);
+	}
+
+	void visitDeclaration (Declaration decl) {
+		if (decl.include_file) {
+			set.add (decl.include_file.name);
+			return;
+		}
+		if (decl.scope?.get_type () != global_scope_type) {
+			// only generate global declarations
+			return;
+		}
+		super (decl);
+	}
+
+	void visitInterfaceDeclaration (InterfaceDeclaration decl) {
+		decl.interfaces?.map_args (handle_interface, self);
+	}
+
+	void visitFile (File file) {
+		Iterator it = set.iterator ();
+		while (it.hasNext ()) {
+			String value = (String) it.getNext ();
+			fprintf (fp, "#include %s\n", value.data);
+		}
+	}
+}
+
+void handle_interface (Token token, va_list *app) {
+	Declaration decl = (Declaration) global_scope.lookup (token);
+	GenerateHeaderIncludesVisitor visitor = (GenerateHeaderIncludesVisitor) va_arg (*app, void *);
+
+	if (decl?.file != main_file) {
+		String filename = new String ("\"%s.h\"", decl.file.name.data);
+		filename.retain ();
+		visitor.set.add (filename);
+	}
 }

@@ -248,7 +248,7 @@ void generatesourcevisitor_visitfunctiondeclaration_generateimplementation (FILE
 	} else {
 		fprintf (fp, "struct ");
 		parent_decl.name.generate (fp);
-		fprintf (fp, " * self = O_CAST (_self, ");
+		fprintf (fp, "* self = O_CAST (_self, "); // TODO add space before *
 		parent_decl.name.generate (fp);
 		fprintf (fp, " ());\n");
 	}
@@ -285,17 +285,17 @@ void classdeclaration_generate_constructor_arguments (ArgumentDeclaration arg, v
 		if (arg.type is_of ObjectType) {
 			ObjectType type = (ObjectType) arg.type;
 			if (type.decl is_of ClassDeclaration) {
-				fprintf (fp, " = O_BRANCH_CAST (va_arg (*app, ");
+				fprintf (fp, " = O_BRANCH_CAST (va_arg(*app, "); // TODO add space after va_arg
 				type.generate (fp);
 				fprintf (fp, "), ");
 				type.token.generate (fp);
-				fprintf (fp, " ());\n");
+				fprintf (fp, "());\n"); // TODO add space
 				return;
 			}
 		}
 		fprintf (fp, " = va_arg (*app, ");
 		arg.type.generate (fp);
-		fprintf (fp, " ());\n");
+		fprintf (fp, ");\n");
 	}
 }
 

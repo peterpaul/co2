@@ -49,7 +49,7 @@ class TryStatement : Statement {
 		if (finally_clause) {
 			fprintf (fp, "finally {\n");
 			finally_clause.generate (fp);
-			fprintf (fp, "throw (1, NULL, NULL, 0, NULL)\n");
+			fprintf (fp, "throw (1, NULL, NULL, 0, NULL);\n");
 			fprintf (fp, "}\n");
 			fprintf (fp, "end_try_finally;\n");
 		} else {
@@ -63,6 +63,9 @@ void trystatement_generate_catch (CatchStatement catch_statement, va_list *app) 
 	TryStatement try_statement = (TryStatement) va_arg (*app, void *);
 	ObjectType type = (ObjectType) catch_statement.argument.type;
 	fprintf (fp, "catch (%s ()) {\n", type.token.name.data);
+	type.generate (fp);
+	catch_statement.argument.name.generate (fp);
+	fprintf (fp, " = (");
 	type.generate (fp);
 	fprintf (fp, ") ex_stack->ex_data;\n");
 	catch_statement.generate (fp);

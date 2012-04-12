@@ -83,7 +83,7 @@ clean-local:
 	if ! test "$(CARBON)" == "no"; then rm -f $(GENERATED_CHEADERS) $(GENERATED_CSOURCES); fi
 
 distclean-local:
-	-rm -r ${bin_PROGRAMS} $(GENERATED_CO2DEPEND)
+	-rm -r $(bin_PROGRAMS) $(GENERATED_CO2DEPEND)
 
 
 include $(GENERATED_CO2DEPEND)

@@ -31,19 +31,22 @@ class Scope : RefObject, IScope {
 	}
 
 	void _log (Token token, char *action) {
-		/*
 		if (type == global_scope_type) {
 			fprintf (stderr, "GLOBAL_SCOPE: %s.%s\t%s: %s\n", type.name.data, name ? name.name.data : null, action, token.name.data);
 		} else {
 			fprintf (stderr, "local scope: %s.%s\t%s: %s\n", type.name.data, name ? name.name.data : null, action, token.name.data);
 		}
-		*/
 	}
 
 	Declaration declare (Declaration decl) {
 		_log (decl.name, "declare");
-		map.put (decl.name.name, decl);
+		if (map.get (decl.name.name) != null) {
+			error_already_declared (decl.name);
+		} else {
+			map.put (decl.name.name, decl);
+		}
 		decl.set_scope (self);
+		return decl;
 	}
 
 	void leave () {
@@ -98,6 +101,10 @@ class Scope : RefObject, IScope {
 
 	void error_not_found (Token token) {
 		error (token, "'%s' not declared.\n", token.name.data);
+	}
+
+	void error_already_declared (Token token) {
+		error (token, "'%s' already declared.\n", token.name.data);
 	}
 
 	ScopeType get_type () {

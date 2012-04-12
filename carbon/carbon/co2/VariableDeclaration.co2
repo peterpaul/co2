@@ -6,9 +6,9 @@ include co2/Context
 class VariableDeclaration : Declaration {
 	Expression expr;
 
-	VariableDeclaration (Token a_name, Expression an_expr) {
-		super (a_name);
-		expr = (Expression) an_expr?.retain ();
+	VariableDeclaration (Token name, Expression expr) {
+		super (name);
+		self.expr = (Expression) expr?.retain ();
 	}
 
 	~VariableDeclaration () {
@@ -58,7 +58,7 @@ class VariableDeclaration : Declaration {
 			Declaration first_decl = parent.lookup (name);
 			if (scope.get_type () == class_scope_type
 				&& first_decl.scope.get_type () == class_scope_type) {
-				error (name, "'%s' already declaraed at %s:%d\n", name.name.data, first_decl.name.file.name.data, first_decl.name.line);
+				error (name, "'%s' already declared at %s:%d\n", name.name.data, first_decl.name.file.name.data, first_decl.name.line);
 			}
 		}
 		current_context?.remove_last ();

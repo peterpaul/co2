@@ -43,9 +43,7 @@ class HashSet : RefObject, Set {
 
 	RefObject add (RefObject item) {
 		unsigned index = getIndexFor (item);
-		RefObject entry = (RefObject) entries.get (index);
-		if (entry) {
-			entry.release ();
+		if (entries.get (index)) {
 			length -= 1;
 		}
 		entries.set (index, item);
@@ -54,10 +52,10 @@ class HashSet : RefObject, Set {
 	}
 
 	RefObject remove (RefObject item) {
-		length -= 1;
 		unsigned index = getIndexFor (item);
 		RefObject entry = (RefObject) entries.get (index);
 		if (entry) {
+			length -= 1;
 			RefObject result = entry.retain ();
 			entries.set (index, null);
 			return result.autoRelease ();
