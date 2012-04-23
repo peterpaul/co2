@@ -167,4 +167,9 @@ class String : RefObject {
 	int equals (BaseObject other) {
 		return strcmp (data, ((String )other).data) == 0;
 	}
+
+	String toString () {
+		String retval = super ();
+		retval.append_str (" \"%s\"", data);
+	}
 }

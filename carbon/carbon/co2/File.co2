@@ -100,6 +100,8 @@ class File : CompileObject {
 	}
 }
 
+
+// Only used in lex.l
 Map file_hash_map = null;
 Map get_hash_map() {
 	if (!file_hash_map) {

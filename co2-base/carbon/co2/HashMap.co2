@@ -45,7 +45,6 @@ class HashMap : RefObject, Map {
 		unsigned index = getIndexFor (key);
 		KeyValuePair entry = (KeyValuePair) entries.get (index);
 		if (entry) {
-			entry.release ();
 			length -= 1;
 		}
 		entry = new KeyValuePair (key, value);

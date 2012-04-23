@@ -252,6 +252,7 @@ O_IMPLEMENT (IncludeStack, void *, ctor, (void *_self, va_list * app))
   include_stack = self;
   self->current_line = va_arg (*app, unsigned);
   self->current_file = O_GET_ARG (File);
+  O_CALL (self->current_file, retain);
   self->buffer_state = va_arg (*app, YY_BUFFER_STATE);
   return self;
 }

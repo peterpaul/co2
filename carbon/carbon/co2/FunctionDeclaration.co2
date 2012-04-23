@@ -24,7 +24,7 @@ class FunctionDeclaration : Declaration {
 	~FunctionDeclaration () {
 		formal_arguments.release ();
 		implemented_methods.release ();
-		body.release ();
+		body?.release ();
 	}
 
 	void accept (CompileObjectVisitor visitor) {

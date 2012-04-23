@@ -46,3 +46,11 @@ function run_fail_test {
 }
 
 run_fail_test ${!#}
+exit_code=$?
+if [[ "${exit_code}" == "0" ]]
+then
+    echo "passed" >> ${LOGFILE}
+else
+    echo "failed" >> ${LOGFILE}
+fi
+exit $exit_code

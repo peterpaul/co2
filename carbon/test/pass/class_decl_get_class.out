@@ -1,2 +1,2 @@
-class.name = MyObject
-o.class.name = MyObject
+class.class_name = MyObject
+o.class.class_name = MyObject

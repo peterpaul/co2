@@ -17,12 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 ["co2/Object.h"] {
-	class Class {
-		char * name;
-	}
-
 	class Object {
 		Class class;
+	}
+
+	class Class : Object {
+		char * class_name;
 	}
 }
 
@@ -32,13 +32,13 @@
 
 class MyObject : Object {
 	void print () {
-		printf ("class.name = %s\n", class.name);
+		printf ("class.class_name = %s\n", class.class_name);
 	}
 }
 
 int main() {
 	MyObject o = new MyObject ();
 	o.print ();
-	printf ("o.class.name = %s\n", o.class.name);
+	printf ("o.class.class_name = %s\n", o.class.class_name);
 	return 0;
 }

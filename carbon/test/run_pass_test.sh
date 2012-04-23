@@ -155,4 +155,11 @@ do
 done
 
 run_pass_test ${MAIN}
-
+exit_code=$?
+if [[ "${exit_code}" == "0" ]]
+then
+    echo "passed" >> ${LOGFILE}
+else
+    echo "failed" >> ${LOGFILE}
+fi
+exit $exit_code

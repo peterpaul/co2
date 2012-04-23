@@ -19,22 +19,25 @@ class GenerateSourceIncludesVisitor : BaseCompileObjectVisitor {
 		delete set;
 	}
 
-	void visitDeclaration (Declaration decl) {
-		if (decl.include_file) {
-			set.add (decl.include_file.name);
-		}
-		if (decl.file != main_file) {
-			String filename = new String ("\"%s.h\"", decl.file.name.data);
-			filename.retain ();
+	void addFile (File file) {
+		if (file && file != main_file) {
+			String filename = new String ("\"%s.h\"", file.name.data);
 			set.add (filename);
 		}
 	}
 
+	void visitDeclaration (Declaration decl) {
+		if (decl.include_file) {
+			set.add (decl.include_file.name);
+		}
+		if (decl) {
+			addFile (decl.file);
+		}
+	}
+
 	void visitTokenExpression (TokenExpression expr) {
-		if (expr.decl && expr.decl.file != main_file) {
-			String filename = new String ("\"%s.h\"", expr.decl.file.name.data);
-			filename.retain ();
-			set.add (filename);
+		if (expr.decl) {
+			addFile (expr.decl.file);
 		}
 
 		if (expr.type && expr.type is_of ObjectType) {
@@ -43,10 +46,8 @@ class GenerateSourceIncludesVisitor : BaseCompileObjectVisitor {
 	}
 
 	void visitObjectType (ObjectType type) {
-		if (type.decl && type.decl.file != main_file) {
-			String filename = new String ("\"%s.h\"", type.decl.file.name.data);
-			filename.retain ();
-			set.add (filename);
+		if (type.decl) {
+			addFile (type.decl.file);
 		}
 	}
 

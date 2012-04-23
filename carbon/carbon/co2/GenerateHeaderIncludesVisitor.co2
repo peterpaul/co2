@@ -19,13 +19,18 @@ class GenerateHeaderIncludesVisitor : BaseCompileObjectVisitor {
 		delete set;
 	}
 
+	void addFile (File file) {
+		if (file && file != main_file) {
+			String filename = new String ("\"%s.h\"", file.name.data);
+			set.add (filename);
+		}
+	}
+
 	void visitClassDeclaration (ClassDeclaration decl) {
 		if (decl.superclass) {
 			Declaration super_decl = global_scope.lookup (decl.superclass);
-			if (super_decl.file != main_file) {
-				String filename = new String ("\"%s.h\"", super_decl.file.name.data);
-				filename.retain ();
-				set.add (filename);
+			if (super_decl) {
+				addFile (super_decl.file);
 			}
 		}
 		decl.interfaces.map_args (handle_interface, self);
@@ -33,6 +38,7 @@ class GenerateHeaderIncludesVisitor : BaseCompileObjectVisitor {
 
 	void visitDeclaration (Declaration decl) {
 		if (decl.include_file) {
+			String filename = new String ("\"%s.h\"", decl.include_file.name.data);
 			set.add (decl.include_file.name);
 			return;
 		}
@@ -59,10 +65,5 @@ class GenerateHeaderIncludesVisitor : BaseCompileObjectVisitor {
 void handle_interface (Token token, va_list *app) {
 	Declaration decl = (Declaration) global_scope.lookup (token);
 	GenerateHeaderIncludesVisitor visitor = (GenerateHeaderIncludesVisitor) va_arg (*app, void *);
-
-	if (decl?.file != main_file) {
-		String filename = new String ("\"%s.h\"", decl.file.name.data);
-		filename.retain ();
-		visitor.set.add (filename);
-	}
+	visitor.addFile (decl.file);
 }

@@ -16,28 +16,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-["co2/Object.h"] {
-	class Object {
-		Class klass;
+["co2/BaseObject.h"] {
 
-		String to_string() {return null;}
-		Object clone() {return null;}
-		int compare(Object other) {return 0;}
+	class Object {
+		Class class;
+	}
+
+	class BaseObject : Object{
+		String toString() {return null;}
 	}
 
 	class Class : Object {
-		int size;
-		char * name;
+		char * class_name;
 	}
 
+	typedef FILE = int;
+	FILE * stdout, stdin, stderr;
+}
+
+["co2/ReleasePool.h"] {
 	class ReleasePool : Object {
 		/* empty */
 	}
 
 	ReleasePool current_release_pool;
-
-	typedef FILE = int;
-	FILE * stdout, stdin, stderr;
 }
 
 ["co2/String.h"] {
@@ -58,21 +60,21 @@
 	}
 }
 
-class MyObject : Object {
+class MyObject : BaseObject {
 	int var;
 	MyObject(int var) {
 		self.var = var;
 	}
-	String to_string() {
-		return new String("%d", var);
+	String toString() {
+		return new String("%s: %d", class.class_name, var);
 	}
 }
 
 int main()
 {
 	new ReleasePool ();
-	Object o = new MyObject (13);
-	String s = o.to_string ();
+	BaseObject o = new MyObject (13);
+	String s = o.toString ();
 	s.fprint(stdout);
 	delete current_release_pool;
 	return 0;

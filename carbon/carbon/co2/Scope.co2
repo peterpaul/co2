@@ -20,6 +20,7 @@ class Scope : RefObject, IScope {
 
 	~Scope () {
 		name?.release ();
+		// delete map; // TODO uncomment
 	}
 
 	IScope get_parent () {
@@ -31,11 +32,13 @@ class Scope : RefObject, IScope {
 	}
 
 	void _log (Token token, char *action) {
+		/*
 		if (type == global_scope_type) {
 			fprintf (stderr, "GLOBAL_SCOPE: %s.%s\t%s: %s\n", type.name.data, name ? name.name.data : null, action, token.name.data);
 		} else {
 			fprintf (stderr, "local scope: %s.%s\t%s: %s\n", type.name.data, name ? name.name.data : null, action, token.name.data);
 		}
+		*/
 	}
 
 	Declaration declare (Declaration decl) {

@@ -60,6 +60,7 @@ class GenerateHeaderVisitor : BaseCompileObjectVisitor {
 		methods.release ();
 		new_methods.release ();
 		constructors.release ();
+		new_constructors.release ();
 		destructors.release ();
 	}
 
@@ -161,6 +162,9 @@ class GenerateHeaderVisitor : BaseCompileObjectVisitor {
 		fprintf (fp, "O_CLASS (");
 		decl.name.generate (fp);
 		fprintf (fp, ", Interface);\n\n");
+
+		methods.release ();
+		new_methods.release ();
 	}
 
 	void visitStructDeclaration (StructDeclaration decl) {

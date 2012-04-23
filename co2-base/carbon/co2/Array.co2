@@ -18,9 +18,7 @@ class Array : RefObject {
 	~Array () {
 		unsigned index;
 		for (index = 0; index < size; index += 1) {
-			if (data[index]) {
-				data[index].release ();
-			}
+			data[index]?.release ();
 		}
 	}
 
