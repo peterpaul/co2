@@ -120,6 +120,22 @@ int mainImpl (char *output_file) {
 	return errors;
 }
 
+int mainImplDepend (char * output_file) {
+	parse ();
+	if (main_file == null || errors != 0) {
+		return 1;
+	}
+
+	main_file.sort ();
+
+	fprintf (stdout, "%s:", output_file);
+	main_file.generateDepend ();
+	fprintf (stdout, "\n");
+
+	return errors;
+}
+	
+
 /*
 ["config.h"] {
 	char * PACKAGE_STRING;
@@ -150,6 +166,21 @@ void usage () {
 void version () {
 }
 void usage () {
+	fprintf (stdout, "Compiler for the carbon programming language\n");
+	fprintf (stdout, "\n");
+	fprintf (stdout, "USAGE:\n");
+	fprintf (stdout, "    %s [OPTION]... [SOURCE_FILE] [C_OUTPUT_FILE]\n", "carbon");
+	fprintf (stdout, "\n");
+	fprintf (stdout, "ARGUMENTS:\n");
+	fprintf (stdout, "        SOURCE_FILE:    %s source file\n", "carbon");
+	fprintf (stdout, "        C_OUTPUT_FILE:  filename of c output\n");
+	fprintf (stdout, "\n");
+	fprintf (stdout, "OPTIONS:\n");
+	fprintf (stdout, "        -I INCLUDE_DIR: include directory to add to search path\n");
+	fprintf (stdout, "        -h,--help:      show this help\n");
+	fprintf (stdout, "        -V,--version:   show version\n");
+	fprintf (stdout, "        -d,--depend:    show dependencies\n");
+	fprintf (stdout, "\n");
 }
 
 int main(int argc, char **argv) {
@@ -159,6 +190,7 @@ int main(int argc, char **argv) {
 	path = new RefList (8, String.class);
 	int arg = 1;
 	Bool next_is_option = false;
+	Bool showDependencies = false;
 	while (arg < argc) {
 		if (argv[arg][0] == '-') {
 			if (strlen (argv[arg]) == 2) {
@@ -172,6 +204,9 @@ int main(int argc, char **argv) {
 				case 'V':
 					version ();
 					return 0;
+				case 'd':
+					showDependencies = true;
+					break;
 				default:
 					error (null, "invalid option: %s\n", argv[arg]);
 				}
@@ -181,6 +216,8 @@ int main(int argc, char **argv) {
 			} else if (strcmp (argv[arg], "--version") == 0) {
 				version ();
 				return 0;
+			} else if (strcmp (argv[arg], "--depend") == 0) {
+				showDependencies = true;
 			} else {
 				error (null, "invalid option: %s\n", argv[arg]);
 			}
@@ -220,7 +257,12 @@ int main(int argc, char **argv) {
 	}
 	current_file = (File) main_file.retain ();
 
-	int retval = mainImpl (output_file);
+	int retval;
+	if (showDependencies) {
+		retval = mainImplDepend (output_file);
+	} else {
+		retval = mainImpl (output_file);
+	}
 
 	main_file.release ();
 	file_path.release ();
