@@ -45,7 +45,7 @@ class FunctionCallExpression : Expression {
 					fprintf (fp, "(");
 					if (!fun_decl.implemented_methods || fun_decl.implemented_methods.size () == 0) {
 						InterfaceDeclaration interface_decl = (InterfaceDeclaration) current_context.find (InterfaceDeclaration.class);
-						interface_decl.generate (fp);
+						interface_decl.name.generate (fp);
 					} else if (fun_decl.implemented_methods.size () == 1) {
 						InterfaceMethodDefinition imd = (InterfaceMethodDefinition) fun_decl.implemented_methods.get (0);
 						imd.interface_decl.name.generate (fp);
@@ -164,6 +164,7 @@ class FunctionCallExpression : Expression {
 		if (!function.type is_of FunctionType) {
 			Token token = function.get_token ();
 			error (token, "'%s' is not a function\n", token.name.data);
+			return;
 		}
 		FunctionType function_type = (FunctionType) function.type;
 		type = (Type) function_type.return_type.retain ();

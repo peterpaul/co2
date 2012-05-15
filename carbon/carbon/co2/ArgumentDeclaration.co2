@@ -9,10 +9,6 @@ class ArgumentDeclaration : Declaration {
 		self.type = (Type) type.retain ();
 	}
 
-	~ArgumentDeclaration () {
-		type.release ();
-	}
-
 	void accept (CompileObjectVisitor visitor) {
 		current_context?.add (self);
 		type.accept (visitor);

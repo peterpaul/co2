@@ -41,7 +41,7 @@ class ClassDeclaration : ObjectTypeDeclaration {
 					if (_if_method_decl is_of FunctionDeclaration) {
 						FunctionDeclaration if_method_decl = (FunctionDeclaration) _if_method_decl;
 						if (if_method_decl.body) {
-							if (member_scope.exists_in_this_scope (if_method_decl.name)) {
+							if (!member_scope.exists_in_this_scope (if_method_decl.name)) {
 								FunctionDeclaration method_decl = new FunctionDeclaration (if_method_decl.name, (FunctionType) if_method_decl.type, if_method_decl.formal_arguments, null);
 
 								method_decl.implemented_methods = new RefList (8, InterfaceMethodDefinition.class);

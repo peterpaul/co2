@@ -13,7 +13,7 @@ class ObjectTypeDeclaration : Declaration {
 
 	~ObjectTypeDeclaration () {
 		members?.release ();
-		member_scope.release ();
+		member_scope?.release ();
 	}
 
 	Bool is_compatible (ObjectTypeDeclaration other);

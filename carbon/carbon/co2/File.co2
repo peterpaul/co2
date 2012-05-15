@@ -43,28 +43,28 @@ class File : CompileObject {
 			file.accept_all_files (visitor);
 		}
 
-		self.file_dependencies.map (accept_all_files_callback);
-		self.accept (visitor);
+		file_dependencies.map (accept_all_files_callback);
+		accept (visitor);
 	}
 
 	void accept (CompileObjectVisitor visitor) {
 		current_context?.add (self);
-		self.declarations.map_args (compileobject_accept, visitor);
+		declarations.map_args (compileobject_accept, visitor);
 		visitor.visit (self);
 		current_context?.remove_last ();
 	}
 
 	void sort() {
-		qsort (self.declarations.data, self.declarations.length, sizeof (void *), declaration_compare_callback);
+		qsort (declarations.data, declarations.length, sizeof (void *), declaration_compare_callback);
 	}
 
 	void type_check () {
-		self.file_dependencies.map (file_type_check);
-		self.declarations.map (file_type_check);
+		file_dependencies.map (file_type_check);
+		declarations.map (file_type_check);
 	}
 
 	void optimize () {
-		self.declarations.map (file_optimize);
+		declarations.map (file_optimize);
 	}
 
 	void generate (FILE *fp) {
@@ -73,11 +73,11 @@ class File : CompileObject {
 		}
 
 		int file_declaration_filter (Declaration member) {
-			return !member.include_file;
+			return member.include_file == null;
 		}
 
-		List definitions = self.declarations.filter (file_definition_filter);
-		List declarations =  self.declarations.filter (file_declaration_filter);
+		List definitions = declarations.filter (file_definition_filter);
+		List declarations =  declarations.filter (file_declaration_filter);
 
 		void generate_callback (CompileObject object) {
 			object.generate (fp);
@@ -95,8 +95,8 @@ class File : CompileObject {
 			object.generateDepend ();
 		}
 
-		printf (" \\\n %s", self.absolute_path.data);
-		self.file_dependencies.map (generateDepend_callback);
+		printf (" \\\n %s", absolute_path.data);
+		file_dependencies.map (generateDepend_callback);
 	}
 }
 
@@ -198,7 +198,7 @@ Bool classdeclaration_1_depends_on_2 (ClassDeclaration decl1, ClassDeclaration d
 int classdeclaration_compare_class (ClassDeclaration decl1, Declaration _decl2) {
 	ClassDeclaration decl2 = (ClassDeclaration) _decl2;
 	int result = classdeclaration_1_depends_on_2 (decl1, decl2);
-	if (result == false) {
+	if (result == 0) {
 		result = -classdeclaration_1_depends_on_2 (decl2, decl1);
 	}
 	return result;
@@ -217,7 +217,7 @@ int interfacedeclaration_compare (Declaration _decl1, Declaration _decl2) {
 			if (!type.decl) {
 				type.type_check ();
 			}
-			if (type.decl != null) {
+			if (type.decl) {
 				return interfacedeclaration_compare (decl1, type.decl);
 			}
 		}
@@ -238,7 +238,7 @@ int classdeclaration_compare (Declaration _decl1, Declaration _decl2) {
 			if (!type.decl) {
 				type.type_check ();
 			}
-			if (type.decl != null) {
+			if (type.decl) {
 				classdeclaration_compare (decl1, type.decl);
 			}
 		}
@@ -282,7 +282,7 @@ int typedeclaration_compare (Declaration _decl1, Declaration decl2) {
 		if (!type.decl) {
 			type.type_check ();
 		}
-		if (type.decl != null) {
+		if (type.decl) {
 			declaration_compare (type.decl, decl2);
 		}
 	}
