@@ -1,3 +1,14 @@
+0.1.5:
+	* Allow identifiers in switch-case statements.
+	* [bugfix] Make sure the visitor visites the whole tree.
+	* Change operator precedence for IS_OF to parse: !obj is_of class
+	* Add <Class>.class expression
+	* [bugfix] Handle nested function in class methods properly
+	* Allow the use of self in interface methods and raise error when used incorrectly.
+	* Use macro to check for implementation of interface.
+	* Generate 'interface instances' as Object
+	* [bugfix] Lookup identifiers upon declaration
+
 0.1.4:
 	* [bugfix] Use conditional cast when casting objects or interfaces
 	* Add option -d/--depend to generate dependency information to be used by Makefiles
