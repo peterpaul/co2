@@ -1,4 +1,6 @@
-0.1.2: 
+0.1.3: Add O_IS_IMPLEMENTATION macro to check whether an Object implements an interface.
+
+0.1.2:
 	* Add o_branch_cast_interface function, and macros O_CAST_INTERFACE and O_BRANCH_CAST_INTERFACE.
 	* Extract O_IMPLEMENT_IF_BINDING macro from O_IMPLEMENT_IF
 	* More verifications in O_CALL_IF and O_BRANCH_CALL_IF when O_DEBUG is defined
