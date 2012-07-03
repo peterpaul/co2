@@ -1,7 +1,7 @@
 include co2/BaseCompileObjectVisitor
 include co2/Context
 include co2/HashSet
-include co2/Compiler
+include co2/CompilerResources
 
 class GenerateSourceIncludesVisitor : BaseCompileObjectVisitor {
 	Set set;

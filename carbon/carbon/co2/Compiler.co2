@@ -8,8 +8,7 @@ include co2/FixScopeVisitor
 include co2/File
 include co2/io
 include co2/Error
-
-File main_file;
+include co2/CompilerResources
 
 ["grammar.h"] {
 	int parse ();

@@ -109,7 +109,7 @@ CO2_BASE_PATH=$(shell pkg-config co2-base-1.0 --cflags | sed 's/-I/-I /g' | sed 
 CARBON_FLAGS=$(CO2_BASE_PATH) $(CO2_BASE_PATH)/co2 -I .
 
 %.c: %.co2
-	if test "$(CARBON)" == "no"; then echo "please install carbon first"; else rm -f $@ | true; $(CARBON) $(CARBON_FLAGS) $< $@ && indent $@; fi
+	if test "$(CARBON)" == "no"; then echo "please install carbon first"; else rm -f $@ | true; $(CARBON) $(CARBON_FLAGS) $< $@; fi
 
 %.h: %.c
 
@@ -124,11 +124,12 @@ libcarbon_1_0_la_CPPFLAGS=-O0 -g3 -DO_DEBUG
 
 bin_PROGRAMS=carbon
 carbon_CO2SOURCES=\
-co2/Compiler.co2\
+co2/CompilerResources.co2\
 co2/GenerateHeaderIncludesVisitor.co2\
 co2/GenerateHeaderVisitor.co2\
 co2/GenerateSourceIncludesVisitor.co2\
-co2/GenerateSourceVisitor.co2
+co2/GenerateSourceVisitor.co2\
+co2/Compiler.co2
 carbon_SOURCES=$(carbon_CO2SOURCES) $(carbon_CO2SOURCES:.co2=.c)
 carbon_LDADD=libcarbon-1.0.la
 carbon_LDFLAGS=$(CO2_LIBS) $(CO2BASE_LIBS)
