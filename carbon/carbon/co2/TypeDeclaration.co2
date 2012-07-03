@@ -12,6 +12,7 @@ class TypeDeclaration : ObjectTypeDeclaration {
 	void accept (CompileObjectVisitor visitor) {
 		current_context?.add (self);
 		type.accept (visitor);
+		visitor.visit (self);
 		current_context?.remove_last ();
 	}
 
