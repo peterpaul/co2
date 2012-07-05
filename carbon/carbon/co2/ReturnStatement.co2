@@ -23,7 +23,7 @@ class ReturnStatement : Statement {
 
 	void accept (CompileObjectVisitor visitor) {
 		current_context?.add (self);
-		expr.accept (visitor);
+		expr?.accept (visitor);
 		visitor.visit (self);
 		current_context?.remove_last ();
 	}

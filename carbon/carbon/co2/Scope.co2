@@ -76,10 +76,10 @@ class Scope : RefObject, IScope {
 
 	Declaration find_type_in_this_scope (Token token, Class type) {
 		Declaration result = (Declaration) map.get (token.name);
-		if (result != null && !(result is_of type)) {
-			!result;
+		if (result != null && result is_of type) {
+			return result;
 		}
-		return result;
+		return null;
 	}
 
 	Declaration find_type (Token token, Class type) {

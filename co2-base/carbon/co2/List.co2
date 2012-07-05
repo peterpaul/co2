@@ -1,12 +1,25 @@
 include co2/RefObject
 include co2/Collection
+include co2/Iterator
 
 interface List, Collection {
 	unsigned size ();
 	RefObject get (unsigned index);
 	RefObject set (unsigned index, RefObject item);
 	RefObject add (RefObject item);
+
 	List addAll (List list);
+/*
+	{
+		Iterator it = list.iterator ();
+		while (it.hasNext ()) {
+			add (it.getNext ());
+		}
+		delete it;
+		return self;
+	}
+*/
+
 	List merge (List list) {
 		List retval = addAll (list);
 		if (list is_of RefObject) {

@@ -23,6 +23,7 @@ class GenerateSourceIncludesVisitor : BaseCompileObjectVisitor {
 		if (file && file != main_file) {
 			String filename = new String ("\"%s.h\"", file.name.data);
 			set.add (filename);
+			printf ("adding: %s\n", filename);
 		}
 	}
 

@@ -31,6 +31,7 @@ class FunctionDeclaration : Declaration {
 		current_context?.add (self);
 		type.accept (visitor);
 		formal_arguments.map_args (compileobject_accept, visitor);
+		body?.accept (visitor);
 		visitor.visit (self);
 		current_context?.remove_last ();
 	}

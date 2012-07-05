@@ -1,5 +1,6 @@
 include co2/BaseCompileObjectVisitor
 include co2/DestructorDeclaration
+include co2/HashSet
 
 class GenerateHeaderVisitor : BaseCompileObjectVisitor {
 	GenerateHeaderVisitor (FILE * fp) {
@@ -35,11 +36,16 @@ class GenerateHeaderVisitor : BaseCompileObjectVisitor {
 		generate_superclass (fp, decl);
 		fprintf (fp, "Class_Attr");
 
-		HashMap map = new HashMap (127);
+		HashSet set = new HashSet (127);
 		new_constructors.map_args (classdeclaration_generate_constructor_registration, fp, decl);
-		new_methods.map_args (classdeclaration_generate_method_registration, fp, decl, map);
-		decl.interfaces.map_args (classdeclaration_generate_mixin_registration, fp, decl, map);
-		delete map;
+
+		void classdeclaration_generate_method_registration (FunctionDeclaration method_decl) {
+			objecttypedeclaration_generate_method_registration (fp, decl, method_decl, set);
+		}
+
+		new_methods.map (classdeclaration_generate_method_registration);
+		decl.interfaces.map_args (classdeclaration_generate_mixin_registration, fp, decl, set);
+		delete set;
 		fprintf (fp, "\n\n");
 
 		fprintf (fp, "#define ");
@@ -154,9 +160,14 @@ class GenerateHeaderVisitor : BaseCompileObjectVisitor {
 		decl.name.generate (fp);
 		fprintf (fp, "_Attr\\\n ");
 		fprintf (fp, "Interface_Attr");
-		HashMap map = new HashMap (127);
-		new_methods.map_args (interfacedeclaration_generate_method_registration, fp, decl, map);
-		delete map;
+		HashSet set = new HashSet (127);
+
+		void interfacedeclaration_generate_method_registration (FunctionDeclaration method_decl) {
+			objecttypedeclaration_generate_method_registration (fp, decl, method_decl, set);
+		}
+
+		new_methods.map (interfacedeclaration_generate_method_registration);
+		delete set;
 		fprintf (fp, "\n\n");
 
 		fprintf (fp, "O_CLASS (");
@@ -241,23 +252,15 @@ void classdeclaration_generate_constructor_registration (ConstructorDeclaration 
 	fprintf (fp, ")");
 }
 
-// TODO use HashSet instead of HashMap?
-void objecttypedeclaration_generate_method_registration (FILE * fp, ObjectTypeDeclaration ot_decl, FunctionDeclaration method_decl, HashMap map) {
-	if (map.get (method_decl.name.name) == null) {
-		map.put (method_decl.name.name, method_decl);
+void objecttypedeclaration_generate_method_registration (FILE * fp, ObjectTypeDeclaration ot_decl, FunctionDeclaration method_decl, HashSet set) {
+	if (!set.contains (method_decl.name.name)) {
+		set.add (method_decl.name.name);
 		fprintf (fp, "; \\\n O_METHOD (");
 		ot_decl.name.generate (fp);
 		fprintf (fp, ", ");
 		method_decl.name.generate (fp);
 		fprintf (fp, ")");
 	}
-}
-
-void classdeclaration_generate_method_registration (FunctionDeclaration method_decl, va_list * app) {
-	FILE * fp = va_arg (*app, FILE *);
-	ClassDeclaration class_decl = (ClassDeclaration) va_arg (*app, void *);
-	HashMap map = (HashMap) va_arg (*app, void *);
-	objecttypedeclaration_generate_method_registration (fp, class_decl, method_decl, map);
 }
 
 void classdeclaration_generate_attribute_registration (VariableDeclaration var_decl, va_list * app) {
@@ -269,29 +272,22 @@ void classdeclaration_generate_attribute_registration (VariableDeclaration var_d
 	var_decl.name.generate (fp);
 }
 
-void interfacedeclaration_generate_method_registration (FunctionDeclaration method_decl, va_list * app) {
-	FILE * fp = va_arg (*app, FILE *);
-	InterfaceDeclaration interface_decl = (InterfaceDeclaration) va_arg (*app, void *);
-	HashMap map = (HashMap) va_arg (*app, void *);
-	objecttypedeclaration_generate_method_registration (fp, interface_decl, method_decl, map);
-}
-
 void classdeclaration_generate_mixin_registration (Token interface_name, va_list * app) {
 	FILE * fp = va_arg (*app, FILE *);
 	ClassDeclaration class_decl = (ClassDeclaration) va_arg (*app, void *);
-	HashMap map = (HashMap) va_arg (*app, void *);
+	HashSet set = (HashSet) va_arg (*app, void *);
 
 	Declaration decl = global_scope.lookup_in_this_scope (interface_name);
 	InterfaceDeclaration interface_decl = (InterfaceDeclaration) decl;
 
 	void generate_mixin_method_registration_2 (FunctionDeclaration method_decl) {
 		if (method_decl.body && !class_decl.member_scope.exists (method_decl.name)) {
-			objecttypedeclaration_generate_method_registration (fp, interface_decl, method_decl, map);
+			objecttypedeclaration_generate_method_registration (fp, interface_decl, method_decl, set);
 		}
 	}
 
 	interface_decl.members.map (generate_mixin_method_registration_2);
 
-	interface_decl.interfaces?.map_args (classdeclaration_generate_mixin_registration, fp, class_decl, map);
+	interface_decl.interfaces?.map_args (classdeclaration_generate_mixin_registration, fp, class_decl, set);
 }
 

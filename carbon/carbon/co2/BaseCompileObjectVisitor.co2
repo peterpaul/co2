@@ -1,19 +1,25 @@
 include co2/RefObject
 include co2/CompileObjectVisitor
 include co2/DestructorDeclaration
+include co2/BreakStatement
+include co2/CaseStatement
 include co2/CatchStatement
 include co2/CompoundStatement
 include co2/DeleteStatement
 include co2/DoStatement
 include co2/ExpressionStatement
+include co2/FinallyStatement
 include co2/ForStatement
 include co2/IfStatement
 include co2/ReturnStatement
+include co2/SwitchStatement
 include co2/ThrowStatement
 include co2/TryStatement
 include co2/WhileStatement
 include co2/BinaryExpression
 include co2/CastExpression
+include co2/ConditionalExpression
+include co2/IsOfExpression
 include co2/NestedExpression
 include co2/NewExpression
 include co2/NullExpression
@@ -75,7 +81,11 @@ class BaseCompileObjectVisitor : RefObject, CompileObjectVisitor {
 	}
 
 	void visitStatement (Statement stat) {
-		if (stat is_of CatchStatement) {
+		if (stat is_of BreakStatement) {
+			visitBreakStatement (stat);
+		} else if (stat is_of CaseStatement) {
+			visitCaseStatement (stat);
+		} else if (stat is_of CatchStatement) {
 			visitCatchStatement (stat);
 		} else if (stat is_of CompoundStatement) {
 			visitCompoundStatement (stat);
@@ -85,12 +95,16 @@ class BaseCompileObjectVisitor : RefObject, CompileObjectVisitor {
 			visitDoStatement (stat);
 		} else if (stat is_of ExpressionStatement) {
 			visitExpressionStatement (stat);
+		} else if (stat is_of FinallyStatement) {
+			visitFinallyStatement (stat);
 		} else if (stat is_of ForStatement) {
 			visitForStatement (stat);
 		} else if (stat is_of IfStatement) {
 			visitIfStatement (stat);
 		} else if (stat is_of ReturnStatement) {
 			visitReturnStatement (stat);
+		} else if (stat is_of SwitchStatement) {
+			visitSwitchStatement (stat);
 		} else if (stat is_of ThrowStatement) {
 			visitThrowStatement (stat);
 		} else if (stat is_of TryStatement) {
@@ -107,6 +121,10 @@ class BaseCompileObjectVisitor : RefObject, CompileObjectVisitor {
 			visitBinaryExpression (expr);
 		} else if (expr is_of CastExpression) {
 			visitCastExpression (expr);
+		} else if (expr is_of ConditionalExpression) {
+			visitConditionalExpression (expr);
+		} else if (expr is_of IsOfExpression) {
+			visitIsOfExpression (expr);
 		} else if (expr is_of FunctionCallExpression) {
 			visitFunctionCallExpression (expr);
 		} else if (expr is_of NestedExpression) {
@@ -154,21 +172,27 @@ class BaseCompileObjectVisitor : RefObject, CompileObjectVisitor {
 	void visitTypeDeclaration (Declaration decl) {}
 	void visitVariableDeclaration (Declaration decl) {}
 
+	void visitBreakStatement (Statement stat) {}
+	void visitCaseStatement (Statement stat) {}
 	void visitCatchStatement (Statement stat) {}
 	void visitCompoundStatement (Statement stat) {}
 	void visitDeleteStatement (Statement stat) {}
 	void visitDoStatement (Statement stat) {}
 	void visitExpressionStatement (Statement stat) {}
+	void visitFinallyStatement (Statement stat) {}
 	void visitForEachStatement (Statement stat) {}
 	void visitForStatement (Statement stat) {}
 	void visitIfStatement (Statement stat) {}
 	void visitReturnStatement (Statement stat) {}
+	void visitSwitchStatement (Statement stat) {}
 	void visitThrowStatement (Statement stat) {}
 	void visitTryStatement (Statement stat) {}
 	void visitWhileStatement (Statement stat) {}
 
 	void visitBinaryExpression (Expression expr) {}
 	void visitCastExpression (Expression expr) {}
+	void visitConditionalExpression (Expression expr) {}
+	void visitIsOfExpression (Expression expr) {}
 	void visitFunctionCallExpression (Expression expr) {}
 	void visitNestedExpression (Expression expr) {}
 	void visitNewExpression (Expression expr) {}
