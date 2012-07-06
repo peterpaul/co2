@@ -19,7 +19,6 @@ class FixScopeVisitor : BaseCompileObjectVisitor {
 				// TODO raise error when decl != ClassDeclaration
 				ClassDeclaration super_class = (ClassDeclaration) _super_class;
 				decl.member_scope.set_parent (super_class.member_scope);
-				fprintf (stderr, "fix scope: %s -> %s\n", decl.name.name.data, super_class.name.name.data);
 			} else {
 				error (decl.name, "Could not find super_class: %s\n", decl.superclass.name.data);
 			}
