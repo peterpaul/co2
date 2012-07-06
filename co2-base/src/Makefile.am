@@ -1,10 +1,90 @@
-MAINTAINERCLEANFILES = Makefile.in
-ACLOCAL_AMFLAGS = -I m4
+MAINTAINERCLEANFILES=Makefile.in
+ACLOCAL_AMFLAGS=-I m4
 
-lib_LTLIBRARIES = libco2-base-1.0.la
+lib_LTLIBRARIES=libco2-base-1.0.la
 libco2_base_1_0_ladir=$(includedir)/co2-base-1.0/co2
 
-libco2_base_1_0_la_SOURCES = co2/List.c co2/String.c co2/Iterator.c co2/ListIterator.c co2/RefObject.c co2/ReleasePool.c co2/ReleasePoolItem.c
-libco2_base_1_0_la_HEADERS = co2/List.h co2/String.h co2/Iterator.h co2/ListIterator.h co2/RefObject.h co2/ReleasePool.h co2/ReleasePoolItem.h
+libco2_base_1_0_la_CO2SOURCES=\
+co2/Array.co2\
+co2/ArrayIterator.co2\
+co2/ArrayList.co2\
+co2/BaseObject.co2\
+co2/ClassCastException.co2\
+co2/Collection.co2\
+co2/Comparable.co2\
+co2/ConsoleHandler.co2\
+co2/DoubleLinkedList.co2\
+co2/DoubleLinkedListIterator.co2\
+co2/DoubleLinkedItem.co2\
+co2/Enum.co2\
+co2/Exception.co2\
+co2/HashMap.co2\
+co2/HashMapIterator.co2\
+co2/HashSet.co2\
+co2/HashSetIterator.co2\
+co2/IndexOutOfBoundsException.co2\
+co2/IntArray.co2\
+co2/Iterable.co2\
+co2/Iterator.co2\
+co2/KeyValuePair.co2\
+co2/Level.co2\
+co2/List.co2\
+co2/ListIterator.co2\
+co2/LogFormatter.co2\
+co2/Logger.co2\
+co2/LogHandler.co2\
+co2/LogRecord.co2\
+co2/Map.co2\
+co2/OutOfMemoryException.co2\
+co2/RefObject.co2\
+co2/ReleasePool.co2\
+co2/ReleasePoolItem.co2\
+co2/Set.co2\
+co2/SimpleFormatter.co2\
+co2/String.co2\
+co2/Throwable.co2
 
-libco2_base_1_0_la_CPPFLAGS = -I$(top_srcdir)/include
+GENERATED_CSOURCES=\
+$(libco2_base_1_0_la_CO2SOURCES:.co2=.c)
+
+GENERATED_CHEADERS=\
+$(libco2_base_1_0_la_CO2SOURCES:.co2=.h)
+
+GENERATED_CO2DEPEND=\
+$(libco2_base_1_0_la_CO2SOURCES:.co2=.d)
+
+BUILT_SOURCES=\
+$(GENERATED_CSOURCES)\
+$(GENERATED_CHEADERS)
+
+libco2_base_1_0_la_SOURCES=\
+$(libco2_base_1_0_la_CO2SOURCES)\
+$(GENERATED_CSOURCES)\
+$(GENERATED_CO2DEPEND)
+
+libco2_base_1_0_la_HEADERS=\
+$(libco2_base_1_0_la_CO2SOURCES)\
+$(GENERATED_CHEADERS)
+
+libco2_base_1_0_la_CPPFLAGS=-O0 -g3 -DO_DEBUG
+
+CARBON_FLAGS=-I .
+
+%.c: %.co2
+	if test "$(CARBON)" == "no"; then echo "please install carbon first"; else rm -f $@ | true; $(CARBON) $(CARBON_FLAGS) $< $@; fi
+
+%.h: %.c
+
+%.d: %.co2
+	-rm -f $@
+	echo -n "`echo $@ | sed 's/\.d/.c/g'` " > $@
+	if test "$(CARBON)" == "no"; then echo ": " $< >> $@; else $(CARBON) --depend $(CARBON_FLAGS) $< $@ >> $@ | rm -f $@; fi
+
+clean-local:
+	if ! test "$(CARBON)" == "no"; then rm -f $(GENERATED_CHEADERS) $(GENERATED_CSOURCES); fi
+
+distclean-local:
+	-rm -r $(bin_PROGRAMS) $(GENERATED_CO2DEPEND)
+
+
+include $(GENERATED_CO2DEPEND)

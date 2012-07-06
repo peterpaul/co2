@@ -57,9 +57,12 @@ carbon/test/pass/*.sh
 carbon/test/fail/*.sh
 
 # Generated files
-*/carbon/co2/*.c
-*/carbon/co2/*.d
-*/carbon/co2/*.h
+co2-base/src/co2/*.c
+co2-base/src/co2/*.d
+co2-base/src/co2/*.h
+carbon/src/co2/*.c
+carbon/src/co2/*.d
+carbon/src/co2/*.h
 
 co2-base/test/co2/*.c
 co2-base/test/co2/*.d

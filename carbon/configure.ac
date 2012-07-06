@@ -6,8 +6,8 @@ AC_INIT([carbon], [0.1.999], [pp_kl_h@hotmail.com])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE
 AM_SILENT_RULES([yes])
-AC_CONFIG_SRCDIR([carbon/co2/Compiler.co2])
-AC_CONFIG_HEADERS([carbon/config.h])
+AC_CONFIG_SRCDIR([src/co2/Compiler.co2])
+AC_CONFIG_HEADERS([src/config.h])
 
 AC_DEFUN([AC_PROG_CARBON],
 	[AC_PATH_PROG(CARBON, carbon, no)])
@@ -59,7 +59,7 @@ AC_CHECK_FUNCS([getcwd memset realpath sqrt strdup strrchr])
 
 AC_CONFIG_FILES([Makefile
                  test/Makefile
-                 carbon/Makefile
+                 src/Makefile
                  carbon-1.0.pc
 		 ])
 

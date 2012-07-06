@@ -21,31 +21,31 @@ noinst_PROGRAMS=TestRefObject TestLogger TestMap TestSet TestList
 TESTS=$(noinst_PROGRAMS)
 
 TestRefObject_SOURCES=co2/TestRefObject.c
-TestRefObject_LDADD=$(top_builddir)/carbon/libco2-base-1.0.la
+TestRefObject_LDADD=$(top_builddir)/src/libco2-base-1.0.la
 TestRefObject_LDFLAGS=$(CO2_LIBS)
-TestRefObject_CPPFLAGS=-O0 -g3 -DO_DEBUG -I$(top_srcdir)/carbon
+TestRefObject_CPPFLAGS=-O0 -g3 -DO_DEBUG -I$(top_srcdir)/src
 
 TestLogger_SOURCES=co2/TestLogger.c
-TestLogger_LDADD=$(top_builddir)/carbon/libco2-base-1.0.la
+TestLogger_LDADD=$(top_builddir)/src/libco2-base-1.0.la
 TestLogger_LDFLAGS=$(CO2_LIBS)
-TestLogger_CPPFLAGS=-O0 -g3 -DO_DEBUG -I$(top_srcdir)/carbon
+TestLogger_CPPFLAGS=-O0 -g3 -DO_DEBUG -I$(top_srcdir)/src
 
 TestMap_SOURCES=co2/TestMap.c
-TestMap_LDADD=$(top_builddir)/carbon/libco2-base-1.0.la
+TestMap_LDADD=$(top_builddir)/src/libco2-base-1.0.la
 TestMap_LDFLAGS=$(CO2_LIBS)
-TestMap_CPPFLAGS=-O0 -g3 -DO_DEBUG -I$(top_srcdir)/carbon
+TestMap_CPPFLAGS=-O0 -g3 -DO_DEBUG -I$(top_srcdir)/src
 
 TestSet_SOURCES=co2/TestSet.c
-TestSet_LDADD=$(top_builddir)/carbon/libco2-base-1.0.la
+TestSet_LDADD=$(top_builddir)/src/libco2-base-1.0.la
 TestSet_LDFLAGS=$(CO2_LIBS)
-TestSet_CPPFLAGS=-O0 -g3 -DO_DEBUG -I$(top_srcdir)/carbon
+TestSet_CPPFLAGS=-O0 -g3 -DO_DEBUG -I$(top_srcdir)/src
 
 TestList_SOURCES=co2/TestList.c
-TestList_LDADD=$(top_builddir)/carbon/libco2-base-1.0.la
+TestList_LDADD=$(top_builddir)/src/libco2-base-1.0.la
 TestList_LDFLAGS=$(CO2_LIBS)
-TestList_CPPFLAGS=-O0 -g3 -DO_DEBUG -I$(top_srcdir)/carbon
+TestList_CPPFLAGS=-O0 -g3 -DO_DEBUG -I$(top_srcdir)/src
 
-CARBON_FLAGS=-I . -I $(top_srcdir)/carbon
+CARBON_FLAGS=-I . -I $(top_srcdir)/src
 
 %.c: %.co2
 	if test "$(CARBON)" == "no"; then echo "please install carbon first"; else rm -f $@ | true; $(CARBON) $(CARBON_FLAGS) $< $@; indent $@; fi

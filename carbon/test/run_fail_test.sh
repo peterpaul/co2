@@ -4,7 +4,7 @@
 LD=gcc
 
 BASEDIR=$(dirname $(readlink -f $(which $0)))
-COMPILER=${BASEDIR}/../carbon/carbon
+COMPILER=${BASEDIR}/../src/carbon
 
 TARGET=${BASEDIR}/target
 
