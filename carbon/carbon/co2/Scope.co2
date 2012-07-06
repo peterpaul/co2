@@ -14,7 +14,7 @@ class Scope : RefObject, IScope {
 		self.type = type;
 		self.name = (Token) name?.retain ();
 		parent = current_scope;
-		map = new HashMap (127);
+		map = new HashMap (1027);
 		current_scope = self;
 	}
 
