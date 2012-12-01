@@ -5,7 +5,8 @@ lib_LTLIBRARIES=libmy-object-carbon-1.0.la
 libmy_object_carbon_1_0_ladir=$(includedir)/co2-1.0/co2
 
 libmy_object_carbon_1_0_la_CO2SOURCES=\
-MyObject.co2
+MyObject.co2\
+YourObject.co2
 
 GENERATED_CSOURCES=\
 $(libmy_object_carbon_1_0_la_CO2SOURCES:.co2=.c)
@@ -19,6 +20,9 @@ $(libmy_object_carbon_1_0_la_CO2SOURCES:.co2=.d)
 BUILT_SOURCES=\
 $(GENERATED_CSOURCES)\
 $(GENERATED_CHEADERS)
+
+EXTRA_DIST=\
+$(GENERATED_CO2DEPEND)
 
 libmy_object_carbon_1_0_la_SOURCES=\
 $(libmy_object_carbon_1_0_la_CO2SOURCES)\
