@@ -92,12 +92,15 @@ BUILT_SOURCES=\
 $(GENERATED_CSOURCES)\
 $(GENERATED_CHEADERS)
 
+EXTRA_DIST=\
+co2/IncludeStack.co2\
+$(GENERATED_CO2DEPEND)
+
 libcarbon_1_0_la_SOURCES=\
 $(libcarbon_1_0_la_CO2SOURCES)\
 co2/grammar.y\
 co2/lex.l\
-$(GENERATED_CSOURCES)\
-$(GENERATED_CO2DEPEND)
+$(GENERATED_CSOURCES)
 
 libcarbon_1_0_la_HEADERS=\
 $(libcarbon_1_0_la_CO2SOURCES)\
@@ -107,17 +110,26 @@ libcarbon_1_0_la_CPPFLAGS=-O0 -g3 -DO_DEBUG
 
 CO2_BASE_PATH=$(shell pkg-config co2-base-1.0 --cflags | sed 's/-I/-I /g' | sed 's/[ \t]*$$//g' )
 
-CARBON_FLAGS=$(CO2_BASE_PATH) $(CO2_BASE_PATH)/co2 -I .
+CARBON_FLAGS=$(CO2_BASE_PATH) $(CO2_BASE_PATH)/co2 -I $(srcdir)
 
 %.c: %.co2
-	if test "$(CARBON)" == "no"; then echo "please install carbon first"; else rm -f $@ | true; $(CARBON) $(CARBON_FLAGS) $< $@; fi
+if CARBON_EXISTS
+	-rm -f $(builddir)/$@ | true; $(CARBON) $(CARBON_FLAGS) $< $(builddir)/$@;
+else
+	echo "please install carbon first";
+endif
 
 %.h: %.c
 
 %.d: %.co2
-	-rm -f $@
-	echo -n "`echo $@ | sed 's/\.d/.c/g'` " > $@
-	if test "$(CARBON)" == "no"; then echo ": " $< >> $@; else $(CARBON) --depend $(CARBON_FLAGS) $< $@ >> $@; fi
+	mkdir -p $(builddir)/co2
+	-rm -f $(builddir)/$@
+	echo -n "`echo $(builddir)/$@ | sed 's/\.d/.c/g'` " > $(builddir)/$@
+if CARBON_EXISTS
+	$(CARBON) --depend $(CARBON_FLAGS) $< $(builddir)/$@ >> $(builddir)/$@ | rm -f $(builddir)/$@;
+else
+	echo ": " $< >> $(builddir)/$@;
+endif
 
 grammar.h: grammar.c
 
@@ -131,7 +143,7 @@ co2/GenerateHeaderVisitor.co2\
 co2/GenerateSourceIncludesVisitor.co2\
 co2/GenerateSourceVisitor.co2\
 co2/Compiler.co2
-carbon_SOURCES=$(carbon_CO2SOURCES) $(carbon_CO2SOURCES:.co2=.c)
+carbon_SOURCES=$(carbon_CO2SOURCES) $(carbon_CO2SOURCES:.co2=.c) $(carbon_CO2SOURCES:.co2=.h)
 carbon_LDADD=libcarbon-1.0.la
 carbon_LDFLAGS=$(CO2_LIBS) $(CO2BASE_LIBS)
 
@@ -141,10 +153,13 @@ co2/IncludeStack.h: co2/IncludeStack.co2
 
 clean-local:
 	-rm -f grammar.c grammar.h lex.c
-	if ! test "$(CARBON)" == "no"; then rm -f $(GENERATED_CHEADERS) $(GENERATED_CSOURCES); fi
+if CARBON_EXISTS
+	-rm -f $(GENERATED_CHEADERS) $(GENERATED_CSOURCES);
+endif
 
 distclean-local:
 	-rm -r $(bin_PROGRAMS) $(GENERATED_CO2DEPEND)
 
-
+if CARBON_EXISTS
 include $(GENERATED_CO2DEPEND)
+endif

@@ -4,21 +4,8 @@
 LD=gcc
 
 BASEDIR=$(dirname $(readlink -f $(which $0)))
-COMPILER=${BASEDIR}/../src/carbon
 
-TARGET=${BASEDIR}/target
-
-LOGFILE=${TARGET}/${!#}.log
-if [[ -e ${LOGFILE} ]]
-then
-    rm -f ${LOGFILE}
-fi
-
-if [[ "${SRCDIR-x}" == "x" ]]
- then
-    echo "SRCDIR not defined"
-    SRCDIR=.
-fi
+. ${BASEDIR}/run_test_base.sh
 
 mkdir -p ${TARGET}/fail
 find ${SRCDIR}/fail -name "*.h" -exec cp -u -t ${TARGET}/fail {} \;

@@ -1,12 +1,14 @@
-EXTRA_DIST=pass fail generate-makefile-am.sh generate-testcases.sh run_pass_test.sh run_fail_test.sh testignore testdonotcreate
+EXTRA_DIST=pass fail generate-testcases.sh run_pass_test.sh run_fail_test.sh run_test_base.sh testignore testdonotcreate
 MAINTAINERCLEANFILES=Makefile.in
 
 targetdir=target
 
-TESTS_ENVIRONMENT=CC="$(CC)" CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" LD="$(LD)" SRCDIR="$(srcdir)"
+TESTS_ENVIRONMENT=CC="$(CC)" CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" LD="$(LD)" SRCDIR="$(srcdir)" TOP_SRCDIR="$(top_srcdir)" BUILDDIR="$(builddir)" TOP_BUILDDIR="$(top_builddir)"
+
+distclean-local:
+	-rm -rf $(targetdir)
 
 clean-local:
-	-rm -rf $(targetdir)
 	-rm -f $(TESTS)
 	-cat $(srcdir)/testdonotcreate | xargs rm -f
 	-cat $(srcdir)/testignore | xargs rm -f

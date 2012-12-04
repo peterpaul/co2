@@ -55,6 +55,7 @@ lt~obsolete.m4
 # Carbon testcases
 carbon/test/pass/*.sh
 carbon/test/fail/*.sh
+carbon/test/target/
 
 # Generated files
 co2-base/src/co2/*.c
