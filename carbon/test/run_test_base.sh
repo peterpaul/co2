@@ -2,12 +2,7 @@
 
 function absolute_path {
     local file=$1
-    if [[ "${file:0:1}" == "." ]]
-    then
-	echo ${PWD}/${file}
-    else
-	readlink -e ${file}
-    fi
+    readlink -e ${file}
 }
 
 if [[ "${SRCDIR-x}" == "x" ]]
