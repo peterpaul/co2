@@ -27,7 +27,7 @@ AC_PROG_CARBON
 AM_CONDITIONAL([CARBON_EXISTS], [test ${CARBON} != no])
 
 # Checks for libraries.
-PKG_CHECK_MODULES([CO2], [libco2-1.0 >= 0.1.999],,AC_MSG_ERROR([required module missing]))
+PKG_CHECK_MODULES([CO2], [libco2-1.0 >= 0.2.0],,AC_MSG_ERROR([required module missing]))
 CFLAGS="$CFLAGS $CO2_CFLAGS"
 LDFLAGS="$LDFLAGS $CO2_LIBS"
 
