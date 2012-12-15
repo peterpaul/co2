@@ -108,13 +108,14 @@ $(GENERATED_CHEADERS)
 
 libcarbon_1_0_la_CPPFLAGS=-O0 -g3 -DO_DEBUG
 
-CO2_BASE_PATH=$(shell pkg-config co2-base-1.0 --cflags | sed 's/-I/-I /g' | sed 's/[ \t]*$$//g' )
+CO2_BASE_PATH=$(shell pkg-config libco2-base-1.0 --cflags | sed 's/-I/-I /g' | sed 's/[ \t]*$$//g' )
 
 CARBON_FLAGS=$(CO2_BASE_PATH) $(CO2_BASE_PATH)/co2 -I $(srcdir)
 
 %.c: %.co2
 if CARBON_EXISTS
-	-rm -f $(builddir)/$@ | true; $(CARBON) $(CARBON_FLAGS) $< $(builddir)/$@;
+	-rm -f $(builddir)/$@
+	$(CARBON) $(CARBON_FLAGS) $< $(builddir)/$@;
 else
 	echo "please install carbon first";
 endif
@@ -122,11 +123,11 @@ endif
 %.h: %.c
 
 %.d: %.co2
-	mkdir -p $(builddir)/co2
 	-rm -f $(builddir)/$@
+	mkdir -p $(builddir)/co2
 	echo -n "`echo $(builddir)/$@ | sed 's/\.d/.c/g'` " > $(builddir)/$@
 if CARBON_EXISTS
-	$(CARBON) --depend $(CARBON_FLAGS) $< $(builddir)/$@ >> $(builddir)/$@ | rm -f $(builddir)/$@;
+	$(CARBON) --depend $(CARBON_FLAGS) $< $(builddir)/$@ >> $(builddir)/$@ || rm -f $(builddir)/$@;
 else
 	echo ": " $< >> $(builddir)/$@;
 endif
