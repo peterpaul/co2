@@ -30,7 +30,7 @@ function generate_testcases {
 }
 
 function generate_makefile_am_header {
-    echo 'EXTRA_DIST=pass fail generate-testcases.sh run_pass_test.sh run_fail_test.sh run_test_base.sh testignore testdonotcreate'
+    echo 'EXTRA_DIST=pass fail generate-makefile-am.sh generate-testcases.sh run_pass_test.sh run_fail_test.sh run_test_base.sh testignore testdonotcreate'
     echo 'MAINTAINERCLEANFILES=Makefile.in'
     echo
     echo 'targetdir=target'
