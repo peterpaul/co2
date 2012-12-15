@@ -1,3 +1,9 @@
+carbon (0.2.0-1) precise; urgency=low
+
+  * Rewrite carbon compiler in carbon itself.
+
+ -- Peterpaul Klein Haneveld <peterpaul@pavilion-dm1>  Sat, 15 Dec 2012 21:45:27 +0100
+
 carbon (0.1.5-1) quantal; urgency=low
 
   * Allow identifiers in switch-case statements.

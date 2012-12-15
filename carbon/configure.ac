@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.67])
-AC_INIT([carbon], [0.1.999], [pp_kl_h@hotmail.com])
+AC_INIT([carbon], [0.2.0], [pp_kl_h@hotmail.com])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE
 AM_SILENT_RULES([yes])
@@ -31,10 +31,10 @@ AM_CONDITIONAL([CARBON_EXISTS], [test ${CARBON} != no])
 
 # Checks for libraries.
 AC_CHECK_LIB([pthread], [pthread_create])
-PKG_CHECK_MODULES([CO2], [libco2-1.0 >= 0.1.999],,AC_MSG_ERROR([required module missing]))
+PKG_CHECK_MODULES([CO2], [libco2-1.0 >= 0.2.0],,AC_MSG_ERROR([required module missing]))
 CFLAGS="$CFLAGS $CO2_CFLAGS"
 LDFLAGS="$LDFLAGS $CO2_LIBS"
-PKG_CHECK_MODULES([CO2BASE], [co2-base-1.0 >= 0.0.1],,AC_MSG_ERROR([required module missing]))
+PKG_CHECK_MODULES([CO2BASE], [libco2-base-1.0 >= 0.1.0],,AC_MSG_ERROR([required module missing]))
 CFLAGS="$CFLAGS $CO2BASE_CFLAGS"
 LDFLAGS="$LDFLAGS $CO2BASE_LIBS"
 
