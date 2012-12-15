@@ -86,7 +86,7 @@ endif
 	-rm -f $(builddir)/$@
 	echo -n "`echo $(builddir)/$@ | sed 's/\.d/.c/g'` " > $(builddir)/$@
 if CARBON_EXISTS
-	$(CARBON) --depend $(CARBON_FLAGS) $< $(builddir)/$@ >> $(builddir)/$@ | rm -f $(builddir)/$@;
+	$(CARBON) --depend $(CARBON_FLAGS) $< $(builddir)/$@ >> $(builddir)/$@ || rm -f $(builddir)/$@;
 else
 	echo ": " $< >> $(builddir)/$@;
 endif
