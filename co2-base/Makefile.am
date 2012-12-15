@@ -3,4 +3,4 @@ ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = src test
 pkgconfigdir = ${libdir}/pkgconfig
-pkgconfig_DATA = co2-base-1.0.pc
+pkgconfig_DATA = libco2-base-1.0.pc

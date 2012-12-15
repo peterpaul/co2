@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.67])
-AC_INIT([co2-base], [0.0.1], [pp_kl_h@hotmail.com])
+AC_INIT([libco2-base], [0.0.1], [pp_kl_h@hotmail.com])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE
 AM_SILENT_RULES([yes])
@@ -46,6 +46,6 @@ AC_CHECK_FUNCS([gettimeofday localtime_r strdup strstr tzset])
 AC_CONFIG_FILES([Makefile
                  src/Makefile
 		 test/Makefile
-                 co2-base-1.0.pc])
+                 libco2-base-1.0.pc])
 
 AC_OUTPUT
