@@ -1,7 +1,7 @@
 /*
  * libco2 Library for object oriented programming in C
  *
- * Copyright (C) 2011 Peterpaul Taekele Klein Haneveld
+ * Copyright (C) 2011,2012 Peterpaul Taekele Klein Haneveld
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by

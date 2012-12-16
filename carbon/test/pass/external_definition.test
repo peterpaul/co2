@@ -1,7 +1,7 @@
 /*
  * carbon Compiler and programming language for libco2
  *
- * Copyright (C) 2011 Peterpaul Taekele Klein Haneveld
+ * Copyright (C) 2011,2012 Peterpaul Taekele Klein Haneveld
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
