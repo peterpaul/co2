@@ -4,9 +4,9 @@ libdir=@libdir@
 includedir=@includedir@
 
 Name: carbon-1.0
-Description: Compiler for carbon language
+Description: Compiler and programming language for libco2
 URL: localhost
 Version: @VERSION@
-Requires: 
+Requires: libco2-1.0, libco2-base-1.0
 Cflags: -I${includedir}/carbon-1.0
 Libs: -L${libdir} -lcarbon-1.0

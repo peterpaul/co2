@@ -3,10 +3,10 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
 
-Name: co2-base-1.0
-Description: C Objects Too
+Name: libco2-base-1.0
+Description: Library with basic datatypes in CO2/carbon
 URL: localhost
 Version: @VERSION@
-Requires: 
+Requires: libco2-1.0
 Cflags: -I${includedir}/co2-base-1.0
 Libs: -L${libdir} -lco2-base-1.0

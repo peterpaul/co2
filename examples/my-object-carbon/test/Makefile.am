@@ -13,6 +13,14 @@ $(CO2SOURCES:.co2=.h)
 GENERATED_CO2DEPEND=\
 $(CO2SOURCES:.co2=.d)
 
+BUILT_SOURCES=\
+$(GENERATED_CSOURCES)\
+$(GENERATED_CHEADERS)
+
+EXTRA_DIST=\
+$(CO2SOURCES)\
+$(BUILT_SOURCES)
+
 noinst_PROGRAMS=TestMyObject
 TESTS=$(noinst_PROGRAMS)
 
@@ -21,22 +29,37 @@ TestMyObject_CPPFLAGS=-O0 -g3 -DO_DEBUG -I$(top_srcdir)/src
 TestMyObject_LDADD=$(top_builddir)/src/libmy-object-carbon-1.0.la
 TestMyObject_LDFLAGS=$(CO2_LIBS)
 
-CARBON_FLAGS=-I . -I $(top_srcdir)/src
+CARBON_FLAGS=-I $(srcdir) -I $(top_srcdir)/src
 
 %.c: %.co2
-	if test "$(CARBON)" == "no"; then echo "please install carbon first"; else rm -f $@ | true; $(CARBON) $(CARBON_FLAGS) $< $@; indent $@; fi
+if CARBON_EXISTS
+	-rm -f $(builddir)/$@
+	$(CARBON) $(CARBON_FLAGS) $< $(builddir)/$@;
+else
+	echo "please install carbon first";
+endif
 
 %.h: %.c
 
+if CARBON_EXISTS
 %.d: %.co2
-	-rm -f $@
-	echo -n "`echo $@ | sed 's/\.d/.c/g'` " > $@
-	if test "$(CARBON)" == "no"; then echo ": " $< >> $@; else $(CARBON) --depend $(CARBON_FLAGS) $< $@ >> $@; fi
-
-distclean-local:
-	-rm -r $(noinst_PROGRAMS)
+	-rm -f $(builddir)/$@
+	mkdir -p `dirname $(builddir)/$@`
+	echo -n "`echo $(builddir)/$@ | sed 's/\.d/.c/g'` " > $(builddir)/$@
+	$(CARBON) --depend $(CARBON_FLAGS) $< $(builddir)/$@ >> $(builddir)/$@ || rm -f $(builddir)/$@;
+endif
 
 clean-local:
-	if test "$(CARBON)" == "no"; then rm -f $(GENERATED_CO2DEPEND); else rm -f $(GENERATED_CHEADERS) $(GENERATED_CSOURCES) $(GENERATED_CO2DEPEND); fi
+if CARBON_EXISTS
+	-rm -f $(GENERATED_CHEADERS) $(GENERATED_CSOURCES);
+endif
 
+distclean-local:
+	-rm -f $(noinst_PROGRAMS)
+if CARBON_EXISTS
+	-rm -f $(GENERATED_CO2DEPEND)
+endif
+
+if CARBON_EXISTS
 include $(GENERATED_CO2DEPEND)
+endif

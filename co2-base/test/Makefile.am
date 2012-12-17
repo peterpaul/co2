@@ -23,8 +23,7 @@ $(GENERATED_CHEADERS)
 
 EXTRA_DIST=\
 $(CO2SOURCES)\
-$(BUILT_SOURCES)\
-$(GENERATED_CO2DEPEND)
+$(BUILT_SOURCES)
 
 # TODO: re-enable TestList and fix problem.
 #noinst_PROGRAMS=TestRefObject TestLogger TestMap TestSet TestList
@@ -60,27 +59,33 @@ CARBON_FLAGS=-I $(srcdir) -I $(top_srcdir)/src
 
 %.c: %.co2
 if CARBON_EXISTS
-	rm -f $(builddir)/$@ | true; $(CARBON) $(CARBON_FLAGS) $< $(builddir)/$@;
+	-rm -f $(builddir)/$@
+	$(CARBON) $(CARBON_FLAGS) $< $(builddir)/$@;
 else
 	echo "please install carbon first";
 endif
 
 %.h: %.c
 
-%.d: %.co2
-	mkdir -p $(builddir)/co2
-	-rm -f $(builddir)/$@
-	echo -n "`echo $(builddir)/$@ | sed 's/\.d/.c/g'` " > $(builddir)/$@
 if CARBON_EXISTS
+%.d: %.co2
+	-rm -f $(builddir)/$@
+	mkdir -p `dirname $(builddir)/$@`
+	echo -n "`echo $(builddir)/$@ | sed 's/\.d/.c/g'` " > $(builddir)/$@
 	$(CARBON) --depend $(CARBON_FLAGS) $< $(builddir)/$@ >> $(builddir)/$@ || rm -f $(builddir)/$@;
-else
-	echo ": " $< >> $(builddir)/$@;
 endif
 
 clean-local:
 if CARBON_EXISTS
-	rm -f $(GENERATED_CHEADERS) $(GENERATED_CSOURCES);
+	-rm -f $(GENERATED_CHEADERS) $(GENERATED_CSOURCES);
 endif
 
 distclean-local:
-	-rm -r $(noinst_PROGRAMS) $(GENERATED_CO2DEPEND)
+	-rm -f $(noinst_PROGRAMS)
+if CARBON_EXISTS
+	-rm -f $(GENERATED_CO2DEPEND)
+endif
+
+if CARBON_EXISTS
+include $(GENERATED_CO2DEPEND)
+endif

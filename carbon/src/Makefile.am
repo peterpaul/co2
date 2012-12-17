@@ -93,8 +93,7 @@ $(GENERATED_CSOURCES)\
 $(GENERATED_CHEADERS)
 
 EXTRA_DIST=\
-co2/IncludeStack.co2\
-$(GENERATED_CO2DEPEND)
+co2/IncludeStack.co2
 
 libcarbon_1_0_la_SOURCES=\
 $(libcarbon_1_0_la_CO2SOURCES)\
@@ -122,14 +121,12 @@ endif
 
 %.h: %.c
 
+if CARBON_EXISTS
 %.d: %.co2
 	-rm -f $(builddir)/$@
-	mkdir -p $(builddir)/co2
+	mkdir -p `dirname $(builddir)/$@`
 	echo -n "`echo $(builddir)/$@ | sed 's/\.d/.c/g'` " > $(builddir)/$@
-if CARBON_EXISTS
 	$(CARBON) --depend $(CARBON_FLAGS) $< $(builddir)/$@ >> $(builddir)/$@ || rm -f $(builddir)/$@;
-else
-	echo ": " $< >> $(builddir)/$@;
 endif
 
 grammar.h: grammar.c
@@ -159,7 +156,10 @@ if CARBON_EXISTS
 endif
 
 distclean-local:
-	-rm -r $(bin_PROGRAMS) $(GENERATED_CO2DEPEND)
+	-rm -f $(bin_PROGRAMS)
+if CARBON_EXISTS
+	-rm -f $(GENERATED_CO2DEPEND)
+endif
 
 if CARBON_EXISTS
 include $(GENERATED_CO2DEPEND)

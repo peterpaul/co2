@@ -43,9 +43,7 @@ libtool
 # Not sure what this one is for
 autom4te.cache
 
-# Dolt
-doltcompile
-doltlibtool
+# libtool
 libtool.m4
 ltoptions.m4
 ltsugar.m4
@@ -58,13 +56,8 @@ carbon/test/fail/*.sh
 carbon/test/target/
 
 # Generated files
-co2-base/src/co2/*.c
-co2-base/src/co2/*.d
-co2-base/src/co2/*.h
-carbon/src/co2/*.c
-carbon/src/co2/*.d
-carbon/src/co2/*.h
-
-co2-base/test/co2/*.c
-co2-base/test/co2/*.d
-co2-base/test/co2/*.h
+co2-base/src/co2/*.[cdh]
+co2-base/test/co2/*.[cdh]
+carbon/src/co2/*.[cdh]
+examples/my-object-carbon/src/*.[cdh]
+examples/my-object-carbon/test/*.[cdh]

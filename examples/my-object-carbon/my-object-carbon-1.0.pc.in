@@ -4,9 +4,9 @@ libdir=@libdir@
 includedir=@includedir@
 
 Name: my-object-carbon-1.0
-Description: C Objects Too
+Description: Example project for libco2
 URL: localhost
 Version: @VERSION@
-Requires: 
+Requires: libco2-1.0
 Cflags: -I${includedir}/my-object-carbon-1.0
 Libs: -L${libdir} -lmy-object-carbon-1.0

@@ -4,7 +4,7 @@ libdir=@libdir@
 includedir=@includedir@
 
 Name: libco2-1.0
-Description: C Objects Too
+Description: Library for object oriented programming in C
 URL: localhost
 Version: @VERSION@
 Requires: 
