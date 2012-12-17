@@ -1,3 +1,7 @@
+0.2.1:
+	* Add/update license/copyrights
+	* Do not distribute .d files
+
 0.2.0: Rewrite carbon compiler in carbon itself.
 
 0.1.5:
