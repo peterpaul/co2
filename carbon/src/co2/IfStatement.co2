@@ -56,7 +56,7 @@ class IfStatement : Statement {
 		fprintf (fp, ")\n");
 		then_clause.generate (fp);
 		if (else_clause) {
-			fprintf (fp, " else ");
+			fprintf (fp, "else\n");
 			else_clause.generate (fp);
 		}
 	}
