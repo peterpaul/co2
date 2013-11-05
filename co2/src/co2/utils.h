@@ -19,6 +19,10 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#ifndef __ASSERT_VOID_CAST
+#define __ASSERT_VOID_CAST (void)
+#endif
+
 #define message(x,...)									\
 	__write_message(x, __FILE__, __LINE__,				\
 					__PRETTY_FUNCTION__, ## __VA_ARGS__)
