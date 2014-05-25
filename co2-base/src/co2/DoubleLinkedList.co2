@@ -83,6 +83,9 @@ class DoubleLinkedList : RefObject, List {
 	}
 
 	RefObject removeLast () {
+		if (tail == null) {
+			return null;
+		}
 		DoubleLinkedItem link = tail;
 		tail = tail.prev;
 

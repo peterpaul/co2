@@ -1,0 +1,18 @@
+include co2/DoubleLinkedList
+
+int testRemoveLast () {
+	DoubleLinkedList list = new DoubleLinkedList ();
+	list.removeLast ();
+	return 0;
+}
+
+int main() {
+	int result = 1;
+	new ReleasePool ();
+        try {
+		result = testRemoveLast ();
+	} finally {
+		delete current_release_pool;
+		return result;
+	}
+}

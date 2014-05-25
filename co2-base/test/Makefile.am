@@ -2,6 +2,7 @@ MAINTAINERCLEANFILES=Makefile.in
 ACLOCAL_AMFLAGS=-I m4
 
 CO2SOURCES=\
+co2/TestDoubleLinkedList.co2\
 co2/TestRefObject.co2\
 co2/TestLogger.co2\
 co2/TestMap.co2\
@@ -27,13 +28,18 @@ $(BUILT_SOURCES)
 
 # TODO: re-enable TestList and fix problem.
 #noinst_PROGRAMS=TestRefObject TestLogger TestMap TestSet TestList
-noinst_PROGRAMS=TestRefObject TestLogger TestMap TestSet
+noinst_PROGRAMS=TestDoubleLinkedList TestRefObject TestLogger TestMap TestSet
 TESTS=$(noinst_PROGRAMS)
 
 TestRefObject_SOURCES=co2/TestRefObject.c
 TestRefObject_LDADD=$(top_builddir)/src/libco2-base-1.0.la
 TestRefObject_LDFLAGS=$(CO2_LIBS)
 TestRefObject_CPPFLAGS=-O0 -g3 -DO_DEBUG -I$(top_srcdir)/src
+
+TestDoubleLinkedList_SOURCES=co2/TestDoubleLinkedList.c
+TestDoubleLinkedList_LDADD=$(top_builddir)/src/libco2-base-1.0.la
+TestDoubleLinkedList_LDFLAGS=$(CO2_LIBS)
+TestDoubleLinkedList_CPPFLAGS=-O0 -g3 -DO_DEBUG -I$(top_srcdir)/src
 
 TestLogger_SOURCES=co2/TestLogger.c
 TestLogger_LDADD=$(top_builddir)/src/libco2-base-1.0.la
