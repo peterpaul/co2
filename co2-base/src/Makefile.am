@@ -41,6 +41,7 @@ co2/ReleasePool.co2\
 co2/ReleasePoolItem.co2\
 co2/Set.co2\
 co2/SimpleFormatter.co2\
+co2/Stack.co2\
 co2/String.co2\
 co2/Throwable.co2
 

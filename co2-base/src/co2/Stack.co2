@@ -1,0 +1,17 @@
+include co2/DoubleLinkedList
+
+class Stack {
+	DoubleLinkedList list;
+
+	Stack () {
+		list = new DoubleLinkedList();
+	}
+
+	void push (RefObject item) {
+		list.add (item);
+	}
+
+	RefObject pop () {
+		return list.removeLast ();
+	}
+}
