@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.67])
-AC_INIT([libco2], [0.3.0], [pp_kl_h@hotmail.com])
+AC_INIT([libco2], [0.3.1], [pp_kl_h@hotmail.com])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE
 AM_SILENT_RULES([yes])
