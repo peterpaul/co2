@@ -96,13 +96,13 @@ class Test, ITest {
 }
 
 void dostuff (Test a) {
-	printf("%p\n", a ? . getObject () ? 1 : 0);
+	printf("%d\n", a ? . getObject () ? 1 : 0);
 	printf("%d\n", a ? . getInt ());
 	printf("%d\n", a ? . getUnsigned ());
 	printf("%f\n", a ? . getFloat ());
 	printf("%f\n", a ? . getDouble ());
 	printf("%d\n", a ? . getChar ());
-	printf("%p\n", a ? . getArray () ? 1 : 0);
+	printf("%d\n", a ? . getArray () ? 1 : 0);
 /*
 	a ? . getVaList ();
 */
@@ -110,13 +110,13 @@ void dostuff (Test a) {
 }
 
 void dostuff_interface (ITest a) {
-	printf("%p\n", a ? . getObject () ? 1 : 0);
+	printf("%d\n", a ? . getObject () ? 1 : 0);
 	printf("%d\n", a ? . getInt ());
 	printf("%d\n", a ? . getUnsigned ());
 	printf("%f\n", a ? . getFloat ());
 	printf("%f\n", a ? . getDouble ());
 	printf("%d\n", a ? . getChar ());
-	printf("%p\n", a ? . getArray () ? 1 : 0);
+	printf("%d\n", a ? . getArray () ? 1 : 0);
 /*
 	a ? . getVaList ();
 */
@@ -124,13 +124,13 @@ void dostuff_interface (ITest a) {
 }
 
 void dostuff_member (Test a) {
-	printf("%p\n", a ? . ao ? 1 : 0);
+	printf("%d\n", a ? . ao ? 1 : 0);
 	printf("%d\n", a ? . ai);
 	printf("%d\n", a ? . au);
 	printf("%f\n", a ? . af);
 	printf("%f\n", a ? . ad);
 	printf("%d\n", a ? . ac);
-	printf("%p\n", a ? . aa ? 1 : 0);
+	printf("%d\n", a ? . aa ? 1 : 0);
 /*
 	a ? . getVaList ();
 */
