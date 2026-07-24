@@ -3,12 +3,12 @@
 
 LD=gcc
 
-BASEDIR=$(dirname $(readlink -f $(which $0)))
+BASEDIR=$(cd "$(dirname "$0")" && pwd)
 
 . ${BASEDIR}/run_test_base.sh
 
 mkdir -p ${TARGET}/pass
-find ${SRCDIR}/pass -name "*.h" -exec cp -u -t ${TARGET}/pass {} \;
+find ${SRCDIR}/pass -name "*.h" -exec cp {} ${TARGET}/pass/ \;
 
 OBJECTS=
 
@@ -30,7 +30,7 @@ function compile_library_test {
 
     local BASENAME=$( basename ${TEST} .test )
     local DIRNAME=$( dirname ${TEST} )
-    local CO2=$( echo ${BASENAME} | grep ".co2" | wc -l )
+    local CO2=$( echo ${BASENAME} | grep -c ".co2" )
     if [[ $CO2 == 1 ]]
     then
 	local BASENAME=$( basename ${TEST} .co2 )
@@ -53,7 +53,7 @@ function compile_library_gcc {
 
     local BASENAME=$( basename ${TEST} .test )
     local DIRNAME=$( dirname ${TEST} )
-    local CO2=$( echo ${BASENAME} | grep ".co2" | wc -l )
+    local CO2=$( echo ${BASENAME} | grep -c ".co2" )
     if [[ $CO2 == 1 ]]
     then
 	local BASENAME=$( basename ${TEST} .co2 )
@@ -78,7 +78,7 @@ function run_pass_test {
 
     local BASENAME=$( basename ${TEST} .test )
     local DIRNAME=$( dirname ${TEST} )
-    local CO2=$( echo ${BASENAME} | grep ".co2" | wc -l )
+    local CO2=$( echo ${BASENAME} | grep -c ".co2" )
     if [[ $CO2 == 1 ]]
     then
 	local BASENAME=$( basename ${TEST} .co2 )

@@ -19,7 +19,7 @@
 include co2/RefObject
 include co2/Token
 include co2/CompileObjectVisitor
-include co2/Grammar
+include co2/GrammarTokens
 
 class CompileObject : RefObject {
 	CompileObject () {

@@ -54,7 +54,7 @@
 	}
 }
 
-["co2/exception.h"] {
+["co2/co2_exception.h"] {
 	struct ExceptionStack {
 		ExceptionStack *previous;
 		char *ex_file;

@@ -27,7 +27,7 @@
 #include <assert.h>
 
 #include "co2/utils.h"
-#include "co2/exception.h"
+#include "co2/co2_exception.h"
 
 /**
  * @file Object.h

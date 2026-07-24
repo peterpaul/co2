@@ -58,7 +58,8 @@ unsigned long hash_function(const unsigned char *str);
 int ipow(int base, int exp);
 unsigned upow(unsigned base, int exp);
 
-#ifndef false
+#if !defined(false) && !defined(__cplusplus) && \
+    (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 202311L)
 typedef int bool;
 #define false 0
 #define true !false

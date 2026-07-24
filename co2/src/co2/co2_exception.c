@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <stdlib.h>
-#include "co2/exception.h"
+#include "co2/co2_exception.h"
 
 struct ex_stack *ex_stack = NULL;
 

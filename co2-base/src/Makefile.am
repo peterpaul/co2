@@ -84,7 +84,7 @@ if CARBON_EXISTS
 %.d: %.co2
 	-rm -f $(builddir)/$@
 	mkdir -p `dirname $(builddir)/$@`
-	echo -n "`echo $(builddir)/$@ | sed 's/\.d/.c/g'` " > $(builddir)/$@
+	printf '%s ' "`echo $(builddir)/$@ | sed 's/\.d/.c/g'`" > $(builddir)/$@
 	$(CARBON) --depend $(CARBON_FLAGS) $< $(builddir)/$@ >> $(builddir)/$@ || rm -f $(builddir)/$@;
 endif
 

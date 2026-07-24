@@ -3,19 +3,19 @@
 
 LD=gcc
 
-BASEDIR=$(dirname $(readlink -f $(which $0)))
+BASEDIR=$(cd "$(dirname "$0")" && pwd)
 
 . ${BASEDIR}/run_test_base.sh
 
 mkdir -p ${TARGET}/fail
-find ${SRCDIR}/fail -name "*.h" -exec cp -u -t ${TARGET}/fail {} \;
+find ${SRCDIR}/fail -name "*.h" -exec cp {} ${TARGET}/fail/ \;
 
 function run_fail_test {
     local TEST=$1
 
     local BASENAME=$( basename ${TEST} .test )
     local DIRNAME=$( dirname ${TEST} )
-    local CO2=$( echo ${BASENAME} | grep ".co2" | wc -l )
+    local CO2=$( echo ${BASENAME} | grep -c ".co2" )
     if [[ $CO2 == 1 ]]
     then
 	local BASENAME=$( basename ${TEST} .co2 )

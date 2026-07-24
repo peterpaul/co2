@@ -40,7 +40,7 @@ co2/ForStatement.co2\
 co2/FunctionCallExpression.co2\
 co2/FunctionDeclaration.co2\
 co2/FunctionType.co2\
-co2/Grammar.co2\
+co2/GrammarTokens.co2\
 co2/Hash.co2\
 co2/HelloWorldVisitor.co2\
 co2/IfStatement.co2\
@@ -89,6 +89,7 @@ GENERATED_CO2DEPEND=\
 $(libcarbon_1_0_la_CO2SOURCES:.co2=.d)
 
 BUILT_SOURCES=\
+grammar.h\
 $(GENERATED_CSOURCES)\
 $(GENERATED_CHEADERS)
 
@@ -125,7 +126,7 @@ if CARBON_EXISTS
 %.d: %.co2
 	-rm -f $(builddir)/$@
 	mkdir -p `dirname $(builddir)/$@`
-	echo -n "`echo $(builddir)/$@ | sed 's/\.d/.c/g'` " > $(builddir)/$@
+	printf '%s ' "`echo $(builddir)/$@ | sed 's/\.d/.c/g'`" > $(builddir)/$@
 	$(CARBON) --depend $(CARBON_FLAGS) $< $(builddir)/$@ >> $(builddir)/$@ || rm -f $(builddir)/$@;
 endif
 

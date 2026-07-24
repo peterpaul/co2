@@ -9,7 +9,7 @@ libco2_1_0_la_SOURCES=\
  co2/utils.c\
  co2/Interface.c\
  co2/Singleton.c\
- co2/exception.c
+ co2/co2_exception.c
 
 libco2_1_0_la_HEADERS=\
 $(libco2_1_0_la_SOURCES:.c=.h)

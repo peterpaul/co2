@@ -2,7 +2,7 @@
 
 function absolute_path {
     local file=$1
-    readlink -e ${file}
+    (cd "${file}" 2>/dev/null && pwd)
 }
 
 if [[ "${SRCDIR-x}" == "x" ]]
@@ -41,7 +41,7 @@ COMPILER=${TOP_BUILDDIR}/src/carbon
 
 TARGET=${BUILDDIR}/target
 
-LOGFILE=$(readlink -m ${TARGET}/${!#}.log)
+LOGFILE=${TARGET}/${!#}.log
 if [[ -e ${LOGFILE} ]]
 then
     rm -f ${LOGFILE}

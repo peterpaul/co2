@@ -34,7 +34,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-struct ArrayList * path;
+extern struct ArrayList * path;
 
 void new_input(struct String *);
 %}
