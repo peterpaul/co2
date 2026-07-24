@@ -29,9 +29,6 @@ include co2/ClassDeclaration
 include co2/VariableDeclaration
 include co2/FunctionDeclaration
 
-["stdlib.h"] void qsort(void *base, int nmemb, int size,
-                  int(*)(void *, void *) compare);
-
 File try_search_path(String file_name);
 
 File current_file;
@@ -73,7 +70,7 @@ class File : CompileObject {
 	}
 
 	void sort() {
-		qsort (declarations.data, declarations.length, sizeof (void *), declaration_compare_callback);
+		fixup_declaration_order (declarations);
 	}
 
 	void type_check () {
@@ -170,34 +167,6 @@ Bool interfacedeclaration_1_depends_on_2 (InterfaceDeclaration decl1, Declaratio
 	return depends;
 }
 
-int interfacedeclaration_compare_interface (InterfaceDeclaration decl1, Declaration _decl2) {
-	InterfaceDeclaration decl2 = (InterfaceDeclaration) _decl2;
-	if (interfacedeclaration_1_depends_on_2 (decl1, decl2)) {
-		return 1;
-	}
-	if (interfacedeclaration_1_depends_on_2 (decl2, decl1)) {
-		return -1;
-	}
-	return 0;
-}
-
-int interfacedeclaration_compare_class (InterfaceDeclaration decl1, Declaration _decl2) {
-	ClassDeclaration decl2 = (ClassDeclaration) _decl2;
-	Bool depends = false;
-
-	void token_equals_callback (Token myself) {
-		if (token_equals (myself, decl1.name)) {
-			depends = true;
-		}
-	}
-
-	decl2.interfaces?.map (token_equals_callback);
-	if (depends) {
-		return -1;
-	}
-	return 0;
-}
-
 Bool classdeclaration_1_depends_on_2 (ClassDeclaration decl1, ClassDeclaration decl2) {
 	if (decl1.superclass) {
 		if (token_equals (decl1.superclass, decl2.name)) {
@@ -213,102 +182,116 @@ Bool classdeclaration_1_depends_on_2 (ClassDeclaration decl1, ClassDeclaration d
 	return false;
 }
 
-int classdeclaration_compare_class (ClassDeclaration decl1, Declaration _decl2) {
-	ClassDeclaration decl2 = (ClassDeclaration) _decl2;
-	int result = classdeclaration_1_depends_on_2 (decl1, decl2);
-	if (result == 0) {
-		result = -classdeclaration_1_depends_on_2 (decl2, decl1);
-	}
-	return result;
-}
+// Whether decl1's class implements interface decl2 directly (mixin),
+// i.e. decl2's Interface_Attr chain must already be defined for decl1's
+// own _Attr/Class_Attr macros to expand.
+Bool classdeclaration_implements_interface (ClassDeclaration decl1, InterfaceDeclaration decl2) {
+	Bool depends = false;
 
-int interfacedeclaration_compare (Declaration _decl1, Declaration _decl2) {
-	InterfaceDeclaration decl1 = (InterfaceDeclaration) _decl1;
-	if (_decl2 is_of InterfaceDeclaration) {
-		return interfacedeclaration_compare_interface (decl1, _decl2);
-	} else if (_decl2 is_of ClassDeclaration) {
-		return interfacedeclaration_compare_class (decl1, _decl2);
-	} else if (_decl2 is_of TypeDeclaration) {
-		TypeDeclaration decl2 = (TypeDeclaration) _decl2;
-		if (decl2.type is_of ObjectType) {
-			ObjectType type = (ObjectType) decl2.type;
-			if (!type.decl) {
-				type.type_check ();
-			}
-			if (type.decl) {
-				return interfacedeclaration_compare (decl1, type.decl);
-			}
+	void token_equals_callback (Token myself) {
+		if (token_equals (myself, decl2.name)) {
+			depends = true;
 		}
 	}
-	return -1;
+
+	decl1.interfaces?.map (token_equals_callback);
+	return depends;
 }
 
-int classdeclaration_compare (Declaration _decl1, Declaration _decl2) {
-	ClassDeclaration decl1 = (ClassDeclaration) _decl1;
-	if (_decl2 is_of InterfaceDeclaration) {
-		return -interfacedeclaration_compare (_decl2, decl1);
-	} else if (_decl2 is_of ClassDeclaration) {
-		return classdeclaration_compare_class (decl1, _decl2);
-	} else if (_decl2 is_of TypeDeclaration) {
-		TypeDeclaration decl2 = (TypeDeclaration) _decl2;
-		if (decl2.type is_of ObjectType) {
-			ObjectType type = (ObjectType) decl2.type;
-			if (!type.decl) {
-				type.type_check ();
-			}
-			if (type.decl) {
-				classdeclaration_compare (decl1, type.decl);
-			}
-		}
-	}
-	return -1;
-}
-
-int simpledeclaration_compare (Declaration decl1, Declaration decl2) {
-	if (strcmp (decl1.name.name.data, "main") == 0) {
-		return 1;
-	}
-	if (decl2 is_of Declaration) {
-		if (strcmp (decl2.name.name.data, "main") == 0) {
-			return -1;
-		} else {
-			return strcmp (decl1.name.name.data, decl2.name.name.data);
-		}
-	}
-	return -declaration_compare (decl2, decl1);
-}
-
-int declaration_compare (Declaration decl1, Declaration decl2) {
-	if (decl1 is_of InterfaceDeclaration) {
-		return interfacedeclaration_compare (decl1, decl2);
-	} else if (decl1 is_of ClassDeclaration) {
-		return classdeclaration_compare (decl1, decl2);
-	} else if (decl1 is_of TypeDeclaration) {
-		return typedeclaration_compare (decl1, decl2);
-	} else if (decl1 is_of FunctionDeclaration) {
-		return simpledeclaration_compare (decl1, decl2);
-	} else if (decl1 is_of VariableDeclaration) {
-		return simpledeclaration_compare (decl1, decl2);
-	}
-	return 0;
-}
-
-int typedeclaration_compare (Declaration _decl1, Declaration decl2) {
-	TypeDeclaration decl1 = (TypeDeclaration) _decl1;
-	if (decl1.type is_of ObjectType) {
-		ObjectType type = (ObjectType) decl1.type;
+void classdeclaration_attribute_uses_type_callback (VariableDeclaration var_decl, va_list *app) {
+	TypeDeclaration type_decl = (TypeDeclaration) va_arg (*app, void *);
+	Bool *found = va_arg (*app, Bool *);
+	if (var_decl.type && var_decl.type is_of ObjectType) {
+		ObjectType type = (ObjectType) var_decl.type;
 		if (!type.decl) {
 			type.type_check ();
 		}
-		if (type.decl) {
-			declaration_compare (type.decl, decl2);
+		if (type.decl == type_decl) {
+			*found = true;
 		}
 	}
-	return 0;
 }
 
-int declaration_compare_callback (void *_decl1, void *_decl2) {
-	void *decl1 = *(void **)_decl1;
-	void *decl2 = *(void **)_decl2;
-	return declaration_compare (decl1, decl2);
+// Whether decl1 declares an attribute (a field) whose type is decl2 --
+// i.e. decl1's generated struct/macros can't be emitted before decl2 is.
+// This is separate from the superclass/interface dependency chains above,
+// since a plain-C typedef (e.g. "typedef Timeval = struct timeval;")
+// used only as a field type never appears in those inheritance graphs.
+Bool classdeclaration_depends_on_type (ClassDeclaration decl1, TypeDeclaration decl2) {
+	Bool found = false;
+	decl1.members.map_args (classdeclaration_attribute_uses_type_callback, decl2, &found);
+	return found;
+}
+
+// Whether decl1 must be generated after decl2, for any of the reasons
+// this file's codegen visitors actually rely on: same-file superclass,
+// same-file mixin interface, same-file superinterface, or same-file
+// field-type typedef. Declarations with no modeled relationship (plain
+// functions/variables, raw C structs, or anything from a *different*
+// file that's brought in via #include instead) simply return false --
+// their relative order doesn't matter for correctness.
+Bool declaration_depends_on (Declaration decl1, Declaration decl2) {
+	if (decl1 is_of ClassDeclaration) {
+		ClassDeclaration class_decl1 = (ClassDeclaration) decl1;
+		if (decl2 is_of ClassDeclaration &&
+		    classdeclaration_1_depends_on_2 (class_decl1, (ClassDeclaration) decl2)) {
+			return true;
+		}
+		if (decl2 is_of InterfaceDeclaration &&
+		    classdeclaration_implements_interface (class_decl1, (InterfaceDeclaration) decl2)) {
+			return true;
+		}
+		if (decl2 is_of TypeDeclaration &&
+		    classdeclaration_depends_on_type (class_decl1, (TypeDeclaration) decl2)) {
+			return true;
+		}
+	} else if (decl1 is_of InterfaceDeclaration) {
+		if (decl2 is_of InterfaceDeclaration &&
+		    interfacedeclaration_1_depends_on_2 ((InterfaceDeclaration) decl1, decl2)) {
+			return true;
+		}
+	}
+	return false;
+}
+
+// A file's top-level declarations must be generated in an order that
+// respects same-file dependencies (a class after its superclass, a
+// typedef before the class using it as a field type, etc). This used
+// to be done with qsort() and a pairwise comparator, but qsort only
+// ever calls the comparator on pairs its pivot selection happens to
+// pick -- a real dependency between two declarations can go entirely
+// unseen if every comparison involving either of them goes through an
+// unrelated third declaration instead. No comparison-based sort fixes
+// that, because the underlying relationship is a partial order (most
+// declarations have no relationship to each other at all), not the
+// total order a sort comparator assumes.
+//
+// So instead: for every declaration, scan strictly forward for any
+// later declaration it depends on and relocate it to just before, in
+// one left-to-right sweep. When a dependency is moved, `i` advances
+// past it before continuing the same scan, so chains of dependencies
+// (C depends on B depends on A) still end up fully in order.
+void fixup_declaration_order (RefList declarations) {
+	RefObject[] data = declarations.data;
+	int n = declarations.length;
+	int i;
+	for (i = 0; i < n; i += 1) {
+		Declaration decl = (Declaration) data[i];
+		if (decl) {
+			int j = i + 1;
+			while (j < n) {
+				Declaration other = (Declaration) data[j];
+				if (other && declaration_depends_on (decl, other)) {
+					RefObject moved = data[j];
+					int k;
+					for (k = j; k > i; k -= 1) {
+						data[k] = data[k - 1];
+					}
+					data[i] = moved;
+					i += 1;
+				}
+				j += 1;
+			}
+		}
+	}
 }

@@ -54,6 +54,12 @@ lt~obsolete.m4
 carbon/test/pass/*.sh
 carbon/test/fail/*.sh
 carbon/test/target/
+carbon/test/**/*.sh.log
+carbon/test/**/*.sh.trs
+co2/test/**/*.log
+co2/test/**/*.trs
+co2-base/test/**/*.log
+co2-base/test/**/*.trs
 
 # Generated files
 co2-base/src/co2/*.[cdh]
