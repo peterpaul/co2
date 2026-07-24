@@ -22,7 +22,7 @@ include co2/File
 int linenumber;
 IncludeStack include_stack;
 
-["File.h"] {
+["co2/File.h"] {
 	struct yy_buffer_state {}
 	typedef YyBufferState = struct yy_buffer_state;
 	typedef YY_BUFFER_STATE = YyBufferState *;

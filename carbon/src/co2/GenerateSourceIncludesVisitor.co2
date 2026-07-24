@@ -44,9 +44,22 @@ class GenerateSourceIncludesVisitor : BaseCompileObjectVisitor {
 		}
 	}
 
+	// A ["header.h"] block always names an external system/library header
+	// for FFI purposes -- never one of this project's own generated headers,
+	// which are always brought in through addFile() instead -- so it must
+	// use the system search path (<...>) rather than the quoted form the
+	// lexer captured verbatim from the source text. Using the quoted form
+	// risks the include resolving to a same-directory file of the same
+	// name instead of the intended system header, on a case-insensitive
+	// filesystem.
+	String angle_bracket_include (Token include_file) {
+		char *quoted = include_file.name.data;
+		return new String ("<%.*s>", strlen (quoted) - 2, &quoted[1]);
+	}
+
 	void visitDeclaration (Declaration decl) {
 		if (decl.include_file) {
-			set.add (decl.include_file.name);
+			set.add (angle_bracket_include (decl.include_file));
 		}
 		if (decl) {
 			addFile (decl.file);
