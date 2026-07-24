@@ -51,7 +51,7 @@ class ArrayType : Type {
 	}
 
 	Token get_token () {
-		base_type.get_token ();
+		return base_type.get_token ();
 	}
 
 	Bool is_compatible (Type _other) {

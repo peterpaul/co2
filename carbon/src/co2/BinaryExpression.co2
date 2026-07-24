@@ -54,6 +54,34 @@ class BinaryExpression : Expression {
 		}
 	}
 
+	Bool is_integer_type (Type t) {
+		if (t is_of PrimitiveType) {
+			PrimitiveType primitive_type = (PrimitiveType) t;
+			switch (primitive_type.token.type) {
+			case _INT:
+			case _UNSIGNED:
+			case _CHAR:
+				return true;
+			}
+		}
+		return false;
+	}
+
+	Bool is_pointer_arithmetic () {
+		if (operator.type != '+' && operator.type != '-') {
+			return false;
+		}
+		if (!operand[0].type || !operand[1].type) {
+			return false;
+		}
+		if (operand[0].type is_of ArrayType) {
+			return is_integer_type (operand[1].type);
+		} else if (operand[1].type is_of ArrayType && operator.type == '+') {
+			return is_integer_type (operand[0].type);
+		}
+		return false;
+	}
+
 	void accept (CompileObjectVisitor visitor) {
 		operand[0]?.accept (visitor);
 		operator?.accept (visitor);
@@ -214,10 +242,21 @@ class BinaryExpression : Expression {
 				type = (Type) int_type.retain ();
 				operand[0].type?.assume_compatible (type);
 				operand[1].type?.assume_compatible (type);
+			} else if (is_pointer_arithmetic ()) {
+				// ptr + int / int + ptr / ptr - int: the result is the
+				// pointer type, same as real C pointer arithmetic. Not
+				// modeled as general type compatibility (ArrayType.
+				// is_compatible) since that's also used for assignments,
+				// where a bare int is never a valid pointer value.
+				if (operand[0].type is_of ArrayType) {
+					type = (Type) operand[0].type?.retain ();
+				} else {
+					type = (Type) operand[1].type?.retain ();
+				}
 			} else if (operand[1].type) {
 				operand[0].type?.assert_compatible (operand[1].type);
 				type = (Type) operand[0].type?.retain ();
-			}				
+			}
 			break;
 		}
 		}
