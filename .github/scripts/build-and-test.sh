@@ -24,6 +24,20 @@ CFLAGS_COMMON="-std=gnu89 -g -O2"
 mkdir -p "$WORKDIR" "$BOOTSTRAP_PREFIX" "$HEAD_PREFIX"
 cd "$WORKDIR"
 
+# `make check`'s own PASS/FAIL summary never includes *why* a test failed --
+# that detail only lands in each test's own .log file. Dump every one of
+# those (plus the aggregate test-suite.log) before failing the build, so a
+# CI failure is actually debuggable from the workflow log instead of needing
+# a second, instrumented run.
+check_with_logs() {
+    if ! make check; then
+        echo "::group::make check failed -- dumping per-test logs"
+        find . -name '*.log' -print -exec cat {} \;
+        echo "::endgroup::"
+        return 1
+    fi
+}
+
 echo "::group::Download bootstrap release tarballs"
 curl -sL -o libco2-0.3.0.tar.gz https://github.com/peterpaul/co2/releases/download/libco2-0.3.0/libco2-0.3.0.tar.gz
 curl -sL -o libco2-base-0.3.0.tar.gz https://github.com/peterpaul/co2/releases/download/libco2-base-0.3.0/libco2-base-0.3.0.tar.gz
@@ -72,7 +86,7 @@ cd "$REPO_ROOT/co2"
 ./autogen.sh
 ./configure --prefix="$HEAD_PREFIX" CC="$CC" CFLAGS="$CFLAGS_COMMON"
 make
-make check
+check_with_logs
 make install
 echo "::endgroup::"
 
@@ -82,7 +96,7 @@ export PKG_CONFIG_PATH="$HEAD_PREFIX/lib/pkgconfig"
 ./autogen.sh
 ./configure --prefix="$HEAD_PREFIX" CC="$CC" CFLAGS="$CFLAGS_COMMON -I$HEAD_PREFIX/include/co2-1.0"
 make
-make check
+check_with_logs
 make install
 echo "::endgroup::"
 
@@ -91,7 +105,7 @@ cd "$REPO_ROOT/carbon"
 ./autogen.sh
 ./configure --prefix="$HEAD_PREFIX" CC="$CC" CFLAGS="$CFLAGS_COMMON -I$HEAD_PREFIX/include/co2-1.0 -I$HEAD_PREFIX/include/co2-base-1.0"
 make
-make check
+check_with_logs
 echo "::endgroup::"
 
 echo "All builds and tests passed."
