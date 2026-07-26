@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      # Windows: build everything inside MSYS2/MinGW64, since carbon's
+      # generated code needs GNU nested functions (see TODO.md item #3),
+      # which MSVC doesn't support and Clang has never implemented.
+      - name: Set up MSYS2 (Windows)
+        if: runner.os == 'Windows'
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            mingw-w64-x86_64-gcc
+            autoconf
+            automake
+            libtool
+            bison
+            flex
+            pkgconf
+            make
+            tar
+            curl
+
+      - name: Install build dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential autoconf automake libtool bison flex pkg-config
+
+      - name: Install build dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: brew install gcc autoconf automake libtool bison flex pkg-config
+
+      - name: Resolve CC (Linux)
+        if: runner.os == 'Linux'
+        run: echo "CC=gcc" >> "$GITHUB_ENV"
+
+      - name: Resolve CC (macOS)
+        if: runner.os == 'macOS'
+        # The homebrew gcc formula's binary is versioned (gcc-14, gcc-15, ...)
+        # and the version isn't stable across runner images, so resolve it
+        # rather than hardcoding a number.
+        run: |
+          GCC_BIN=$(ls "$(brew --prefix gcc)/bin" | grep -E '^gcc-[0-9]+$' | sort -V | tail -1)
+          echo "CC=$(brew --prefix gcc)/bin/${GCC_BIN}" >> "$GITHUB_ENV"
+
+      - name: Resolve CC (Windows)
+        if: runner.os == 'Windows'
+        shell: msys2 {0}
+        run: echo "CC=gcc" >> "$GITHUB_ENV"
+
+      - name: Build and test (Linux/macOS)
+        if: runner.os != 'Windows'
+        env:
+          WORKDIR: ${{ runner.temp }}/co2-ci
+        run: bash .github/scripts/build-and-test.sh
+
+      - name: Build and test (Windows)
+        if: runner.os == 'Windows'
+        shell: msys2 {0}
+        env:
+          WORKDIR: ${{ runner.temp }}/co2-ci
+        run: bash .github/scripts/build-and-test.sh

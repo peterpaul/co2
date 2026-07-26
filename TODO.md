@@ -6,32 +6,58 @@ of this — see git log for `Fix macOS build portability...`, `Replace carbon's 
 `Fix the last 2 flaky carbon test fixtures`, and `Emit angle-bracket includes for external...`.
 This file only tracks what's still open.
 
-## 1. GitHub Actions CI not yet added
+## 1. GitHub Actions CI — ADDED, macOS path fully verified, Windows untested
 
-The original ask. Plan already decided, not yet implemented:
+`.github/workflows/ci.yml` + `.github/scripts/{patch-bootstrap.sh,build-and-test.sh}`. Matrix:
+`ubuntu-latest`/`macos-latest`/`windows-latest` (MSYS2 MINGW64, since carbon's generated code
+needs GNU nested functions — see #3 — which Clang/MSVC don't support). `CFLAGS="-std=gnu89 -g
+-O2"` throughout (see #2 — `-fcommon` confirmed unnecessary).
 
 - **Bootstrap problem**: `carbon` needs a working `carbon` binary to build itself, and `co2-base`
-  needs `carbon` to translate `.co2` → `.c`. A clean checkout can't self-host. Fix: this repo's
-  GitHub Releases already host `make dist` tarballs with pre-generated sources
-  (`libco2-0.3.0.tar.gz`, `libco2-base-0.3.0.tar.gz`, `carbon-0.3.1.tar.gz` at
-  `github.com/peterpaul/co2/releases`) — download these, build them first as a bootstrap
-  toolchain, then use that `carbon` binary to build HEAD's actual `co2`/`co2-base`/`carbon`.
-- **Important**: those bootstrap tarballs are old releases and predate every fix in this file and
-  in the recent commits. Building *them* still needs the full old patch set applied by hand
-  (bool/C23 guard, `exception.h`→`co2_exception.h` rename, `Grammar.co2`→`GrammarTokens.co2`
-  rename, `lex.l`'s `path` made `extern`, `echo -n`→`printf` in `Makefile.am`, `BUILT_SOURCES`
-  fix, and the `string.h`/`IncludeStack.h` angle-bracket fixes since those tarballs' *shipped*
-  generated files predate the compiler fix that makes them unnecessary at HEAD). Once bootstrap
-  is built, building HEAD's own three projects needs none of that anymore — that's the whole
-  point of the work done so far.
-- **Matrix**: `ubuntu-latest` (system GCC is real GCC, no special setup needed),
-  `macos-latest` (`brew install gcc`, then find the versioned `gcc-N` binary — formula version
-  isn't stable, resolve it via `ls $(brew --prefix gcc)/bin | grep -E '^gcc-[0-9]+$' | sort -V | tail -1`),
-  `windows-latest` via `msys2/setup-msys2` action in `MINGW64` mode (`mingw-w64-x86_64-gcc`,
-  `autoconf`, `automake`, `libtool`, `bison`, `flex`, `pkgconf`) — decided over a Clang-only or
-  Windows-skipped approach specifically because carbon's generated code needs GNU nested
-  functions (see #3 below).
-- All three OS's need `CFLAGS="-std=gnu89 -g -O2"` (see #2 — `-fcommon` no longer needed, verified).
+  needs `carbon` to translate `.co2` → `.c`. A clean checkout can't self-host. Fix:
+  `build-and-test.sh` downloads this repo's own old GitHub Release tarballs (`libco2-0.3.0`,
+  `libco2-base-0.3.0`, `carbon-0.3.1` — these ship `make dist`-bundled pre-generated `.c`/`.h`, so
+  building *them* needs no carbon at all, just a plain C toolchain), builds them into a scratch
+  bootstrap prefix, then puts that `carbon` on `PATH` to build HEAD's real `co2`/`co2-base`/`carbon`
+  the normal way (`autogen.sh && configure && make && make check`).
+- **The bootstrap tarballs predate every fix in this file, and needed patching** —
+  `patch-bootstrap.sh` applies all of it, **verified via a full local dry run on macOS** (bootstrap
+  build → install → build & test HEAD's own three projects: 1/1, 5/5, 90/90, all green). The
+  patch set that was *actually* needed (found by really running it, not by guessing from memory —
+  a couple of these differ from what was assumed here previously):
+  - `exception.h`→`co2_exception.h` rename in libco2 (case-insensitive collision with co2-base's
+    `Exception.h` once both are on the include path) — matches HEAD's own fix exactly.
+  - co2-base's generated `BaseObject.h`/`.c`: quoted `#include "string.h"` → angle brackets (same
+    case-insensitive-collision shape as HEAD's fix, this time against co2-base's own `String.h`),
+    plus updating their `co2/exception.h` reference to match the rename above.
+  - `Grammar.co2`→`GrammarTokens.co2` rename in carbon (`co2/Grammar.h` collides with bison's own
+    `grammar.h` case-insensitively) — matches HEAD's own fix, but needed a few extra steps the old
+    tarball's *shipped* generated sources didn't have pre-baked: manually recreating the trivial
+    generated `GrammarTokens.c` (no carbon binary exists yet at this bootstrap stage to
+    regenerate it), and fixing `ArgumentDeclaration.c`'s pre-generated source, which was missing
+    the `#include` for these token constants entirely (an unrelated, pre-existing gap in that
+    specific tarball).
+  - `lex.l`'s `path` made `extern` (matches HEAD's fix — macOS `ld64` doesn't merge tentative
+    definitions).
+  - `BUILT_SOURCES` fix — but the *real* generated path is bare `grammar.h` at the top of `src/`,
+    not `co2/grammar.h`, despite `grammar.y` living in `co2/` (bison's `-d` output naming/ylwrap
+    quirk) — matches HEAD's actual fix once traced through.
+  - **New finding, not previously documented**: this dist tarball also bundles *stale,
+    wrongly-located* pre-generated `grammar.c`/`grammar.h`/`lex.c` at the top level of `src/`
+    (leftover from before `grammar.y`/`lex.l` moved into `co2/` — `Makefile.am`'s own `clean-local`
+    rule, which still `rm`s those exact top-level paths, confirms this). They duplicate-link
+    against the real `co2/grammar.c` that `Makefile.am`'s source list actually builds
+    (`duplicate symbol '_yyerror'`). Deleting them lets automake's own bison rule regenerate
+    `co2/grammar.c` correctly.
+  - **Not needed after all** (documented here previously, never actually hit): the C23/`bool`
+    guard (moot once `-std=gnu89` is explicit) and `echo -n`→`printf`/`IncludeStack.h`
+    angle-bracket fixes (apparently specific to building from raw git history, not these
+    particular tarball snapshots).
+- **Not verified**: the Linux path (should be strictly easier — no case-insensitive-filesystem
+  collisions to trigger any of the renames above, though applying them is harmless either way) and
+  the Windows/MSYS2 path (no local Windows environment to test against) haven't actually been run,
+  only reasoned through against the same documented plan. First real CI run on those two may need
+  follow-up fixes.
 
 ## 2. `-std=gnu89 -fcommon` masks real bugs in carbon's generated C — MOSTLY FIXED
 
