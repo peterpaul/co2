@@ -3,6 +3,7 @@ Bug fixing:
 * promote float to double when passing through class constructor
 * fix segfault in fail testcases
 * enable ignored testcases
+* allow importing C-style constants (capitalized) by using a rename
 
 Refactoring:
 * add type member to declaration [DONE]
@@ -33,5 +34,15 @@ Language Features:
 * make one identifier type and use for types, identifiers and macros
 * retrieve the class [DONE]
 * abstract classes [DONE]
+* hygienic macros
 
 * bash scripts for tests aren't really portable yet.
+
+Tooling
+* LSP server
+* tree-sitter support
+* syntax-highlighting support for
+  - Emacs/XEmacs
+  - zed
+  - visual studio code
+* code formatter
