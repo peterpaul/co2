@@ -65,22 +65,46 @@ come from three *independent* root causes, not one:
   verify without real control-flow analysis. Reverted; not worth the noise. If this is
   revisited, it needs to understand call-site dispatch context, not just compare two
   declarations in isolation.
-- **Category B — call-site argument casts (highest volume, ~330 of ~368 baseline warnings,
-  untouched).** `FunctionCallExpression.generate()` emits arguments with no cast even where
-  `type_check_arguments()` already validated (and approved, via subtype/interface compatibility)
-  a type that still needs an explicit cast in C, since C has no struct-pointer subtyping. Not
-  attempted this round — see the full plan (mechanism, affected files, `NewExpression`/
-  `SuperExpression` extensions, interface-cast-to-`struct Object*` caveat) preserved at
-  `~/.claude/plans/abundant-percolating-brooks.md` if picked up later.
+- **Category B — call-site argument casts — PARTIALLY FIXED (highest volume, was ~330 of ~368
+  baseline warnings).** `FunctionCallExpression.generate()` emitted arguments with no cast even
+  where `type_check_arguments()` already validated (and approved, via subtype/interface
+  compatibility) a type that still needs an explicit cast in C, since C has no struct-pointer
+  subtyping. **FIXED for ordinary expression arguments**: added `expression_generate_casted`/
+  `expression_generate_actual_arguments_casted`/`expression_generate_ctor_arguments_casted`
+  (`Expression.co2`) and wired them into `FunctionCallExpression.generate()` (all 5 call-emission
+  sites, using a resolved `FunctionType` fetched once at the top of `generate()` — named
+  `resolved_function_type` specifically to avoid the existing, confusingly-named local
+  `function_type` that's actually the *receiver's* `ObjectType` a few lines below),
+  `NewExpression.generate()` (needed a new retained `resolved_ctor` field, since the
+  `ConstructorDeclaration` was previously only resolved transiently inside
+  `newexpression_type_check_arguments()` during `type_check()` and never carried forward —
+  changed that function to return the resolved decl instead of `void`), and
+  `SuperExpression.generate()` (same pattern, new `resolved_super_target` field, both the
+  `super(...)` ctor-call and `super.method(...)` branches). Verified: eliminated 135 of the 330
+  baseline "passing argument ... incompatible pointer type" warnings (330 → 195) in a full clean
+  carbon self-host rebuild, zero regressions (libco2 1/1, co2-base 5/5, carbon 90/90, end-to-end
+  smoke test).
+- **Category D — NEW, found while measuring Category B's result, not yet attempted.** The
+  remaining ~195 call-site warnings are almost entirely a *different* shape than Category B
+  covers: `.map()`/`.map_args()` calls (e.g. `list.map_args(some_callback, ...)`) passing a
+  specific callback *function pointer* as an argument, where the callback's real C signature
+  (e.g. `void (*)(struct SomeSpecificType*, va_list*)`) doesn't match the generic parameter type
+  `map`/`map_args` itself declares. This is a fundamentally different problem from Category B
+  (which casts *object* arguments) — it needs the callback function pointer itself cast to the
+  generic signature at the call site, not an object-pointer cast. Not investigated further; likely
+  the single largest remaining bucket now that A and (most of) B are fixed.
 - **Category C — silent numeric narrowing (lower priority, doesn't move the GCC-warning-count
   needle).** `PrimitiveType.is_compatible()` warns on numeric narrowing but still returns `true`,
   so no cast is ever inserted — but this is carbon's *own* compile-time diagnostic, not a
   GCC/Clang warning at default `-Wall -Wextra`, so it isn't a blocker for dropping the flags
-  either. Not attempted. Same plan file has the mechanism if picked up.
+  either. Not attempted. The plan file below has the mechanism (extend
+  `expression_generate_casted` with a `PrimitiveType` branch) if picked up.
 
-**Next step to actually drop the flags**: Category B needs to land before `-std=gnu89 -fcommon`
-can be meaningfully relaxed (330 of ~368 baseline warnings are still there). `-fcommon` itself may
-already be droppable independently — worth a quick check.
+**Next step to actually drop the flags**: Category D needs scoping and fixing (still ~195 call-site
+warnings left, mostly callback function pointers now, not object arguments) before
+`-std=gnu89 -fcommon` can be meaningfully relaxed. `-fcommon` itself may already be droppable
+independently — worth a quick check. Full mechanism/history for all of this preserved at
+`~/.claude/plans/abundant-percolating-brooks.md`.
 
 ## 3. GNU nested functions force real GCC (excludes Clang, MSVC)
 

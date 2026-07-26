@@ -44,6 +44,7 @@ class FunctionCallExpression : Expression {
 	}
 
 	void generate (FILE *fp) {
+		FunctionType resolved_function_type = (FunctionType) self.function.type;
 		if (function is_of TokenExpression) {
 			TokenExpression function = (TokenExpression) self.function;
 			if (function.decl && function.decl is_of FunctionDeclaration) {
@@ -52,10 +53,9 @@ class FunctionCallExpression : Expression {
 				if (scope_type == class_scope_type) {
 					fprintf (fp, "O_CALL ");
 					fprintf (fp, "(");
-					Bool is_first_arg = false;
 					fprintf (fp, "self, ");
 					function.token.generate (fp);
-					actual_arguments.map_args (expression_generate_actual_argument, fp, &is_first_arg);
+					expression_generate_actual_arguments_casted (fp, actual_arguments, resolved_function_type, false);
 					fprintf (fp, ")");
 					return;
 				} else if (scope_type == interface_scope_type) {
@@ -72,10 +72,9 @@ class FunctionCallExpression : Expression {
 						InterfaceMethodDefinition imd = (InterfaceMethodDefinition) fun_decl.implemented_methods.get (0);
 						imd.interface_decl.name.generate (fp);
 					}
-					Bool is_first_arg = false;
 					fprintf (fp, ", self, ");
 					function.token.generate (fp);
-					actual_arguments.map_args (expression_generate_actual_argument, fp, &is_first_arg);
+					expression_generate_actual_arguments_casted (fp, actual_arguments, resolved_function_type, false);
 					fprintf (fp, ")");
 					return;
 				} else {
@@ -94,11 +93,10 @@ class FunctionCallExpression : Expression {
 					fprintf (fp, "O_CALL ");
 				}
 				fprintf (fp, "(");
-				Bool is_first_arg = false;
 				function.operand[0].generate (fp);
 				fprintf (fp, ", ");
 				function.operand[1].generate_left (fp, false);
-				actual_arguments.map_args (expression_generate_actual_argument, fp, &is_first_arg);
+				expression_generate_actual_arguments_casted (fp, actual_arguments, resolved_function_type, false);
 				fprintf (fp, ")");
 				return;
 			} else if (function_type.decl is_of InterfaceDeclaration) {
@@ -110,11 +108,10 @@ class FunctionCallExpression : Expression {
 				fprintf (fp, "(");
 				function_type.decl.name.generate (fp);
 				fprintf (fp, ", ");
-				Bool is_first_arg = false;
 				function.operand[0].generate (fp);
 				fprintf (fp, ", ");
 				function.operand[1].generate_left (fp, false);
-				actual_arguments.map_args (expression_generate_actual_argument, fp, &is_first_arg);
+				expression_generate_actual_arguments_casted (fp, actual_arguments, resolved_function_type, false);
 				fprintf (fp, ")");
 				return;
 			}
@@ -130,7 +127,7 @@ class FunctionCallExpression : Expression {
 				is_first_arg = false;
 			}
 		}
-		actual_arguments.map_args (expression_generate_actual_argument, fp, &is_first_arg);
+		expression_generate_actual_arguments_casted (fp, actual_arguments, resolved_function_type, is_first_arg);
 		fprintf (fp, ")");
 	}
 

@@ -20,12 +20,14 @@ include co2/Expression
 include co2/Type
 include co2/TokenExpression
 include co2/RefList
+include co2/ConstructorDeclaration
 
 class NewExpression : Expression {
 	Type new_type;
 	TokenExpression ctor_name;
 	Expression array_size;
 	RefList ctor_arguments;
+	ConstructorDeclaration resolved_ctor;
 
 	NewExpression (Type new_type, RefObject arg) {
 		super ();
@@ -44,6 +46,7 @@ class NewExpression : Expression {
 		ctor_name?.release ();
 		ctor_arguments?.release ();
 		array_size?.release ();
+		resolved_ctor?.release ();
 	}
 
 	void accept (CompileObjectVisitor visitor) {
@@ -56,7 +59,6 @@ class NewExpression : Expression {
 
 	void generate (FILE *fp) {
 		if (ctor_arguments != null) {
-			Bool is_first_arg = false;
 			fprintf (fp, "O_CALL_CLASS (");
 			Token token = new_type.get_token ();
 			token.generate (fp);
@@ -66,11 +68,21 @@ class NewExpression : Expression {
 				token.generate (fp);
 				fprintf (fp, "_ctor_");
 				ctor_name.token.generate (fp);
-				ctor_arguments.map_args (expression_generate_actual_argument, fp, &is_first_arg);
+				if (resolved_ctor) {
+					expression_generate_ctor_arguments_casted (fp, ctor_arguments, resolved_ctor.formal_arguments, resolved_ctor.has_var_args (), false);
+				} else {
+					Bool is_first_arg = false;
+					ctor_arguments.map_args (expression_generate_actual_argument, fp, &is_first_arg);
+				}
 				fprintf (fp, ")");
 			} else {
 				fprintf (fp, " (), new");
-				ctor_arguments.map_args (expression_generate_actual_argument, fp, &is_first_arg);
+				if (resolved_ctor) {
+					expression_generate_ctor_arguments_casted (fp, ctor_arguments, resolved_ctor.formal_arguments, resolved_ctor.has_var_args (), false);
+				} else {
+					Bool is_first_arg = false;
+					ctor_arguments.map_args (expression_generate_actual_argument, fp, &is_first_arg);
+				}
 				fprintf (fp, ")");
 			}
 		} else if (array_size != null) {
@@ -92,7 +104,7 @@ class NewExpression : Expression {
 			if (ctor_name != null) {
 				ctor_name.set_scope (class_decl.member_scope);
 				ctor_name.type_check ();
-				newexpression_type_check_arguments (ctor_name, ctor_arguments);
+				resolved_ctor = (ConstructorDeclaration) newexpression_type_check_arguments (ctor_name, ctor_arguments)?.retain ();
 			} else {
 				Token ctor_token = new Token.fromToken (object_type.token, "ctor", _IDENTIFIER);
 				TokenExpression token_expr = new TokenExpression (ctor_token);
@@ -102,7 +114,7 @@ class NewExpression : Expression {
 				if (token_expr.scope.exists (token_expr.token)
 					|| global_scope.exists (token_expr.token)) {
 					token_expr.type_check ();
-					newexpression_type_check_arguments (token_expr, ctor_arguments);
+					resolved_ctor = (ConstructorDeclaration) newexpression_type_check_arguments (token_expr, ctor_arguments)?.retain ();
 				} else {
 					// accept empty constructor
 					ctor_arguments.map (compileobject_type_check);
@@ -122,10 +134,10 @@ class NewExpression : Expression {
 	}
 }
 
-void newexpression_type_check_arguments (TokenExpression ctor_token, RefList actual_arguments) {
+ConstructorDeclaration newexpression_type_check_arguments (TokenExpression ctor_token, RefList actual_arguments) {
 	if (!ctor_token.decl is_of ConstructorDeclaration) {
 		error (ctor_token.token, "'%s' is not a constructor.", ctor_token.token.name.data);
-		return;
+		return null;
 	}
 	ConstructorDeclaration ctor_decl = (ConstructorDeclaration) ctor_token.decl;
 	int expected_length = ctor_decl.formal_arguments.length;
@@ -134,12 +146,12 @@ void newexpression_type_check_arguments (TokenExpression ctor_token, RefList act
 		expected_length -= 1;
 		if (actual_arguments.length < expected_length) {
 			error (ctor_token.token, "'%s' needs %d arguments, but got %d.", ctor_token.token.name.data, expected_length, actual_arguments.length);
-			return;
+			return null;
 		}
 	} else {
 		if (actual_arguments.length != expected_length) {
 			error (ctor_token.token, "'%s' needs %d arguments, but got %d.", ctor_token.token.name.data, expected_length, actual_arguments.length);
-			return;
+			return null;
 		}
 	}
 
@@ -155,4 +167,5 @@ void newexpression_type_check_arguments (TokenExpression ctor_token, RefList act
 		Expression arg_expr = (Expression) actual_arguments.get (i);
 		arg_expr.type_check ();
 	}
+	return ctor_decl;
 }

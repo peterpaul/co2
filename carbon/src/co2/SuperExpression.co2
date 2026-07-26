@@ -27,6 +27,7 @@ class SuperExpression : Expression {
 	ClassDeclaration class_context;
 	Declaration method_context;
 	RefList actual_arguments;
+	Declaration resolved_super_target;
 
 	SuperExpression (Token super_name, Token ctor_name, RefList actual_arguments) {
 		super ();
@@ -39,6 +40,7 @@ class SuperExpression : Expression {
 		super_name.release ();
 		ctor_name.release ();
 		actual_arguments.release ();
+		resolved_super_target?.release ();
 	}
 
 	void accept (CompileObjectVisitor visitor) {
@@ -71,6 +73,7 @@ class SuperExpression : Expression {
 			}
 			_ctor_name.retain ();
 			ConstructorDeclaration ctor_decl = (ConstructorDeclaration) super_decl.member_scope.lookup (_ctor_name);
+			resolved_super_target = (Declaration) ctor_decl?.retain ();
 
 			if (actual_arguments.length < ctor_decl.formal_arguments.length) {
 				error (super_name, "'%s' needs %d arguments, but got %d.\n", ctor_decl.name.name.data, ctor_decl.formal_arguments.length, actual_arguments.length);
@@ -86,6 +89,7 @@ class SuperExpression : Expression {
 			_ctor_name.release ();
 		} else if (method_context is_of FunctionDeclaration) {
 			FunctionDeclaration function_decl = (FunctionDeclaration) super_decl.member_scope.lookup (method_context.name);
+			resolved_super_target = (Declaration) function_decl?.retain ();
 
 			if (actual_arguments.length < function_decl.formal_arguments.length) {
 				error (super_name, "'%s' needs %d arguments, but got %d.\n", function_decl.name.name.data, function_decl.formal_arguments.length, actual_arguments.length);
@@ -108,29 +112,44 @@ class SuperExpression : Expression {
 	void generate (FILE *fp) {
 		ClassDeclaration class_decl = (ClassDeclaration) current_context.find (ClassDeclaration.class);
 		if (method_context is_of ConstructorDeclaration) {
+			ConstructorDeclaration ctor_decl = (ConstructorDeclaration) resolved_super_target;
 			if (!ctor_name) {
-				Bool is_first_arg = false;
 				fprintf (fp, "self = o_super_ctor (self, ");
 				class_decl.superclass.generate (fp);
 				fprintf (fp, " ()");
-				actual_arguments.map_args (expression_generate_actual_argument, fp, &is_first_arg);
+				if (ctor_decl) {
+					expression_generate_ctor_arguments_casted (fp, actual_arguments, ctor_decl.formal_arguments, ctor_decl.has_var_args (), false);
+				} else {
+					Bool is_first_arg = false;
+					actual_arguments.map_args (expression_generate_actual_argument, fp, &is_first_arg);
+				}
 				fprintf (fp, ")");
 			} else {
-				Bool is_first_arg = false;
 				fprintf (fp, "self = o_super_ctor_named (self, _");
 				class_context.superclass.generate (fp);
 				fprintf (fp, "_ctor_");
 				ctor_name.generate (fp);
-				actual_arguments.map_args (expression_generate_actual_argument, fp, &is_first_arg);
+				if (ctor_decl) {
+					expression_generate_ctor_arguments_casted (fp, actual_arguments, ctor_decl.formal_arguments, ctor_decl.has_var_args (), false);
+				} else {
+					Bool is_first_arg = false;
+					actual_arguments.map_args (expression_generate_actual_argument, fp, &is_first_arg);
+				}
 				fprintf (fp, ")");
 			}
 		} else {
-			Bool is_first_arg = false;
+			FunctionDeclaration function_decl = (FunctionDeclaration) resolved_super_target;
 			class_decl.superclass.generate (fp);
 			fprintf (fp, " ()->");
 			method_context.name.generate (fp);
 			fprintf (fp, " (self");
-			actual_arguments.map_args (expression_generate_actual_argument, fp, &is_first_arg);
+			if (function_decl) {
+				FunctionType function_type = (FunctionType) function_decl.type;
+				expression_generate_ctor_arguments_casted (fp, actual_arguments, function_decl.formal_arguments, function_type.has_var_args, false);
+			} else {
+				Bool is_first_arg = false;
+				actual_arguments.map_args (expression_generate_actual_argument, fp, &is_first_arg);
+			}
 			fprintf (fp, ")");
 		}
 	}
