@@ -18,6 +18,8 @@
  */
 include co2/CompileObject
 include co2/Type
+include co2/Token
+include co2/TokenExpression
 
 void expression_generate_actual_argument (Expression arg, va_list *app) {
 	FILE *fp = va_arg (*app, FILE *);
@@ -59,6 +61,21 @@ void expression_generate_casted (FILE *fp, Expression arg, Type target_type) {
 		FunctionType function_target_type = (FunctionType) target_type;
 		fprintf (fp, "(");
 		function_target_type.generate_cast (fp);
+		fprintf (fp, ") ");
+	} else if (target_type && target_type is_of ObjectType && arg is_of TokenExpression
+		&& ((TokenExpression) arg).token.type == _TYPE_IDENTIFIER) {
+		// `SomeClass.class` (parsed as a bare TokenExpression wrapping the _TYPE_IDENTIFIER
+		// token) generates as `SomeClass ()`, calling the O_OBJECT-generated accessor that
+		// returns `struct SomeClassClass *` -- a distinct synthetic per-class struct type,
+		// not modeled anywhere in the Type hierarchy (TokenExpression.type_check() gives
+		// this expression a generic ArrayType(void) rather than a real ObjectType, so the
+		// ObjectType-vs-ObjectType branch above never sees it). `struct XClass` always
+		// starts with the common `struct Class` fields (see O_OBJECT's Class()-accessor,
+		// which chains every class's init through Class's own), so it's always safe to
+		// cast to whatever ObjectType the parameter actually declares (in practice always
+		// the `Class` type IScope's find()/find_type() family takes).
+		fprintf (fp, "(");
+		target_type.generate (fp);
 		fprintf (fp, ") ");
 	}
 	arg.generate (fp);

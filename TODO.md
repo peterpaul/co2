@@ -106,9 +106,9 @@ come from three *independent* root causes, not one:
   Verified via full clean self-hosted rebuild (two bootstrap passes — see note below):
   `carbon self-hosted 90/90` via `make check` (the properly-wired per-test `.sh` suite, not the
   standalone `run_tests.sh`, which has its own pre-existing, unrelated path-handling bug — see
-  below), zero regressions, and the `incompatible pointer type`/`passing argument ... from
-  incompatible pointer type` warning count dropped from the ~195 baseline to **69** in a from-raw
-  full rebuild.
+  below), zero regressions. (An initial "330 → 69" warning count reported here was measured from a
+  contaminated intermediate rebuild during the two-pass bootstrap debugging below — see Category
+  E's note for the corrected, reproducible baseline: 330 → 116.)
   - **Bootstrap gotcha hit while verifying this**: `make`'s `%.c: %.co2` rule uses a `CARBON`
     variable hardcoded to an absolute path at `./configure` time (`carbon/src/Makefile:392`), not
     whatever `carbon` is first on `$PATH`. So after building a new `carbon` binary containing a
@@ -143,17 +143,67 @@ come from three *independent* root causes, not one:
     run and "fail"; (2) several `pass/` tests (`class_decl_inheritance`, `dependencies`, `import`,
     etc.) depend on a companion `.co2` helper file in the same directory (e.g. `InheritB.co2` →
     `InheritB.h`) that `run_tests.sh` never compiles, since it only iterates `*.test` files.
-- **Category C — silent numeric narrowing (lower priority, doesn't move the GCC-warning-count
-  needle).** `PrimitiveType.is_compatible()` warns on numeric narrowing but still returns `true`,
-  so no cast is ever inserted — but this is carbon's *own* compile-time diagnostic, not a
-  GCC/Clang warning at default `-Wall -Wextra`, so it isn't a blocker for dropping the flags
-  either. Not attempted. The plan file below has the mechanism (extend
-  `expression_generate_casted` with a `PrimitiveType` branch) if picked up.
+- **Category C — silent numeric narrowing — investigated, confirmed to be a non-issue for this
+  goal.** `PrimitiveType.is_compatible()` warns on numeric narrowing but still returns `true`, so
+  no cast is ever inserted — but checked directly against a full clean rebuild's warning log: there
+  are **zero** GCC int/float-narrowing warnings at `-Wall -Wextra` (the handful of `-Wint-conversion`
+  hits present are all the pre-existing, unrelated `Interface.h` ternary macro issue noted below,
+  not numeric narrowing). Confirms the original plan's own caveat: this is carbon's *own*
+  compile-time diagnostic, invisible to GCC by default, so it's not a blocker for dropping the
+  flags. Not implemented — would only improve carbon's own diagnostic noise, not GCC's.
+- **Category E — `.class` literal arguments mistyped as `void[]` — FIXED (highest-volume of the
+  remainder: 89 of the 116 baseline warnings).** Found while measuring Category D's result and
+  re-verifying the true baseline (see below). `SomeClass.class` (parsed by the grammar as
+  `_TYPE_IDENTIFIER '.' _CLASS` → a bare `TokenExpression` wrapping the `_TYPE_IDENTIFIER` token —
+  the *only* place this grammar shape is produced) generates as `SomeClass ()`, calling the
+  `O_OBJECT`-generated accessor that returns `struct SomeClassClass *` — a synthetic, per-class
+  struct type with no representation anywhere in the `Type` hierarchy. Instead of modeling that,
+  `TokenExpression.type_check()`'s `_TYPE_IDENTIFIER` case gives the expression a generic
+  `ArrayType(PrimitiveType(void))`, so it never matches Category B/D's `ObjectType`-vs-`ObjectType`
+  or `FunctionType`-vs-`FunctionType` branches in `expression_generate_casted()` — the argument
+  reaches the callee (typically `Context.find(Class klass)` or `IScope.find_type(Token, Class
+  type)`) completely uncast, and `struct SomeClassClass *` vs `struct Class *` is a real GCC
+  warning. **Fixed**: added a third branch to `expression_generate_casted()` (`Expression.co2`)
+  that detects the AST shape directly — `arg is_of TokenExpression && arg.token.type ==
+  _TYPE_IDENTIFIER` — rather than relying on `arg.type` (which stays wrong), and casts
+  unconditionally to whatever `ObjectType` the target parameter declares, same "always cast, no
+  need to check whether it's needed" reasoning as Category D (every `O_OBJECT`-generated
+  `XClass` struct starts with the common `Class` fields via its own `Class()`-accessor
+  initialization chain, so the upcast is always safe). Did **not** fix the underlying
+  `ArrayType(void)` mistyping itself — that's a real characteristic of the type checker (used
+  nowhere except this one grammar production, confirmed by grepping the grammar), left alone to
+  keep this fix scoped to codegen, matching how Categories B/D were scoped.
+  - **Corrected baseline**: while verifying this, re-measured from a genuinely fresh, fully clean
+    rebuild (all generated `.c`/`.h`/`.d` deleted, proper two-pass bootstrap) and got **116** total
+    warnings before this fix, not the 69 previously logged under Category D — that 69 was measured
+    from an intermediate rebuild contaminated by this session's own debugging (stale files left
+    over from chasing the `CARBON`-pinning gotcha below). 116 is the reproducible number: full
+    clean two-pass rebuild, `make check` 90/90, then count. This fix takes it to **27**.
+  - Verified: full two-pass clean rebuild (`make` with the old installed `carbon`, then `make
+    CARBON=<newly-built local binary>` to force every `.co2` file to be re-translated by the fixed
+    compiler — see the `CARBON`-pinning gotcha noted under Category D, hit again here), `make
+    check` 90/90, zero regressions, warnings 116 → 27. Installed the fixed compiler to
+    `~/local-repo` afterward so it's the new baseline for future bootstrap iterations.
+  - **Remaining 27 warnings**, for whoever picks this up next: 5 are the pre-existing `Interface.h`
+    ternary macro issue (unrelated to codegen); most of the rest are `assignment to`/`returning ...
+    from a function with incompatible type` in `Scope.co2`/`CompositeScope.co2`/`RefList.co2`/
+    `ClassDeclaration.co2`/`FunctionDeclaration.co2`/`StructDeclaration.co2` — i.e. constructor
+    field assignments and `return` statements, not call *arguments*, so Category B/D/E's
+    `expression_generate_casted` machinery (only wired into `FunctionCallExpression`/
+    `NewExpression`/`SuperExpression`) doesn't reach them at all; a handful are still-uncast
+    `passing argument` sites (`set_scope`, `is_compatible`, `visitObjectType`) where the target
+    parameter is an interface type — needs checking why Category B's `ObjectType`-vs-`ObjectType`
+    branch doesn't already catch those. This last stretch is exactly Category C's originally
+    envisioned mechanism (extend casting to `VariableDeclaration.generate()`/
+    `ReturnStatement.generate()`), just needed for interface/subtype mismatches rather than numeric
+    narrowing.
 
-**Next step to actually drop the flags**: only Category C (69 warnings left, down from 368
-baseline — numeric narrowing, doesn't move the GCC-warning-count needle anyway) and Phase 4 (the
-actual attempt to relax `-std=gnu89 -fcommon`) remain. `-fcommon` itself may already be droppable
-independently — worth a quick check. Full mechanism/history for all of this preserved at
+**Next step to actually drop the flags**: 27 warnings left (down from a 368 original baseline — see
+the corrected-baseline note above for why the intermediate "195"/"69" figures logged earlier don't
+match a from-scratch rebuild). What's left is assignment/return-statement casts (not call
+arguments) plus a few interface-parameter call sites, and Phase 4 (the actual attempt to relax
+`-std=gnu89 -fcommon`). `-fcommon` itself may already be droppable independently — worth a quick
+check. Full mechanism/history for all of this preserved at
 `~/.claude/plans/abundant-percolating-brooks.md`.
 
 ## 3. GNU nested functions force real GCC (excludes Clang, MSVC)
