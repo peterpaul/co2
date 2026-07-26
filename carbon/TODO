@@ -36,6 +36,7 @@ Language Features:
 * retrieve the class [DONE]
 * abstract classes [DONE]
 * hygienic macros
+* bool type, with true/false
 
 * bash scripts for tests aren't really portable yet.
 
