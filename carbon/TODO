@@ -19,6 +19,7 @@ Functionality:
 * implement file inclusion (include) [DONE]
 * know whether a tokenexpression is part of the current class [DONE]
 * implement casts [DONE]
+* detect missing return statements
 
 Language Features:
 * enum
