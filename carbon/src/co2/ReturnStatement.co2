@@ -50,16 +50,18 @@ class ReturnStatement : Statement {
 		FunctionType function_type = (FunctionType) function_context.type;
 		if (!try_context && !function_type.has_var_args) {
 			fprintf (fp, "return ");
-			expr?.generate (fp);
+			if (expr) {
+				expression_generate_casted (fp, expr, function_type.return_type);
+			}
 			fprintf (fp, ";\n");
 			return;
 		}
 
 		fprintf (fp, "{\n");
 		if (expr) {
-			expr.type.generate (fp);
+			function_type.return_type.generate (fp);
 			fprintf (fp, " __return_value = ");
-			expr.generate (fp);
+			expression_generate_casted (fp, expr, function_type.return_type);
 			fprintf (fp, ";\n");
 		}
 

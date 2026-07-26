@@ -184,27 +184,80 @@ come from three *independent* root causes, not one:
     compiler — see the `CARBON`-pinning gotcha noted under Category D, hit again here), `make
     check` 90/90, zero regressions, warnings 116 → 27. Installed the fixed compiler to
     `~/local-repo` afterward so it's the new baseline for future bootstrap iterations.
-  - **Remaining 27 warnings**, for whoever picks this up next: 5 are the pre-existing `Interface.h`
-    ternary macro issue (unrelated to codegen); most of the rest are `assignment to`/`returning ...
-    from a function with incompatible type` in `Scope.co2`/`CompositeScope.co2`/`RefList.co2`/
-    `ClassDeclaration.co2`/`FunctionDeclaration.co2`/`StructDeclaration.co2` — i.e. constructor
-    field assignments and `return` statements, not call *arguments*, so Category B/D/E's
-    `expression_generate_casted` machinery (only wired into `FunctionCallExpression`/
-    `NewExpression`/`SuperExpression`) doesn't reach them at all; a handful are still-uncast
-    `passing argument` sites (`set_scope`, `is_compatible`, `visitObjectType`) where the target
-    parameter is an interface type — needs checking why Category B's `ObjectType`-vs-`ObjectType`
-    branch doesn't already catch those. This last stretch is exactly Category C's originally
-    envisioned mechanism (extend casting to `VariableDeclaration.generate()`/
-    `ReturnStatement.generate()`), just needed for interface/subtype mismatches rather than numeric
-    narrowing.
+- **Category F — assignment/return-statement casts — FIXED (27 → 15).** The remaining warnings
+  after Category E were `assignment to`/`returning ... from a function with incompatible type` in
+  `Scope.co2`/`CompositeScope.co2`/`RefList.co2`/`ClassDeclaration.co2`/`FunctionDeclaration.co2`/
+  `StructDeclaration.co2` — constructor field assignments, plain variable assignments, and `return`
+  statements, none of which are call *arguments*, so Category B/D/E's `expression_generate_casted`
+  machinery (only wired into `FunctionCallExpression`/`NewExpression`/`SuperExpression`) never
+  reached them. This is exactly Category C's originally-envisioned mechanism, just needed for
+  interface/subtype mismatches (e.g. `Scope.get_parent()` declares return type `IScope` — matching
+  its interface base declaration exactly — but returns `self->parent`, a field concretely typed
+  `Scope`) rather than numeric narrowing. **Fixed** in three places: `BinaryExpression.generate()`'s
+  default case (covers `=`/`==`/`!=`) now casts the right-hand operand to the left-hand operand's
+  resolved type via `expression_generate_casted`, instead of emitting it bare;
+  `VariableDeclaration.generate()` now casts its initializer expression to the declared `type`
+  instead of calling `expr.generate(fp)` directly; `ReturnStatement.generate()` now casts `expr` to
+  `function_type.return_type` in both its plain and try/finally-wrapped forms (the latter also had
+  its own separate bug — the `__return_value` temporary was declared using `expr.type` instead of
+  the function's actual `return_type`, which could itself silently mismatch the final `return
+  __return_value;`).
+  - **Bug found and fixed while implementing this**: casting an entire assignment-as-expression
+    (`return self->parent = parent_scope;`, i.e. `return X = Y`) by wrapping bare `arg.generate(fp)`
+    output in a prefix cast breaks C operator precedence — `(Type) X = Y` parses as `((Type)X) = Y`,
+    not `(Type)(X = Y)`, and GCC correctly rejected it (`lvalue required as left operand of
+    assignment`). Fixed by having `expression_generate_casted()` wrap the *argument's own output* in
+    parens whenever it emits a cast — `(Type) (X = Y)` — via a `casted` flag set in every cast
+    branch and checked once at the end, rather than each branch managing its own closing syntax.
+    Never triggered before this category because Category B/D/E only ever cast plain call
+    arguments (never assignment-shaped expressions).
+  - **Second bug found and fixed**: `ObjectType.generate()` emits a plain by-value `struct X` (no
+    `*`) when `.decl` is a `StructDeclaration` or `TypeDeclaration` (used for lightweight
+    non-object-system value structs, e.g. a `vec` struct in the `ray.test` fixture) — casting an
+    expression to a non-pointer aggregate type is illegal C (`conversion to non-scalar type
+    requested`), and this newly-added assignment-casting was the first thing to actually exercise
+    that path (Category B/D/E never cast a by-value struct field). Fixed by excluding
+    `StructDeclaration`/`TypeDeclaration`-backed `ObjectType`s from the cast-decl-mismatch branch —
+    only the pointer-shaped forms (plain class, or interface/unresolved → `struct X*`/`struct
+    Object*`) get cast.
+  - Verified via full two-pass clean rebuild + `make check`: caught a real regression this way
+    (`pass/ray.sh` failing to compile from the struct-cast bug above) before it was fixed. Final
+    state: 90/90, zero regressions, warnings 27 → 15. Installed to `~/local-repo` as the new
+    baseline.
+- **Category G — vtable-dispatched calls resolve against the override's own signature, not the
+  base-declared vtable slot type — investigated, not fixed (5 warnings remain).** The last 5
+  non-`Interface.h` warnings (`RefList.filter()`'s return via `List.filter()`, `ClassDeclaration
+  .is_compatible()`'s argument via `ObjectTypeDeclaration.is_compatible()`, `TokenExpression
+  .set_scope()`'s argument via `Expression.set_scope()`, `GenerateSourceIncludesVisitor
+  .visitObjectType()`'s argument via its base visitor declaration) all share one root cause: for a
+  virtually-dispatched method call (ordinary class-scope `O_CALL`, going through a vtable slot),
+  the C function pointer's *actual* signature is fixed by whichever class/interface *first*
+  declared that method name (same fact Category A's `typeof`-cast fix relies on for the
+  *assignment* side) — but the type-checker (correctly, for type-checking purposes) resolves
+  `.type_check()`/`.type` against the *most-derived* override's own declared signature, which this
+  session's cast-insertion logic (reasonably) trusts. When an override narrows/widens a parameter
+  or return type (the same safe-by-construction pattern noted throughout Category A's investigation
+  — e.g. `TokenExpression.set_scope(IScope scope)` overriding `Expression.set_scope(Scope scope);`),
+  the two signatures genuinely differ, and casting against the override's type doesn't match what
+  the vtable slot actually expects.
+  **Direction, if picked up**: needs a hierarchy-walk helper — given a class and a method name,
+  find the *first* declaring class/interface in its superclass/interface chain and return that
+  declaration's parameter/return types — then have `expression_generate_casted`
+  (call-argument/assignment/return sites) and `ReturnStatement.generate()` use that base signature
+  instead of the resolved override's own for any call that dispatches through a class-scope
+  `O_CALL` (not needed for direct/non-virtual calls, where the resolved and slot signatures always
+  match). Deliberately not attempted this session — real new mechanism touching core call
+  resolution used everywhere, higher regression risk for only 5 remaining warnings, decided not
+  worth it relative to Category F's much larger, lower-risk win.
 
-**Next step to actually drop the flags**: 27 warnings left (down from a 368 original baseline — see
-the corrected-baseline note above for why the intermediate "195"/"69" figures logged earlier don't
-match a from-scratch rebuild). What's left is assignment/return-statement casts (not call
-arguments) plus a few interface-parameter call sites, and Phase 4 (the actual attempt to relax
-`-std=gnu89 -fcommon`). `-fcommon` itself may already be droppable independently — worth a quick
-check. Full mechanism/history for all of this preserved at
-`~/.claude/plans/abundant-percolating-brooks.md`.
+**Next step to actually drop the flags**: 15 warnings left (down from a 368 original baseline — see
+the corrected-baseline note under Category E for why the intermediate "195"/"69" figures logged
+earlier don't match a from-scratch rebuild). 10 are the pre-existing, unrelated `Interface.h`
+ternary macro issue (`O_BRANCH_CALL_IF`'s `assertTrue(_tmp ? _if : true, ...)` — a pointer/int
+mismatch in the conditional expression itself, nothing to do with codegen casts); 5 are Category
+G, above. Plus Phase 4 (the actual attempt to relax `-std=gnu89 -fcommon`) — `-fcommon` itself may
+already be droppable independently, worth a quick check. Full mechanism/history for all of this
+preserved at `~/.claude/plans/abundant-percolating-brooks.md`.
 
 ## 3. GNU nested functions force real GCC (excludes Clang, MSVC)
 

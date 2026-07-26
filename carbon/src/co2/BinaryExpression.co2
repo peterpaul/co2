@@ -205,7 +205,16 @@ class BinaryExpression : Expression {
 			fprintf (fp, " ");
 			operator.generate (fp);
 			fprintf (fp, " ");
-			operand[1].generate (fp);
+			if (operator.type == '=' || operator.type == _EQ || operator.type == _NEQ) {
+				// Assignment/equality between two struct-pointer-shaped operands:
+				// type_check()'s default case already validated this (assert_compatible
+				// for '=', the softer assume_compatible for comparisons), but C has no
+				// implicit struct-pointer subtyping, so cast the right-hand side to the
+				// left-hand side's resolved type the same way call arguments are cast.
+				expression_generate_casted (fp, operand[1], operand[0].type);
+			} else {
+				operand[1].generate (fp);
+			}
 			break;
 		}
 		}

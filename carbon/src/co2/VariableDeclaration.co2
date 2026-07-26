@@ -56,7 +56,7 @@ class VariableDeclaration : Declaration {
 		}
 		if (expr) {
 			fprintf (fp, " = ");
-			expr.generate (fp);
+			expression_generate_casted (fp, expr, type);
 		}
 		fprintf (fp, ";\n");
 	}

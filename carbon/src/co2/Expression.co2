@@ -42,13 +42,20 @@ void expression_generate_actual_argument (Expression arg, va_list *app) {
 // different declarations; anything already void*-shaped on either side
 // converts silently in C and needs no cast.
 void expression_generate_casted (FILE *fp, Expression arg, Type target_type) {
+	Bool casted = false;
 	if (target_type && arg.type && target_type is_of ObjectType && arg.type is_of ObjectType) {
 		ObjectType target_object_type = (ObjectType) target_type;
 		ObjectType arg_object_type = (ObjectType) arg.type;
-		if (target_object_type.decl && arg_object_type.decl && target_object_type.decl != arg_object_type.decl) {
+		// ObjectType.generate() emits a plain by-value "struct X" (no "*") when
+		// decl is a StructDeclaration or TypeDeclaration -- a C cast expression
+		// can't target a non-scalar aggregate type, so only cast the pointer-shaped
+		// forms (plain class decl, or unresolved/interface -> "struct X*"/"struct Object*").
+		if (target_object_type.decl && arg_object_type.decl && target_object_type.decl != arg_object_type.decl
+			&& !(target_object_type.decl is_of StructDeclaration) && !(target_object_type.decl is_of TypeDeclaration)) {
 			fprintf (fp, "(");
 			target_type.generate (fp);
-			fprintf (fp, ") ");
+			fprintf (fp, ") (");
+			casted = true;
 		}
 	} else if (target_type && arg.type && target_type is_of FunctionType && arg.type is_of FunctionType) {
 		// Callback arguments to map()/map_args()-style higher-order functions
@@ -61,7 +68,8 @@ void expression_generate_casted (FILE *fp, Expression arg, Type target_type) {
 		FunctionType function_target_type = (FunctionType) target_type;
 		fprintf (fp, "(");
 		function_target_type.generate_cast (fp);
-		fprintf (fp, ") ");
+		fprintf (fp, ") (");
+		casted = true;
 	} else if (target_type && target_type is_of ObjectType && arg is_of TokenExpression
 		&& ((TokenExpression) arg).token.type == _TYPE_IDENTIFIER) {
 		// `SomeClass.class` (parsed as a bare TokenExpression wrapping the _TYPE_IDENTIFIER
@@ -76,9 +84,13 @@ void expression_generate_casted (FILE *fp, Expression arg, Type target_type) {
 		// the `Class` type IScope's find()/find_type() family takes).
 		fprintf (fp, "(");
 		target_type.generate (fp);
-		fprintf (fp, ") ");
+		fprintf (fp, ") (");
+		casted = true;
 	}
 	arg.generate (fp);
+	if (casted) {
+		fprintf (fp, ")");
+	}
 }
 
 // Same comma-separated-argument-list generation expression_generate_actual_argument
