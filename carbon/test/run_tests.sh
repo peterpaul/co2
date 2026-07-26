@@ -1,7 +1,8 @@
 #!/bin/bash -u
 # Copyright (C) 2011 Peterpaul Taekele Klein Haneveld
 
-BASEDIR=`pwd`
+BASEDIR=$(cd "$(dirname "$0")" && pwd)
+cd "${BASEDIR}"
 COMPILER=${BASEDIR}/../src/carbon
 
 TESTDIR=${BASEDIR}

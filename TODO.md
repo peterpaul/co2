@@ -123,12 +123,18 @@ come from three *independent* root causes, not one:
     check`'s own `TESTS_ENVIRONMENT` does (`SRCDIR="$(srcdir)"`). The result was either a silent
     "file not found"-turned-crash (segfault) for `fail/` tests (which still counts as "correctly
     failed to compile" so the bug hid), or an outright missing-file build failure for `pass/`
-    tests. Pre-existing, not caused by this session's earlier changes. **Fixed**: `find` now
-    searches `${TYPE}` (relative to the script's own `$PWD`, which is always the test directory)
-    instead of `${TESTDIR}/${TYPE}`, so `$TEST` is relative like `pass/foo.test` — matching what
-    `run_pass_test.sh`/`run_fail_test.sh` already expect when invoked directly by a human, and what
-    `run_test_base.sh`'s `$SRCDIR` join logic assumes in both its "unset" (`.`) and "set, made
-    absolute" branches. Verified: bare `./run_tests.sh` and `SRCDIR=... ./run_tests.sh` (mimicking
+    tests. Pre-existing, not caused by this session's earlier changes. Root cause was actually one
+    level deeper than the path join itself: unlike `run_pass_test.sh`/`run_fail_test.sh` (which
+    already derive `BASEDIR` from `$(dirname "$0")`, location-independent), `run_tests.sh` derived
+    `BASEDIR` from bare `` `pwd` ``, i.e. it silently assumed it was always invoked with the test
+    directory as the caller's CWD. **Fixed**: `BASEDIR` now resolves via `$0` like its sibling
+    scripts, and the script `cd`s into it once up front — so `find ${TYPE}` (relative) now always
+    searches the right directory regardless of caller CWD, `$TEST` comes out relative like
+    `pass/foo.test` (matching what `run_pass_test.sh`/`run_fail_test.sh` expect when invoked
+    directly by a human, and what `run_test_base.sh`'s `$SRCDIR` join logic assumes in both its
+    "unset" (`.`, now correctly resolving against the `cd`'d-to test dir) and "set, made absolute"
+    branches), and the whole script is now callable from any CWD via an absolute or relative path
+    to it. Verified: bare `./run_tests.sh` and `SRCDIR=... ./run_tests.sh` (mimicking
     `make check`'s `TESTS_ENVIRONMENT`) both now run every `fail/` test to a clean pass/fail
     verdict with no segfaults. Remaining `run_tests.sh` failures after the fix are two distinct,
     unrelated, pre-existing gaps, not path bugs: (1) `testignore` (`scope_override_declaration_order`,
