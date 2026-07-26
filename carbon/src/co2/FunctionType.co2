@@ -86,6 +86,16 @@ class FunctionType : Type {
 		fprintf (fp, ")");
 	}
 
+	// Same shape as generate_named, but for a bare cast target, e.g.
+	// "(void (*)(struct RefObject *, va_list *))" -- no declarator name.
+	void generate_cast (FILE *fp) {
+		Bool first_arg = true;
+		return_type.generate (fp);
+		fprintf (fp, "(*)(");
+		parameters.map_args (functiontype_generate_parameter, fp, &first_arg);
+		fprintf (fp, ")");
+	}
+
 	void generate (FILE *fp) {
 		/* TODO This only works when the type should be generated for a declaration first.
 		 * when this is called in code it will fail.

@@ -48,6 +48,18 @@ void expression_generate_casted (FILE *fp, Expression arg, Type target_type) {
 			target_type.generate (fp);
 			fprintf (fp, ") ");
 		}
+	} else if (target_type && arg.type && target_type is_of FunctionType && arg.type is_of FunctionType) {
+		// Callback arguments to map()/map_args()-style higher-order functions
+		// routinely narrow their first parameter (e.g. RefObject -> VariableDeclaration)
+		// relative to the generic callback signature the callee declares -- type_check()
+		// already accepts this (the caller only ever invokes fun() with instances of the
+		// narrower type), but C requires the two distinct function pointer types to match
+		// exactly, so always bridge with an explicit cast. A cast to an identical type is
+		// a harmless no-op, so no need to first check whether the signatures differ.
+		FunctionType function_target_type = (FunctionType) target_type;
+		fprintf (fp, "(");
+		function_target_type.generate_cast (fp);
+		fprintf (fp, ") ");
 	}
 	arg.generate (fp);
 }
