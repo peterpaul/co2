@@ -60,7 +60,7 @@ class ObjectType : Type {
 		return token;
 	}
 
-	String to_string () {
+	String toString () {
 		return new String ("%s", token.name.data);
 	}
 

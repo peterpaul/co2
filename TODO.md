@@ -256,15 +256,40 @@ come from three *independent* root causes, not one:
   base signature instead of the resolved one.
   - **Deliberately did NOT touch `type_check()`** (which would have additionally fixed the 5th
     warning, `RefList.filter()`'s return value flowing into a caller's `struct RefList*` variable
-    uncast) — tried it, and it broke self-hosted rebuilds with spurious carbon-level "incompatible
-    types" compiler errors on named types like `Bool` that get looked up independently at different
-    call sites and apparently don't always converge on one canonical `.decl` in every context this
-    ran in. Reverted rather than chase it further; call-argument casting alone is a real, safe,
-    independent win, and doesn't need that fix to be correct. The 1 remaining warning (`Object.h:256`,
-    the `RefList.filter()` return case) is now the *only* known item left in this whole warning-count
-    effort, and needs that `type_check()`-side fix specifically — a real, separate, well-scoped
-    follow-on (root-cause it: why does resolving the same type name via `global_scope.lookup` in two
-    different call contexts sometimes produce non-identical or incompatible `.decl` objects?).
+    uncast) — tried it twice, in two separate sessions, and both times it broke self-hosted rebuilds
+    with a spurious carbon-level "incompatible types: Bool and Bool" error at
+    `ClassDeclaration.co2:95` (`is_compatible`'s own declaration line) and a couple of similar spots.
+    **Follow-up investigation (this session)**: the error message itself was previously misleading —
+    found and fixed a real, separate, unrelated bug along the way: `ObjectType.co2` defined its
+    `toString()` override as `to_string()` (snake_case), so `Type.assert_compatible()`'s calls to
+    `.toString()` never dispatched to it, always falling back to `BaseObject`'s generic "ClassName at
+    0xADDRESS" — meaning *every* `ObjectType` incompatibility error in this compiler's whole history
+    printed useless output instead of the actual type name. Fixed (renamed to `toString()`, no other
+    callers depended on the old name) — this alone is a real, independent, useful fix, since it makes
+    every future type-mismatch error message across the entire compiler actually readable. With that
+    fixed, the real message read "incompatible types: Bool and Bool" — and debugging further (temporary
+    instrumentation in `ObjectType.is_compatible()`) confirmed both sides resolve to the *same*
+    `TypeDeclaration` object for `Bool` (identical pointer, so it's not a canonicalization/identity
+    problem as originally suspected), and `TypeDeclaration.is_compatible()` unconditionally `return
+    true;` — so by every check performed, this comparison *should* succeed. Yet it still fails, and
+    only in the full multi-file `make -k` build: reproducing the *exact* same compiler invocation
+    standalone (`make V=1 co2/ClassDeclaration.c`, or `carbon` invoked directly with the identical
+    `-I` flags) compiles `ClassDeclaration.co2` cleanly every time, with no error — the failure only
+    manifests when many files are retranslated in the same overall build run, which rules out a
+    static logic bug in the new casting code itself and points at some state that differs between
+    "this file alone" and "this file as file N of ~80 in one build," not yet identified (not
+    filesystem parallelism — this Makefile builds serially; the same mystery persisted across
+    multiple independent repro attempts). Reverted `type_check()`'s change again rather than ship
+    something with an intermittent, unexplained failure mode; call-argument casting alone (kept) is
+    a real, safe, independent win that doesn't need it to be correct.
+  - **For whoever picks this up next**: the remaining 1 warning (`Object.h:256`, `RefList.filter()`'s
+    return case) needs the `type_check()` fix specifically (set `type` from the base-resolved return
+    type, not the resolved override's), but *don't* trust a standalone repro — this bug only shows up
+    inside the real multi-file `make -k` build, and the fastest way to iterate on it is probably to
+    add a print statement identifying which specific `.co2` file's compilation triggers it (not just
+    which line the error is attributed to, which may be misleading — check whether it's actually
+    `ClassDeclaration.co2` being compiled at that point in the log, e.g. by cross-referencing
+    surrounding warning lines' file paths, the same way this session did).
   - Verified via full two-pass clean rebuild + `make check`: 90/90, zero regressions, warnings
     5 → 1. Installed to `~/local-repo` as the new bootstrap baseline.
 
