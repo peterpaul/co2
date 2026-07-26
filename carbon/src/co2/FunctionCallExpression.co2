@@ -21,6 +21,59 @@ include co2/RefList
 include co2/TokenExpression
 include co2/BinaryExpression
 include co2/ConditionalBinaryExpression
+include co2/ClassDeclaration
+
+// A virtually-dispatched call (ordinary class-scope O_CALL, which is every
+// plain method call in this object model -- there's no non-virtual variant)
+// goes through a vtable slot whose C signature is fixed by whichever
+// class/interface *first* declared the method name, per
+// ClassDeclaration.find_base_function_declaration(). But the type-checker
+// resolves function_expr's .type against the receiver's *static* type,
+// which finds whatever override is nearest (e.g. RefList's own narrower
+// `RefList filter(...)`, not List's `List filter(...)` that actually
+// shapes the vtable slot). Casting *call arguments* against the base
+// signature is safe (used in generate() below) -- argument *validation*
+// (type_check_arguments) still uses the resolved/most-derived signature,
+// since that's the real declared contract being called.
+//
+// Deliberately NOT used to override this call expression's own .type in
+// type_check() (e.g. to fix a caller-side "struct RefList* x = obj.filter()"
+// cast): that would need the base return type to compare equal, by .decl,
+// to types resolved the normal way elsewhere -- tried it, and typedef'd
+// type names (e.g. "Bool") that get looked up independently at each call
+// site don't reliably compare as the same .decl in every context this ran
+// in, causing spurious "incompatible types" compiler errors during
+// self-hosted rebuilds. Fixing that needs sorting out why two resolutions
+// of the same type name don't converge on one canonical decl -- a separate,
+// deeper problem than this cast-insertion mechanism, not attempted here.
+FunctionType functioncallexpression_resolve_vtable_type (Expression function_expr, FunctionType resolved_type) {
+	ObjectTypeDeclaration receiver_decl = null;
+	Token method_name = null;
+	if (function_expr is_of TokenExpression) {
+		TokenExpression token_expr = (TokenExpression) function_expr;
+		if (token_expr.decl && token_expr.decl is_of FunctionDeclaration) {
+			FunctionDeclaration fun_decl = (FunctionDeclaration) token_expr.decl;
+			if (fun_decl.scope && fun_decl.scope.get_type () == class_scope_type) {
+				receiver_decl = (ObjectTypeDeclaration) current_context?.find (ClassDeclaration.class);
+				method_name = token_expr.token;
+			}
+		}
+	} else if (function_expr is_of BinaryExpression) {
+		BinaryExpression bin_expr = (BinaryExpression) function_expr;
+		if (bin_expr.operator.type == '.' && bin_expr.operand[0].type is_of ObjectType) {
+			receiver_decl = ((ObjectType) bin_expr.operand[0].type).decl;
+			method_name = bin_expr.operand[1].get_token ();
+		}
+	}
+	if (receiver_decl && receiver_decl is_of ClassDeclaration && method_name) {
+		ClassDeclaration class_decl = (ClassDeclaration) receiver_decl;
+		FunctionDeclaration base_decl = class_decl.find_base_function_declaration (method_name);
+		if (base_decl && base_decl.type is_of FunctionType) {
+			return (FunctionType) base_decl.type;
+		}
+	}
+	return resolved_type;
+}
 
 class FunctionCallExpression : Expression {
 	Expression function;
@@ -44,7 +97,7 @@ class FunctionCallExpression : Expression {
 	}
 
 	void generate (FILE *fp) {
-		FunctionType resolved_function_type = (FunctionType) self.function.type;
+		FunctionType resolved_function_type = functioncallexpression_resolve_vtable_type (self.function, (FunctionType) self.function.type);
 		if (function is_of TokenExpression) {
 			TokenExpression function = (TokenExpression) self.function;
 			if (function.decl && function.decl is_of FunctionDeclaration) {

@@ -119,6 +119,47 @@ class ClassDeclaration : ObjectTypeDeclaration {
 		}
 		return base;
 	}
+
+	// Walks from self up through the superclass chain (and each level's own
+	// declared interfaces) to find the *first* (most-ancestral) declaration of
+	// method_name. That declaration's signature is the one that actually fixes
+	// the vtable slot's C type -- every override further down independently
+	// regenerates its own (possibly narrower/wider) function-pointer typedef,
+	// but the slot itself never changes shape once the base class/interface
+	// establishes it (see O_OBJECT_METHOD/O_OBJECT_IF_METHOD's typeof-cast:
+	// it silently accepts any override, it doesn't change what the slot holds).
+	// Callers use this to cast call arguments/return values against the real
+	// dispatched-through signature instead of whichever override the
+	// type-checker happens to resolve to for a given static receiver type.
+	FunctionDeclaration find_base_function_declaration (Token method_name) {
+		ClassDeclaration current = self;
+		FunctionDeclaration result = null;
+
+		void check_interface (Token interface_name) {
+			Declaration _interface_decl = global_scope.lookup (interface_name);
+			if (_interface_decl is_of InterfaceDeclaration) {
+				InterfaceDeclaration interface_decl = (InterfaceDeclaration) _interface_decl;
+				FunctionDeclaration iface_found = (FunctionDeclaration) interface_decl.member_scope.find_type_in_this_scope (method_name, FunctionDeclaration.class);
+				if (iface_found) {
+					result = iface_found;
+				}
+			}
+		}
+
+		while (current) {
+			FunctionDeclaration found = (FunctionDeclaration) current.member_scope.find_type_in_this_scope (method_name, FunctionDeclaration.class);
+			if (found) {
+				result = found;
+			}
+			current.interfaces?.map (check_interface);
+			if (current.superclass) {
+				current = (ClassDeclaration) global_scope.lookup (current.superclass);
+			} else {
+				current = null;
+			}
+		}
+		return result;
+	}
 }
 
 Bool new_constructor_filter (ConstructorDeclaration constructor) {

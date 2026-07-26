@@ -225,30 +225,48 @@ come from three *independent* root causes, not one:
     state: 90/90, zero regressions, warnings 27 → 15. Installed to `~/local-repo` as the new
     baseline.
 - **Category G — vtable-dispatched calls resolve against the override's own signature, not the
-  base-declared vtable slot type — investigated, not fixed (5 warnings remain).** The last 5
+  base-declared vtable slot type — MOSTLY FIXED (4 of 5 warnings eliminated).** The 5
   non-`Interface.h` warnings (`RefList.filter()`'s return via `List.filter()`, `ClassDeclaration
   .is_compatible()`'s argument via `ObjectTypeDeclaration.is_compatible()`, `TokenExpression
-  .set_scope()`'s argument via `Expression.set_scope()`, `GenerateSourceIncludesVisitor
+  .set_scope()`'s argument via `Expression.set_scope()` (2 call sites), `GenerateSourceIncludesVisitor
   .visitObjectType()`'s argument via its base visitor declaration) all share one root cause: for a
-  virtually-dispatched method call (ordinary class-scope `O_CALL`, going through a vtable slot),
-  the C function pointer's *actual* signature is fixed by whichever class/interface *first*
-  declared that method name (same fact Category A's `typeof`-cast fix relies on for the
-  *assignment* side) — but the type-checker (correctly, for type-checking purposes) resolves
-  `.type_check()`/`.type` against the *most-derived* override's own declared signature, which this
-  session's cast-insertion logic (reasonably) trusts. When an override narrows/widens a parameter
-  or return type (the same safe-by-construction pattern noted throughout Category A's investigation
-  — e.g. `TokenExpression.set_scope(IScope scope)` overriding `Expression.set_scope(Scope scope);`),
-  the two signatures genuinely differ, and casting against the override's type doesn't match what
-  the vtable slot actually expects.
-  **Direction, if picked up**: needs a hierarchy-walk helper — given a class and a method name,
-  find the *first* declaring class/interface in its superclass/interface chain and return that
-  declaration's parameter/return types — then have `expression_generate_casted`
-  (call-argument/assignment/return sites) and `ReturnStatement.generate()` use that base signature
-  instead of the resolved override's own for any call that dispatches through a class-scope
-  `O_CALL` (not needed for direct/non-virtual calls, where the resolved and slot signatures always
-  match). Deliberately not attempted this session — real new mechanism touching core call
-  resolution used everywhere, higher regression risk for only 5 remaining warnings, decided not
-  worth it relative to Category F's much larger, lower-risk win.
+  virtually-dispatched method call (ordinary class-scope `O_CALL`, which is every plain method call
+  in this object model — there's no non-virtual variant), the C function pointer's *actual*
+  signature is fixed by whichever class/interface *first* declared that method name (same fact
+  Category A's `typeof`-cast fix relies on for the *assignment* side) — but the type-checker
+  (correctly, for type-checking purposes) resolves `.type` against the *most-derived* override's
+  own declared signature, which this session's cast-insertion logic (reasonably) trusted. When an
+  override narrows/widens a parameter or return type (the same safe-by-construction pattern noted
+  throughout Category A's investigation — e.g. `TokenExpression.set_scope(IScope scope)` overriding
+  `Expression.set_scope(Scope scope);`), the two signatures genuinely differ, and casting against
+  the override's type doesn't match what the vtable slot actually expects.
+  **Fixed**: added `ClassDeclaration.find_base_function_declaration(Token method_name)`
+  (`ClassDeclaration.co2`) — walks from a receiver class up through its superclass chain, and at
+  each level also checks that level's own directly-declared interfaces (each interface's
+  `member_scope` already has all of *its* super-interfaces flattened in via the existing
+  diamond-of-death fix, so one level of interface-checking per class is enough — no separate
+  recursion needed there), using `Scope.find_type_in_this_scope()` to check only what's declared
+  directly at that exact level, not inherited. Returns the most-ancestral `FunctionDeclaration`
+  found — the one that actually shaped the vtable slot. Added
+  `functioncallexpression_resolve_vtable_type()` (`FunctionCallExpression.co2`) to determine, from
+  a call's `function` sub-expression (either bare-name self-calls or explicit `receiver.method()`
+  calls — the two shapes `FunctionCallExpression.generate()` already distinguishes), the receiver's
+  static class and the method name, then delegates to the new hierarchy walk; wired into
+  `generate()` so call-argument casting (`expression_generate_actual_arguments_casted`) uses the
+  base signature instead of the resolved one.
+  - **Deliberately did NOT touch `type_check()`** (which would have additionally fixed the 5th
+    warning, `RefList.filter()`'s return value flowing into a caller's `struct RefList*` variable
+    uncast) — tried it, and it broke self-hosted rebuilds with spurious carbon-level "incompatible
+    types" compiler errors on named types like `Bool` that get looked up independently at different
+    call sites and apparently don't always converge on one canonical `.decl` in every context this
+    ran in. Reverted rather than chase it further; call-argument casting alone is a real, safe,
+    independent win, and doesn't need that fix to be correct. The 1 remaining warning (`Object.h:256`,
+    the `RefList.filter()` return case) is now the *only* known item left in this whole warning-count
+    effort, and needs that `type_check()`-side fix specifically — a real, separate, well-scoped
+    follow-on (root-cause it: why does resolving the same type name via `global_scope.lookup` in two
+    different call contexts sometimes produce non-identical or incompatible `.decl` objects?).
+  - Verified via full two-pass clean rebuild + `make check`: 90/90, zero regressions, warnings
+    5 → 1. Installed to `~/local-repo` as the new bootstrap baseline.
 
 - **`Interface.h`'s `O_BRANCH_CALL_IF` ternary macro bug — FIXED (10 warnings eliminated).**
   `assertTrue(_tmp ? _if : true, ...)` and `assertTrue(_tmp ? _if->msg : true, ...)` mix a pointer
@@ -302,10 +320,12 @@ come from three *independent* root causes, not one:
 **Current recommended `CFLAGS`**: `-std=gnu89 -g -O2` (just dropped `-fcommon` — verified above).
 Still `-std=gnu89`, not plain `c89`/`c17`, since GNU nested functions/`typeof`/statement-expressions
 are used throughout `Object.h`/`Interface.h`/carbon's own codegen (item #3, unaffected by any of
-this). 5 warnings remain (Category G), none of them blocking a successful build — just diagnostic
-noise pending that fix. Moving to `-std=gnu17` is real, valuable, separate follow-on work (fix
-Category G + add the three missing prototypes above), not attempted further this session. Full
-mechanism/history for all of this preserved at `~/.claude/plans/abundant-percolating-brooks.md`.
+this). **1 warning remains** (`RefList.filter()`'s uncast return value, Category G's last piece —
+see above), down from a 368 original baseline, none of them blocking a successful build — just
+diagnostic noise pending that fix. Moving to `-std=gnu17` is real, valuable, separate follow-on work
+(fix that last warning so Category G's errors-under-`gnu17` concern is moot, + add the three missing
+prototypes noted above), not attempted further this session. Full mechanism/history for all of this
+preserved at `~/.claude/plans/abundant-percolating-brooks.md`.
 
 ## 3. GNU nested functions force real GCC (excludes Clang, MSVC)
 
