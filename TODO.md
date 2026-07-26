@@ -31,9 +31,9 @@ The original ask. Plan already decided, not yet implemented:
   `autoconf`, `automake`, `libtool`, `bison`, `flex`, `pkgconf`) — decided over a Clang-only or
   Windows-skipped approach specifically because carbon's generated code needs GNU nested
   functions (see #3 below).
-- All three OS's need `CFLAGS="-std=gnu89 -fcommon -g -O2"` (see #2) until that's fixed properly.
+- All three OS's need `CFLAGS="-std=gnu89 -g -O2"` (see #2 — `-fcommon` no longer needed, verified).
 
-## 2. `-std=gnu89 -fcommon` masks real bugs in carbon's generated C — PARTIALLY FIXED
+## 2. `-std=gnu89 -fcommon` masks real bugs in carbon's generated C — MOSTLY FIXED
 
 Original framing here was wrong: `TypeCheckVisitor.co2` is actually a dead stub (never
 instantiated, zero references anywhere) — type-checking happens via a `type_check()` method on
@@ -250,14 +250,62 @@ come from three *independent* root causes, not one:
   resolution used everywhere, higher regression risk for only 5 remaining warnings, decided not
   worth it relative to Category F's much larger, lower-risk win.
 
-**Next step to actually drop the flags**: 15 warnings left (down from a 368 original baseline — see
-the corrected-baseline note under Category E for why the intermediate "195"/"69" figures logged
-earlier don't match a from-scratch rebuild). 10 are the pre-existing, unrelated `Interface.h`
-ternary macro issue (`O_BRANCH_CALL_IF`'s `assertTrue(_tmp ? _if : true, ...)` — a pointer/int
-mismatch in the conditional expression itself, nothing to do with codegen casts); 5 are Category
-G, above. Plus Phase 4 (the actual attempt to relax `-std=gnu89 -fcommon`) — `-fcommon` itself may
-already be droppable independently, worth a quick check. Full mechanism/history for all of this
-preserved at `~/.claude/plans/abundant-percolating-brooks.md`.
+- **`Interface.h`'s `O_BRANCH_CALL_IF` ternary macro bug — FIXED (10 warnings eliminated).**
+  `assertTrue(_tmp ? _if : true, ...)` and `assertTrue(_tmp ? _if->msg : true, ...)` mix a pointer
+  operand (`_if`/`_if->msg`) with the integer `true` in a ternary — `true` isn't a null-pointer
+  constant, so GCC correctly flags the two branches as incompatible types
+  (`-Wint-conversion`). `assertTrue`'s parameter is only ever used for truthiness, so the ternary's
+  actual result type never mattered semantically — fixed in both `co2/src/co2/Interface.h` and the
+  installed copy by making both branches genuinely boolean: `_tmp ? _if != NULL : true` and
+  `_tmp ? _if->msg != NULL : true`. Zero behavior change, purely a type-compatibility fix.
+- **A whole previously-uncounted warning bucket in hand-written `grammar.y`/`lex.l` — FOUND and
+  FIXED (39 warnings).** Every warning count logged in this file up through Category F (368, 195,
+  116, 27, 15) was measured from builds that never actually recompiled `grammar.c`/`lex.c` — these
+  are bison/flex output, not `.co2`-translated, so nothing in this session's "clean rebuild"
+  procedure (which only deleted `.co2`-derived `.c`/`.h`/`.d`) ever forced them to rebuild; `make`
+  correctly saw their `.o`s as up to date (since `grammar.y`/`lex.l` themselves were untouched) and
+  silently reused stale objects from early in the session. Found while investigating why dropping
+  `-fcommon` appeared to add ~40 new warnings — it didn't; a fully-thorough `make clean` finally
+  forced them to recompile for the first time, surfacing warnings that were *always* there,
+  completely independent of `-fcommon`. Since `grammar.y`/`lex.l` are hand-written C mixed with
+  bison/flex, not code the carbon *compiler* generates, none of Categories A–G's compiler-side
+  fixes could ever have reached them — these needed manual casts added directly in the two source
+  files, same shapes as the categories above: ~24 `RefList.append(RefObject)` calls passed a more
+  specific AST node type (cast to `(struct RefObject*)`); ~6 `List.merge(List)` calls passed a
+  concrete `RefList*` (cast to `(struct Object*)`, plus the one call that assigns `merge`'s return
+  also needed `(struct RefList*)` on the assignment); 4 `.map_args()` calls passed callbacks with
+  narrower first-parameter types (cast to `(void (*)(struct RefObject*, va_list*))`, matching
+  Category D's mechanism by hand); 5 plain field-assignment/return-value mismatches (`decl->body =
+  O_CALL(...);`-style, matching Category F's mechanism by hand); 4 in `lex.l`'s `Map`/`List`
+  interface calls (`get`/`put`/`add` all expect `RefObject*`, got `String*`/`File*`). Verified via
+  full clean rebuild + `make check`: 90/90, zero regressions, all 39 gone.
+- **`-fcommon` is fully droppable, right now, with everything already fixed above — VERIFIED.**
+  Empirically tested rather than guessed at: full clean rebuilds of `co2` (`make check` 1/1),
+  `co2-base` (`make check` 5/5), and `carbon` (`make check` 90/90) with plain `CFLAGS="-std=gnu89 -g
+  -O2"` (no `-fcommon`) all succeed with the exact same 5 residual warnings (Category G, above) as
+  with `-fcommon` present — dropping the flag changes nothing, confirming item #4's own suspicion
+  that the `lex.l` `extern`-fix from an earlier session was already sufficient. **Item #4's planned
+  `path`-global refactor to a lazy-singleton getter turned out to be unnecessary** — leaving it as
+  documented direction below in case a *future* hand-written global runs into the same issue, but
+  it's not blocking anything right now.
+- **`-std=gnu17` (dropping the `89`, keeping `-fcommon` or not) is a separate, bigger effort — not
+  yet attempted successfully.** Tried it directly: the 5 Category G warnings become **hard errors**
+  under `gnu17` (`-Wincompatible-pointer-types` is error-by-default in modern C dialects, not just
+  a warning) — so Category G is no longer optional once this is attempted, it must be fixed first.
+  On top of that, `gnu17`'s stricter K&R-implicit-declaration rules surfaced entirely new errors
+  unrelated to any category here: `Compiler.c`'s call to `parse` (bison-generated `yyparse`'s
+  wrapper), `grammar.c`'s own call to `yylex`, and `grammar.y`'s call to `error` (the parser's error
+  hook) are all missing proper prototypes before use, relying on C89's implicit-declaration
+  leniency. Real, separate follow-on work: fix Category G (see its own entry above) *and* add
+  proper forward declarations for these three, before `gnu17` can be attempted again.
+
+**Current recommended `CFLAGS`**: `-std=gnu89 -g -O2` (just dropped `-fcommon` — verified above).
+Still `-std=gnu89`, not plain `c89`/`c17`, since GNU nested functions/`typeof`/statement-expressions
+are used throughout `Object.h`/`Interface.h`/carbon's own codegen (item #3, unaffected by any of
+this). 5 warnings remain (Category G), none of them blocking a successful build — just diagnostic
+noise pending that fix. Moving to `-std=gnu17` is real, valuable, separate follow-on work (fix
+Category G + add the three missing prototypes above), not attempted further this session. Full
+mechanism/history for all of this preserved at `~/.claude/plans/abundant-percolating-brooks.md`.
 
 ## 3. GNU nested functions force real GCC (excludes Clang, MSVC)
 
@@ -272,20 +320,20 @@ by every "closures compiled to portable C" system. Would remove the GCC dependen
 Sizable rewrite of however callback generation works across the compiler's own source; not
 attempted yet.
 
-## 4. `path` global's fragile sharing pattern
+## 4. `path` global's fragile sharing pattern — no longer blocking anything
 
 Fixed the acute symptom (added `extern` to `lex.l`'s declaration so it doesn't create a second
-tentative definition that collides with the real one in `io.c`/`Compiler.c`), but the pattern
-itself — a bare global shared by name across a hand-written file and generated files, relying on
-both sides declaring compatible types — is fragile by construction and was the one place `-fcommon`
-was actually load-bearing.
+tentative definition that collides with the real one in `io.c`/`Compiler.c`). That turned out to be
+the *whole* fix needed: empirically verified (see item #2) that `-fcommon` is now fully droppable
+from `CFLAGS` with zero build or test differences across `co2`/`co2-base`/`carbon` — this was the
+only place relying on old-style tentative-definition merging after all.
 
-**Direction**: this codebase already has the right shape sitting right next to it —
-`file_hash_map`/`get_hash_map()` in `File.co2` is a lazily-initialized singleton behind a getter,
-not a raw shared global. Convert `path` (the include search path list) to the same shape. If this
-is genuinely the only place relying on old-style tentative-definition merging, `-fcommon` can
-likely be dropped from `CFLAGS` entirely afterward — worth verifying nothing else needs it before
-removing it.
+The underlying pattern itself — a bare global shared by name across a hand-written file and
+generated files, relying on both sides declaring compatible types — is still fragile by
+construction, just not currently causing any problem. **Direction, if it ever bites again**: this
+codebase already has the right shape sitting right next to it — `file_hash_map`/`get_hash_map()` in
+`File.co2` is a lazily-initialized singleton behind a getter, not a raw shared global. Convert
+`path` (the include search path list) to the same shape.
 
 ## 5. ~~carbon has no pointer arithmetic support (`ptr + int`)~~ — FIXED
 

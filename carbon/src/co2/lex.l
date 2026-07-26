@@ -171,14 +171,14 @@ int yywrap()
  */
 struct File * validate_file(struct File * file)
 {
-	struct File * existing_file = O_CALL_IF (Map, get_hash_map (), get, file->absolute_path);
+	struct File * existing_file = (struct File *) O_CALL_IF (Map, get_hash_map (), get, (struct RefObject *) (file->absolute_path));
 	if (existing_file)
 	{
 		/* printf ("skipping already parsed file: %s\n", file->absolute_path->data); */
 		O_CALL (file, delete);
 		return NULL;
 	}
-	O_CALL_IF (Map, get_hash_map (), put, file->absolute_path, file);
+	O_CALL_IF (Map, get_hash_map (), put, (struct RefObject *) (file->absolute_path), (struct RefObject *) (file));
 	yyin = fopen (file->absolute_path->data, "r");
 	return file;
 }
@@ -231,7 +231,7 @@ void new_input(struct String * file_name)
 	if (new_file) {
 		O_CALL_CLASS(IncludeStack(), new, linenumber, current_file, YY_CURRENT_BUFFER);
 		current_file = new_file;
-		O_CALL_IF (List, include_stack->current_file->file_dependencies, add, current_file);
+		O_CALL_IF (List, include_stack->current_file->file_dependencies, add, (struct RefObject *) (current_file));
 		linenumber = 1;
 		yy_switch_to_buffer(yy_create_buffer(yyin, YY_BUF_SIZE));
 	}

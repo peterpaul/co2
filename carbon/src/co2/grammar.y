@@ -256,7 +256,7 @@ input
 global_declaration_list
 :	global_declaration_list declaration_list_content
 {
-  O_CALL_IF (List, current_file->declarations, merge, $2);
+  O_CALL_IF (List, current_file->declarations, merge, (struct Object*) ($2));
 }
 |	/* empty */
 ;
@@ -264,7 +264,7 @@ global_declaration_list
 declaration_list
 :	declaration_list declaration_list_content
 {
-  $$ = O_CALL($1, merge, $2);
+  $$ = (struct RefList*) O_CALL($1, merge, (struct Object*) ($2));
 }
 |	/* empty */
 {
@@ -276,7 +276,7 @@ declaration_list_content
 :	declaration 
 {
   $$ = O_CALL_CLASS(RefList(), new, 8, Declaration()); 
-  O_CALL($$, append, $1); 
+  O_CALL($$, append, (struct RefObject*) ($1)); 
 }
 |	variable_declaration_list
 |	definition_declaration
@@ -285,7 +285,7 @@ declaration_list_content
   O_CALL_IF(IScope, current_scope, leave);
   O_CALL_IF(IScope, current_scope, declare, $1);
   $$ = O_CALL_CLASS(RefList(), new, 8, Declaration()); 
-  O_CALL($$, append, $1); 
+  O_CALL($$, append, (struct RefObject*) ($1)); 
 }
 ;
 
@@ -339,19 +339,19 @@ definition_declaration
 :	header_file definition
 {
   $$ = $2;
-  O_CALL($$, map_args, declaration_list_set_include_header, $1);
+  O_CALL($$, map_args, (void (*)(struct RefObject*, va_list*)) declaration_list_set_include_header, $1);
 }
 |	header_file '{' definition_list '}'
 {
   $$ = $3;
-  O_CALL($$, map_args, declaration_list_set_include_header, $1);
+  O_CALL($$, map_args, (void (*)(struct RefObject*, va_list*)) declaration_list_set_include_header, $1);
 }
 ;
 
 definition_list
 :	definition_list definition
 {
-  O_CALL($1, merge, $2);
+  O_CALL($1, merge, (struct Object*) ($2));
 }
 |	definition
 ;
@@ -362,12 +362,12 @@ definition
   O_CALL_IF(IScope, current_scope, leave);
   O_CALL_IF(IScope, current_scope, declare, $1);
   $$ = O_CALL_CLASS(RefList(), new, 8, Declaration());
-  O_CALL($$, append, $1);
+  O_CALL($$, append, (struct RefObject*) ($1));
 }
 |	declaration 
 {
   $$ = O_CALL_CLASS(RefList(), new, 8, Declaration()); 
-  O_CALL($$, append, $1); 
+  O_CALL($$, append, (struct RefObject*) ($1)); 
 }
 |	variable_declaration_list
 ;
@@ -382,7 +382,7 @@ header_file
 variable_declaration_list
 :	type variable_declaration_id_list ';' 
 {
-  O_CALL($2, map_args, VariableDeclaration_set_type, $1);
+  O_CALL($2, map_args, (void (*)(struct RefObject*, va_list*)) VariableDeclaration_set_type, $1);
   $$ = $2;
 }
 ;
@@ -390,12 +390,12 @@ variable_declaration_list
 variable_declaration_id_list
 :	variable_declaration_id_list ',' variable_declaration_id
 {
-  O_CALL($$, append, $3);
+  O_CALL($$, append, (struct RefObject*) ($3));
 }
 |	variable_declaration_id
 {
   $$ = O_CALL_CLASS(RefList(), new, 8, Declaration());
-  O_CALL($$, append, $1);
+  O_CALL($$, append, (struct RefObject*) ($1));
 }
 ;
 
@@ -421,7 +421,7 @@ function_declaration
 :	function_header statement
 {
   struct FunctionDeclaration * decl = O_CAST($1, FunctionDeclaration());
-  decl->body = O_CALL($2, retain);
+  decl->body = (struct Statement*) O_CALL($2, retain);
   O_CALL_IF(IScope, current_scope, leave);
 }
 ;
@@ -435,15 +435,15 @@ formal_argument_list_var ')' implemented_interface_methods
 {
   struct FunctionType * type = O_CALL_CLASS(FunctionType(), new_ctor, _FunctionType_ctor_from_decl, $1, $5);
   struct FunctionDeclaration * decl = O_CALL_CLASS(FunctionDeclaration(), new, $2, type, $5, NULL);
-  decl->implemented_methods = O_CALL($7, retain);
-  $$ = decl;
+  decl->implemented_methods = (struct RefList*) O_CALL($7, retain);
+  $$ = (struct Declaration*) decl;
 }
 ;
 
 implemented_interface_methods
 :	implemented_interface_methods implemented_interface_method
 {
-  O_CALL ($1, append, $2);
+  O_CALL ($1, append, (struct RefObject*) ($2));
 }
 |	/* empty */
 {
@@ -467,7 +467,7 @@ formal_argument_list_var
 {
   struct Type * type = O_CALL_CLASS(PrimitiveType(), new, $3);
   struct ArgumentDeclaration * arg = O_CALL_CLASS(ArgumentDeclaration(), new, $3, type);
-  O_CALL($$, append, arg);
+  O_CALL($$, append, (struct RefObject*) (arg));
 }
 |	opt_formal_argument_list
 |	_VA_ARG
@@ -475,7 +475,7 @@ formal_argument_list_var
   $$ = O_CALL_CLASS(RefList(), new, 8, ArgumentDeclaration());
   struct Type * type = O_CALL_CLASS(PrimitiveType(), new, $1);
   struct ArgumentDeclaration * arg = O_CALL_CLASS(ArgumentDeclaration(), new, $1, type);
-  O_CALL($$, append, arg);
+  O_CALL($$, append, (struct RefObject*) (arg));
 }
 ;
 
@@ -490,12 +490,12 @@ opt_formal_argument_list
 formal_argument_list
 :	formal_argument_list ',' formal_argument
 {
-  O_CALL($$, append, $3);
+  O_CALL($$, append, (struct RefObject*) ($3));
 }
 |	formal_argument
 {
   $$ = O_CALL_CLASS(RefList(), new, 8, ArgumentDeclaration());
-  O_CALL($$, append, $1);
+  O_CALL($$, append, (struct RefObject*) ($1));
 }
 ;
 
@@ -528,7 +528,7 @@ identifier
 struct_declaration_body
 :	struct_declaration_body variable_declaration_list
 {
-  O_CALL ($1, merge, $2);
+  O_CALL ($1, merge, (struct Object*) ($2));
 }
 |	/* empty */
 {
@@ -548,8 +548,8 @@ class_declaration
 {
   O_CALL_IF(IScope, current_scope, leave);
   struct ClassDeclaration * decl = O_CAST($1, ClassDeclaration());
-  decl->members = O_CALL($4, retain);
-  O_CALL(decl->members, map_args, Declaration_set_class_decl, decl);
+  decl->members = (struct RefList*) O_CALL($4, retain);
+  O_CALL(decl->members, map_args, (void (*)(struct RefObject*, va_list*)) Declaration_set_class_decl, decl);
   O_CALL_IF (IScope, decl->member_scope, set_parent, NULL);
   $$ =(struct Declaration *) decl;
 }
@@ -571,7 +571,7 @@ class_header
 interface_list
 :	interface_list ',' _TYPE_IDENTIFIER
 {
-  O_CALL($$, append, $3);
+  O_CALL($$, append, (struct RefObject*) ($3));
 }
 |	/* empty */
 {
@@ -611,7 +611,7 @@ compound_content_list '}'
 compound_content_list
 :	compound_content_list compound_content
 {
-  O_CALL($$, merge, $2);
+  O_CALL($$, merge, (struct Object*) ($2));
 }
 |	/* empty */
 {
@@ -623,17 +623,17 @@ compound_content
 :	statement
 {
   $$ = O_CALL_CLASS(RefList(), new, 8, CompileObject());
-  O_CALL($$, append, $1);
+  O_CALL($$, append, (struct RefObject*) ($1));
 }
 |	declaration
 {
   $$ = O_CALL_CLASS(RefList(), new, 8, CompileObject());
-  O_CALL($$, append, $1);
+  O_CALL($$, append, (struct RefObject*) ($1));
 }
 |	variable_declaration_list
 {
   $$ = O_CALL_CLASS(RefList(), new, 8, CompileObject());
-  O_CALL($$, merge, $1);
+  O_CALL($$, merge, (struct Object*) ($1));
 }
 ;
 
@@ -652,7 +652,7 @@ try_statement
 catch_statement_list
 :	catch_statement_list catch_statement
 {
-  O_CALL ($1, append, $2);
+  O_CALL ($1, append, (struct RefObject*) ($2));
 }
 |	/* empty */
 {
@@ -760,7 +760,7 @@ switch_statement
 case_statement_list_with_default
 :	case_statement_list default_case
 {
-  O_CALL ($$, append, $2);
+  O_CALL ($$, append, (struct RefObject*) ($2));
 }
 |	case_statement_list
 ;
@@ -769,7 +769,7 @@ case_statement_list_with_default
 case_statement_list
 :	case_statement_list case_statement
 {
-  O_CALL ($$, append, $2);
+  O_CALL ($$, append, (struct RefObject*) ($2));
 }
 |	/* empty */
 {
@@ -792,7 +792,7 @@ case_statement
 case_content_list
 :	case_content_list statement
 {
-  O_CALL ($$, append, $2);
+  O_CALL ($$, append, (struct RefObject*) ($2));
 }
 |	/* empty */
 {
@@ -818,7 +818,7 @@ interface_declaration
 {
   O_CALL_IF(IScope, current_scope, leave);
   struct InterfaceDeclaration * decl = O_CAST($1, InterfaceDeclaration());
-  decl->members = O_CALL($4, retain);
+  decl->members = (struct RefList*) O_CALL($4, retain);
 }
 ;
 
@@ -834,12 +834,12 @@ interface_method_declaration_list
 {
   O_CALL_IF(IScope, current_scope, leave);
   O_CALL_IF(IScope, current_scope, declare, $2);
-  O_CALL($1, append, $2);
+  O_CALL($1, append, (struct RefObject*) ($2));
 }
 |	interface_method_declaration_list function_declaration
 {
   O_CALL_IF(IScope, current_scope, declare, $2);
-  O_CALL($1, append, $2);
+  O_CALL($1, append, (struct RefObject*) ($2));
 }
 |	/* empty */
 {
@@ -905,12 +905,12 @@ opt_type_list
 type_list
 :	type_list ',' type
 {
-	O_CALL($1, append, $3);
+	O_CALL($1, append, (struct RefObject*) ($3));
 }
 |	type
 {
 	$$ = O_CALL_CLASS(RefList(), new, 8, Type());
-	O_CALL($$, append, $1);
+	O_CALL($$, append, (struct RefObject*) ($1));
 }
 ;
 
@@ -1003,12 +1003,12 @@ opt_actual_argument_list
 actual_argument_list
 :	actual_argument_list ',' expression
 {
-  O_CALL($$, append, $3);
+  O_CALL($$, append, (struct RefObject*) ($3));
 }
 |	expression
 {
   $$ = O_CALL_CLASS(RefList(), new, 8, Expression());
-  O_CALL($$, append, $1);
+  O_CALL($$, append, (struct RefObject*) ($1));
 }
 ;
 
