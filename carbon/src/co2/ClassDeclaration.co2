@@ -101,7 +101,7 @@ class ClassDeclaration : ObjectTypeDeclaration {
 			return self == other;
 		} else if (_other is_of InterfaceDeclaration) {
 			InterfaceDeclaration other = (InterfaceDeclaration) _other;
-			other.is_compatible (self);
+			return other.is_compatible (self);
 		} else {
 			return false;
 		}

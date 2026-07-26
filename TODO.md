@@ -33,20 +33,54 @@ The original ask. Plan already decided, not yet implemented:
   functions (see #3 below).
 - All three OS's need `CFLAGS="-std=gnu89 -fcommon -g -O2"` (see #2) until that's fixed properly.
 
-## 2. `-std=gnu89 -fcommon` masks real bugs in carbon's generated C
+## 2. `-std=gnu89 -fcommon` masks real bugs in carbon's generated C — PARTIALLY FIXED
 
-Currently required because carbon's codegen relies on implicit-int, mismatched pointer types
-through the `O_CALL`/`O_CALL_IF` dynamic-dispatch macros, and (until recently) tentative-definition
-symbol merging — all things modern C compilers reject or warn hard on by default.
+Original framing here was wrong: `TypeCheckVisitor.co2` is actually a dead stub (never
+instantiated, zero references anywhere) — type-checking happens via a `type_check()` method on
+every AST node, not a visitor. Two rounds of investigation this session found the real warnings
+come from three *independent* root causes, not one:
 
-**Direction**: `TypeCheckVisitor.co2` already detects these mismatches — it's *why* you see
-`WARNING: incompatible types: ...` / `WARNING: possible data loss ...` spam on every build. It
-just warns and moves on instead of inserting the explicit cast it already knows is needed. Fix:
-make the type checker (or a new pass) auto-insert those casts in generated code, so the output
-compiles clean under a strict modern C dialect and the `-std=gnu89` pin can be dropped (or at
-least the reliance on it becomes a choice, not a requirement). Biggest, most valuable, but also
-the most invasive fix on this list — touches every codegen path going through the object-dispatch
-macros.
+- **Category A — vtable slot assignment mismatch.** `O_OBJECT_METHOD`/`O_OBJECT_IF_METHOD*`
+  (`co2/src/co2/Object.h`, `Interface.h`) do a bare `self->method = _Class_method;` with no cast,
+  but each override independently regenerates its own function-pointer typedef from its own
+  `.co2` parameter annotations, with zero cross-check against the base class's declared slot type.
+  **FIXED**: added a `(typeof(self->method))` cast to all three macros (`typeof` was already used
+  elsewhere in the same files, so this isn't a new dependency). Verified: eliminated all 36
+  baseline occurrences of this specific warning shape (`assignment to ... from incompatible
+  pointer type`) in a full clean carbon self-host rebuild, confirmed by inspecting exactly which
+  generated functions the remaining ~13 "assignment to" warnings come from (all ordinary
+  constructor field assignments — Category B/C territory, not this one). Zero regressions,
+  90/90 carbon tests, 5/5 co2-base, 1/1 co2.
+- **Considered and explicitly reverted: a defensive override-signature check.** Tried adding a
+  check to `FunctionDeclaration.type_check()` warning when an override's parameter/return types
+  aren't a valid contravariant/covariant widening of the base declaration's (to catch genuinely
+  broken overrides now that the `typeof` cast above silently accepts *any* mismatch). Built,
+  worked correctly on a synthetic bad-override repro — then flagged ~26 sites across carbon's own
+  source when run for real. Investigated each: **all 26 are false positives**, all the same
+  pattern — this codebase's entire visitor system (`BaseCompileObjectVisitor` and every
+  `Generate*Visitor`/`FixScopeVisitor` subclass) depends on overrides *narrowing* their parameter
+  type (base declares `visitClassDeclaration(Declaration decl)`, every override declares
+  `visitClassDeclaration(ClassDeclaration decl)`), safe only because the call site always does an
+  `is_of` check immediately before dispatching — an invariant no static per-signature check can
+  verify without real control-flow analysis. Reverted; not worth the noise. If this is
+  revisited, it needs to understand call-site dispatch context, not just compare two
+  declarations in isolation.
+- **Category B — call-site argument casts (highest volume, ~330 of ~368 baseline warnings,
+  untouched).** `FunctionCallExpression.generate()` emits arguments with no cast even where
+  `type_check_arguments()` already validated (and approved, via subtype/interface compatibility)
+  a type that still needs an explicit cast in C, since C has no struct-pointer subtyping. Not
+  attempted this round — see the full plan (mechanism, affected files, `NewExpression`/
+  `SuperExpression` extensions, interface-cast-to-`struct Object*` caveat) preserved at
+  `~/.claude/plans/abundant-percolating-brooks.md` if picked up later.
+- **Category C — silent numeric narrowing (lower priority, doesn't move the GCC-warning-count
+  needle).** `PrimitiveType.is_compatible()` warns on numeric narrowing but still returns `true`,
+  so no cast is ever inserted — but this is carbon's *own* compile-time diagnostic, not a
+  GCC/Clang warning at default `-Wall -Wextra`, so it isn't a blocker for dropping the flags
+  either. Not attempted. Same plan file has the mechanism if picked up.
+
+**Next step to actually drop the flags**: Category B needs to land before `-std=gnu89 -fcommon`
+can be meaningfully relaxed (330 of ~368 baseline warnings are still there). `-fcommon` itself may
+already be droppable independently — worth a quick check.
 
 ## 3. GNU nested functions force real GCC (excludes Clang, MSVC)
 

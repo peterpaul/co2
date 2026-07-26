@@ -204,7 +204,7 @@
 				    O_SUPER)
 
 #define O_OBJECT_METHOD(klass,method)		\
-	self->method = _##klass##_##method
+	self->method = (typeof(self->method)) _##klass##_##method
 
 #define O_OBJECT_METHOD_VAL(klass,method,val)	\
 	self->method = val

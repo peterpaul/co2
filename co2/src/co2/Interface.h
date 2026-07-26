@@ -44,10 +44,10 @@
 	self->interface_list = interface
 
 #define O_OBJECT_IF_METHOD(klass,method)		\
-	interface->method = klass##_##method##_impl
+	interface->method = (typeof(interface->method)) klass##_##method##_impl
 
 #define O_OBJECT_IF_METHOD_BINDING(klass,if_method,method)	\
-	interface->if_method = klass##_##method##_impl
+	interface->if_method = (typeof(interface->if_method)) klass##_##method##_impl
 
 #define O_OBJECT_IF_END				\
 	}
