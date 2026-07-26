@@ -30,7 +30,7 @@ function run_tests {
     test_separator
     echo "${TYPE} test-cases"
     test_separator
-    local TESTS=`find ${TESTDIR}/${TYPE} -name "*.test" | sort`
+    local TESTS=`find ${TYPE} -name "*.test" | sort`
     for TEST in ${TESTS}
     do
 	local BASENAME=`basename ${TEST} .test`

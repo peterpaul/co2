@@ -115,17 +115,28 @@ come from three *independent* root causes, not one:
     compiler source fix, seeing that fix's effect on *other* `.co2` files requires either
     `make CARBON=/path/to/the/new/binary` or manually invoking that binary — plain `make` silently
     keeps using the old pinned compiler and the fix appears to do nothing.
-  - **Also found, unrelated, not fixed**: `carbon/test/run_tests.sh` (the standalone, non-`make
-    check` driver documented as the normal way to run this suite) passes already-absolute test
-    paths (from `find $TESTDIR/...`) into `run_pass_test.sh`/`run_fail_test.sh`, whose
-    `run_test_base.sh` then prefixes them with `$SRCDIR` again — this double-prefixes the path
-    into something nonexistent whenever `$SRCDIR` is set to anything other than literally empty,
-    which is exactly what `make check`'s own `TESTS_ENVIRONMENT` does (`SRCDIR="$(srcdir)"`). The
-    result is either a silent "file not found"-turned-crash (segfault) for `fail/` tests (which
-    still counts as "correctly failed to compile" so the bug hides), or an outright missing-file
-    build failure for `pass/` tests. Pre-existing, not caused by this session's changes; not fixed
-    here since `make check`'s per-test `.sh` scripts are unaffected and give a reliable 90/90.
-    Worth fixing `run_tests.sh`/`run_test_base.sh`'s path-joining before relying on it again.
+  - **Also found, and FIXED**: `carbon/test/run_tests.sh` (the standalone, non-`make check` driver
+    documented as the normal way to run this suite) passed already-absolute test paths (from
+    `find ${TESTDIR}/${TYPE}`) into `run_pass_test.sh`/`run_fail_test.sh`, whose `run_test_base.sh`
+    then prefixed them with `$SRCDIR` again — double-prefixing the path into something nonexistent
+    whenever `$SRCDIR` is set to anything other than literally empty, which is exactly what `make
+    check`'s own `TESTS_ENVIRONMENT` does (`SRCDIR="$(srcdir)"`). The result was either a silent
+    "file not found"-turned-crash (segfault) for `fail/` tests (which still counts as "correctly
+    failed to compile" so the bug hid), or an outright missing-file build failure for `pass/`
+    tests. Pre-existing, not caused by this session's earlier changes. **Fixed**: `find` now
+    searches `${TYPE}` (relative to the script's own `$PWD`, which is always the test directory)
+    instead of `${TESTDIR}/${TYPE}`, so `$TEST` is relative like `pass/foo.test` — matching what
+    `run_pass_test.sh`/`run_fail_test.sh` already expect when invoked directly by a human, and what
+    `run_test_base.sh`'s `$SRCDIR` join logic assumes in both its "unset" (`.`) and "set, made
+    absolute" branches. Verified: bare `./run_tests.sh` and `SRCDIR=... ./run_tests.sh` (mimicking
+    `make check`'s `TESTS_ENVIRONMENT`) both now run every `fail/` test to a clean pass/fail
+    verdict with no segfaults. Remaining `run_tests.sh` failures after the fix are two distinct,
+    unrelated, pre-existing gaps, not path bugs: (1) `testignore` (`scope_override_declaration_order`,
+    `cast_expression`, etc.) isn't consulted by `run_tests.sh` the way it is by
+    `generate-testcases.sh`'s generated per-test `.sh` scripts, so deliberately-excluded tests still
+    run and "fail"; (2) several `pass/` tests (`class_decl_inheritance`, `dependencies`, `import`,
+    etc.) depend on a companion `.co2` helper file in the same directory (e.g. `InheritB.co2` →
+    `InheritB.h`) that `run_tests.sh` never compiles, since it only iterates `*.test` files.
 - **Category C — silent numeric narrowing (lower priority, doesn't move the GCC-warning-count
   needle).** `PrimitiveType.is_compatible()` warns on numeric narrowing but still returns `true`,
   so no cast is ever inserted — but this is carbon's *own* compile-time diagnostic, not a
