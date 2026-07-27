@@ -55,6 +55,13 @@ sed -i.bak '/#define __ASSERT_VOID_CAST (void)/a\
 #define __STRING(x) #x' src/co2/utils.h
 rm -f src/co2/utils.h.bak
 
+# ASSERT_FAIL's non-glibc branch calls Darwin/BSD's __assert_rtn, which
+# doesn't exist on MinGW either -- message() has already printed the failure
+# text by the time ASSERT_FAIL runs, so all it needs to do elsewhere is
+# actually terminate the program. Same fix as this repo's own HEAD utils.h.
+perl -0777 -pi -e 's/#else\n#define ASSERT_FAIL\(p,file,line,function\)     \\\n  __assert_rtn\(function,file,line,p\)\n#endif/#elif defined(__APPLE__)\n#define ASSERT_FAIL(p,file,line,function)     \\\n  __assert_rtn(function,file,line,p)\n#else\n#define ASSERT_FAIL(p,file,line,function)     \\\n  abort()\n#endif/' src/co2/utils.h
+sedi 's|#include <assert.h>|#include <assert.h>\n#include <stdlib.h>|' src/co2/utils.h
+
 autoreconf -fi
 
 echo "=== Patching libco2-base (bootstrap) ==="

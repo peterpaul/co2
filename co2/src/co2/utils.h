@@ -20,6 +20,7 @@
 #define UTILS_H
 
 #include <assert.h>
+#include <stdlib.h>
 
 #ifndef __ASSERT_VOID_CAST
 #define __ASSERT_VOID_CAST (void)
@@ -38,9 +39,16 @@
 #ifdef __GLIBC__
 #define ASSERT_FAIL(p,file,line,function)     \
   __assert_fail(p,file,line,function)
-#else
+#elif defined(__APPLE__)
 #define ASSERT_FAIL(p,file,line,function)     \
   __assert_rtn(function,file,line,p)
+#else
+/* Neither glibc's __assert_fail nor Darwin's __assert_rtn exist on MinGW
+ * (or any other libc that isn't one of those two) -- message() has already
+ * printed the failure text above, so all ASSERT_FAIL needs to do here is
+ * actually terminate the program. */
+#define ASSERT_FAIL(p,file,line,function)     \
+  abort()
 #endif
 
 #define message(x,...)                                                  \
