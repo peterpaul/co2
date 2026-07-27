@@ -67,3 +67,7 @@ co2-base/test/co2/*.[cdh]
 carbon/src/co2/*.[cdh]
 examples/my-object-carbon/src/*.[cdh]
 examples/my-object-carbon/test/*.[cdh]
+
+# Hand-written (not .co2-generated) exceptions to the blanket rules above
+!co2-base/src/co2/time_compat.c
+!co2-base/src/co2/time_compat.h
