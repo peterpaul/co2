@@ -78,5 +78,11 @@ jobs:
         if: runner.os == 'Windows'
         shell: msys2 {0}
         env:
-          WORKDIR: ${{ runner.temp }}/co2-ci
+          # runner.temp resolves to a Windows-style path (D:\a\_temp) that,
+          # once mixed with forward slashes and passed through MSYS2's
+          # POSIX<->Windows path conversion, comes out mangled (libtool's
+          # -rpath handling has seen it collapse to "D:a_temp/..." with the
+          # separators dropped). Use a plain MSYS2-native path instead --
+          # entirely within one path universe, nothing to convert.
+          WORKDIR: /tmp/co2-ci
         run: bash .github/scripts/build-and-test.sh
