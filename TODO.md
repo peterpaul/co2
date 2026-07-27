@@ -6,58 +6,88 @@ of this — see git log for `Fix macOS build portability...`, `Replace carbon's 
 `Fix the last 2 flaky carbon test fixtures`, and `Emit angle-bracket includes for external...`.
 This file only tracks what's still open.
 
-## 1. GitHub Actions CI — ADDED, macOS path fully verified, Windows untested
+## 1. GitHub Actions CI — Linux and macOS fully green; Windows has one known open failure
 
 `.github/workflows/ci.yml` + `.github/scripts/{patch-bootstrap.sh,build-and-test.sh}`. Matrix:
 `ubuntu-latest`/`macos-latest`/`windows-latest` (MSYS2 MINGW64, since carbon's generated code
 needs GNU nested functions — see #3 — which Clang/MSVC don't support). `CFLAGS="-std=gnu89 -g
 -O2"` throughout (see #2 — `-fcommon` confirmed unnecessary).
 
+**Linux (`ubuntu-latest`) and macOS (`macos-latest`): fully verified passing via real CI runs.**
+
 - **Bootstrap problem**: `carbon` needs a working `carbon` binary to build itself, and `co2-base`
   needs `carbon` to translate `.co2` → `.c`. A clean checkout can't self-host. Fix:
   `build-and-test.sh` downloads this repo's own old GitHub Release tarballs (`libco2-0.3.0`,
-  `libco2-base-0.3.0`, `carbon-0.3.1` — these ship `make dist`-bundled pre-generated `.c`/`.h`, so
-  building *them* needs no carbon at all, just a plain C toolchain), builds them into a scratch
-  bootstrap prefix, then puts that `carbon` on `PATH` to build HEAD's real `co2`/`co2-base`/`carbon`
-  the normal way (`autogen.sh && configure && make && make check`).
-- **The bootstrap tarballs predate every fix in this file, and needed patching** —
-  `patch-bootstrap.sh` applies all of it, **verified via a full local dry run on macOS** (bootstrap
-  build → install → build & test HEAD's own three projects: 1/1, 5/5, 90/90, all green). The
-  patch set that was *actually* needed (found by really running it, not by guessing from memory —
-  a couple of these differ from what was assumed here previously):
-  - `exception.h`→`co2_exception.h` rename in libco2 (case-insensitive collision with co2-base's
-    `Exception.h` once both are on the include path) — matches HEAD's own fix exactly.
-  - co2-base's generated `BaseObject.h`/`.c`: quoted `#include "string.h"` → angle brackets (same
-    case-insensitive-collision shape as HEAD's fix, this time against co2-base's own `String.h`),
-    plus updating their `co2/exception.h` reference to match the rename above.
-  - `Grammar.co2`→`GrammarTokens.co2` rename in carbon (`co2/Grammar.h` collides with bison's own
-    `grammar.h` case-insensitively) — matches HEAD's own fix, but needed a few extra steps the old
-    tarball's *shipped* generated sources didn't have pre-baked: manually recreating the trivial
-    generated `GrammarTokens.c` (no carbon binary exists yet at this bootstrap stage to
-    regenerate it), and fixing `ArgumentDeclaration.c`'s pre-generated source, which was missing
-    the `#include` for these token constants entirely (an unrelated, pre-existing gap in that
-    specific tarball).
-  - `lex.l`'s `path` made `extern` (matches HEAD's fix — macOS `ld64` doesn't merge tentative
-    definitions).
-  - `BUILT_SOURCES` fix — but the *real* generated path is bare `grammar.h` at the top of `src/`,
-    not `co2/grammar.h`, despite `grammar.y` living in `co2/` (bison's `-d` output naming/ylwrap
-    quirk) — matches HEAD's actual fix once traced through.
-  - **New finding, not previously documented**: this dist tarball also bundles *stale,
-    wrongly-located* pre-generated `grammar.c`/`grammar.h`/`lex.c` at the top level of `src/`
-    (leftover from before `grammar.y`/`lex.l` moved into `co2/` — `Makefile.am`'s own `clean-local`
-    rule, which still `rm`s those exact top-level paths, confirms this). They duplicate-link
-    against the real `co2/grammar.c` that `Makefile.am`'s source list actually builds
-    (`duplicate symbol '_yyerror'`). Deleting them lets automake's own bison rule regenerate
-    `co2/grammar.c` correctly.
-  - **Not needed after all** (documented here previously, never actually hit): the C23/`bool`
-    guard (moot once `-std=gnu89` is explicit) and `echo -n`→`printf`/`IncludeStack.h`
-    angle-bracket fixes (apparently specific to building from raw git history, not these
-    particular tarball snapshots).
-- **Not verified**: the Linux path (should be strictly easier — no case-insensitive-filesystem
-  collisions to trigger any of the renames above, though applying them is harmless either way) and
-  the Windows/MSYS2 path (no local Windows environment to test against) haven't actually been run,
-  only reasoned through against the same documented plan. First real CI run on those two may need
-  follow-up fixes.
+  `libco2-base-0.3.0`, `carbon-0.3.1`), patches and builds them into a scratch bootstrap prefix
+  (`patch-bootstrap.sh`), then does a **two-pass** build of HEAD's own `co2`/`co2-base`/`carbon`:
+  pass 1 uses the bootstrap carbon to produce HEAD's own carbon binary (untested — this pass's
+  compiler-side fixes aren't present in the *old* bootstrap carbon, so it can only be trusted to
+  produce a working binary, not correct output); pass 2 re-translates everything with that
+  freshly-built HEAD carbon (now reflecting every compiler-side fix in this repo's history) and is
+  the pass that's actually tested via `make check`. Both `co2-base` and `carbon` need a `configure`
+  re-run between passes — `AC_PATH_PROG(CARBON, carbon, no)` resolves `$CARBON` to an absolute path
+  once, at configure time, and doesn't re-resolve it from `PATH` on every `make`.
+- Linux needed one additional fix beyond the bootstrap-tarball patches: `LD_LIBRARY_PATH` must
+  include both prefixes' `lib/` dirs — Linux shared objects are referenced by bare SONAME and need
+  the dynamic linker told where to look outside a system prefix, unlike macOS where libtool embeds
+  an absolute install path in each `.dylib` at link time.
+- Full list of bootstrap-tarball patches, per-OS fixes, and the two-pass rationale: see the CI
+  fix commits themselves (`.github/scripts/build-and-test.sh` and `patch-bootstrap.sh`'s inline
+  comments document each one at the point it's applied — the raw reasoning is more useful there
+  than duplicated here).
+
+**Windows (`windows-latest`, MSYS2 MINGW64): substantial progress, one test still failing.**
+
+Six separate MinGW/MSYS2 portability gaps were found and fixed (each one only surfaced after
+fixing the previous one and getting further into the build — every fix confirmed via a real CI
+run before moving to the next):
+  - `O_CALL`'s bare `__STRING(msg)` macro-argument stringification relies on BSD/glibc's
+    `<sys/cdefs.h>` `__STRING` macro, which MinGW's headers don't provide — added an
+    `#ifndef __STRING` fallback in `co2/src/co2/utils.h` (and `patch-bootstrap.sh`'s copy for the
+    bootstrap tarball).
+  - `ASSERT_FAIL`'s non-glibc branch called Darwin/BSD's `__assert_rtn`, which doesn't exist on
+    MinGW either — split into a proper `#elif defined(__APPLE__)` branch plus a generic
+    `abort()` fallback (same two files).
+  - `runner.temp`'s Windows-style path (`D:\a\_temp`), once passed through MSYS2's path
+    conversion, came out mangled (`libtool: error: argument to -rpath is not absolute`) — the
+    Windows workflow step now uses a plain MSYS2-native `WORKDIR: /tmp/co2-ci` instead.
+  - `random()` isn't provided by MinGW's C library — switched to `rand()` in `BaseObject.co2`'s
+    declaration and the two `.co2` test files that called it (plus `patch-bootstrap.sh`'s
+    pre-generated bootstrap-tarball `.c` files, which have no carbon binary yet to retranslate
+    from source).
+  - `localtime_r` (POSIX reentrant variant) isn't provided by MinGW either — switched to plain
+    `localtime()` (`LogRecord.co2`, `SimpleFormatter.co2`, `patch-bootstrap.sh`).
+  - That `localtime()` swap alone still crashed at runtime on Windows only: MinGW-w64's own
+    `struct timeval.tv_sec` is a 32-bit `long`, but `time_t` is 64-bit there, so passing
+    `&tv_sec` straight to `localtime()` read 4 bytes of garbage past the field. carbon has no
+    `long`/`time_t`-sized type to fix this from `.co2` source alone, so added a small
+    hand-written conversion shim (`co2-base/src/co2/time_compat.c`/`.h`, wired into
+    `co2-base/src/Makefile.am` as a plain, non-`.co2` source — note the root `.gitignore`'s
+    blanket `co2-base/src/co2/*.[cdh]` rule for generated files needed explicit negation
+    exceptions for these two, or a fresh clone silently drops them) that takes the seconds count
+    *by value* and lets C's own int-to-time_t promotion widen it correctly.
+  - `realpath()` (used in carbon's own hand-written `lex.l` for import path resolution) isn't
+    provided by MinGW — swapped to `_fullpath(NULL, path, 0)` under `#ifdef __MINGW32__`, matching
+    `_fullpath`'s NULL-buffer allocation convention to `realpath`'s.
+- **Currently failing**: after all six fixes above, the Windows build now gets all the way
+  through both bootstrap passes and HEAD's own two-pass rebuild, but `co2-base`'s own `make check`
+  fails on exactly one test — `TestLogger.exe` exits with status 127 and **zero output** (the
+  other four co2-base tests — `TestDoubleLinkedList`, `TestRefObject`, `TestMap`, `TestSet` — all
+  pass). `TestLogger` is the only one of the five that exercises the `Logger`/`ConsoleHandler`/
+  `SimpleFormatter`/`LogRecord` code path at all, so the bug is almost certainly still somewhere in
+  there, but the previous `time_compat.c` fix's own cross-compiled object files link cleanly with
+  zero warnings, and the import table (checked via `objdump -p`) shows only standard
+  `api-ms-win-crt-*.dll`/`KERNEL32.dll` entries — nothing exotic or missing. Diagnosis attempts so
+  far: ruled out a missing-DLL theory (clean import table); ruled out `gettimeofday`'s `NULL`
+  timezone argument (MinGW-w64's own header comment confirms "the timezone pointer arg is ignored,
+  errors are ignored"); attempted to reproduce locally by cross-compiling the exact same sources
+  with the MinGW cross-compiler (`brew install mingw-w64`) and running under Wine, but `wine-stable`
+  needs `sudo` for its `gstreamer-runtime` dependency, which wasn't available in this environment.
+  **Next step, if picked back up**: get a real Windows box or a working local Wine install and
+  actually run `TestLogger.exe` directly to see the crash instead of guessing from CI log text —
+  every other Windows fix in this list was found this way once local reproduction became possible
+  (the MinGW cross-compiler installed via `brew install mingw-w64` is enough to build; only running
+  needs Wine or real Windows).
 
 ## 2. `-std=gnu89 -fcommon` masks real bugs in carbon's generated C — MOSTLY FIXED
 
