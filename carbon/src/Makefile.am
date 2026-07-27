@@ -147,8 +147,12 @@ carbon_LDADD=libcarbon-1.0.la
 carbon_LDFLAGS=$(CO2_LIBS) $(CO2BASE_LIBS)
 
 co2/IncludeStack.h: co2/IncludeStack.co2
-	-rm $@
-	carbon $(CARBON_FLAGS) $< co2/IncludeStack.c
+if CARBON_EXISTS
+	-rm -f $@
+	$(CARBON) $(CARBON_FLAGS) $< co2/IncludeStack.c
+else
+	echo "please install carbon first";
+endif
 
 clean-local:
 	-rm -f grammar.c grammar.h lex.c
