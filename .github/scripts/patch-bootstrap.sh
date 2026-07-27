@@ -73,6 +73,17 @@ sedi 's|#include "string.h"|#include <string.h>|' src/co2/BaseObject.h src/co2/B
 # Match libco2's exception.h -> co2_exception.h rename above.
 sedi 's|co2/exception\.h|co2/co2_exception.h|' src/co2/BaseObject.h src/co2/BaseObject.c
 
+# random() is a POSIX extension that MinGW's C library doesn't provide --
+# it's declared (implicitly, no prototype) and used in a few places but
+# never actually defined, so linking fails with "undefined reference to
+# `random'" the moment a test binary that calls it gets built. No carbon
+# binary exists yet at this bootstrap stage to retranslate the .co2 sources
+# (that's what pass 1/2 in build-and-test.sh are for), so patch the
+# tarball's bundled pre-generated .c files directly. rand() is standard C89,
+# available everywhere, and plenty adequate for what these tests need
+# (alternating/pseudo-random test data).
+sedi 's|random ()|rand ()|' test/co2/TestRefObject.c test/co2/TestMap.c
+
 echo "=== Patching carbon (bootstrap) ==="
 cd "$CARBON_DIR/src"
 # This dist tarball bundles stale, wrongly-located pre-generated grammar.c/

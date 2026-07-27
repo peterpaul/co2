@@ -51,7 +51,7 @@ int mainImpl () {
 		for (i = 0; i < 15; i += 1) {
 			TestRefObject obj = (TestRefObject) list.get (i);
 			printf ("%d\n", obj.val);
-			if (random () % 2 == 0) {
+			if (rand () % 2 == 0) {
 				list.set (i, null);
 			}
 		}

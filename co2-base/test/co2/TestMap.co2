@@ -27,7 +27,7 @@ int mainImpl () {
 	int i;
 	for (i = 0; i < 10; i += 1) {
 		String key = new String ("%d", i);
-		String val = new String ("%d", random ());
+		String val = new String ("%d", rand ());
 		map.put (key, val);
 	}
 

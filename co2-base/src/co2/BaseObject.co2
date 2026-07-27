@@ -81,7 +81,7 @@
 	void *calloc(int nmemb, int size);
 	void *realloc(void *ptr, int size);
 	void free(void *ptr);
-	int random();
+	int rand();
 }
 
 ["stdarg.h"] {
