@@ -186,7 +186,14 @@ struct File * validate_file(struct File * file)
 struct File * try_absolute_path(struct String * file_name, struct String * _absolute_path)
 {
 	struct stat st;
+#ifdef __MINGW32__
+	/* realpath() is POSIX; MinGW's C library doesn't provide it. _fullpath's
+	 * NULL-buffer convention matches realpath's -- it malloc's the result,
+	 * which the caller already frees below either way. */
+	char * _real_path = _fullpath (NULL, _absolute_path->data, 0);
+#else
 	char * _real_path = realpath (_absolute_path->data, NULL);
+#endif
 	struct String * absolute_path = O_CALL_CLASS (String (), new, "%s", _real_path);
 	free (_real_path);
 	if (absolute_path->data && stat (absolute_path->data, &st) == 0) {

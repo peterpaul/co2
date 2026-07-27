@@ -143,6 +143,13 @@ sedi 's|^BUILT_SOURCES=\\|BUILT_SOURCES=\\\ngrammar.h\\|' Makefile.am
 # platform regardless of linker behavior.
 sedi 's|^struct ArrayList \* path;|extern struct ArrayList * path;|' co2/lex.l
 
+# realpath() is POSIX; MinGW's C library doesn't provide it. _fullpath's
+# NULL-buffer convention matches realpath's -- it malloc's the result, which
+# the caller already frees either way. Same fix as this repo's own HEAD
+# lex.l.
+sed -i.bak 's|\tchar \* _real_path = realpath (_absolute_path->data, NULL);|#ifdef __MINGW32__\n\tchar * _real_path = _fullpath (NULL, _absolute_path->data, 0);\n#else\n\tchar * _real_path = realpath (_absolute_path->data, NULL);\n#endif|' co2/lex.l
+rm -f co2/lex.l.bak
+
 cd "$CARBON_DIR"
 autoreconf -fi
 
