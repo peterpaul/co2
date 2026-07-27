@@ -19,6 +19,10 @@
 include co2/LogFormatter
 include co2/LogRecord
 
+["co2/time_compat.h"] {
+	Tm *co2_localtime(int seconds);
+}
+
 class SimpleFormatter : BaseObject, LogFormatter {
 	SimpleFormatter () {
 		super ();
@@ -26,7 +30,7 @@ class SimpleFormatter : BaseObject, LogFormatter {
 
 	String format (LogRecord record) {
 		char[] logTime = new char[50];
-		strftime(logTime, 50, "%d/%m/%Y %T", localtime (&record.time.tv_sec));
+		strftime(logTime, 50, "%d/%m/%Y %T", co2_localtime (record.time.tv_sec));
 		String result = new String ("%s.%.3d: %s: %s", 
 			logTime, 
 			record.time.tv_usec / 1000, 

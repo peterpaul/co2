@@ -60,11 +60,13 @@ $(GENERATED_CHEADERS)
 
 libco2_base_1_0_la_SOURCES=\
 $(libco2_base_1_0_la_CO2SOURCES)\
-$(GENERATED_CSOURCES)
+$(GENERATED_CSOURCES)\
+co2/time_compat.c
 
 libco2_base_1_0_la_HEADERS=\
 $(libco2_base_1_0_la_CO2SOURCES)\
-$(GENERATED_CHEADERS)
+$(GENERATED_CHEADERS)\
+co2/time_compat.h
 
 libco2_base_1_0_la_CPPFLAGS=-O0 -g3 -DO_DEBUG
 
