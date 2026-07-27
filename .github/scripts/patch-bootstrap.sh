@@ -41,6 +41,20 @@ mv src/co2/exception.c src/co2/co2_exception.c
 mv src/co2/exception.h src/co2/co2_exception.h
 sedi 's|co2/exception\.h|co2/co2_exception.h|' src/co2/Object.h src/co2/co2_exception.c
 sedi 's|co2/exception\.c|co2/co2_exception.c|' src/Makefile.am
+
+# MinGW's headers don't provide BSD/glibc's __STRING(x) macro (used to
+# stringify O_CALL's method-name argument), so it's left unexpanded and the
+# compiler tries to call a nonexistent function named __STRING with a bare
+# identifier like `ctor`/`dtor` as its argument -- which fails to compile
+# since those are only ever valid as struct member names, never standalone
+# variables. Same fix as this repo's own HEAD utils.h.
+sed -i.bak '/#define __ASSERT_VOID_CAST (void)/a\
+#endif\
+\
+#ifndef __STRING\
+#define __STRING(x) #x' src/co2/utils.h
+rm -f src/co2/utils.h.bak
+
 autoreconf -fi
 
 echo "=== Patching libco2-base (bootstrap) ==="

@@ -25,6 +25,16 @@
 #define __ASSERT_VOID_CAST (void)
 #endif
 
+/* BSD/glibc's <sys/cdefs.h> provides this; MinGW's headers don't, so
+ * __STRING(x) is left unexpanded and the compiler tries to call a
+ * nonexistent function named __STRING with x as a bare argument -- which
+ * fails to compile whenever x isn't itself a declared identifier (e.g. the
+ * method-name tokens `ctor`/`dtor` passed in by O_CALL below, which are only
+ * ever valid as struct member names, never as standalone variables). */
+#ifndef __STRING
+#define __STRING(x) #x
+#endif
+
 #ifdef __GLIBC__
 #define ASSERT_FAIL(p,file,line,function)     \
   __assert_fail(p,file,line,function)
