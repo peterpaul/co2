@@ -84,6 +84,12 @@ sedi 's|co2/exception\.h|co2/co2_exception.h|' src/co2/BaseObject.h src/co2/Base
 # (alternating/pseudo-random test data).
 sedi 's|random ()|rand ()|' test/co2/TestRefObject.c test/co2/TestMap.c
 
+# localtime_r is a POSIX reentrant variant MinGW's C library doesn't provide
+# either (only plain, non-reentrant localtime()); same undefined-reference-
+# at-link-time failure as random() above. logging one record at a time,
+# non-reentrant is an acceptable trade for portability here.
+sedi 's|localtime_r (\& record->time.tv_sec, \& tm)|localtime (\& record->time.tv_sec)|' src/co2/SimpleFormatter.c
+
 echo "=== Patching carbon (bootstrap) ==="
 cd "$CARBON_DIR/src"
 # This dist tarball bundles stale, wrongly-located pre-generated grammar.c/

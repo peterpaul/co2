@@ -25,9 +25,8 @@ class SimpleFormatter : BaseObject, LogFormatter {
 	}
 
 	String format (LogRecord record) {
-		Tm tm;
 		char[] logTime = new char[50];
-		strftime(logTime, 50, "%d/%m/%Y %T", localtime_r (&record.time.tv_sec, &tm));
+		strftime(logTime, 50, "%d/%m/%Y %T", localtime (&record.time.tv_sec));
 		String result = new String ("%s.%.3d: %s: %s", 
 			logTime, 
 			record.time.tv_usec / 1000, 

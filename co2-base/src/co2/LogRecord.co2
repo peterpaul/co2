@@ -42,7 +42,7 @@ typedef Timeval = struct timeval;
 
 	int gettimeofday(Timeval *tv, void *tz);
 	int strftime(char *s, int max, char *format, Tm *tm);
-	Tm *localtime_r(int *timep, Tm *result);
+	Tm *localtime(int *timep);
 	void tzset ();
 }
 typedef Tm = struct tm;
