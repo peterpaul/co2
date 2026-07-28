@@ -8,33 +8,59 @@ This file only tracks what's still open.
 
 ## 1. GitHub Actions CI — Linux and macOS fully green; Windows has one known open failure
 
-`.github/workflows/ci.yml` + `.github/scripts/{patch-bootstrap.sh,build-and-test.sh}`. Matrix:
-`ubuntu-latest`/`macos-latest`/`windows-latest` (MSYS2 MINGW64, since carbon's generated code
-needs GNU nested functions — see #3 — which Clang/MSVC don't support). `CFLAGS="-std=gnu89 -g
--O2"` throughout (see #2 — `-fcommon` confirmed unnecessary).
+`.github/workflows/ci.yml` + `.github/scripts/{patch-bootstrap.sh,translate.sh,build-and-test.sh}`.
+`CFLAGS="-std=gnu89 -g -O2"` throughout (see #2 — `-fcommon` confirmed unnecessary).
 
-**Linux (`ubuntu-latest`) and macOS (`macos-latest`): fully verified passing via real CI runs.**
+**Two-stage architecture** (restructured from an earlier single-stage design that repeated the
+full bootstrap+translate dance independently on every OS — wasteful, and didn't scale to adding
+new platforms/architectures, since each one would've needed to re-derive the same bootstrap-
+toolchain quirks that have nothing to do with the new platform itself):
 
-- **Bootstrap problem**: `carbon` needs a working `carbon` binary to build itself, and `co2-base`
-  needs `carbon` to translate `.co2` → `.c`. A clean checkout can't self-host. Fix:
-  `build-and-test.sh` downloads this repo's own old GitHub Release tarballs (`libco2-0.3.0`,
-  `libco2-base-0.3.0`, `carbon-0.3.1`), patches and builds them into a scratch bootstrap prefix
-  (`patch-bootstrap.sh`), then does a **two-pass** build of HEAD's own `co2`/`co2-base`/`carbon`:
-  pass 1 uses the bootstrap carbon to produce HEAD's own carbon binary (untested — this pass's
-  compiler-side fixes aren't present in the *old* bootstrap carbon, so it can only be trusted to
-  produce a working binary, not correct output); pass 2 re-translates everything with that
-  freshly-built HEAD carbon (now reflecting every compiler-side fix in this repo's history) and is
-  the pass that's actually tested via `make check`. Both `co2-base` and `carbon` need a `configure`
-  re-run between passes — `AC_PATH_PROG(CARBON, carbon, no)` resolves `$CARBON` to an absolute path
-  once, at configure time, and doesn't re-resolve it from `PATH` on every `make`.
-- Linux needed one additional fix beyond the bootstrap-tarball patches: `LD_LIBRARY_PATH` must
-  include both prefixes' `lib/` dirs — Linux shared objects are referenced by bare SONAME and need
-  the dynamic linker told where to look outside a system prefix, unlike macOS where libtool embeds
-  an absolute install path in each `.dylib` at link time.
-- Full list of bootstrap-tarball patches, per-OS fixes, and the two-pass rationale: see the CI
-  fix commits themselves (`.github/scripts/build-and-test.sh` and `patch-bootstrap.sh`'s inline
-  comments document each one at the point it's applied — the raw reasoning is more useful there
-  than duplicated here).
+- **`translate` job (`ubuntu-latest` only, runs on every push/PR, not just releases)**: `carbon`
+  needs a working `carbon` binary to build itself, and `co2-base` needs `carbon` to translate
+  `.co2` → `.c` — a clean checkout can't self-host. `translate.sh` downloads this repo's own old
+  GitHub Release tarballs (`libco2-0.3.0`, `libco2-base-0.3.0`, `carbon-0.3.1`), patches
+  (`patch-bootstrap.sh`) and builds them into a scratch bootstrap prefix, then does a **two-pass**
+  translate of HEAD's own `co2-base`/`carbon`: pass 1 uses the bootstrap carbon to produce a fresh
+  HEAD `carbon` binary (untested — this pass's compiler-side fixes aren't present in the *old*
+  bootstrap carbon, so it can only be trusted to produce a working binary, not correct translation
+  output); pass 2 re-translates everything with that freshly-built HEAD carbon (self-consistent,
+  reflecting every compiler-side fix in this repo's history). No tests run in this job — it
+  packages pass 2's output via `make dist` (which automake already gates identically for both
+  projects — every `.co2`-consuming rule falls back to a harmless no-op when no `carbon` binary is
+  on PATH, relying on an already-generated file instead, exactly the shape `make dist` produces —
+  see below for the one place this wasn't true) and uploads the two dist tarballs as a build
+  artifact.
+- **`build-and-test` job (matrix: `ubuntu-latest`/`macos-latest`/`windows-latest`, `needs:
+  translate`)**: downloads `translate`'s two dist tarballs and builds+tests `co2` (from the
+  checkout — pure C, needs no translation at all), `co2-base`, and `carbon` (both from their dist
+  tarballs) with each platform's own native C toolchain. **No carbon binary or bootstrap dance is
+  needed on any of these legs** — translation already happened once, centrally, in `translate`.
+  Adding a new platform/architecture in the future is just a new matrix entry running the same
+  script — this is the whole point of the restructuring. Windows still needs MSYS2 MINGW64, since
+  carbon's generated code needs GNU nested functions (see #3), which Clang/MSVC don't support.
+  Linux needed one additional fix: `LD_LIBRARY_PATH` must include the install prefix's `lib/` dir
+  — Linux shared objects are referenced by bare SONAME and need the dynamic linker told where to
+  look outside a system prefix, unlike macOS where libtool embeds an absolute install path in each
+  `.dylib` at link time.
+- **Prerequisite fix that made this possible**: `carbon/src/Makefile.am`'s
+  `co2/IncludeStack.h: co2/IncludeStack.co2` rule was the only `.co2`-consuming rule in the entire
+  codebase that called bare `carbon` unconditionally, with no `CARBON_EXISTS` fallback — every
+  other such rule already had one. Since `IncludeStack.h` is unconditionally part of
+  `BUILT_SOURCES`, this would have hard-failed `build-and-test`'s `carbon` build with "carbon:
+  command not found" on any platform with no carbon on PATH (which is every `build-and-test` leg
+  now). Gated it the same way as every other rule in the file. (`IncludeStack.co2` declares a real
+  class with no methods — its ctor/dtor are hand-written directly in `carbon/src/co2/lex.l`,
+  because they need to mutate `lex.l`'s own `include_stack` global; the carbon-generated
+  `IncludeStack.c` would duplicate-symbol-conflict with that if it were ever compiled, which is why
+  it's deliberately excluded from the build — not itself a bug.)
+- **Retiring `patch-bootstrap.sh`**: its patches are specific to the pinned old release tags
+  (`libco2-0.3.0`/`libco2-base-0.3.0`/`carbon-0.3.1`) predating fixes already landed at HEAD, not a
+  permanent architectural need. Once a new official release is cut that incorporates everything
+  currently in this file, `translate.sh`'s bootstrap step can point at that release instead and
+  `patch-bootstrap.sh` can be deleted. Not done yet — natural follow-up, not blocking.
+- Full list of bootstrap-tarball patches and the two-pass rationale: see `translate.sh` and
+  `patch-bootstrap.sh`'s inline comments, which document each one at the point it's applied.
 
 **Windows (`windows-latest`, MSYS2 MINGW64): substantial progress, one test still failing.**
 
@@ -69,9 +95,9 @@ run before moving to the next):
   - `realpath()` (used in carbon's own hand-written `lex.l` for import path resolution) isn't
     provided by MinGW — swapped to `_fullpath(NULL, path, 0)` under `#ifdef __MINGW32__`, matching
     `_fullpath`'s NULL-buffer allocation convention to `realpath`'s.
-- **Currently failing**: after all six fixes above, the Windows build now gets all the way
-  through both bootstrap passes and HEAD's own two-pass rebuild, but `co2-base`'s own `make check`
-  fails on exactly one test — `TestLogger.exe` exits with status 127 and **zero output** (the
+- **Currently failing**: after all six fixes above, the Windows `build-and-test` leg gets all the
+  way through downloading and building both dist tarballs, but `co2-base`'s own `make check` fails
+  on exactly one test — `TestLogger.exe` exits with status 127 and **zero output** (the
   other four co2-base tests — `TestDoubleLinkedList`, `TestRefObject`, `TestMap`, `TestSet` — all
   pass). `TestLogger` is the only one of the five that exercises the `Logger`/`ConsoleHandler`/
   `SimpleFormatter`/`LogRecord` code path at all, so the bug is almost certainly still somewhere in
