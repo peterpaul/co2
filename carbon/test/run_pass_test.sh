@@ -85,8 +85,11 @@ function run_pass_test {
     fi
     local TARGETNAME=${TARGET}/${DIRNAME}/${BASENAME}
     # Compile the generated code with ${CC}
-    echo "Command: ${LD} ${OBJECTS} -o ${TARGETNAME}.bin ${LDFLAGS} -lc -lm" >> ${LOGFILE}
-    ${LD} ${OBJECTS} -o ${TARGETNAME}.bin ${LDFLAGS} -lc -lm >> ${LOGFILE} 2>&1
+    # -lc is redundant on every platform (the C compiler driver always links
+    # libc implicitly) and MinGW's linker doesn't even provide a library
+    # findable via that name -- "ld.exe: cannot find -lc". Drop it.
+    echo "Command: ${LD} ${OBJECTS} -o ${TARGETNAME}.bin ${LDFLAGS} -lm" >> ${LOGFILE}
+    ${LD} ${OBJECTS} -o ${TARGETNAME}.bin ${LDFLAGS} -lm >> ${LOGFILE} 2>&1
     local LD_STATUS=$?
     if [[ "${LD_STATUS}" != "0" ]]
     then
