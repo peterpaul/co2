@@ -1,0 +1,264 @@
+name: Release
+
+# Triggered by pushing a version tag matching this repo's existing
+# <project>-<version> convention (e.g. `carbon-0.3.2`, `libco2-0.3.1`,
+# `libco2-base-0.3.1`). Each of the three projects releases independently --
+# pushing one tag builds and publishes only that project's release, not a
+# lockstep bump of all three. See TODO.md item #1 for how this pipeline
+# reuses translate.sh/build-and-test.sh from the regular CI workflow.
+on:
+  push:
+    tags:
+      - 'carbon-*'
+      - 'libco2-*'
+      - 'libco2-base-*'
+
+jobs:
+  # Figures out which project this tag is for -- libco2-base-* must be
+  # checked before libco2-* since the latter is a prefix of the former --
+  # and sanity-checks the tag's version against that project's actual
+  # AC_INIT version so a mismatched tag fails loudly here instead of
+  # publishing a release that doesn't match the source it was built from.
+  determine-release:
+    runs-on: ubuntu-latest
+    outputs:
+      project: ${{ steps.parse.outputs.project }}
+      version: ${{ steps.parse.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - id: parse
+        run: |
+          TAG="${{ github.ref_name }}"
+          case "$TAG" in
+            libco2-base-*)
+              project=libco2-base
+              version="${TAG#libco2-base-}"
+              configure_ac=co2-base/configure.ac
+              ;;
+            libco2-*)
+              project=libco2
+              version="${TAG#libco2-}"
+              configure_ac=co2/configure.ac
+              ;;
+            carbon-*)
+              project=carbon
+              version="${TAG#carbon-}"
+              configure_ac=carbon/configure.ac
+              ;;
+            *)
+              echo "Unrecognized tag: $TAG" >&2
+              exit 1
+              ;;
+          esac
+
+          actual_version=$(grep -oP 'AC_INIT\(\[[^]]*\],\s*\[\K[^]]*' "$configure_ac")
+          if [ "$actual_version" != "$version" ]; then
+            echo "Tag version ($version) doesn't match $configure_ac's AC_INIT version ($actual_version)" >&2
+            exit 1
+          fi
+
+          echo "project=$project" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+  # Same as ci.yml's translate job -- translates .co2 -> .c once, on Linux,
+  # and packages the result via `make dist`. Skipped for libco2, which has
+  # no .co2 sources to translate.
+  translate:
+    needs: determine-release
+    if: needs.determine-release.outputs.project != 'libco2'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential autoconf automake libtool bison flex pkg-config
+
+      - name: Resolve CC
+        run: echo "CC=gcc" >> "$GITHUB_ENV"
+
+      - name: Translate
+        env:
+          WORKDIR: ${{ runner.temp }}/co2-translate
+          OUTDIR: ${{ runner.temp }}/co2-dist
+        run: bash .github/scripts/translate.sh
+
+      - name: Upload dist tarballs
+        uses: actions/upload-artifact@v7
+        with:
+          name: dist-tarballs
+          path: ${{ runner.temp }}/co2-dist/*.tar.gz
+          compression-level: 0
+          if-no-files-found: error
+
+  # Same build as ci.yml's build-and-test job (co2 from the checkout,
+  # co2-base/carbon from translate's dist tarballs, all three installed into
+  # one prefix), plus packaging that whole prefix as a per-platform binary
+  # tarball. Packages co2 + co2-base + carbon together regardless of which
+  # single project's version bumped -- simplest to implement, and a
+  # complete working environment for whoever downloads it.
+  build-and-package:
+    needs: [determine-release, translate]
+    if: always() && !failure() && !cancelled()
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Download dist tarballs
+        if: needs.determine-release.outputs.project != 'libco2'
+        uses: actions/download-artifact@v8
+        with:
+          name: dist-tarballs
+          path: ${{ runner.temp }}/co2-dist
+
+      # libco2-only releases skip the translate job (nothing to download),
+      # but build-and-test.sh always expects a DISTDIR to exist -- give it
+      # an empty one so its `tar xzf "$DISTDIR"/*.tar.gz` globs harmlessly
+      # match nothing instead of failing on a missing directory. co2-base
+      # and carbon still get built from the checkout in that case, same as
+      # this job always does for co2 itself.
+      - name: Ensure DISTDIR exists (libco2-only releases)
+        if: needs.determine-release.outputs.project == 'libco2'
+        run: mkdir -p "${{ runner.temp }}/co2-dist"
+
+      - name: Set up MSYS2 (Windows)
+        if: runner.os == 'Windows'
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            mingw-w64-x86_64-gcc
+            autoconf
+            automake
+            libtool
+            bison
+            flex
+            pkgconf
+            make
+            tar
+            curl
+
+      - name: Install build dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential autoconf automake libtool bison flex pkg-config
+
+      - name: Install build dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: brew install gcc autoconf automake libtool bison flex pkg-config
+
+      - name: Resolve CC (Linux)
+        if: runner.os == 'Linux'
+        run: echo "CC=gcc" >> "$GITHUB_ENV"
+
+      - name: Resolve CC (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          GCC_BIN=$(ls "$(brew --prefix gcc)/bin" | grep -E '^gcc-[0-9]+$' | sort -V | tail -1)
+          echo "CC=$(brew --prefix gcc)/bin/${GCC_BIN}" >> "$GITHUB_ENV"
+
+      - name: Resolve CC (Windows)
+        if: runner.os == 'Windows'
+        shell: msys2 {0}
+        run: echo "CC=gcc" >> "$GITHUB_ENV"
+
+      # Set via GITHUB_ENV (not step-level `env:`) so the same values are
+      # still visible in the packaging steps further down, not just the
+      # build step immediately after this one.
+      - name: Resolve WORKDIR/DISTDIR (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: |
+          echo "WORKDIR=${{ runner.temp }}/co2-ci" >> "$GITHUB_ENV"
+          echo "DISTDIR=${{ runner.temp }}/co2-dist" >> "$GITHUB_ENV"
+
+      - name: Resolve WORKDIR/DISTDIR (Windows)
+        if: runner.os == 'Windows'
+        shell: msys2 {0}
+        # See ci.yml's identical comment: runner.temp is a Windows-style path
+        # that comes out mangled once mixed with MSYS2's path conversion, so
+        # resolve it to a proper MSYS2 POSIX path with cygpath instead. A
+        # plain (non-msys2) `bash` step on Windows runs in git-bash, which
+        # mounts /tmp somewhere entirely different from MSYS2's own /tmp --
+        # so every step that reads WORKDIR/DISTDIR after this one also needs
+        # `shell: msys2 {0}` to interpret them the same way this step did.
+        run: |
+          echo "WORKDIR=/tmp/co2-ci" >> "$GITHUB_ENV"
+          echo "DISTDIR=$(cygpath -u '${{ runner.temp }}')/co2-dist" >> "$GITHUB_ENV"
+
+      - name: Build and test (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: bash .github/scripts/build-and-test.sh
+
+      - name: Build and test (Windows)
+        if: runner.os == 'Windows'
+        shell: msys2 {0}
+        run: bash .github/scripts/build-and-test.sh
+
+      - name: Package binary tarball (Linux/macOS)
+        if: runner.os != 'Windows'
+        env:
+          PROJECT: ${{ needs.determine-release.outputs.project }}
+          VERSION: ${{ needs.determine-release.outputs.version }}
+        run: tar czf "${PROJECT}-${VERSION}-${{ matrix.os }}.tar.gz" -C "$WORKDIR/head-prefix" .
+
+      - name: Package binary tarball (Windows)
+        if: runner.os == 'Windows'
+        shell: msys2 {0}
+        env:
+          PROJECT: ${{ needs.determine-release.outputs.project }}
+          VERSION: ${{ needs.determine-release.outputs.version }}
+        run: tar czf "${PROJECT}-${VERSION}-${{ matrix.os }}.tar.gz" -C "$WORKDIR/head-prefix" .
+
+      - name: Upload binary tarball
+        uses: actions/upload-artifact@v7
+        with:
+          name: binary-${{ matrix.os }}
+          path: "*.tar.gz"
+          compression-level: 0
+          if-no-files-found: error
+
+  publish:
+    needs: [determine-release, translate, build-and-package]
+    if: always() && !failure() && !cancelled()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download all release artifacts
+        uses: actions/download-artifact@v8
+        with:
+          path: ${{ runner.temp }}/release-assets
+          merge-multiple: true
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PROJECT: ${{ needs.determine-release.outputs.project }}
+          VERSION: ${{ needs.determine-release.outputs.version }}
+        run: |
+          # dist-tarballs always contains both carbon-* and libco2-base-*
+          # (translate.sh builds both as a mutual build dependency, whether
+          # or not this tag is releasing them) -- filtering by the released
+          # project's own name+version prefix keeps an unrelated project's
+          # dist tarball from ending up attached to this release. The
+          # per-platform binary tarballs already carry that same prefix by
+          # construction, so this one filter covers both.
+          gh release create "${{ github.ref_name }}" \
+            --repo "${{ github.repository }}" \
+            --title "${{ github.ref_name }}" \
+            --generate-notes \
+            "${{ runner.temp }}"/release-assets/"${PROJECT}"-"${VERSION}"*.tar.gz
