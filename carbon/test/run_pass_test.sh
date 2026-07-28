@@ -108,7 +108,17 @@ function run_pass_test {
     # 	echo "ERROR: ${TEST} failed: execution error" >> ${LOGFILE}
     # 	return 1
     # fi
-    diff ${TESTOUTPUT} ${TARGETNAME}.out
+    # Windows' C runtime translates \n to \r\n when stdout is redirected to a
+    # file (text-mode translation), so ${TARGETNAME}.out picks up trailing \r
+    # bytes the checked-in .out fixture doesn't have -- a spurious mismatch
+    # even though the text is otherwise identical. Strip \r from both sides
+    # before comparing so line-ending differences alone don't fail a test on
+    # any platform (a no-op on platforms that never had \r to begin with).
+    # `tr` behaves identically everywhere, unlike diff flags for this (GNU
+    # diff's --strip-trailing-cr isn't available in macOS's BSD diff).
+    tr -d '\r' < ${TESTOUTPUT} > ${TARGETNAME}.expected
+    tr -d '\r' < ${TARGETNAME}.out > ${TARGETNAME}.actual
+    diff ${TARGETNAME}.expected ${TARGETNAME}.actual
     if [[ "$?" != "0" ]]
     then
 	echo "ERROR: ${TEST} failed: output error" >> ${LOGFILE}
