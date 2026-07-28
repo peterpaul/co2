@@ -62,11 +62,17 @@ jobs:
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
   # Same as ci.yml's translate job -- translates .co2 -> .c once, on Linux,
-  # and packages the result via `make dist`. Skipped for libco2, which has
-  # no .co2 sources to translate.
+  # and packages the result via `make dist`. Always runs, even for a libco2
+  # release (which doesn't need it): build-and-test.sh unconditionally
+  # expects co2-base/carbon dist tarballs to extract, since it's reused
+  # as-is from ci.yml where that's always true. Skipping this for libco2 was
+  # tried and found to break build-and-test.sh's tar step on the resulting
+  # empty DISTDIR -- always building all three costs a few extra minutes on
+  # a libco2-only release but keeps both scripts genuinely unchanged from
+  # ci.yml, and publish already filters to only the released project's
+  # assets.
   translate:
     needs: determine-release
-    if: needs.determine-release.outputs.project != 'libco2'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -117,21 +123,10 @@ jobs:
       - uses: actions/checkout@v7
 
       - name: Download dist tarballs
-        if: needs.determine-release.outputs.project != 'libco2'
         uses: actions/download-artifact@v8
         with:
           name: dist-tarballs
           path: ${{ runner.temp }}/co2-dist
-
-      # libco2-only releases skip the translate job (nothing to download),
-      # but build-and-test.sh always expects a DISTDIR to exist -- give it
-      # an empty one so its `tar xzf "$DISTDIR"/*.tar.gz` globs harmlessly
-      # match nothing instead of failing on a missing directory. co2-base
-      # and carbon still get built from the checkout in that case, same as
-      # this job always does for co2 itself.
-      - name: Ensure DISTDIR exists (libco2-only releases)
-        if: needs.determine-release.outputs.project == 'libco2'
-        run: mkdir -p "${{ runner.temp }}/co2-dist"
 
       - name: Set up MSYS2 (Windows)
         if: runner.os == 'Windows'
