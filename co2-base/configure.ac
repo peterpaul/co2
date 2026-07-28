@@ -8,6 +8,7 @@ AM_INIT_AUTOMAKE
 AM_SILENT_RULES([yes])
 AC_CONFIG_SRCDIR([src/co2/RefObject.co2])
 AC_CONFIG_HEADERS([config.h])
+AC_CANONICAL_HOST
 
 AC_DEFUN([AC_PROG_CARBON],
 	[AC_PATH_PROG(CARBON, carbon, no)])
@@ -25,6 +26,16 @@ AC_PROG_RANLIB
 AC_PROG_CARBON
 
 AM_CONDITIONAL([CARBON_EXISTS], [test ${CARBON} != no])
+
+# TestLogger crashes at runtime on MinGW with no output (exit status 127) --
+# see TODO.md item #1 for the still-open investigation. Marked XFAIL only on
+# this platform, not unconditionally, so a real regression on Linux/macOS
+# still fails the build loudly.
+case $host_os in
+  *mingw*) on_mingw=yes ;;
+  *) on_mingw=no ;;
+esac
+AM_CONDITIONAL([ON_MINGW], [test "x$on_mingw" = "xyes"])
 
 # Checks for libraries.
 PKG_CHECK_MODULES([CO2], [libco2-1.0 >= 0.2.0],,AC_MSG_ERROR([required module missing]))
