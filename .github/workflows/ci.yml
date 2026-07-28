@@ -7,7 +7,47 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  # Stage 1: translate .co2 -> .c once, on Linux, and package the results as
+  # dist tarballs. Every other job just builds a plain C toolchain against
+  # these -- no carbon/bootstrap dance repeated per platform. See
+  # .github/scripts/translate.sh and TODO.md item #1.
+  translate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential autoconf automake libtool bison flex pkg-config
+
+      - name: Resolve CC
+        run: echo "CC=gcc" >> "$GITHUB_ENV"
+
+      - name: Translate
+        env:
+          WORKDIR: ${{ runner.temp }}/co2-translate
+          OUTDIR: ${{ runner.temp }}/co2-dist
+        run: bash .github/scripts/translate.sh
+
+      - name: Upload dist tarballs
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-tarballs
+          path: ${{ runner.temp }}/co2-dist/*.tar.gz
+          compression-level: 0
+          if-no-files-found: error
+
+  # Stage 2: build + test everything with each platform's own native C
+  # toolchain, consuming Stage 1's pre-translated dist tarballs for co2-base
+  # and carbon (co2/libco2 is pure C, built straight from the checkout).
+  # Extensible: adding a new platform/architecture is just a new matrix
+  # entry running the same script, no new bootstrap-patching work.
+  build-and-test:
+    needs: translate
     strategy:
       fail-fast: false
       matrix:
@@ -18,6 +58,12 @@ jobs:
         shell: bash
     steps:
       - uses: actions/checkout@v4
+
+      - name: Download dist tarballs
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-tarballs
+          path: ${{ runner.temp }}/co2-dist
 
       # Windows: build everything inside MSYS2/MinGW64, since carbon's
       # generated code needs GNU nested functions (see TODO.md item #3),
@@ -40,6 +86,14 @@ jobs:
             tar
             curl
 
+      # bison/flex are only genuinely needed here for co2 (libco2)'s own
+      # ./autogen.sh -- co2-base/carbon's dist tarballs already bundle
+      # pre-generated grammar.c/lex.c (autoreconf output baked in by Stage
+      # 1's `make dist`), and automake's standard yacc/lex dist-tarball
+      # support is a well-established mechanism for not needing bison/flex
+      # downstream. Kept installed here regardless, since that specific
+      # no-bison/flex-needed path hasn't been verified end-to-end the way
+      # the CARBON_EXISTS=false path was -- worth revisiting once confirmed.
       - name: Install build dependencies (Linux)
         if: runner.os == 'Linux'
         run: |
@@ -68,10 +122,22 @@ jobs:
         shell: msys2 {0}
         run: echo "CC=gcc" >> "$GITHUB_ENV"
 
+      - name: Resolve DISTDIR (Windows)
+        if: runner.os == 'Windows'
+        shell: msys2 {0}
+        # download-artifact resolves runner.temp in the native Windows/Node
+        # context (correct for its own use), but the downstream build step
+        # runs inside MSYS2 -- same category of path-mangling risk that hit
+        # WORKDIR before (see the comment on the Windows build-and-test step
+        # below), so convert it to a proper MSYS2 POSIX path with cygpath
+        # rather than assume the raw Windows-style path works everywhere.
+        run: echo "DISTDIR=$(cygpath -u '${{ runner.temp }}')/co2-dist" >> "$GITHUB_ENV"
+
       - name: Build and test (Linux/macOS)
         if: runner.os != 'Windows'
         env:
           WORKDIR: ${{ runner.temp }}/co2-ci
+          DISTDIR: ${{ runner.temp }}/co2-dist
         run: bash .github/scripts/build-and-test.sh
 
       - name: Build and test (Windows)
@@ -83,6 +149,8 @@ jobs:
           # POSIX<->Windows path conversion, comes out mangled (libtool's
           # -rpath handling has seen it collapse to "D:a_temp/..." with the
           # separators dropped). Use a plain MSYS2-native path instead --
-          # entirely within one path universe, nothing to convert.
+          # entirely within one path universe, nothing to convert. DISTDIR
+          # is set via GITHUB_ENV by the "Resolve DISTDIR (Windows)" step
+          # above (same cygpath-conversion reasoning).
           WORKDIR: /tmp/co2-ci
         run: bash .github/scripts/build-and-test.sh
