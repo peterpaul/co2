@@ -77,6 +77,11 @@ cd "$CARBON_DIR"
 ./configure --prefix="$HEAD_PREFIX" CC="$CC" CFLAGS="$CFLAGS_COMMON -I$HEAD_PREFIX/include/co2-1.0 -I$HEAD_PREFIX/include/co2-base-1.0"
 make
 check_with_logs
+# Nothing in this script needs carbon installed, but installing it makes
+# $HEAD_PREFIX a complete, ready-to-package environment either way (all
+# three projects' build outputs in one prefix) -- useful for the release
+# workflow, which tars this exact directory up as a binary release asset.
+make install
 echo "::endgroup::"
 
 echo "All builds and tests passed."
