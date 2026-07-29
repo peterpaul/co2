@@ -60,6 +60,26 @@ BOOTSTRAP_PREFIX="$WORKDIR/bootstrap-prefix"
 HEAD_PREFIX="$WORKDIR/head-prefix"
 CFLAGS_COMMON="-std=gnu89 -g -O2"
 
+# TODO.md item #6: this repo has hit three separate case-insensitive-
+# filesystem naming collisions (macOS/Windows) across its history --
+# exception.h/Exception.h, Grammar.h/grammar.h, IncludeStack.co2's own
+# File.h reference. Cheap, fast, fails before any of the expensive
+# bootstrap/build work below: every .co2-consuming project's own src/co2/
+# directory is where all three actually happened, so check each one for two
+# tracked filenames that only differ by case. Not a perfect check (a
+# collision could in principle span two *different* directories that both
+# end up on the same -I search path), but matches every incident so far
+# and catches new ones within a single project before they cause a
+# hard-to-debug platform-specific build failure.
+for dir in co2 co2-base carbon; do
+    dupes=$(git -C "$REPO_ROOT" ls-files "$dir/src/co2/*.co2" "$dir/src/co2/*.h" \
+        | xargs -n1 basename | awk '{print tolower($0)}' | sort | uniq -d)
+    if [ -n "$dupes" ]; then
+        echo "::error::Case-insensitive filename collision(s) in $dir/src/co2/ (breaks macOS/Windows builds): $dupes" >&2
+        exit 1
+    fi
+done
+
 mkdir -p "$WORKDIR" "$BOOTSTRAP_PREFIX" "$HEAD_PREFIX" "$OUTDIR"
 cd "$WORKDIR"
 
