@@ -1,21 +1,39 @@
 #!/usr/bin/env bash
-# Stage 1 of the CI pipeline ("translate"): bootstrap an old carbon release,
-# then use it to two-pass-translate HEAD's own co2-base and carbon .co2
-# sources into portable C, and package the results as dist tarballs. Stage 2
+# Stage 1 of the CI pipeline ("translate"): bootstrap a carbon release, then
+# use it to two-pass-translate HEAD's own co2-base and carbon .co2 sources
+# into portable C, and package the results as dist tarballs. Stage 2
 # (build-and-test.sh) downloads those tarballs and builds+tests co2-base and
 # carbon on every platform in the matrix with a plain C toolchain -- no
 # bootstrap-carbon dance repeated per platform, since translation only ever
-# happens here, once, on Linux. See TODO.md item #1 for the full rationale,
-# and .github/scripts/patch-bootstrap.sh for why the bootstrap tarballs need
-# patching first.
+# happens here, once, on Linux. See TODO.md item #1 for the full rationale.
 #
-# Two-pass rebuild of co2-base and carbon (see "PASS 2" below) is required,
-# not optional: the bootstrap carbon is an old (0.3.1) release that predates
-# every carbon-*compiler*-side fix in this repo's history. Anything the
-# *bootstrap* carbon translates comes out at old-compiler quality on the
-# first pass; only after HEAD's own carbon has been built once (pass 1) and
-# installed does translating everything *again* (pass 2) actually reflect
-# those fixes -- and pass 2's output is what gets packaged.
+# The bootstrap releases below (BOOTSTRAP_*_TAG) should always point at the
+# *most recently cut* release of each project, not a historical pin -- as
+# long as that's true, the bootstrap sources already reflect every fix in
+# this repo's history (case-insensitive-filesystem renames, MinGW
+# portability fixes, compiler-side codegen fixes, all of it), so no patching
+# step is needed before building them, unlike when this bootstrapped from the
+# 2015-2018 releases (`libco2-0.3.0`/`libco2-base-0.3.0`/`carbon-0.3.1`) --
+# see `git log -- .github/scripts/patch-bootstrap.sh` if that patching logic
+# is ever needed again (e.g. bootstrapping a long-stale fork). Bump these tags
+# whenever a new release is cut, to keep the bootstrap chain (and CI runtime)
+# as fast and simple as possible: libco2-base and carbon's release tarballs
+# are already `make dist` output (pre-generated configure/Makefile.in/.c/.h,
+# no autoreconf needed); libco2 has no equivalent dist tarball asset yet, so
+# it uses GitHub's automatic per-tag source archive instead (a plain git
+# checkout at that tag, needing ./autogen.sh, but with every rename/fix from
+# this repo's history already applied in the checked-in source itself).
+BOOTSTRAP_LIBCO2_TAG=libco2-0.3.1
+BOOTSTRAP_LIBCO2_BASE_TAG=libco2-base-0.3.1
+BOOTSTRAP_CARBON_TAG=carbon-0.3.2
+#
+# Two-pass rebuild of co2-base and carbon (see "PASS 2" below) is still
+# required: the bootstrap carbon predates *this* commit's own .co2 source
+# changes, if any. Anything the *bootstrap* carbon translates only reflects
+# compiler-side fixes as of the bootstrap release, not necessarily anything
+# newer at HEAD; only after HEAD's own carbon has been built once (pass 1)
+# and installed does translating everything *again* (pass 2) actually
+# reflect HEAD's current state -- and pass 2's output is what gets packaged.
 #
 # Unlike the old single-stage build-and-test.sh, this script never runs
 # `make check` -- testing is entirely Stage 2's job (including for Linux
@@ -63,29 +81,33 @@ regen_co2() {
     make -C "$dir" clean >/dev/null 2>&1 || true
 }
 
-echo "::group::Download bootstrap release tarballs"
-curl -sL -o libco2-0.3.0.tar.gz https://github.com/peterpaul/co2/releases/download/libco2-0.3.0/libco2-0.3.0.tar.gz
-curl -sL -o libco2-base-0.3.0.tar.gz https://github.com/peterpaul/co2/releases/download/libco2-base-0.3.0/libco2-base-0.3.0.tar.gz
-curl -sL -o carbon-0.3.1.tar.gz https://github.com/peterpaul/co2/releases/download/carbon-0.3.1/carbon-0.3.1.tar.gz
-tar xzf libco2-0.3.0.tar.gz
-tar xzf libco2-base-0.3.0.tar.gz
-tar xzf carbon-0.3.1.tar.gz
-echo "::endgroup::"
-
-echo "::group::Patch bootstrap tarballs"
-bash "$REPO_ROOT/.github/scripts/patch-bootstrap.sh" \
-    "$WORKDIR/libco2-0.3.0" "$WORKDIR/libco2-base-0.3.0" "$WORKDIR/carbon-0.3.1"
+echo "::group::Download bootstrap releases"
+# libco2 has no `make dist`-style release asset yet (see the header comment)
+# -- GitHub's automatic per-tag source archive gives the same source at a
+# small extra cost (needs ./autogen.sh below, since it's a raw checkout
+# without pre-generated configure/Makefile.in).
+curl -sL -o libco2-src.tar.gz "https://github.com/peterpaul/co2/archive/refs/tags/${BOOTSTRAP_LIBCO2_TAG}.tar.gz"
+curl -sL -o libco2-base.tar.gz "https://github.com/peterpaul/co2/releases/download/${BOOTSTRAP_LIBCO2_BASE_TAG}/${BOOTSTRAP_LIBCO2_BASE_TAG}.tar.gz"
+curl -sL -o carbon.tar.gz "https://github.com/peterpaul/co2/releases/download/${BOOTSTRAP_CARBON_TAG}/${BOOTSTRAP_CARBON_TAG}.tar.gz"
+tar xzf libco2-src.tar.gz
+tar xzf libco2-base.tar.gz
+tar xzf carbon.tar.gz
+# GitHub's archive names its top-level directory <repo>-<tag>, not <tag> --
+# capture it rather than assume, since it doesn't match this repo's own
+# release-asset naming convention.
+LIBCO2_DIR="$(find "$WORKDIR" -maxdepth 1 -type d -name "co2-${BOOTSTRAP_LIBCO2_TAG}")"
 echo "::endgroup::"
 
 echo "::group::Build bootstrap libco2"
-cd "$WORKDIR/libco2-0.3.0"
+cd "$LIBCO2_DIR/co2"
+./autogen.sh
 ./configure --prefix="$BOOTSTRAP_PREFIX" CC="$CC" CFLAGS="$CFLAGS_COMMON"
 make
 make install
 echo "::endgroup::"
 
 echo "::group::Build bootstrap libco2-base"
-cd "$WORKDIR/libco2-base-0.3.0"
+cd "$WORKDIR/$BOOTSTRAP_LIBCO2_BASE_TAG"
 export PKG_CONFIG_PATH="$BOOTSTRAP_PREFIX/lib/pkgconfig"
 ./configure --prefix="$BOOTSTRAP_PREFIX" CC="$CC" CFLAGS="$CFLAGS_COMMON -I$BOOTSTRAP_PREFIX/include/co2-1.0"
 make
@@ -93,7 +115,7 @@ make install
 echo "::endgroup::"
 
 echo "::group::Build bootstrap carbon"
-cd "$WORKDIR/carbon-0.3.1"
+cd "$WORKDIR/$BOOTSTRAP_CARBON_TAG"
 ./configure --prefix="$BOOTSTRAP_PREFIX" CC="$CC" CFLAGS="$CFLAGS_COMMON"
 make
 make install
@@ -101,8 +123,7 @@ make install
 echo "::endgroup::"
 
 # From here on, the bootstrap carbon (now on PATH) translates HEAD's own
-# .co2 sources -- none of the bootstrap patches above are needed for HEAD,
-# since every one of those bugs is already fixed in this repo's history.
+# .co2 sources.
 export PATH="$BOOTSTRAP_PREFIX/bin:$PATH"
 unset PKG_CONFIG_PATH
 
@@ -125,37 +146,6 @@ cd "$REPO_ROOT/co2-base"
 export PKG_CONFIG_PATH="$HEAD_PREFIX/lib/pkgconfig"
 ./autogen.sh
 ./configure --prefix="$HEAD_PREFIX" CC="$CC" CFLAGS="$CFLAGS_COMMON -I$HEAD_PREFIX/include/co2-1.0"
-# The bootstrap carbon predates the angle-bracket-include fix (this repo's
-# own compiler-side fix for exactly this), so it translates BaseObject.co2's
-# `["string.h"]` as a quoted include, which collides on a case-insensitive
-# filesystem with co2-base's own generated String.h. Let it generate the
-# (still-broken) output, patch just that, then continue -- pass 2 below
-# retranslates this correctly with HEAD's own (fixed) carbon, so this only
-# ever affects pass 1.
-(cd src && make co2/BaseObject.c) || true
-if [ -f src/co2/BaseObject.h ]; then
-    sed -i.bak 's|#include "string.h"|#include <string.h>|' src/co2/BaseObject.h src/co2/BaseObject.c
-    rm -f src/co2/BaseObject.h.bak src/co2/BaseObject.c.bak
-fi
-# Same bootstrap-carbon-only codegen gap: LogRecord.co2 declares `typedef
-# Timeval = struct timeval` (and uses it in a field) before the bootstrap
-# carbon has emitted that typedef in LogRecord.h -- it emits the typedef only
-# at the very end of the file instead of at first use. Insert an early,
-# include-guarded copy right after the existing #include block; the original
-# (later) block is itself guarded by the same #ifndef, so it becomes a
-# harmless no-op once this one has already defined it. Pass 2 retranslates
-# this correctly with HEAD's own (fixed) carbon, so this only ever affects
-# pass 1.
-(cd src && make co2/LogRecord.c) || true
-if [ -f src/co2/LogRecord.h ]; then
-    sed -i.bak '/^#include "co2\/BaseObject.h"$/a\
-struct timeval;\
-#ifndef TYPEDEF_Timeval\
-#define TYPEDEF_Timeval\
-typedef struct timeval Timeval;\
-#endif /* TYPEDEF_Timeval */' src/co2/LogRecord.h
-    rm -f src/co2/LogRecord.h.bak
-fi
 make
 make install
 echo "::endgroup::"

@@ -8,7 +8,7 @@ This file only tracks what's still open.
 
 ## 1. GitHub Actions CI — fully green on all three platforms; a release pipeline now exists too
 
-`.github/workflows/ci.yml` + `.github/scripts/{patch-bootstrap.sh,translate.sh,build-and-test.sh}`.
+`.github/workflows/ci.yml` + `.github/scripts/{translate.sh,build-and-test.sh}`.
 `CFLAGS="-std=gnu89 -g -O2"` throughout (see #2 — `-fcommon` confirmed unnecessary).
 
 **Two-stage architecture** (restructured from an earlier single-stage design that repeated the
@@ -18,19 +18,18 @@ toolchain quirks that have nothing to do with the new platform itself):
 
 - **`translate` job (`ubuntu-latest` only, runs on every push/PR, not just releases)**: `carbon`
   needs a working `carbon` binary to build itself, and `co2-base` needs `carbon` to translate
-  `.co2` → `.c` — a clean checkout can't self-host. `translate.sh` downloads this repo's own old
-  GitHub Release tarballs (`libco2-0.3.0`, `libco2-base-0.3.0`, `carbon-0.3.1`), patches
-  (`patch-bootstrap.sh`) and builds them into a scratch bootstrap prefix, then does a **two-pass**
-  translate of HEAD's own `co2-base`/`carbon`: pass 1 uses the bootstrap carbon to produce a fresh
-  HEAD `carbon` binary (untested — this pass's compiler-side fixes aren't present in the *old*
-  bootstrap carbon, so it can only be trusted to produce a working binary, not correct translation
-  output); pass 2 re-translates everything with that freshly-built HEAD carbon (self-consistent,
-  reflecting every compiler-side fix in this repo's history). No tests run in this job — it
-  packages pass 2's output via `make dist` (which automake already gates identically for both
-  projects — every `.co2`-consuming rule falls back to a harmless no-op when no `carbon` binary is
-  on PATH, relying on an already-generated file instead, exactly the shape `make dist` produces —
-  see below for the one place this wasn't true) and uploads the two dist tarballs as a build
-  artifact.
+  `.co2` → `.c` — a clean checkout can't self-host. `translate.sh` downloads this repo's own
+  *most recently cut* releases (currently `libco2-0.3.1`, `libco2-base-0.3.1`, `carbon-0.3.2` —
+  see `BOOTSTRAP_*_TAG` at the top of the script, bump these whenever a new release is cut) and
+  builds them into a scratch bootstrap prefix, then does a **two-pass** translate of HEAD's own
+  `co2-base`/`carbon`: pass 1 uses the bootstrap carbon to produce a fresh HEAD `carbon` binary
+  (only untrusted if HEAD has newer `.co2`/compiler-side changes than the bootstrap release
+  itself — otherwise it's already self-consistent); pass 2 re-translates everything with that
+  freshly-built HEAD carbon regardless, to be safe. No tests run in this job — it packages pass
+  2's output via `make dist` (which automake already gates identically for both projects — every
+  `.co2`-consuming rule falls back to a harmless no-op when no `carbon` binary is on PATH,
+  relying on an already-generated file instead, exactly the shape `make dist` produces) and
+  uploads the two dist tarballs as a build artifact.
 - **`build-and-test` job (matrix: `ubuntu-latest`/`macos-latest`/`windows-latest`, `needs:
   translate`)**: downloads `translate`'s two dist tarballs and builds+tests `co2` (from the
   checkout — pure C, needs no translation at all), `co2-base`, and `carbon` (both from their dist
@@ -54,17 +53,24 @@ toolchain quirks that have nothing to do with the new platform itself):
   because they need to mutate `lex.l`'s own `include_stack` global; the carbon-generated
   `IncludeStack.c` would duplicate-symbol-conflict with that if it were ever compiled, which is why
   it's deliberately excluded from the build — not itself a bug.)
-- **Retiring `patch-bootstrap.sh`**: its patches are specific to the pinned old release tags
-  (`libco2-0.3.0`/`libco2-base-0.3.0`/`carbon-0.3.1`) predating fixes already landed at HEAD, not a
-  permanent architectural need. **New releases now exist that incorporate every fix in this
-  file** — `libco2-0.3.1`, `libco2-base-0.3.1`, `carbon-0.3.2` (see the release pipeline below) —
-  so this is now a concrete, unblocked follow-up: repoint `translate.sh`'s bootstrap-download URLs
-  at those three tags instead of the 2015–2018 ones, confirm the bootstrap stage still works
-  against them, and only then delete or drastically shrink `patch-bootstrap.sh`. Deliberately not
-  done as a side effect of cutting those releases — repointing the bootstrap chain is its own
-  change worth verifying on its own.
-- Full list of bootstrap-tarball patches and the two-pass rationale: see `translate.sh` and
-  `patch-bootstrap.sh`'s inline comments, which document each one at the point it's applied.
+- **`patch-bootstrap.sh` has been retired.** Once real releases existed that incorporate every fix
+  in this file (`libco2-0.3.1`/`libco2-base-0.3.1`/`carbon-0.3.2`, cut via the release pipeline
+  below), `translate.sh` was repointed at them instead of the 2015–2018 tags patch-bootstrap.sh
+  existed to patch — bootstrapping from a release that's already this close to HEAD needs no
+  renames/portability patches at all, so the script (and its `bash patch-bootstrap.sh ...` call)
+  was deleted outright; `git log -- .github/scripts/patch-bootstrap.sh` has it if this kind of
+  patching is ever needed again (e.g. bootstrapping a long-stale fork). This also let two more
+  bootstrap-carbon-only pass-1 workarounds in `translate.sh` (a quoted-`#include` fix for
+  `BaseObject.h` and a typedef-ordering fix for `LogRecord.h`, both specific to the *old* 0.3.1
+  bootstrap carbon's codegen bugs) be deleted too, confirmed unnecessary against the new bootstrap
+  carbon by direct inspection of its pass-1 output before removing them. Net effect: fewer steps,
+  no `autoreconf` for co2-base/carbon (their release tarballs are already `make dist` output with
+  `configure`/`Makefile.in` pre-generated), faster `translate` job — this is what "iterate faster"
+  concretely bought. One asymmetry remains: `libco2` has no `make dist`-style release asset yet
+  (only per-platform binaries from the release pipeline), so its bootstrap step still uses
+  GitHub's automatic per-tag source archive (a raw checkout, needing `./autogen.sh`) instead of a
+  proper dist tarball — a small, optional future enhancement would be adding a `co2` dist-tarball
+  asset to `release.yml` to close this gap and drop `autogen.sh` there too.
 
 **Release pipeline**: `.github/workflows/release.yml`, triggered by pushing a version tag matching
 this repo's existing `<project>-<version>` convention (`carbon-*`/`libco2-*`/`libco2-base-*`). Each
