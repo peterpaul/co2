@@ -528,18 +528,25 @@ something introduced by or in scope for this fix.
 Verified with fully clean rebuilds of `co2-base` and `carbon` (all generated sources deleted,
 rebuilt from raw `.co2`): co2-base 5/5, carbon self-hosted 90/90, no regressions.
 
-## 6. Naming-collision risk on case-insensitive filesystems (process, not a bug)
+## 6. Naming-collision risk on case-insensitive filesystems — FIXED (automated check added)
 
 Already hit and fixed three instances this session (`exception.h`/`Exception.h`,
 `Grammar.h`/`grammar.h` at the object-file layer, `IncludeStack.co2`'s `["File.h"]` referencing
-its own `File.h`). No fourth instance is currently known, but nothing stops a new one from being
-introduced as classes get added, since carbon has no awareness of case-insensitive filesystems at
-all.
+its own `File.h`). Carbon itself has no awareness of case-insensitive filesystems, so nothing
+stopped a new one from being introduced as classes get added.
 
-**Direction**: no code fix needed, just a convention — before adding a new class/header name,
-grep for existing names that are a case-insensitive match. Could be automated as a cheap CI lint
-step (`find . -iname '*.co2' -o -iname '*.h' | tr '[:upper:]' '[:lower:]' | sort | uniq -d`-style
-check) if this becomes a recurring problem.
+**Automated**: `.github/scripts/translate.sh` now checks, as its very first step (before any of
+the expensive bootstrap/build work, so it fails fast), each project's `git ls-files`-tracked
+`src/co2/*.co2`/`*.h` for two filenames that only differ by case. Scoped to `src/co2/` specifically
+(where all three historical incidents happened) using `git ls-files` rather than a plain `find` —
+tested an unscoped version first and it flagged over a dozen same-named files in unrelated
+`test/target/` build-artifact directories that could never actually collide, since they're never
+on the same include path. Applies to both `ci.yml` and `release.yml` automatically, since both
+call this script. Verified against the current (clean) tree, and the detection logic itself
+(`tolower` + `sort` + `uniq -d`) confirmed correct against a synthetic collision — couldn't
+construct an actual on-disk two-file test case, since attempting to create case-variant filenames
+on this checkout's own case-insensitive filesystem hits exactly the bug this check exists to catch
+(`cp` reports the two paths as identical).
 
 ## 7. `["header.h"]` doesn't distinguish quoted vs. angle-bracket includes
 
