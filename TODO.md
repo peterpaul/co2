@@ -150,7 +150,7 @@ run before moving to the next):
 
 All three platforms are now fully green.
 
-## 2. `-std=gnu89 -fcommon` masks real bugs in carbon's generated C — MOSTLY FIXED
+## 2. `-std=gnu89 -fcommon` masks real bugs in carbon's generated C — ALL WARNINGS FIXED (gnu17 migration itself still pending)
 
 Original framing here was wrong: `TypeCheckVisitor.co2` is actually a dead stub (never
 instantiated, zero references anywhere) — type-checking happens via a `type_check()` method on
@@ -342,7 +342,7 @@ come from three *independent* root causes, not one:
     state: 90/90, zero regressions, warnings 27 → 15. Installed to `~/local-repo` as the new
     baseline.
 - **Category G — vtable-dispatched calls resolve against the override's own signature, not the
-  base-declared vtable slot type — MOSTLY FIXED (4 of 5 warnings eliminated).** The 5
+  base-declared vtable slot type — FULLY FIXED (all 5 warnings eliminated).** The 5
   non-`Interface.h` warnings (`RefList.filter()`'s return via `List.filter()`, `ClassDeclaration
   .is_compatible()`'s argument via `ObjectTypeDeclaration.is_compatible()`, `TokenExpression
   .set_scope()`'s argument via `Expression.set_scope()` (2 call sites), `GenerateSourceIncludesVisitor
@@ -371,44 +371,43 @@ come from three *independent* root causes, not one:
   static class and the method name, then delegates to the new hierarchy walk; wired into
   `generate()` so call-argument casting (`expression_generate_actual_arguments_casted`) uses the
   base signature instead of the resolved one.
-  - **Deliberately did NOT touch `type_check()`** (which would have additionally fixed the 5th
-    warning, `RefList.filter()`'s return value flowing into a caller's `struct RefList*` variable
-    uncast) — tried it twice, in two separate sessions, and both times it broke self-hosted rebuilds
-    with a spurious carbon-level "incompatible types: Bool and Bool" error at
-    `ClassDeclaration.co2:95` (`is_compatible`'s own declaration line) and a couple of similar spots.
-    **Follow-up investigation (this session)**: the error message itself was previously misleading —
-    found and fixed a real, separate, unrelated bug along the way: `ObjectType.co2` defined its
-    `toString()` override as `to_string()` (snake_case), so `Type.assert_compatible()`'s calls to
-    `.toString()` never dispatched to it, always falling back to `BaseObject`'s generic "ClassName at
-    0xADDRESS" — meaning *every* `ObjectType` incompatibility error in this compiler's whole history
-    printed useless output instead of the actual type name. Fixed (renamed to `toString()`, no other
-    callers depended on the old name) — this alone is a real, independent, useful fix, since it makes
-    every future type-mismatch error message across the entire compiler actually readable. With that
-    fixed, the real message read "incompatible types: Bool and Bool" — and debugging further (temporary
-    instrumentation in `ObjectType.is_compatible()`) confirmed both sides resolve to the *same*
-    `TypeDeclaration` object for `Bool` (identical pointer, so it's not a canonicalization/identity
-    problem as originally suspected), and `TypeDeclaration.is_compatible()` unconditionally `return
-    true;` — so by every check performed, this comparison *should* succeed. Yet it still fails, and
-    only in the full multi-file `make -k` build: reproducing the *exact* same compiler invocation
-    standalone (`make V=1 co2/ClassDeclaration.c`, or `carbon` invoked directly with the identical
-    `-I` flags) compiles `ClassDeclaration.co2` cleanly every time, with no error — the failure only
-    manifests when many files are retranslated in the same overall build run, which rules out a
-    static logic bug in the new casting code itself and points at some state that differs between
-    "this file alone" and "this file as file N of ~80 in one build," not yet identified (not
-    filesystem parallelism — this Makefile builds serially; the same mystery persisted across
-    multiple independent repro attempts). Reverted `type_check()`'s change again rather than ship
-    something with an intermittent, unexplained failure mode; call-argument casting alone (kept) is
-    a real, safe, independent win that doesn't need it to be correct.
-  - **For whoever picks this up next**: the remaining 1 warning (`Object.h:256`, `RefList.filter()`'s
-    return case) needs the `type_check()` fix specifically (set `type` from the base-resolved return
-    type, not the resolved override's), but *don't* trust a standalone repro — this bug only shows up
-    inside the real multi-file `make -k` build, and the fastest way to iterate on it is probably to
-    add a print statement identifying which specific `.co2` file's compilation triggers it (not just
-    which line the error is attributed to, which may be misleading — check whether it's actually
-    `ClassDeclaration.co2` being compiled at that point in the log, e.g. by cross-referencing
-    surrounding warning lines' file paths, the same way this session did).
-  - Verified via full two-pass clean rebuild + `make check`: 90/90, zero regressions, warnings
-    5 → 1. Installed to `~/local-repo` as the new bootstrap baseline.
+  - **`type_check()` fix (root-caused and landed this session)**: the same base-signature resolution
+    now also drives this call expression's own `.type` in `type_check()`, fixing the 5th warning
+    (`RefList.filter()`'s return value flowing into a caller's `struct RefList*` variable uncast).
+    Two earlier sessions had tried this and reverted it after hitting a spurious carbon-level
+    "incompatible types: Bool and Bool" error at `ClassDeclaration.co2:95` that only reproduced inside
+    the full multi-file self-hosted build, never in an isolated repro. A prior investigation had fixed
+    an unrelated but real bug along the way — `ObjectType.co2` defined its `toString()` override as
+    `to_string()` (snake_case), so `Type.assert_compatible()`'s `.toString()` calls never dispatched to
+    it and every `ObjectType` mismatch in this compiler's history printed a useless generic
+    "ClassName at 0xADDRESS" instead of the real type name (fixed: renamed to `toString()`) — and had
+    confirmed both "Bool" resolutions pointed at the *same* `TypeDeclaration` object, with
+    `TypeDeclaration.is_compatible()` unconditionally `return true;`, an apparent contradiction.
+    **Root cause, found this session via a debug build with instrumentation in
+    `Type.get_declared_type()`** (print each `ObjectType`'s token name and `.decl` pointer on every
+    call, in a from-scratch clone rebuilt with the real `translate.sh`): the comparison never actually
+    reaches `TypeDeclaration.is_compatible()` at all. `find_base_function_declaration()` reaches into
+    another declaration's AST directly (`member_scope.find_type_in_this_scope()`), bypassing the
+    normal `type_check()` traversal that would otherwise already have resolved that return type's
+    `ObjectType.decl` (`ObjectType.decl` is lazily populated on first `type_check()` call — see
+    `ObjectType.type_check()`). `Type.is_compatible()`'s `get_declared_type()` silently returns an
+    unresolved `ObjectType` wrapper as-is rather than resolving it first, so comparing it against an
+    already-resolved `ObjectType` for the exact same typedef failed the `is_of` class check
+    (`ObjectType` vs. the unwrapped `int`) even though both sides were, in fact, the same declaration —
+    hence "Bool and Bool," textually identical but in different resolution states. The "only in the
+    full build" symptom was ordering, not shared state across processes: a small isolated repro
+    happens to type-check the base declaration (via its own normal path) before
+    `functioncallexpression_resolve_vtable_type()` ever needs it, so `.decl` is already populated by
+    the time it's grabbed; deep into the full self-hosted build, ordering differs enough that it isn't
+    yet. **Fixed**: `functioncallexpression_resolve_vtable_type()` now calls `base_decl.type.type_check
+    ()` before returning it, forcing `.decl` resolution regardless of ordering — one line, at the exact
+    point the unresolved type escapes into a context that doesn't know to resolve it.
+  - Verified via a from-scratch clone, the real `.github/scripts/translate.sh` (not a hand-rolled
+    repro), and `carbon/test/run_tests.sh` against the resulting self-hosted binary: 0 errors, 0
+    `incompatible pointer type` warnings in the self-consistent pass (down from 1), and the same 12
+    pre-existing/environment-only `run_tests.sh` failures reproduce identically against the *old,
+    unfixed* bootstrap carbon under the same manual (non-`make check`) invocation — confirming they're
+    unrelated to this fix, not a regression it introduced.
 
 - **`Interface.h`'s `O_BRANCH_CALL_IF` ternary macro bug — FIXED (10 warnings eliminated).**
   `assertTrue(_tmp ? _if : true, ...)` and `assertTrue(_tmp ? _if->msg : true, ...)` mix a pointer
@@ -449,25 +448,24 @@ come from three *independent* root causes, not one:
   documented direction below in case a *future* hand-written global runs into the same issue, but
   it's not blocking anything right now.
 - **`-std=gnu17` (dropping the `89`, keeping `-fcommon` or not) is a separate, bigger effort — not
-  yet attempted successfully.** Tried it directly: the 5 Category G warnings become **hard errors**
-  under `gnu17` (`-Wincompatible-pointer-types` is error-by-default in modern C dialects, not just
-  a warning) — so Category G is no longer optional once this is attempted, it must be fixed first.
-  On top of that, `gnu17`'s stricter K&R-implicit-declaration rules surfaced entirely new errors
+  yet attempted successfully.** Tried it directly (before Category G was fully fixed): its warnings
+  became **hard errors** under `gnu17` (`-Wincompatible-pointer-types` is error-by-default in modern
+  C dialects, not just a warning) — Category G is now fully fixed (see above), so this concern is
+  moot. What's left: `gnu17`'s stricter K&R-implicit-declaration rules surfaced entirely new errors
   unrelated to any category here: `Compiler.c`'s call to `parse` (bison-generated `yyparse`'s
   wrapper), `grammar.c`'s own call to `yylex`, and `grammar.y`'s call to `error` (the parser's error
   hook) are all missing proper prototypes before use, relying on C89's implicit-declaration
-  leniency. Real, separate follow-on work: fix Category G (see its own entry above) *and* add
-  proper forward declarations for these three, before `gnu17` can be attempted again.
+  leniency. Real, separate follow-on work: add proper forward declarations for these three, before
+  `gnu17` can be attempted again.
 
-**Current recommended `CFLAGS`**: `-std=gnu89 -g -O2` (just dropped `-fcommon` — verified above).
+**Current recommended `CFLAGS`**: `-std=gnu89 -g -O2` (dropped `-fcommon` — verified above).
 Still `-std=gnu89`, not plain `c89`/`c17`, since GNU nested functions/`typeof`/statement-expressions
 are used throughout `Object.h`/`Interface.h`/carbon's own codegen (item #3, unaffected by any of
-this). **1 warning remains** (`RefList.filter()`'s uncast return value, Category G's last piece —
-see above), down from a 368 original baseline, none of them blocking a successful build — just
-diagnostic noise pending that fix. Moving to `-std=gnu17` is real, valuable, separate follow-on work
-(fix that last warning so Category G's errors-under-`gnu17` concern is moot, + add the three missing
-prototypes noted above), not attempted further this session. Full mechanism/history for all of this
-preserved at `~/.claude/plans/abundant-percolating-brooks.md`.
+this). **0 warnings remain** (Category G's last piece, `RefList.filter()`'s uncast return value, is
+now fixed — see above), down from a 368 original baseline. Moving to `-std=gnu17` is real, valuable,
+separate follow-on work (just the three missing prototypes noted above now), not attempted further
+this session. Full mechanism/history for all of this preserved at
+`~/.claude/plans/abundant-percolating-brooks.md`.
 
 ## 3. GNU nested functions force real GCC (excludes Clang, MSVC)
 

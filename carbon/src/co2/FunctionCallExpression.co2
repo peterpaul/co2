@@ -36,16 +36,23 @@ include co2/ClassDeclaration
 // (type_check_arguments) still uses the resolved/most-derived signature,
 // since that's the real declared contract being called.
 //
-// Deliberately NOT used to override this call expression's own .type in
-// type_check() (e.g. to fix a caller-side "struct RefList* x = obj.filter()"
-// cast): that would need the base return type to compare equal, by .decl,
-// to types resolved the normal way elsewhere -- tried it, and typedef'd
-// type names (e.g. "Bool") that get looked up independently at each call
-// site don't reliably compare as the same .decl in every context this ran
-// in, causing spurious "incompatible types" compiler errors during
-// self-hosted rebuilds. Fixing that needs sorting out why two resolutions
-// of the same type name don't converge on one canonical decl -- a separate,
-// deeper problem than this cast-insertion mechanism, not attempted here.
+// Also used (see type_check() below) to override this call expression's own
+// .type with the base-declared return type, so a caller-side
+// "struct RefList* x = obj.filter()" cast is generated correctly against the
+// vtable slot's actual (base) type instead of the override's narrower one.
+//
+// This previously caused spurious "incompatible types: Bool and Bool"
+// errors during self-hosted rebuilds (tried and reverted twice, in two
+// separate sessions, before being root-caused): find_base_function_declaration
+// reaches into another declaration's AST directly, bypassing the normal
+// type_check() traversal that would otherwise already have resolved that
+// return type's ObjectType.decl (ObjectType lazily resolves .decl on first
+// type_check() call, see ObjectType.type_check()). Type.is_compatible()'s
+// get_declared_type() silently returns an unresolved ObjectType wrapper as-is
+// (rather than resolving it), so comparing it against an already-resolved
+// ObjectType for the exact same typedef (e.g. "Bool") failed the class check
+// even though both sides were, in fact, the same declaration. Fixed below by
+// forcing type_check() on the base-resolved type before returning it.
 FunctionType functioncallexpression_resolve_vtable_type (Expression function_expr, FunctionType resolved_type) {
 	ObjectTypeDeclaration receiver_decl = null;
 	Token method_name = null;
@@ -69,6 +76,7 @@ FunctionType functioncallexpression_resolve_vtable_type (Expression function_exp
 		ClassDeclaration class_decl = (ClassDeclaration) receiver_decl;
 		FunctionDeclaration base_decl = class_decl.find_base_function_declaration (method_name);
 		if (base_decl && base_decl.type is_of FunctionType) {
+			base_decl.type.type_check ();
 			return (FunctionType) base_decl.type;
 		}
 	}
@@ -235,7 +243,8 @@ class FunctionCallExpression : Expression {
 			return;
 		}
 		FunctionType function_type = (FunctionType) function.type;
-		type = (Type) function_type.return_type.retain ();
+		FunctionType resolved_function_type = functioncallexpression_resolve_vtable_type (function, function_type);
+		type = (Type) resolved_function_type.return_type.retain ();
 		type_check_arguments (function_type);
 	}
 }
