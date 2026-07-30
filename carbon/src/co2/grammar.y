@@ -133,6 +133,7 @@
 %token <token> _SELF
 %token <token> _SIZEOF
 %token <token> _STRING_CONSTANT
+%token <token> _ANGLE_HEADER_CONSTANT
 %token <token> _STRUCT
 %token <token> _SUPER
 %token <token> _SWITCH
@@ -376,6 +377,10 @@ header_file
 :	'[' _STRING_CONSTANT ']'
 {
   $$ = $2;
+}
+|	_ANGLE_HEADER_CONSTANT ']'
+{
+  $$ = $1;
 }
 ;
 

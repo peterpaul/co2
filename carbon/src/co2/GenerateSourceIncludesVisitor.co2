@@ -44,22 +44,31 @@ class GenerateSourceIncludesVisitor : BaseCompileObjectVisitor {
 		}
 	}
 
-	// A ["header.h"] block always names an external system/library header
-	// for FFI purposes -- never one of this project's own generated headers,
-	// which are always brought in through addFile() instead -- so it must
-	// use the system search path (<...>) rather than the quoted form the
-	// lexer captured verbatim from the source text. Using the quoted form
-	// risks the include resolving to a same-directory file of the same
-	// name instead of the intended system header, on a case-insensitive
-	// filesystem.
-	String angle_bracket_include (Token include_file) {
-		char *quoted = include_file.name.data;
-		return new String ("<%.*s>", strlen (quoted) - 2, &quoted[1]);
+	// A ["header.h"]/[<header.h>] block names an external system/library
+	// header for FFI purposes -- never one of this project's own generated
+	// headers, which are always brought in through addFile() instead. The
+	// new [<header.h>] form (TODO item #7) is reproduced verbatim -- the
+	// lexer already captures it fully delimited. The older ["header.h"]
+	// form still normalizes to angle-bracket output rather than being
+	// reproduced verbatim: every current use in this codebase actually
+	// means a real system/library header, never a same-directory file, and
+	// this project's own .co2 sources can't migrate their existing
+	// ["..."]  uses to [<...>] yet -- that needs a carbon release that
+	// understands this new syntax to exist *first*, so it can bootstrap
+	// translating sources that use it (see TODO item #7). Until that
+	// migration happens, keep normalizing ["..."] the same way as before
+	// so behavior doesn't silently change out from under existing sources.
+	String format_include (Token include_file) {
+		char *text = include_file.name.data;
+		if (text[0] == '<') {
+			return new String ("%s", text);
+		}
+		return new String ("<%.*s>", strlen (text) - 2, &text[1]);
 	}
 
 	void visitDeclaration (Declaration decl) {
 		if (decl.include_file) {
-			set.add (angle_bracket_include (decl.include_file));
+			set.add (format_include (decl.include_file));
 		}
 		if (decl) {
 			addFile (decl.file);

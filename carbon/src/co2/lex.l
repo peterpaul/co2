@@ -55,6 +55,7 @@ CHAR_SYMBOL	{NON_ESCAPED}|\\{ESCAPED}
 CHAR_CONST	\'({CHAR_SYMBOL}|\")\'
 CHAR_CONST_ERR	\'({CHAR_SYMBOL}|\")*\'
 STRING_CONST	\"({CHAR_SYMBOL}|\')*\"
+ANGLE_HEADER_CONST	"[<"[^>\n]*">"
 
 %x MULTI_LINE_COMMENT
 %x ONE_LINE_COMMENT
@@ -139,6 +140,7 @@ STRING_CONST	\"({CHAR_SYMBOL}|\')*\"
 {CHAR_CONST}	yylval.token = O_CALL_CLASS(Token(), new, yytext, _CHAR_CONSTANT, current_file, linenumber); return yylval.token->type;
 {CHAR_CONST_ERR}  yylval.token = O_CALL_CLASS(Token(), new, yytext, _CHAR_CONSTANT, current_file, linenumber); error(yylval.token, "invalid character constant %s", yytext); return yylval.token->type;
 {STRING_CONST}	yylval.token = O_CALL_CLASS(Token(), new, yytext, _STRING_CONSTANT, current_file, linenumber); return yylval.token->type;
+{ANGLE_HEADER_CONST}	yylval.token = O_CALL_CLASS(Token(), new, &yytext[1], _ANGLE_HEADER_CONSTANT, current_file, linenumber); return yylval.token->type;
 \n		linenumber++; /* count lines */
 [ \t]		/* eat whitespace */
 [\(\)\]\{\}\;\:\,]	return yytext[0]; /* no Token for these characters */

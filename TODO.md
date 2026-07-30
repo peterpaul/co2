@@ -553,7 +553,7 @@ construct an actual on-disk two-file test case, since attempting to create case-
 on this checkout's own case-insensitive filesystem hits exactly the bug this check exists to catch
 (`cp` reports the two paths as identical).
 
-## 7. `["header.h"]` doesn't distinguish quoted vs. angle-bracket includes
+## 7. `["header.h"]` doesn't distinguish quoted vs. angle-bracket includes — LANGUAGE SUPPORT ADDED, existing sources not yet migrated (bootstrap-blocked)
 
 The angle-bracket fix (see `Emit angle-bracket includes for external...` commit) made
 `["header.h"]` *always* emit `#include <header.h>`, since every current use in this codebase is a
@@ -565,12 +565,47 @@ A real C-embedding language should let the author choose quoted-vs-angle-bracket
 itself does, since a from-scratch program built with carbon could plausibly need a header findable
 only by same-directory adjacency, not through the compiler's `-I` search path.
 
-**Direction**: extend the grammar to accept both `["quoted.h"]` and `[<bracket.h>]`, preserving
-whichever form the source used through to the generated `#include` line, instead of normalizing
-everything to one form. Needs: a context-sensitive lexer state entered right after `[` (so `<`/`>`
-don't collide with their normal use as relational operators elsewhere in the grammar — same trick
-already used for the `<INCLUDE>` start-condition), a way for the resulting token to carry which
-form was written, and simplifying `GenerateHeaderIncludesVisitor`/`GenerateSourceIncludesVisitor`
-back to just passing that token through unchanged rather than transforming it. Real front-end
-surface (lexer/grammar/AST), in the most bootstrap-fragile part of the codebase to iterate on —
-worth doing, not urgent.
+**Added**: the grammar now also accepts `[<bracket.h>]` alongside the existing `["quoted.h"]`.
+`lex.l` gains one regex, `"[<"[^>\n]*">"`, matching the whole `[<...>` prefix as a single token
+(mirroring how `STRING_CONST` already matches an entire `"..."` as one token) and stripping just
+the leading `[` so the token's text is exactly the desired `#include` argument, `<header.h>`.
+`grammar.y` adds a `%token <token> _ANGLE_HEADER_CONSTANT` and a second `header_file` alternative,
+`_ANGLE_HEADER_CONSTANT ']'` (no separate `'['`, since the new token already consumed it) — no
+grammar conflicts, since it's a wholly new terminal. `GenerateHeaderIncludesVisitor`/
+`GenerateSourceIncludesVisitor`'s `format_include()` reproduces the `[<...>]` form verbatim
+(already fully delimited by the lexer) instead of stripping/rewrapping it. Verified with a new
+`carbon/test/pass/external_definition_angle.test` (same fixture as `external_definition.test`,
+using `[<...>]` instead) — inspected the generated `.c` directly and confirmed `#include
+<include.h>` comes through unchanged, alongside the old form's `["include.h"]` still correctly
+normalizing to `<include.h>` in `external_definition.test`'s own output (unchanged behavior, see
+below for why that's deliberate for now). Full two-pass `translate.sh` clean (0 errors, same 2
+pre-existing warnings as before, both in bootstrap/pass-1 legs using the *old* carbon, none in
+pass 2), and `carbon/test/run_tests.sh`: the new test passes, same 12 pre-existing
+environment-only failures as always, no regressions.
+
+**Not done, and deliberately deferred**: migrating this codebase's own 15 `["..."]` uses (in
+`BaseObject.co2`, `LogRecord.co2`, `SimpleFormatter.co2`, `IncludeStack.co2`, `Compiler.co2`,
+`GrammarTokens.co2`) to the new `[<...>]` form, and flipping `["..."]`'s own codegen to stop
+normalizing to angle-bracket (i.e. making quoted actually mean quoted, the other half of this
+item's stated goal). Tried doing both in the same change and hit a real bootstrap chicken-and-egg
+wall: `translate.sh`'s pass 1 uses the *already-released* bootstrap carbon (`carbon-0.3.2`, predates
+this change) to translate HEAD's own co2-base/carbon `.co2` sources — and that old carbon can't
+parse `[<...>]` at all, since the syntax didn't exist yet when it was built. This is the same
+category of constraint this file's own intro describes for any language-level change: a new release
+of carbon that understands the syntax has to exist and become the bootstrap tag *before* this
+project's own sources can actually use it. `format_include()` deliberately still special-cases
+`["..."]` to keep normalizing to angle-bracket (unchanged from before this change) rather than
+flipping its meaning — flipping it without also migrating the 15 use sites would silently change
+their generated `#include` style out from under them, including reintroducing the exact
+case-insensitive collision `IncludeStack.co2`'s own `["co2/File.h"]` was fixed to avoid. **For
+whoever picks this up next**: once a carbon release built from a commit at or after this one
+becomes `translate.sh`'s `BOOTSTRAP_CARBON_TAG`, migrate all 15 sites to `[<...>]` and remove
+`format_include()`'s special-casing of the quoted form (make it reproduce `["..."]` verbatim too,
+i.e. genuinely quoted) in the same change.
+
+(Original framing figured this would need a context-sensitive lexer start-condition entered right
+after `[`, to keep `<`/`>` from colliding with their normal use as relational operators. Turned out
+unnecessary: matching the whole `"[<"[^>\n]*">"` sequence as one token, the same way `STRING_CONST`
+already matches an entire `"..."` in one token, disambiguates for free — a bare `[` is always a
+shorter match, and flex's longest-match rule prefers the compound token whenever the input actually
+starts with `[<`, with no start-condition or grammar conflict.)
