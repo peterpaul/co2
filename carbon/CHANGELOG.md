@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `[<header.h>]` angle-bracket include syntax, alongside the existing `["header.h"]`
+  (TODO #7). The existing quoted form still normalizes to angle-bracket output for now —
+  this repo's own 15 uses can't migrate to the new syntax until a carbon release built
+  from this change becomes the bootstrap seed.
+- `CHANGELOG.md`, in [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format.
+
+### Fixed
+
+- `RefList.filter()`'s vtable return-type cast: root-caused and fixed the long-standing
+  "incompatible types: Bool and Bool" mystery (TODO #2, Category G's last warning). The
+  base-resolved return type from `find_base_function_declaration()` wasn't being
+  type-checked before use, leaving its `ObjectType.decl` unresolved and causing spurious
+  mismatches against an already-resolved `ObjectType` for the same typedef.
+- `README.md` and `CHANGELOG.md` are now actually included in `make dist` tarballs
+  (previously silently missing — only the plain `README`/`ChangeLog` were).
+
 ## [0.3.2] - 2026-07-28
 
 ### Added

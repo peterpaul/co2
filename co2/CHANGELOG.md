@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `CHANGELOG.md`, in [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format.
+
+### Fixed
+
+- `README.md` and `CHANGELOG.md` are now actually included in `make dist` tarballs
+  (previously silently missing — only the plain `README`/`ChangeLog` were).
+
 ## [0.3.1] - 2026-07-28
 
 ### Fixed
