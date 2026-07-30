@@ -111,3 +111,10 @@ freshly built `../src/carbon` binary, logging results to
 
 `generate-testcases.sh` / `generate-makefile-am.sh` regenerate the test
 list after adding or removing `.test` files.
+
+This suite — not "does carbon still compile itself" — is how a new language feature actually gets
+verified: a brand-new grammar/lexer feature can't be exercised by self-hosting until a release built
+from it becomes the bootstrap seed elsewhere in this repo (see the root
+[repo README](../README.md#the-bootstrap-cycle) and `CLAUDE.md`), so add a `pass/`/`fail/` fixture
+for it here first. See `TODO.md` for a running list of confirmed grammar-level gaps in this suite's
+current coverage.

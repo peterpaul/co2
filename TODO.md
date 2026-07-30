@@ -609,3 +609,61 @@ unnecessary: matching the whole `"[<"[^>\n]*">"` sequence as one token, the same
 already matches an entire `"..."` in one token, disambiguates for free — a bare `[` is always a
 shorter match, and flex's longest-match rule prefers the compound token whenever the input actually
 starts with `[<`, with no start-condition or grammar conflict.)
+
+## 8. `carbon/test/` coverage gaps — found 2 real, live bugs, plus several untested-but-working operators
+
+Prompted by item #7's bootstrap constraint: since a new language feature can't be exercised by
+self-hosting until a release-and-rebootstrap cycle happens (see `CLAUDE.md`), `carbon/test/pass/`
+and `carbon/test/fail/` are the *only* immediate way to verify a compiler feature actually works —
+which only holds if that suite is genuinely comprehensive. Cross-referenced every non-terminal in
+`grammar.y` (`%type` declarations) against what `carbon/test/pass/*.test` and `carbon/test/fail/*.test`
+actually exercise (grep across the whole suite, not just plausible-looking filenames), then smoke-
+tested every zero-coverage construct directly against the current `carbon` binary to check whether
+"untested" also meant "broken." Most of the language is well covered — classes, interfaces, structs,
+typedefs, inheritance, mixins, try/catch/finally, switch/case, loops, casts, `is_of`, `va_arg`,
+external declarations (both `["..."]` and now `[<...>]`) — but two zero-coverage constructs turned
+out to be **actually broken**, not just untested:
+
+- **`continue` — crashes the compiler outright.** `ContinueStatement.co2` is an empty class body
+  (`class ContinueStatement : Statement {}`) inheriting `generate()`/`type_check()` from `Statement`
+  (itself empty) and ultimately `CompileObject`'s *abstract* `generate (FILE *fp);` declaration —
+  never overridden. Compiling any source containing a bare `continue;` crashes with `runtime error:
+  ContinueStatement at 0x...doesn't respond to get_token` / `Assertion failed:
+  (_o_tmp_get_token->class->get_token)` (verified directly: `carbon t.co2 t.c` on a minimal
+  `for`-loop-with-`continue` fixture exits 134). `break` works fine (`BreakStatement.co2` properly
+  overrides both methods). **Needs an actual fix** (add `type_check()`/`generate()` to
+  `ContinueStatement.co2`, mirroring `BreakStatement.co2` exactly — `generate` should just emit
+  `continue;\n`), not just a test — though a `pass/` fixture exercising it is exactly what would
+  have caught this originally, and must accompany the fix.
+- **Bitwise XOR `#`/`##` and compound `#=` — generate invalid C.** Carbon repurposes `^` for
+  `_POWER` (see `arithmetic_expressions.test`'s `i^3` meaning "i cubed"), so `#`/`##`/`#=` exist as
+  the actual bitwise-XOR/XOR-assign operators — but codegen just passes the `#`/`#=` token straight
+  through into the generated C, and `#` isn't a valid C infix operator at all. Verified directly:
+  `int e = a # 2;` translates without error from carbon, but the resulting `.c` fails to compile
+  with GCC (`error: expected ';' at end of declaration`). **Needs an actual fix** in whichever
+  `BinaryExpression`/`ConditionalBinaryExpression` codegen path handles this operator — translate to
+  C's `^` the same way `_POWER`'s codegen must already avoid colliding with it.
+
+Verified as **working correctly**, genuinely just untested (smoke-tested a fixture exercising all of
+these together, translated, compiled with real GCC, and ran it — output matched hand-computed
+expected values): logical `&&`/`||` (`_AND`/`_OR` tokens), bitwise `&`/`|` (binary), shifts
+`<<`/`>>`, compound-assigns `&=`/`|=`, unary address-of `&expr`, unary dereference `*expr`-as-
+expression (as opposed to `*` in a pointer *type*, e.g. `char *`, which is everywhere), and unary
+plus `+expr`. None of these have a single `.test` fixture anywhere in `pass/`/`fail/` despite
+working — comparisons (`<`, `>`, `<=`, `>=`, `==`, `!=`) and the arithmetic compound-assigns
+(`+=`/`-=`/`*=`/`/=`/`^=`/`%=`) *are* covered, mostly in `arithmetic_expressions.test`.
+
+**Related, not itself a coverage gap**: `MacroDeclaration.co2` defines a class that's `#include`d by
+`grammar.y` but never actually instantiated by any grammar production (no `macro` keyword rule
+exists) — looks like dead/unreachable code, the same category of thing `TypeCheckVisitor.co2` turned
+out to be earlier in item #2's investigation. Nothing to test since nothing reaches it; worth
+confirming and removing in a future cleanup pass, separate from this item.
+
+**Direction**: fix `continue` and `#`/`##`/`#=` first (real bugs, small fixes, each needs a
+regression test to accompany it so this doesn't silently regress again), then add `pass/` fixtures
+for the untested-but-working operators (most can probably fold into
+`arithmetic_expressions.test`'s existing int/unsigned/float pattern, or a new sibling file, rather
+than needing many new files). Also worth a `fail/` fixture checking whether `continue`/`break`
+outside any loop is rejected — current behavior there is unverified too. Not attempted in this
+pass — this item is the audit result, not the fix (the two bugs above were confirmed by direct
+smoke-testing, not by writing and landing an actual fix).

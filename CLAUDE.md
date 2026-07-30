@@ -21,6 +21,34 @@ This repo is a bootstrap chain of three GNU Autotools C projects, built and rele
 - When bumping the Carbon language/compiler, the usual sequence is: install current `carbon` → rebuild `co2-base` → rebuild `carbon` against it → reinstall → repeat if the language itself changed.
 - Release commits alternate between `carbon` and `libco2-base` version bumps (see git log) precisely because of this cycle.
 
+### New compiler (language) features need a release before this repo's own `.co2` sources can use them
+
+`.github/scripts/translate.sh`'s pass 1 uses the *already-released* bootstrap `carbon`
+(`BOOTSTRAP_CARBON_TAG`) to translate HEAD's own `co2-base`/`carbon` `.co2` sources — not a
+freshly-built one. If a change adds new grammar/lexer syntax (a new token, a new production, a new
+`%x` lexer state, ...) *and* that same change also starts using the new syntax in this repo's own
+`.co2` source, pass 1 breaks: the old bootstrap binary predates the feature and simply can't parse
+it. This isn't a bug to work around — it's an inherent property of any self-hosted grammar change,
+the same category of thing the bootstrap cycle above describes for the compiler binary itself.
+
+**The rule**: land a new language feature's compiler-side implementation (grammar, lexer, codegen)
+on its own, without changing any of this repo's own `.co2` sources to use it yet. Everything must
+still compile and self-host exactly as before — purely additive, zero behavior change for existing
+code. Verify the feature works with a new `carbon/test/pass/`(or `fail/`) fixture (see the next
+section for why this step carries more weight than usual), not by using it in `co2-base`/`carbon`'s
+own source. Only *after* a release built from that change becomes `translate.sh`'s bootstrap seed
+(i.e. `BOOTSTRAP_CARBON_TAG` is bumped to point at it) can a follow-up change actually start using
+the new syntax in this repo's own sources. TODO.md item #7 (`[<header.h>]` include syntax) is a
+worked example of exactly this split — read its two commits/changelog entries for the concrete
+before/after.
+
+**Corollary**: because of this, "does carbon still compile itself cleanly" is *not* a reliable way
+to validate a new language feature — by design, a brand-new feature can't be exercised by
+self-compilation until a full release-and-rebootstrap cycle has happened. `carbon/test/pass/` and
+`carbon/test/fail/` (see "Running tests" below) are the actual, immediate verification mechanism
+for new language features — keep that suite genuinely comprehensive, not just "the compiler
+happens to still build."
+
 ## Build commands
 
 Each of `co2/`, `co2-base/`, `carbon/`, and the `examples/*` projects is a standalone autotools project (own `configure.ac`, `Makefile.am`). From inside a project directory:
@@ -41,7 +69,7 @@ Install to `~/local` is the convention used by the test scripts (`--prefix=$HOME
   cd carbon/test
   ./run_tests.sh
   ```
-  This runs every `*.test` file under `carbon/test/pass/` (must compile and run successfully) and `carbon/test/fail/` (must fail to compile) against the freshly built `../src/carbon` compiler binary, writing per-test logs to `carbon/test/target/`. A single test can be run directly with `./run_pass_test.sh <path>.test` or `./run_fail_test.sh <path>.test` (both source `run_test_base.sh` for `SRCDIR`/`BUILDDIR` setup). `carbon/test/generate-testcases.sh` / `generate-makefile-am.sh` regenerate the test list when `.test` files are added/removed.
+  This runs every `*.test` file under `carbon/test/pass/` (must compile and run successfully) and `carbon/test/fail/` (must fail to compile) against the freshly built `../src/carbon` compiler binary, writing per-test logs to `carbon/test/target/`. A single test can be run directly with `./run_pass_test.sh <path>.test` or `./run_fail_test.sh <path>.test` (both source `run_test_base.sh` for `SRCDIR`/`BUILDDIR` setup). `carbon/test/generate-testcases.sh` / `generate-makefile-am.sh` regenerate the test list when `.test` files are added/removed. This suite is the primary verification mechanism for language features (see the bootstrap-cycle note above for why); TODO.md has a running list of confirmed grammar-level coverage gaps (operators, `continue`, address-of, ...) found by cross-referencing `grammar.y`'s productions against this directory.
 - **`co2-base/test`**: automake-driven; add cases via `Makefile.am`.
 
 ## Working with `.co2` source files

@@ -34,6 +34,12 @@ project's most recently cut release as the bootstrap seed — see `.github/scrip
 `TODO.md` item #1 for the full mechanism, and each project's own README for its "Bootstrap note"
 section.
 
+**Adding a new compiler (language) feature?** It can't be used in this repo's own `.co2` sources
+until a release built from it becomes the bootstrap seed above — the old bootstrap `carbon` simply
+can't parse syntax it predates. See `CLAUDE.md`'s "New compiler (language) features..." section for
+the concrete rule and a worked example, and `carbon/README.md`'s "Tests" section for why
+`carbon/test/`'s own fixtures (not self-compilation) are how such a feature actually gets verified.
+
 ## Building
 
 Each of `co2/`, `co2-base/`, `carbon/`, and the `examples/*` projects is a standalone Autotools
