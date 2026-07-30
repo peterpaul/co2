@@ -69,5 +69,6 @@
 	_VA_LIST__,
 	_VOID,
 	_WHILE,
-	_XOR;
+	_XOR,
+	_XOR_IS;
 }

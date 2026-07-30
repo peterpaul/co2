@@ -610,7 +610,7 @@ already matches an entire `"..."` in one token, disambiguates for free — a bar
 shorter match, and flex's longest-match rule prefers the compound token whenever the input actually
 starts with `[<`, with no start-condition or grammar conflict.)
 
-## 8. `carbon/test/` coverage gaps — found 2 real, live bugs, plus several untested-but-working operators
+## 8. `carbon/test/` coverage gaps — 2 real bugs found and FIXED, several operators still untested-but-working
 
 Prompted by item #7's bootstrap constraint: since a new language feature can't be exercised by
 self-hosting until a release-and-rebootstrap cycle happens (see `CLAUDE.md`), `carbon/test/pass/`
@@ -624,25 +624,31 @@ typedefs, inheritance, mixins, try/catch/finally, switch/case, loops, casts, `is
 external declarations (both `["..."]` and now `[<...>]`) — but two zero-coverage constructs turned
 out to be **actually broken**, not just untested:
 
-- **`continue` — crashes the compiler outright.** `ContinueStatement.co2` is an empty class body
-  (`class ContinueStatement : Statement {}`) inheriting `generate()`/`type_check()` from `Statement`
-  (itself empty) and ultimately `CompileObject`'s *abstract* `generate (FILE *fp);` declaration —
-  never overridden. Compiling any source containing a bare `continue;` crashes with `runtime error:
-  ContinueStatement at 0x...doesn't respond to get_token` / `Assertion failed:
-  (_o_tmp_get_token->class->get_token)` (verified directly: `carbon t.co2 t.c` on a minimal
-  `for`-loop-with-`continue` fixture exits 134). `break` works fine (`BreakStatement.co2` properly
-  overrides both methods). **Needs an actual fix** (add `type_check()`/`generate()` to
-  `ContinueStatement.co2`, mirroring `BreakStatement.co2` exactly — `generate` should just emit
-  `continue;\n`), not just a test — though a `pass/` fixture exercising it is exactly what would
-  have caught this originally, and must accompany the fix.
-- **Bitwise XOR `#`/`##` and compound `#=` — generate invalid C.** Carbon repurposes `^` for
+- **`continue` — crashed the compiler outright. FIXED.** The real root cause ran one level deeper
+  than it first looked: adding `type_check()`/`generate()` to `ContinueStatement.co2` (mirroring
+  `BreakStatement.co2`) *didn't* fix the crash on its own — `ContinueStatement` was never wired into
+  `BaseCompileObjectVisitor` at all (no `include co2/ContinueStatement`, no `is_of
+  ContinueStatement` branch in `visitStatement()`'s dispatch chain, no `visitContinueStatement()`
+  stub), so every `continue;` fell through to that dispatch's generic `else` branch, which calls
+  `stat.get_token()` — itself abstract and never overridden, hence "doesn't respond to get_token"
+  rather than any error mentioning `generate`. Fixed both: `ContinueStatement.co2` now overrides
+  `accept`/`type_check`/`generate` exactly like `BreakStatement.co2`, and
+  `BaseCompileObjectVisitor.co2` gained the missing include, dispatch branch, and empty
+  `visitContinueStatement (Statement stat) {}` stub (same shape as `visitBreakStatement`, confirmed
+  nothing else overrides it either). Verified: a `for`/`while` fixture with `continue` in both now
+  translates, compiles, and runs with the correct output. Regression test:
+  `carbon/test/pass/continue_statement.test`.
+- **Bitwise XOR `#`/`##` and compound `#=` — generated invalid C. FIXED.** Carbon repurposes `^` for
   `_POWER` (see `arithmetic_expressions.test`'s `i^3` meaning "i cubed"), so `#`/`##`/`#=` exist as
-  the actual bitwise-XOR/XOR-assign operators — but codegen just passes the `#`/`#=` token straight
-  through into the generated C, and `#` isn't a valid C infix operator at all. Verified directly:
-  `int e = a # 2;` translates without error from carbon, but the resulting `.c` fails to compile
-  with GCC (`error: expected ';' at end of declaration`). **Needs an actual fix** in whichever
-  `BinaryExpression`/`ConditionalBinaryExpression` codegen path handles this operator — translate to
-  C's `^` the same way `_POWER`'s codegen must already avoid colliding with it.
+  the actual bitwise-XOR/XOR-assign operators — but codegen just passed the `#`/`#=` token straight
+  through into the generated C, and `#` isn't a valid C infix operator at all. Fixed in
+  `BinaryExpression.co2`'s `generate()`: added `case '#': case _XOR:` emitting `" ^ "` and a
+  `case _XOR_IS:` emitting `" ^= "`, instead of falling to `default:`'s `operator.generate(fp)`
+  (which just prints the literal `#`/`##`/`#=` text). Also had to add `_XOR_IS` to
+  `GrammarTokens.co2`'s token list (`_XOR` was already there; `_XOR_IS` wasn't, so the new code
+  didn't even type-check until that was added). Verified: `a # 2`, `a ## 2`, and `a #= 2` all now
+  translate, compile, and produce the correct XORed value. Regression test:
+  `carbon/test/pass/bitwise_xor.test`.
 
 Verified as **working correctly**, genuinely just untested (smoke-tested a fixture exercising all of
 these together, translated, compiled with real GCC, and ran it — output matched hand-computed
@@ -659,11 +665,11 @@ exists) — looks like dead/unreachable code, the same category of thing `TypeCh
 out to be earlier in item #2's investigation. Nothing to test since nothing reaches it; worth
 confirming and removing in a future cleanup pass, separate from this item.
 
-**Direction**: fix `continue` and `#`/`##`/`#=` first (real bugs, small fixes, each needs a
-regression test to accompany it so this doesn't silently regress again), then add `pass/` fixtures
-for the untested-but-working operators (most can probably fold into
-`arithmetic_expressions.test`'s existing int/unsigned/float pattern, or a new sibling file, rather
-than needing many new files). Also worth a `fail/` fixture checking whether `continue`/`break`
-outside any loop is rejected — current behavior there is unverified too. Not attempted in this
-pass — this item is the audit result, not the fix (the two bugs above were confirmed by direct
-smoke-testing, not by writing and landing an actual fix).
+**Remaining direction**: add `pass/` fixtures for the still-untested-but-working operators listed
+above (most can probably fold into `arithmetic_expressions.test`'s existing int/unsigned/float
+pattern, or a new sibling file, rather than needing many new files). Also worth a `fail/` fixture
+checking whether `continue`/`break` outside any loop is rejected — current behavior there is
+unverified (given carbon does zero semantic validation of loop context for either, per the
+`continue` bug investigation above, this is a real open design question, not just a missing test:
+right now both just emit plain C `break;`/`continue;` and rely entirely on the C compiler to reject
+a misplaced one).

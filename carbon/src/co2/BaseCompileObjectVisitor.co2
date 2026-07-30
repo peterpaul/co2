@@ -23,6 +23,7 @@ include co2/BreakStatement
 include co2/CaseStatement
 include co2/CatchStatement
 include co2/CompoundStatement
+include co2/ContinueStatement
 include co2/DeleteStatement
 include co2/DoStatement
 include co2/ExpressionStatement
@@ -107,6 +108,8 @@ class BaseCompileObjectVisitor : RefObject, CompileObjectVisitor {
 			visitCatchStatement (stat);
 		} else if (stat is_of CompoundStatement) {
 			visitCompoundStatement (stat);
+		} else if (stat is_of ContinueStatement) {
+			visitContinueStatement (stat);
 		} else if (stat is_of DeleteStatement) {
 			visitDeleteStatement (stat);
 		} else if (stat is_of DoStatement) {
@@ -194,6 +197,7 @@ class BaseCompileObjectVisitor : RefObject, CompileObjectVisitor {
 	void visitCaseStatement (Statement stat) {}
 	void visitCatchStatement (Statement stat) {}
 	void visitCompoundStatement (Statement stat) {}
+	void visitContinueStatement (Statement stat) {}
 	void visitDeleteStatement (Statement stat) {}
 	void visitDoStatement (Statement stat) {}
 	void visitExpressionStatement (Statement stat) {}

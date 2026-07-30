@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `continue` no longer crashes the compiler. `ContinueStatement` was never wired into
+  `BaseCompileObjectVisitor`'s dispatch at all; every `continue;` fell through to a generic error
+  path that called an abstract, never-overridden `get_token()` (TODO #8).
+- Bitwise XOR (`#`/`##`) and compound XOR-assign (`#=`) no longer generate invalid C. Codegen was
+  passing these tokens' literal text straight through instead of translating to C's `^`/`^=` (TODO
+  #8).
+
 ## [0.3.3] - 2026-07-30
 
 ### Added

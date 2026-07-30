@@ -200,6 +200,22 @@ class BinaryExpression : Expression {
 			fprintf (fp, ")");
 			break;
 		}
+		case '#':
+		case _XOR: {
+			// carbon repurposes '^'/_POWER for exponentiation (see above), so
+			// bitwise XOR uses '#'/'##' instead -- operator.generate() would
+			// print that literal text, which isn't a valid C infix operator.
+			operand[0].generate (fp);
+			fprintf (fp, " ^ ");
+			operand[1].generate (fp);
+			break;
+		}
+		case _XOR_IS: {
+			operand[0].generate (fp);
+			fprintf (fp, " ^= ");
+			operand[1].generate (fp);
+			break;
+		}
 		default: {
 			operand[0].generate (fp);
 			fprintf (fp, " ");

@@ -16,16 +16,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-include co2/Statement
 
-class ContinueStatement : Statement {
-	void accept (CompileObjectVisitor visitor) {
-		visitor.visit (self);
-	}
+// Regression test: carbon repurposes '^'/_POWER for exponentiation (see
+// arithmetic_expressions.test), so bitwise XOR uses '#'/'##' (_XOR) and
+// '#=' (_XOR_IS) instead -- but BinaryExpression.generate()'s default case
+// printed that operator token's literal text, which isn't valid C, so any
+// use of these operators failed to compile (TODO.md item #8).
 
-	void type_check () {}
+["stdio.h"] int printf(char * format, ...);
 
-	void generate (FILE *fp) {
-		fprintf (fp, "continue;\n");
-	}
+int main(int argc, char ** argv)
+{
+	int i = 5;
+	printf("i#2 (7) = %d\n", i#2);
+	printf("i##2 (7) = %d\n", i##2);
+	printf("i#=2 (7) = %d\n", i#=2);
+
+	unsigned u = 5;
+	printf("u#2 (7) = %u\n", u#2);
+	printf("u##2 (7) = %u\n", u##2);
+	printf("u#=2 (7) = %u\n", u#=2);
+	return 0;
 }

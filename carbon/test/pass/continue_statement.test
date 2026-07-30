@@ -16,16 +16,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-include co2/Statement
 
-class ContinueStatement : Statement {
-	void accept (CompileObjectVisitor visitor) {
-		visitor.visit (self);
+// Regression test: ContinueStatement was never wired into
+// BaseCompileObjectVisitor's visitStatement() dispatch (no include, no
+// `is_of ContinueStatement` branch, no visitContinueStatement() stub), so
+// any `continue;` crashed the compiler with "doesn't respond to get_token"
+// (TODO.md item #8).
+
+["stdio.h"] int printf(char * format, ...);
+
+int main(int argc, char ** argv)
+{
+	int i;
+	for (i = 0; i < 5; i += 1) {
+		if (i == 2) {
+			continue;
+		}
+		printf("i = %d\n", i);
 	}
 
-	void type_check () {}
-
-	void generate (FILE *fp) {
-		fprintf (fp, "continue;\n");
+	int j = 0;
+	while (j < 5) {
+		j += 1;
+		if (j == 3) {
+			continue;
+		}
+		printf("j = %d\n", j);
 	}
+	return 0;
 }
