@@ -1,0 +1,5 @@
+a=1 b=0
+eq=0 gt=1 andr=1 orr=0 notb=1
+gt is true
+eq is false
+stored_as_int=1

@@ -103,6 +103,7 @@
   struct IScope * scope;
 }
 
+%token <token> _BOOL
 %token <token> _BREAK
 %token <token> _CASE
 %token <token> _CATCH
@@ -856,6 +857,10 @@ type
 :	_TYPE_IDENTIFIER %prec _CONSTRUCTX
 {
   $$ = O_CALL_CLASS(ObjectType(), new, $1, NULL);
+}
+|	_BOOL
+{
+  $$ = O_CALL_CLASS(PrimitiveType(), new, $1);
 }
 |	_INT
 {

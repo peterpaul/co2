@@ -673,3 +673,59 @@ unverified (given carbon does zero semantic validation of loop context for eithe
 `continue` bug investigation above, this is a real open design question, not just a missing test:
 right now both just emit plain C `break;`/`continue;` and rely entirely on the C compiler to reject
 a misplaced one).
+
+## 9. Native `bool` type with `true`/`false` — ADDED (compiler side only; `typedef Bool = int;` migration deferred)
+
+Added per `carbon/TODO`'s longstanding wishlist entry ("bool type, with true/false"). Carbon has had
+no real boolean type — `Bool` has always been `typedef Bool = int;` (`CompileObject.co2`), and
+`true`/`false` were plain external `int` variables declared via `["co2/Object.h"] { int true,
+false; }` in `BaseObject.co2`, backed by `#define false 0` / `#define true !false` in `co2/src/co2/
+utils.h`.
+
+**Added**: `bool` is now a real primitive type, parsed like `int`/`char`/`float` (`_BOOL` token,
+new `type` grammar alternative in `grammar.y`, new `%token`, registered in `GrammarTokens.co2`).
+`PrimitiveType.generate()` special-cases `_BOOL` to emit plain `int` in the generated C (no native
+bool in `-std=gnu89`) — the same representation the existing typedef convention already relies on.
+Comparisons (`==`, `!=`, `<`, `>`, `<=`, `>=`), logical `&&`/`||`, and unary `!` now produce a
+`Bool`-typed result (`BinaryExpression`'s `is_condition()` path, `UnaryExpression`'s `'!'` case)
+instead of a synthetic `int` — but the *operand*-compatibility check in both places still anchors
+on `int` specifically (split into two separate synthetic types), since that's validating "is this
+operand some comparable scalar," not the expression's own result type.
+
+**`true`/`false` are deliberately *not* reserved keywords** — `TokenExpression.type_check()`
+recognizes them by name (`token.name.data == "true"`/`"false"`) ahead of the normal `_IDENTIFIER`
+lookup, giving them the new `Bool` type directly. Making them real lexer keywords was the more
+obvious design, and was tried first, but `BaseObject.co2` still declares `int true, false;` — a
+reserved-keyword lexer would turn that exact declaration into a syntax error the moment a carbon
+built from this change re-translates `co2-base` during self-hosting (pass 2), since `_TRUE`/`_FALSE`
+tokens aren't valid in a variable-declaration-name position. Recognizing them by name in the type
+checker sidesteps this entirely — no existing `.co2` source needed to change.
+
+**`Bool` is compatible with `int`/`unsigned`, not a strictly separate type** (`PrimitiveType.
+is_compatible()` folds `_BOOL` into the existing int/unsigned interoperability group, rather than
+standing alone like `char`/`void` do) — also not the "purest" design, but required for the same
+bootstrap-safety reason: `is_condition()`/`'!'` now producing `Bool` everywhere means *every*
+existing comparison/logical expression throughout this codebase's own self-hosted source becomes
+Bool-typed the moment a carbon built from this change re-translates it, and plenty of that existing
+code assigns such results to plain `int` fields/variables via the older typedef convention. Strict
+separation would turn every one of those into a hard `assert_compatible` error during pass 2 self-
+hosting. Still correctly rejects genuinely incompatible types (verified: `char c = true;` errors
+with "incompatible types: char and bool") — it only folds into the int/unsigned group, not
+everything.
+
+**Verified**: full two-pass `translate.sh` (0 errors, no new warning *categories* — diffed the full
+"incompatible types" warning list against the pre-change baseline, zero mentions of `bool`
+anywhere), a direct smoke-test fixture (`bool` declarations, `true`/`false`, all the affected
+operators, `if`/`!` conditions, and a `Bool` result stored into a plain `int` — translated, compiled
+with real GCC, ran, output matched hand-computed expected values), and the full
+`carbon/test/run_tests.sh` suite (99 total including two new fixtures below, same 12 pre-existing
+environment-only failures, no regressions). New regression tests:
+`carbon/test/pass/bool_type.test` and `carbon/test/fail/bool_type_incompatible.test`.
+
+**Deliberately not done, per explicit instruction**: migrating this codebase's own `.co2` sources
+off `typedef Bool = int;` onto the new real `bool` type, and removing that typedef along with
+`BaseObject.co2`'s `int true, false;` declaration — same bootstrap-sequencing reason as item #7:
+this exact commit's carbon can't be used to translate a version of itself that already assumes
+`bool`/`true`/`false` are keywords/an independent type, since *this* carbon is what a future
+bootstrap tag would need to already understand that. Do this only after a release built from this
+change becomes `translate.sh`'s `BOOTSTRAP_CARBON_TAG`.

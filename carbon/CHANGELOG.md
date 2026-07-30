@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Native `bool` type, parsed like `int`/`char`/`float` and generated as plain `int` (no native bool
+  in `-std=gnu89`). Comparisons, `&&`/`||`, and unary `!` now produce a `Bool`-typed result. `true`/
+  `false` are recognized by name rather than as reserved keywords, and `Bool` is compatible with
+  `int`/`unsigned` rather than a strictly separate type — both deliberate bootstrap-safety choices,
+  see TODO #9. This codebase's own `typedef Bool = int;` isn't removed yet; that's a deliberate
+  follow-up once a release built from this becomes the bootstrap seed.
+
 ### Fixed
 
 - `continue` no longer crashes the compiler. `ContinueStatement` was never wired into

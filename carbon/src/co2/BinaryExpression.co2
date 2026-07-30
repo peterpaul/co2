@@ -262,11 +262,19 @@ class BinaryExpression : Expression {
 			operand[0].type_check ();
 			operand[1].type_check ();
 			if (is_condition ()) {
+				// The operands just need to be *some* comparable scalar --
+				// "int" here is a stand-in anchor for that (PrimitiveType.
+				// is_compatible()'s int/unsigned/float widening already
+				// covers the common numeric cases), not the expression's own
+				// result type, which is the new Bool type below.
 				Token int_token = new Token.fromToken (operator, "int", _INT);
 				Type int_type = new PrimitiveType (int_token);
-				type = (Type) int_type.retain ();
-				operand[0].type?.assume_compatible (type);
-				operand[1].type?.assume_compatible (type);
+				operand[0].type?.assume_compatible (int_type);
+				operand[1].type?.assume_compatible (int_type);
+
+				Token bool_token = new Token.fromToken (operator, "bool", _BOOL);
+				Type bool_type = new PrimitiveType (bool_token);
+				type = (Type) bool_type.retain ();
 			} else if (is_pointer_arithmetic ()) {
 				// ptr + int / int + ptr / ptr - int: the result is the
 				// pointer type, same as real C pointer arithmetic. Not

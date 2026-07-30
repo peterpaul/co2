@@ -79,6 +79,7 @@ ANGLE_HEADER_CONST	"[<"[^>\n]*">"
 }
 <INCLUDE>[ \t]*		/* eat the whitespace */
 <INCLUDE>[^ \t\n]+	{ new_input (O_CALL_CLASS (String (), new, "%s", yytext)); }
+"bool"		yylval.token = O_CALL_CLASS(Token(), new, yytext, _BOOL, current_file, linenumber); return yylval.token->type;
 "break"		return _BREAK;
 "catch"		return _CATCH;
 "case"		return _CASE;

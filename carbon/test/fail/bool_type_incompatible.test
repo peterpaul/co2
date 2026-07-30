@@ -16,60 +16,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-["grammar.h"] {
-	int
-	_AND,
-	_BOOL,
-	_BREAK,
-	_CASE,
-	_CATCH,
-	_CHAR,
-	_CHAR_CONSTANT,
-	_CLASS,
-	_CONTINUE,
-	_DEFAULT,
-	_DO,
-	_DOUBLE,
-	_DELETE,
-	_ELSE,
-	_EQ,
-	_FINALLY,
-	_FLOAT,
-	_FLOAT_CONSTANT,
-	_FOR,
- /* 	_FOREACH, */
-	_GEQ,
-	_GET_VA_ARG,
-	_IDENTIFIER,
-	_IF,
-	_IMPORT,
-	_INT,
-	_INT_CONSTANT,
-	_INTERFACE,
-	_LEQ,
-	_NEQ,
-	_NEW,
-	_NULL_,
-	_OR,
-	_POWER,
-	_REMAINDER,
-	_RETURN,
-	_SELF,
-	_SIZEOF,
-	_STRING_CONSTANT,
-	_STRUCT,
-	_SUPER,
-	_SWITCH,
-	_THROW,
-	_TRY,
-	_TYPEDEF,
-	_TYPE_IDENTIFIER,
-	_UNSIGNED
- /* '...' */,
-	_VA_ARG,
-	_VA_LIST__,
-	_VOID,
-	_WHILE,
-	_XOR,
-	_XOR_IS;
-}
+
+// Bool is compatible with int/unsigned (needed for this codebase's own
+// existing typedef-Bool-as-int code, see bool_type.test), but must still
+// reject genuinely incompatible types like char.
+
+char c = true;
+
+int main(int argv, char [][] args)
+	return 0;

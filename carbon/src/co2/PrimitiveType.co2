@@ -32,7 +32,14 @@ class PrimitiveType : Type {
 	}
 
 	void generate (FILE *fp) {
-		token.generate (fp);
+		if (token.type == _BOOL) {
+			// No real bool in gnu89 -- generate as plain int, same
+			// representation the existing `typedef Bool = int;` convention
+			// already relies on throughout this codebase.
+			fprintf (fp, "int");
+		} else {
+			token.generate (fp);
+		}
 	}
 
 	Token get_token () {
@@ -52,8 +59,16 @@ class PrimitiveType : Type {
 			PrimitiveType other = (PrimitiveType) _other;
 			Token name_self = get_token ();
 			Token name_other = other.get_token ();
-			if ((name_self.type == _INT || name_self.type == _UNSIGNED) &&
-				(name_other.type == _INT || name_other.type == _UNSIGNED) ||
+			// Bool joins the int/unsigned group rather than standing alone:
+			// comparisons/`!`/&&/|| are now Bool-typed (see BinaryExpression/
+			// UnaryExpression), and plenty of existing code still assigns
+			// those results (and plain true/false) to ordinary `int` fields
+			// via the older `typedef Bool = int;` convention -- that has to
+			// keep type-checking cleanly until this codebase migrates off
+			// it (see TODO.md), so Bool can't be a strictly separate type
+			// yet the way `char`/`void` are below.
+			if ((name_self.type == _INT || name_self.type == _UNSIGNED || name_self.type == _BOOL) &&
+				(name_other.type == _INT || name_other.type == _UNSIGNED || name_other.type == _BOOL) ||
 				(name_self.type == _FLOAT || name_self.type == _DOUBLE) &&
 				(name_other.type == _FLOAT || name_other.type == _DOUBLE)) {
 				if (name_self.type != name_other.type) {

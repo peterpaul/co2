@@ -1,0 +1,56 @@
+/*
+ * carbon Compiler and programming language for libco2
+ *
+ * Copyright (C) 2011,2012 Peterpaul Taekele Klein Haneveld
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+// bool is a real primitive type now (generates as plain int -- no native
+// bool in gnu89), with true/false as literal values (recognized by name in
+// TokenExpression rather than as reserved keywords, since BaseObject.co2
+// still declares `int true, false;` and making them keywords would break
+// parsing that during self-hosted rebuilds -- see the note there). Also
+// exercises that comparisons/&&/||/! are now Bool-typed, and that a Bool
+// result still assigns to a plain int (needed for this codebase's own
+// existing `typedef Bool = int;`-based code until it migrates off that).
+
+["stdio.h"] int printf(char * format, ...);
+
+int main(int argc, char ** argv)
+{
+	bool a = true;
+	bool b = false;
+	printf("a=%d b=%d\n", a, b);
+
+	int x = 5;
+	int y = 3;
+	bool eq = (x == y);
+	bool gt = (x > y);
+	bool andr = (a && gt);
+	bool orr = (b || eq);
+	bool notb = !b;
+	printf("eq=%d gt=%d andr=%d orr=%d notb=%d\n", eq, gt, andr, orr, notb);
+
+	if (gt) {
+		printf("gt is true\n");
+	}
+	if (!eq) {
+		printf("eq is false\n");
+	}
+
+	int stored_as_int = (x > y);
+	printf("stored_as_int=%d\n", stored_as_int);
+	return 0;
+}

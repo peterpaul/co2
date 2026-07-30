@@ -94,8 +94,21 @@ class TokenExpression : Expression {
 			type.retain ();
 			break;
 		}
-		case _CLASS:
 		case _IDENTIFIER:
+			// `true`/`false` aren't reserved keywords -- BaseObject.co2 still
+			// declares `int true, false;` (see TODO.md item on removing the
+			// `typedef Bool = int` convention once bootstrapped past a
+			// release with this), and turning them into real keywords would
+			// break parsing that exact declaration during self-hosted
+			// rebuilds. Recognize them by name instead, ahead of the normal
+			// identifier lookup below, and give them the new Bool type.
+			if (!strcmp (token.name.data, "true") || !strcmp (token.name.data, "false")) {
+				Token bool_token = new Token.fromToken (self.token, "bool", _BOOL);
+				type = new PrimitiveType (bool_token);
+				type.retain ();
+				break;
+			}
+		case _CLASS:
 			if (!decl || !check_global_scope) {
 				lookup ();
 			}
