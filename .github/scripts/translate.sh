@@ -148,16 +148,23 @@ export PATH="$BOOTSTRAP_PREFIX/bin:$PATH"
 unset PKG_CONFIG_PATH
 
 # co2-base and carbon's own `configure` steps below need libco2-1.0 findable
-# via pkg-config -- libco2 itself needs no .co2 translation (pure C) and no
-# packaging (Stage 2 builds it fresh from the checkout, not from a dist
-# tarball), it just needs to exist in HEAD_PREFIX so those configure checks
-# pass.
-echo "::group::Build & install HEAD libco2 (no translation, no test, no packaging -- just a build dependency for co2-base/carbon below)"
+# via pkg-config -- libco2 itself needs no .co2 translation (pure C), it just
+# needs to exist in HEAD_PREFIX so those configure checks pass. Stage 2 still
+# builds it fresh from the checkout rather than this dist tarball (no
+# translation dependency to short-circuit there), but packaging it here
+# closes TODO.md item #1's noted asymmetry: a future libco2 release now gets
+# a real `make dist` tarball as a release asset like the other two projects,
+# instead of only GitHub's raw per-tag source archive -- release.yml's
+# artifact upload/publish steps already glob `*.tar.gz` generically, so
+# nothing else needs to change to pick this up.
+echo "::group::Build & install HEAD libco2 (no translation, no test -- just a build dependency for co2-base/carbon below -- but packaged via make dist)"
 cd "$REPO_ROOT/co2"
 ./autogen.sh
 ./configure --prefix="$HEAD_PREFIX" CC="$CC" CFLAGS="$CFLAGS_COMMON"
 make
 make install
+make dist
+cp *.tar.gz "$OUTDIR/"
 echo "::endgroup::"
 
 echo "::group::Build HEAD co2-base (pass 1, bootstrap carbon -- not tested yet)"

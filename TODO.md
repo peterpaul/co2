@@ -66,11 +66,18 @@ toolchain quirks that have nothing to do with the new platform itself):
   carbon by direct inspection of its pass-1 output before removing them. Net effect: fewer steps,
   no `autoreconf` for co2-base/carbon (their release tarballs are already `make dist` output with
   `configure`/`Makefile.in` pre-generated), faster `translate` job — this is what "iterate faster"
-  concretely bought. One asymmetry remains: `libco2` has no `make dist`-style release asset yet
-  (only per-platform binaries from the release pipeline), so its bootstrap step still uses
-  GitHub's automatic per-tag source archive (a raw checkout, needing `./autogen.sh`) instead of a
-  proper dist tarball — a small, optional future enhancement would be adding a `co2` dist-tarball
-  asset to `release.yml` to close this gap and drop `autogen.sh` there too.
+  concretely bought. **`libco2` dist-tarball asymmetry — FIXED.** `translate.sh` now also runs
+  `make dist` for `co2` (it's already a normal `AM_INIT_AUTOMAKE` project, needed no changes to
+  support this) and copies the result into `$OUTDIR` alongside the other two tarballs —
+  `release.yml`/`ci.yml`'s artifact upload/publish steps already glob `*.tar.gz` generically, and
+  `build-and-test.sh` extracts `libco2-base-*`/`carbon-*` by explicit name (never a blanket
+  wildcard), so this needed no changes anywhere else and can't collide with the other two. Verified
+  the resulting `libco2-*.tar.gz` builds standalone (`configure && make && make check`, no
+  `autogen.sh` needed, 0 failures). **Not yet done** (deliberately separate, since it means cutting
+  a real, visible release): once an actual `libco2-*` tag is released with this change live,
+  `translate.sh`'s *bootstrap* step (`BOOTSTRAP_LIBCO2_TAG`, near the top of the script) can be
+  repointed at that release's dist tarball instead of GitHub's raw per-tag source archive, dropping
+  the bootstrap-libco2 `./autogen.sh` call too.
 
 **Release pipeline**: `.github/workflows/release.yml`, triggered by pushing a version tag matching
 this repo's existing `<project>-<version>` convention (`carbon-*`/`libco2-*`/`libco2-base-*`). Each
