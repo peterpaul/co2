@@ -23,9 +23,9 @@
 # it uses GitHub's automatic per-tag source archive instead (a plain git
 # checkout at that tag, needing ./autogen.sh, but with every rename/fix from
 # this repo's history already applied in the checked-in source itself).
-BOOTSTRAP_LIBCO2_TAG=libco2-0.3.1
-BOOTSTRAP_LIBCO2_BASE_TAG=libco2-base-0.3.1
-BOOTSTRAP_CARBON_TAG=carbon-0.3.2
+BOOTSTRAP_LIBCO2_TAG=libco2-0.3.2
+BOOTSTRAP_LIBCO2_BASE_TAG=libco2-base-0.3.2
+BOOTSTRAP_CARBON_TAG=carbon-0.3.3
 #
 # Two-pass rebuild of co2-base and carbon (see "PASS 2" below) is still
 # required: the bootstrap carbon predates *this* commit's own .co2 source
