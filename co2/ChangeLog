@@ -1,3 +1,13 @@
+0.3.1:
+	* Fix vtable slot assignment mismatch: O_OBJECT_METHOD/O_OBJECT_IF_METHOD* now cast
+	  against the base-declared vtable slot type, not the override's own type (TODO #2,
+	  Category A)
+	* Fix Interface.h's O_BRANCH_CALL_IF ternary mixing a pointer operand with integer true
+	* Fix macOS build portability (co2, co2-base, and carbon)
+	* Fix Windows/MinGW build: __STRING fallback (no <sys/cdefs.h>), ASSERT_FAIL's
+	  non-glibc branch
+	* Add README.md
+
 0.3.0:
 	* Portability fixes
 

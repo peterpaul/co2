@@ -1,3 +1,12 @@
+0.3.1:
+	* Fix macOS build portability (co2, co2-base, and carbon)
+	* Fix Windows/MinGW build: random() -> rand(), localtime_r() -> localtime(), a
+	  pointer-punning crash from MinGW-w64's 32-bit struct timeval.tv_sec vs. 64-bit
+	  time_t (new time_compat.c/.h shim)
+	* Fix time_compat.c/.h being caught by the generated-files .gitignore rule
+	* Mark TestLogger as an expected failure (XFAIL) on MinGW/Windows only
+	* Add README.md
+
 0.3.0:
 	* Portability fixes
 
