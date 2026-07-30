@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.2] - 2026-07-30
+
 ### Added
 
 - `CHANGELOG.md`, in [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format.
@@ -56,7 +58,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial release.
 
-[Unreleased]: https://github.com/peterpaul/co2/compare/libco2-base-0.3.1...HEAD
+[Unreleased]: https://github.com/peterpaul/co2/compare/libco2-base-0.3.2...HEAD
+[0.3.2]: https://github.com/peterpaul/co2/releases/tag/libco2-base-0.3.2
 [0.3.1]: https://github.com/peterpaul/co2/releases/tag/libco2-base-0.3.1
 [0.3.0]: https://github.com/peterpaul/co2/releases/tag/libco2-base-0.3.0
 [0.1.1]: https://github.com/peterpaul/co2/releases/tag/libco2-base-0.1.1
