@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.4] - 2026-08-01
+
 ### Added
 
 - Native `bool` type, parsed like `int`/`char`/`float` and generated as plain `int` (no native bool
@@ -174,7 +176,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial release.
 
-[Unreleased]: https://github.com/peterpaul/co2/compare/carbon-0.3.3...HEAD
+[Unreleased]: https://github.com/peterpaul/co2/compare/carbon-0.3.4...HEAD
+[0.3.4]: https://github.com/peterpaul/co2/compare/carbon-0.3.3...carbon-0.3.4
 [0.3.3]: https://github.com/peterpaul/co2/compare/carbon-0.3.2...carbon-0.3.3
 [0.3.2]: https://github.com/peterpaul/co2/compare/carbon-0.3.1...carbon-0.3.2
 [0.3.1]: https://github.com/peterpaul/co2/compare/carbon-0.3.0...carbon-0.3.1
