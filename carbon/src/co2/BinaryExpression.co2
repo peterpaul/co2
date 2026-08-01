@@ -295,7 +295,7 @@ class BinaryExpression : Expression {
 		}
 	}
 
-	void set_scope (IScope scope) {
+	void set_scope (Scope scope) {
 		operand[0].set_scope (scope);
 	}
 

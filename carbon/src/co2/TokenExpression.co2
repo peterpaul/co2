@@ -65,7 +65,7 @@ class TokenExpression : Expression {
 		}
 	}
 
-	void set_scope (IScope scope) {
+	void set_scope (Scope scope) {
 		self.scope = scope;
 		check_global_scope = false;
 	}

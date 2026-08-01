@@ -26,6 +26,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bitwise XOR (`#`/`##`) and compound XOR-assign (`#=`) no longer generate invalid C. Codegen was
   passing these tokens' literal text straight through instead of translating to C's `^`/`^=` (TODO
   #8).
+- `Expression.set_scope()`'s overrides in `TokenExpression`/`BinaryExpression` now declare the same
+  `Scope` parameter type as the base method, instead of the interface type `IScope`. A long-standing
+  (2011/2012) override-signature mismatch that only ever produced a warning; surfaced as a hard
+  build error on toolchains that promote `-Wincompatible-function-pointer-types` to an error by
+  default.
 
 ## [0.3.3] - 2026-07-30
 
