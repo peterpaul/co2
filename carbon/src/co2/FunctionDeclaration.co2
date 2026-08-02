@@ -26,7 +26,7 @@ include co2/FunctionType
 include co2/ArgumentDeclaration
 
 class FunctionDeclaration : Declaration {
-	Bool binding_generated;
+	bool binding_generated;
 	RefList formal_arguments;
 	RefList implemented_methods;
 	Statement body;
@@ -83,7 +83,7 @@ class FunctionDeclaration : Declaration {
 
 void functiondeclaration_generate_formal_arg (Declaration decl, va_list * app) {
 	FILE * fp = va_arg (*app, FILE *);
-	Bool * first_formal_arg = va_arg (*app, Bool *);
+	bool * first_formal_arg = va_arg (*app, bool *);
 	if (*first_formal_arg == false) {
 		fprintf (fp, ", ");
 	}
@@ -96,7 +96,7 @@ void functiondeclaration_generateFunction (FILE * fp, FunctionDeclaration myself
 	if (!myself.body) {
 		return;
 	}
-	Bool first_formal_arg = true;
+	bool first_formal_arg = true;
 	FunctionType function_type = (FunctionType) myself.type;
 	function_type.return_type.generate (fp);
 	fprintf (fp, " ");

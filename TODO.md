@@ -674,7 +674,7 @@ unverified (given carbon does zero semantic validation of loop context for eithe
 right now both just emit plain C `break;`/`continue;` and rely entirely on the C compiler to reject
 a misplaced one).
 
-## 9. Native `bool` type with `true`/`false` — ADDED (compiler side only; `typedef Bool = int;` migration deferred)
+## 9. Native `bool` type with `true`/`false` — DONE
 
 Added per `carbon/TODO`'s longstanding wishlist entry ("bool type, with true/false"). Carbon has had
 no real boolean type — `Bool` has always been `typedef Bool = int;` (`CompileObject.co2`), and
@@ -722,10 +722,14 @@ with real GCC, ran, output matched hand-computed expected values), and the full
 environment-only failures, no regressions). New regression tests:
 `carbon/test/pass/bool_type.test` and `carbon/test/fail/bool_type_incompatible.test`.
 
-**Deliberately not done, per explicit instruction**: migrating this codebase's own `.co2` sources
-off `typedef Bool = int;` onto the new real `bool` type, and removing that typedef along with
-`BaseObject.co2`'s `int true, false;` declaration — same bootstrap-sequencing reason as item #7:
-this exact commit's carbon can't be used to translate a version of itself that already assumes
-`bool`/`true`/`false` are keywords/an independent type, since *this* carbon is what a future
-bootstrap tag would need to already understand that. Do this only after a release built from this
-change becomes `translate.sh`'s `BOOTSTRAP_CARBON_TAG`.
+**Follow-up completed**: once carbon 0.3.4 (the release built from the change above) became
+`translate.sh`'s `BOOTSTRAP_CARBON_TAG`, this codebase's own `.co2` sources migrated off
+`typedef Bool = int;` onto the real `bool` type — `Bool` renamed to `bool` throughout
+`carbon/src/co2/` (27 files), the now-unused `typedef Bool = int;` removed from
+`CompileObject.co2`, and `BaseObject.co2`'s `int true, false;` declaration removed (`true`/`false`
+are recognized by name regardless of any declaration existing for them, so nothing replaces it).
+`true`/`false` are still not reserved keywords and `bool` still folds into the int/unsigned
+compatibility group rather than standing alone — both remain deliberate design choices independent
+of this repo's own bootstrap sequencing (see the two sections above), not something this follow-up
+needed to revisit. Verified with a full two-pass `translate.sh` run (0 errors) using the bumped
+bootstrap tag, plus `make check` for both co2-base (5/5) and carbon (90/90) — no regressions.

@@ -36,8 +36,6 @@ class CompileObject : RefObject {
 	}
 }
 
-typedef Bool = int;
-
 int type_filter (RefObject member, va_list *app) {
 	Class klass = (Class) va_arg (*app, void *);
 	return member is_of klass;

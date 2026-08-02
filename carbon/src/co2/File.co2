@@ -141,13 +141,13 @@ void file_optimize (CompileObject object) {
 	
 }
 
-Bool token_equals (Token myself, Token other) {
+bool token_equals (Token myself, Token other) {
 	return strcmp (myself.name.data, other.name.data) == 0;
 }
 
 void interface_depends_on (Token myself, va_list *app) {
 	InterfaceDeclaration decl2 = (InterfaceDeclaration) va_arg (*app, void *);
-	Bool * depends = va_arg (*app, Bool *);
+	bool * depends = va_arg (*app, bool *);
 	if (token_equals (myself, decl2.name)) {
 		*depends = true;
 	} else {
@@ -161,13 +161,13 @@ void interface_depends_on (Token myself, va_list *app) {
 	}
 }
 
-Bool interfacedeclaration_1_depends_on_2 (InterfaceDeclaration decl1, Declaration decl2) {
-	Bool depends = false;
+bool interfacedeclaration_1_depends_on_2 (InterfaceDeclaration decl1, Declaration decl2) {
+	bool depends = false;
 	decl1.interfaces?.map_args (interface_depends_on, decl2, &depends);
 	return depends;
 }
 
-Bool classdeclaration_1_depends_on_2 (ClassDeclaration decl1, ClassDeclaration decl2) {
+bool classdeclaration_1_depends_on_2 (ClassDeclaration decl1, ClassDeclaration decl2) {
 	if (decl1.superclass) {
 		if (token_equals (decl1.superclass, decl2.name)) {
 			return true;
@@ -185,8 +185,8 @@ Bool classdeclaration_1_depends_on_2 (ClassDeclaration decl1, ClassDeclaration d
 // Whether decl1's class implements interface decl2 directly (mixin),
 // i.e. decl2's Interface_Attr chain must already be defined for decl1's
 // own _Attr/Class_Attr macros to expand.
-Bool classdeclaration_implements_interface (ClassDeclaration decl1, InterfaceDeclaration decl2) {
-	Bool depends = false;
+bool classdeclaration_implements_interface (ClassDeclaration decl1, InterfaceDeclaration decl2) {
+	bool depends = false;
 
 	void token_equals_callback (Token myself) {
 		if (token_equals (myself, decl2.name)) {
@@ -200,7 +200,7 @@ Bool classdeclaration_implements_interface (ClassDeclaration decl1, InterfaceDec
 
 void classdeclaration_attribute_uses_type_callback (VariableDeclaration var_decl, va_list *app) {
 	TypeDeclaration type_decl = (TypeDeclaration) va_arg (*app, void *);
-	Bool *found = va_arg (*app, Bool *);
+	bool *found = va_arg (*app, bool *);
 	if (var_decl.type && var_decl.type is_of ObjectType) {
 		ObjectType type = (ObjectType) var_decl.type;
 		if (!type.decl) {
@@ -217,8 +217,8 @@ void classdeclaration_attribute_uses_type_callback (VariableDeclaration var_decl
 // This is separate from the superclass/interface dependency chains above,
 // since a plain-C typedef (e.g. "typedef Timeval = struct timeval;")
 // used only as a field type never appears in those inheritance graphs.
-Bool classdeclaration_depends_on_type (ClassDeclaration decl1, TypeDeclaration decl2) {
-	Bool found = false;
+bool classdeclaration_depends_on_type (ClassDeclaration decl1, TypeDeclaration decl2) {
+	bool found = false;
 	decl1.members.map_args (classdeclaration_attribute_uses_type_callback, decl2, &found);
 	return found;
 }
@@ -230,7 +230,7 @@ Bool classdeclaration_depends_on_type (ClassDeclaration decl1, TypeDeclaration d
 // functions/variables, raw C structs, or anything from a *different*
 // file that's brought in via #include instead) simply return false --
 // their relative order doesn't matter for correctness.
-Bool declaration_depends_on (Declaration decl1, Declaration decl2) {
+bool declaration_depends_on (Declaration decl1, Declaration decl2) {
 	if (decl1 is_of ClassDeclaration) {
 		ClassDeclaration class_decl1 = (ClassDeclaration) decl1;
 		if (decl2 is_of ClassDeclaration &&

@@ -41,7 +41,7 @@ include co2/ClassDeclaration
 // "struct RefList* x = obj.filter()" cast is generated correctly against the
 // vtable slot's actual (base) type instead of the override's narrower one.
 //
-// This previously caused spurious "incompatible types: Bool and Bool"
+// This previously caused spurious "incompatible types: bool and bool"
 // errors during self-hosted rebuilds (tried and reverted twice, in two
 // separate sessions, before being root-caused): find_base_function_declaration
 // reaches into another declaration's AST directly, bypassing the normal
@@ -50,7 +50,7 @@ include co2/ClassDeclaration
 // type_check() call, see ObjectType.type_check()). Type.is_compatible()'s
 // get_declared_type() silently returns an unresolved ObjectType wrapper as-is
 // (rather than resolving it), so comparing it against an already-resolved
-// ObjectType for the exact same typedef (e.g. "Bool") failed the class check
+// ObjectType for the exact same typedef (e.g. "bool") failed the class check
 // even though both sides were, in fact, the same declaration. Fixed below by
 // forcing type_check() on the base-resolved type before returning it.
 FunctionType functioncallexpression_resolve_vtable_type (Expression function_expr, FunctionType resolved_type) {
@@ -180,7 +180,7 @@ class FunctionCallExpression : Expression {
 			function.generate (fp);
 		}
 		fprintf (fp, " (");
-		Bool is_first_arg = true;
+		bool is_first_arg = true;
 		if (function is_of BinaryExpression) {
 			BinaryExpression function = (BinaryExpression) self.function;
 			if (function.operator.type == '.') {

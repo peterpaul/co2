@@ -23,7 +23,7 @@ include co2/TokenExpression
 
 void expression_generate_actual_argument (Expression arg, va_list *app) {
 	FILE *fp = va_arg (*app, FILE *);
-	Bool *is_first_arg = va_arg (*app, Bool *);
+	bool *is_first_arg = va_arg (*app, bool *);
 
 	if (!*is_first_arg) {
 		fprintf (fp, ", ");
@@ -42,7 +42,7 @@ void expression_generate_actual_argument (Expression arg, va_list *app) {
 // different declarations; anything already void*-shaped on either side
 // converts silently in C and needs no cast.
 void expression_generate_casted (FILE *fp, Expression arg, Type target_type) {
-	Bool casted = false;
+	bool casted = false;
 	if (target_type && arg.type && target_type is_of ObjectType && arg.type is_of ObjectType) {
 		ObjectType target_object_type = (ObjectType) target_type;
 		ObjectType arg_object_type = (ObjectType) arg.type;
@@ -99,7 +99,7 @@ void expression_generate_casted (FILE *fp, Expression arg, Type target_type) {
 // tail arguments (beyond function_type's own, non-variadic parameter count)
 // are generated uncast, same as type_check_arguments() already only type-checks
 // up to that point.
-void expression_generate_actual_arguments_casted (FILE *fp, RefList actual_arguments, FunctionType function_type, Bool is_first_arg) {
+void expression_generate_actual_arguments_casted (FILE *fp, RefList actual_arguments, FunctionType function_type, bool is_first_arg) {
 	int expected_length = function_type.parameters.size ();
 	if (function_type.has_var_args) {
 		expected_length -= 1;
@@ -127,7 +127,7 @@ void expression_generate_actual_arguments_casted (FILE *fp, RefList actual_argum
 // themselves (e.g. ConstructorDeclaration.has_var_args()) since not every
 // caller has a ConstructorDeclaration on hand (only the target's formal
 // argument list).
-void expression_generate_ctor_arguments_casted (FILE *fp, RefList actual_arguments, RefList formal_arguments, Bool has_var_args, Bool is_first_arg) {
+void expression_generate_ctor_arguments_casted (FILE *fp, RefList actual_arguments, RefList formal_arguments, bool has_var_args, bool is_first_arg) {
 	int expected_length = formal_arguments.length;
 	if (has_var_args) {
 		expected_length -= 1;
@@ -162,5 +162,5 @@ class Expression : CompileObject {
 	void set_scope (Scope scope);
 
 
-	void generate_left (FILE *fp, Bool left);
+	void generate_left (FILE *fp, bool left);
 }

@@ -58,7 +58,7 @@ class UnaryExpression : Expression {
 		case '!': {
 			// Same split as BinaryExpression's is_condition() cases: "int" is
 			// just the operand-compatibility anchor, the expression's own
-			// result type is the new Bool type.
+			// result type is the new bool type.
 			Token int_token = new Token.fromToken (operator, "int", _INT);
 			Type int_type = new PrimitiveType (int_token);
 			operand.type?.assume_compatible (int_type);

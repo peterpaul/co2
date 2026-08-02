@@ -38,7 +38,7 @@ class StructDeclaration : ObjectTypeDeclaration {
 		current_context?.remove_last ();
 	}
 
-	Bool is_compatible (ObjectTypeDeclaration other) {
+	bool is_compatible (ObjectTypeDeclaration other) {
 		StructDeclaration other_decl;
 		if (other is_of TypeDeclaration) {
 			TypeDeclaration type_decl = (TypeDeclaration) other;

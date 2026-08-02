@@ -54,7 +54,7 @@ class ArrayType : Type {
 		return base_type.get_token ();
 	}
 
-	Bool is_compatible (Type _other) {
+	bool is_compatible (Type _other) {
 		if (super (_other)) {
 			ArrayType other = (ArrayType) _other;
 			if (self.is_void_ptr () || other.is_void_ptr ()) {

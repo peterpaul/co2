@@ -31,8 +31,6 @@
 		int object_size;
 		char * class_name;
 	}
-
-	int true, false;
 }
 
 ["co2/utils.h"] {

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- `BaseObject.co2`'s `int true, false;` declaration. `true`/`false` are recognized natively by the
+  compiler as of carbon 0.3.4 (see its `bool` type, TODO #9); this declaration only existed so the
+  old compiler would accept them as ordinary identifiers.
+
 ## [0.3.2] - 2026-07-30
 
 ### Added

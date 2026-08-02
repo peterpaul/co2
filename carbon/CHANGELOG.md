@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Migrated this codebase's own compiler sources off the `typedef Bool = int;` convention onto the
+  real `bool` type added in 0.3.4 (TODO #9), now that a release with `bool` can be used as
+  `translate.sh`'s bootstrap seed. Renamed `Bool` to `bool` throughout `carbon/src/co2/`.
+
+### Removed
+
+- The `typedef Bool = int;` declaration itself (`CompileObject.co2`), now that every usage has
+  migrated to the real `bool` type.
+
 ## [0.3.4] - 2026-08-01
 
 ### Added

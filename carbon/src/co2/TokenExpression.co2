@@ -24,7 +24,7 @@ class TokenExpression : Expression {
 	Token token;
 	IScope scope;
 	Declaration decl;
-	Bool check_global_scope;
+	bool check_global_scope;
 
 	TokenExpression (Token token) {
 		super ();
@@ -51,7 +51,7 @@ class TokenExpression : Expression {
 		visitor.visit (self);
 	}
 
-	void generate_left (FILE * fp, Bool left) {
+	void generate_left (FILE * fp, bool left) {
 		if (token.type == _VA_ARG) {
 			fprintf (fp, "ap");
 			return;
@@ -95,13 +95,17 @@ class TokenExpression : Expression {
 			break;
 		}
 		case _IDENTIFIER:
-			// `true`/`false` aren't reserved keywords -- BaseObject.co2 still
-			// declares `int true, false;` (see TODO.md item on removing the
-			// `typedef Bool = int` convention once bootstrapped past a
-			// release with this), and turning them into real keywords would
-			// break parsing that exact declaration during self-hosted
-			// rebuilds. Recognize them by name instead, ahead of the normal
-			// identifier lookup below, and give them the new Bool type.
+			// `true`/`false` aren't reserved keywords, even though
+			// BaseObject.co2's old `int true, false;` declaration (which
+			// motivated that -- turning them into real keywords would have
+			// broken parsing it) is gone now that this codebase's own
+			// sources use the real `bool` type (TODO #9). Keeping them
+			// name-recognized rather than reserved is itself compiler-side
+			// behavior from an already-released version; changing that would
+			// be a new keyword-syntax change needing its own bootstrap cycle
+			// (see the class-level note on the bootstrap constraint).
+			// Recognize them by name instead, ahead of the normal identifier
+			// lookup below, and give them the bool type.
 			if (!strcmp (token.name.data, "true") || !strcmp (token.name.data, "false")) {
 				Token bool_token = new Token.fromToken (self.token, "bool", _BOOL);
 				type = new PrimitiveType (bool_token);

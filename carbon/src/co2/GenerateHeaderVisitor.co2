@@ -149,7 +149,7 @@ class GenerateHeaderVisitor : BaseCompileObjectVisitor {
 			decl.formal_arguments.map_args (objecttypedeclaration_generate_method_arguments, fp);
 			fprintf (fp, "));\n");
 		} else {
-			Bool first_formal_arg = true;
+			bool first_formal_arg = true;
 			FunctionType function_type = (FunctionType) decl.type;
 			function_type.return_type.generate (fp);
 			fprintf (fp, " ");

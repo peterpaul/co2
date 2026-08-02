@@ -34,7 +34,7 @@ class ObjectTypeDeclaration : Declaration {
 		member_scope?.release ();
 	}
 
-	Bool is_compatible (ObjectTypeDeclaration other);
+	bool is_compatible (ObjectTypeDeclaration other);
 }
 
 void objecttypedeclaration_generate_method_arguments(ArgumentDeclaration arg, va_list *app) {

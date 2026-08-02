@@ -64,7 +64,7 @@ class ObjectType : Type {
 		return new String ("%s", token.name.data);
 	}
 
-	Bool is_compatible (Type other) {
+	bool is_compatible (Type other) {
 		if (super (other)) {
 			if (other is_of ObjectType) {
 				ObjectType o_other = (ObjectType) other;

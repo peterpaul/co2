@@ -22,7 +22,7 @@ include co2/FunctionCallExpression
 include co2/TokenGenerator
 
 class FunctionType : Type {
-	Bool has_var_args;
+	bool has_var_args;
 	Type return_type;
 	RefList parameters;
 	Token generated_name;
@@ -69,7 +69,7 @@ class FunctionType : Type {
 
 	String toString () {
 		String string = return_type.toString ();
-		Bool first_arg = true;
+		bool first_arg = true;
 		string.append_str ("(*)(");
 		parameters.map_args (functiontype_parameter_toString, string, &first_arg);
 		string.append_str (")");
@@ -77,7 +77,7 @@ class FunctionType : Type {
 	}
 
 	void generate_named (FILE *fp, Token name) {
-		Bool first_arg = true;
+		bool first_arg = true;
 		return_type.generate (fp);
 		fprintf (fp, "(*");
 		name.generate (fp);
@@ -89,7 +89,7 @@ class FunctionType : Type {
 	// Same shape as generate_named, but for a bare cast target, e.g.
 	// "(void (*)(struct RefObject *, va_list *))" -- no declarator name.
 	void generate_cast (FILE *fp) {
-		Bool first_arg = true;
+		bool first_arg = true;
 		return_type.generate (fp);
 		fprintf (fp, "(*)(");
 		parameters.map_args (functiontype_generate_parameter, fp, &first_arg);
@@ -110,11 +110,11 @@ class FunctionType : Type {
 		generate_named (fp, generated_name);
 	}
 
-	Bool is_compatible (Type _other) {
+	bool is_compatible (Type _other) {
 		if (super (_other)) {
 			FunctionType other = (FunctionType) _other;
-			Bool result = true;
-			Bool tmp_result = return_type.is_compatible (other.return_type);
+			bool result = true;
+			bool tmp_result = return_type.is_compatible (other.return_type);
 			result = tmp_result ? result : tmp_result;
 			if (parameters.length != other.parameters.length) {
 				return false;
@@ -161,7 +161,7 @@ void functiontype_ctor_get_parameter_type_from_expr (Expression expr, va_list * 
 
 void functiontype_generate_parameter (Type parameter, va_list * app) {
 	FILE * fp = va_arg (*app, FILE *);
-	Bool * first_arg = va_arg (*app, Bool *);
+	bool * first_arg = va_arg (*app, bool *);
 	if (!*first_arg) {
 		fprintf (fp, ", ");
 	} else {
@@ -172,7 +172,7 @@ void functiontype_generate_parameter (Type parameter, va_list * app) {
 
 void functiontype_parameter_toString (Type parameter, va_list * app) {
 	String string = (String) va_arg (*app, void *);
-	Bool * first_arg = va_arg (*app, Bool *);
+	bool * first_arg = va_arg (*app, bool *);
 	if (!*first_arg) {
 		string.append_str (", ");
 	} else {

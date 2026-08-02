@@ -49,8 +49,8 @@ class ConditionalExpression : Expression {
 		condition.type_check ();
 		then_expr.type_check ();
 		else_expr.type_check ();
-		Bool then_compat_else = then_expr.type.is_compatible (else_expr.type);
-		Bool else_compat_then = else_expr.type.is_compatible (then_expr.type);
+		bool then_compat_else = then_expr.type.is_compatible (else_expr.type);
+		bool else_compat_then = else_expr.type.is_compatible (then_expr.type);
 		if (then_compat_else) {
 			type = (Type) then_expr.type.retain ();
 		} else if (else_compat_then) {

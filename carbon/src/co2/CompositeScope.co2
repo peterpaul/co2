@@ -131,8 +131,8 @@ class CompositeScope : RefObject, IScope {
 		return decl;
 	}
 
-	Bool exists_in_this_scope (Token token) {
-		Bool result = false;
+	bool exists_in_this_scope (Token token) {
+		bool result = false;
 
 		void exists_in_this_scope_callback (RefObject _scope) {
 			IScope scope = (IScope) _scope;
@@ -146,8 +146,8 @@ class CompositeScope : RefObject, IScope {
 		return result;
 	}
 
-	Bool exists (Token token) {
-		Bool result = false;
+	bool exists (Token token) {
+		bool result = false;
 
 		void exists_callback (RefObject _scope) {
 			IScope scope = (IScope) _scope;

@@ -20,8 +20,8 @@ include co2/ObjectTypeDeclaration
 include co2/Token
 
 class TypeDeclaration : ObjectTypeDeclaration {
-	Bool is_struct;
-	TypeDeclaration (Token name, Type type, Bool is_struct) {
+	bool is_struct;
+	TypeDeclaration (Token name, Type type, bool is_struct) {
 		super (name);
 		self.type = (Type) type.retain ();
 		self.is_struct = is_struct;
@@ -48,7 +48,7 @@ class TypeDeclaration : ObjectTypeDeclaration {
 		}
 	}
 
-	Bool is_compatible (ObjectTypeDeclaration other) {
+	bool is_compatible (ObjectTypeDeclaration other) {
 		// TODO do stuff?
 		return true;
 	}

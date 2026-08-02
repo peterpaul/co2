@@ -206,8 +206,8 @@ int main(int argc, char **argv) {
 	char *output_file = null;
 	path = new RefList (8, String.class);
 	int arg = 1;
-	Bool next_is_option = false;
-	Bool showDependencies = false;
+	bool next_is_option = false;
+	bool showDependencies = false;
 	while (arg < argc) {
 		if (argv[arg][0] == '-') {
 			if (strlen (argv[arg]) == 2) {

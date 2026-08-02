@@ -62,8 +62,8 @@ class InterfaceDeclaration : ObjectTypeDeclaration {
 		current_context?.remove_last ();
 	}
 
-	Bool is_compatible (ObjectTypeDeclaration other) {
-		Bool found = false;
+	bool is_compatible (ObjectTypeDeclaration other) {
+		bool found = false;
 
 		void is_compatible_with_class (Token token) {
 			if (strcmp (token.name.data, name.name.data) == 0) {
@@ -92,11 +92,11 @@ class InterfaceDeclaration : ObjectTypeDeclaration {
 	}
 }
 
-Bool interface_implements (InterfaceDeclaration first, InterfaceDeclaration second) {
+bool interface_implements (InterfaceDeclaration first, InterfaceDeclaration second) {
 	if (second == first) {
 		return true;
 	}
-	Bool implements = false;
+	bool implements = false;
 
 	void interface_implements_callback (Token if_name) {
 		Declaration decl = global_scope.lookup (if_name);

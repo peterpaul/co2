@@ -71,7 +71,7 @@ class NewExpression : Expression {
 				if (resolved_ctor) {
 					expression_generate_ctor_arguments_casted (fp, ctor_arguments, resolved_ctor.formal_arguments, resolved_ctor.has_var_args (), false);
 				} else {
-					Bool is_first_arg = false;
+					bool is_first_arg = false;
 					ctor_arguments.map_args (expression_generate_actual_argument, fp, &is_first_arg);
 				}
 				fprintf (fp, ")");
@@ -80,7 +80,7 @@ class NewExpression : Expression {
 				if (resolved_ctor) {
 					expression_generate_ctor_arguments_casted (fp, ctor_arguments, resolved_ctor.formal_arguments, resolved_ctor.has_var_args (), false);
 				} else {
-					Bool is_first_arg = false;
+					bool is_first_arg = false;
 					ctor_arguments.map_args (expression_generate_actual_argument, fp, &is_first_arg);
 				}
 				fprintf (fp, ")");

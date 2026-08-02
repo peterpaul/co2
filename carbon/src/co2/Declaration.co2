@@ -30,7 +30,7 @@ class Declaration : CompileObject {
 	Token include_file;
 	ClassDeclaration class_decl;
 	File file;
-	Bool declared, defined;
+	bool declared, defined;
 
 	Declaration (Token a_name) {
 		super ();

@@ -120,7 +120,7 @@ class SuperExpression : Expression {
 				if (ctor_decl) {
 					expression_generate_ctor_arguments_casted (fp, actual_arguments, ctor_decl.formal_arguments, ctor_decl.has_var_args (), false);
 				} else {
-					Bool is_first_arg = false;
+					bool is_first_arg = false;
 					actual_arguments.map_args (expression_generate_actual_argument, fp, &is_first_arg);
 				}
 				fprintf (fp, ")");
@@ -132,7 +132,7 @@ class SuperExpression : Expression {
 				if (ctor_decl) {
 					expression_generate_ctor_arguments_casted (fp, actual_arguments, ctor_decl.formal_arguments, ctor_decl.has_var_args (), false);
 				} else {
-					Bool is_first_arg = false;
+					bool is_first_arg = false;
 					actual_arguments.map_args (expression_generate_actual_argument, fp, &is_first_arg);
 				}
 				fprintf (fp, ")");
@@ -147,7 +147,7 @@ class SuperExpression : Expression {
 				FunctionType function_type = (FunctionType) function_decl.type;
 				expression_generate_ctor_arguments_casted (fp, actual_arguments, function_decl.formal_arguments, function_type.has_var_args, false);
 			} else {
-				Bool is_first_arg = false;
+				bool is_first_arg = false;
 				actual_arguments.map_args (expression_generate_actual_argument, fp, &is_first_arg);
 			}
 			fprintf (fp, ")");

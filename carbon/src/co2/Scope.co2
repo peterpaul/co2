@@ -108,12 +108,12 @@ class Scope : RefObject, IScope {
 		return result;
 	}
  
-	Bool exists_in_this_scope (Token token) {
+	bool exists_in_this_scope (Token token) {
 		return map.get (token.name) != null;
 	}
 
-	Bool exists (Token token) {
-		Bool result = exists_in_this_scope (token);
+	bool exists (Token token) {
+		bool result = exists_in_this_scope (token);
 		if (result == false && parent != null) {
 			result = parent.exists (token);
 		}

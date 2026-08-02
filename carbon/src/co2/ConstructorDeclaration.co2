@@ -68,7 +68,7 @@ class ConstructorDeclaration : Declaration {
 		current_context?.remove_last ();
 	}
 	
-	Bool has_var_args () {
+	bool has_var_args () {
 		if (formal_arguments.length > 0) {
 			ArgumentDeclaration last_arg = (ArgumentDeclaration) formal_arguments.get (formal_arguments.length - 1);
 			if (last_arg.name.type == _VA_ARG) {

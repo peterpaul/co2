@@ -92,7 +92,7 @@ class ClassDeclaration : ObjectTypeDeclaration {
 		current_context?.remove_last ();
 	}
 
-	Bool is_compatible (Declaration _other) {
+	bool is_compatible (Declaration _other) {
 		if (_other is_of ClassDeclaration) {
 			ClassDeclaration other = (ClassDeclaration) _other;
 			while (other && other.superclass && self != other) {
@@ -162,7 +162,7 @@ class ClassDeclaration : ObjectTypeDeclaration {
 	}
 }
 
-Bool new_constructor_filter (ConstructorDeclaration constructor) {
+bool new_constructor_filter (ConstructorDeclaration constructor) {
 	if (strcmp (constructor.name.name.data, "ctor") != 0) {
 		return !constructor.scope.get_parent ()?.find_type (constructor.name, ConstructorDeclaration.class);
 	}

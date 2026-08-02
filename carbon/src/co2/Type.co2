@@ -41,7 +41,7 @@ class Type : CompileObject {
 		return self;
 	}
 
-	Bool is_compatible (Type other) {
+	bool is_compatible (Type other) {
 		if (other != null) {
 			other = other.get_declared_type ();
 			return other is_of get_declared_type ().class;
@@ -90,7 +90,7 @@ class Type : CompileObject {
 		// intentionally empty
 	}
 
-	Bool is_void_ptr () {
+	bool is_void_ptr () {
 		if (self is_of ArrayType) {
 			ArrayType array_type = (ArrayType) self;
 			if (array_type.base_type is_of PrimitiveType) {

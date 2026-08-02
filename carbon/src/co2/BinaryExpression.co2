@@ -37,7 +37,7 @@ class BinaryExpression : Expression {
 		delete operand;
 	}
 
-	Bool is_condition () {
+	bool is_condition () {
 		switch (operator.type) {
 		case '>':
 		case '<':
@@ -54,7 +54,7 @@ class BinaryExpression : Expression {
 		}
 	}
 
-	Bool is_integer_type (Type t) {
+	bool is_integer_type (Type t) {
 		if (t is_of PrimitiveType) {
 			PrimitiveType primitive_type = (PrimitiveType) t;
 			switch (primitive_type.token.type) {
@@ -67,7 +67,7 @@ class BinaryExpression : Expression {
 		return false;
 	}
 
-	Bool is_pointer_arithmetic () {
+	bool is_pointer_arithmetic () {
 		if (operator.type != '+' && operator.type != '-') {
 			return false;
 		}
@@ -266,7 +266,7 @@ class BinaryExpression : Expression {
 				// "int" here is a stand-in anchor for that (PrimitiveType.
 				// is_compatible()'s int/unsigned/float widening already
 				// covers the common numeric cases), not the expression's own
-				// result type, which is the new Bool type below.
+				// result type, which is the new bool type below.
 				Token int_token = new Token.fromToken (operator, "int", _INT);
 				Type int_type = new PrimitiveType (int_token);
 				operand[0].type?.assume_compatible (int_type);
