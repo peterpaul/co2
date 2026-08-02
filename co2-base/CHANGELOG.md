@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `BaseObject.getClass()` now explicitly casts its return value to `Class`. Every generated class
+  struct redeclares its own `class` field with a more specific covariant type (`struct
+  BaseObjectClass *`, not the base `struct Class *`) as a deliberate codegen convenience, so
+  returning the field bare (`return class;`) from a method declared to return the base type is a
+  real return-type mismatch — harmless under `-std=gnu89`, but a hard build error under newer C
+  standards (part of an ongoing audit into what blocks moving off `gnu89`).
+
 ### Removed
 
 - `BaseObject.co2`'s `int true, false;` declaration. `true`/`false` are recognized natively by the
