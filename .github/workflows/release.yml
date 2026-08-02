@@ -233,6 +233,8 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@v7
+
       - name: Download all release artifacts
         uses: actions/download-artifact@v8
         with:
@@ -257,3 +259,44 @@ jobs:
             --title "${{ github.ref_name }}" \
             --generate-notes \
             "${{ runner.temp }}"/release-assets/"${PROJECT}"-"${VERSION}"*.tar.gz
+
+      # --generate-notes above already gives a correct "Full Changelog"
+      # compare link (it knows how to find this project's *previous* tag,
+      # which we'd otherwise have to work out ourselves) -- this step just
+      # prepends the project's own CHANGELOG.md entry for this version in
+      # front of it, so the release body reads like carbon/co2/co2-base's
+      # CHANGELOG.md itself instead of a bare commit-compare link.
+      - name: Prepend CHANGELOG.md section to release notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PROJECT: ${{ needs.determine-release.outputs.project }}
+          VERSION: ${{ needs.determine-release.outputs.version }}
+        run: |
+          case "$PROJECT" in
+            carbon) changelog=carbon/CHANGELOG.md ;;
+            libco2) changelog=co2/CHANGELOG.md ;;
+            libco2-base) changelog=co2-base/CHANGELOG.md ;;
+            *) echo "Unrecognized project: $PROJECT" >&2; exit 1 ;;
+          esac
+
+          # Print every line between this version's "## [X.Y.Z]" heading and
+          # the next "## [" heading (Keep a Changelog format), dropping
+          # blank lines up to the first real content line.
+          section=$(awk -v ver="$VERSION" '
+            /^## \[/ {
+              if (found) exit
+              if ($0 ~ ("^## \\[" ver "\\]")) { found = 1; next }
+              next
+            }
+            found { print }
+          ' "$changelog" | awk 'NF { p = 1 } p')
+
+          if [ -z "$section" ]; then
+            echo "No CHANGELOG.md section found for $PROJECT $VERSION in $changelog" >&2
+            exit 1
+          fi
+
+          existing_notes=$(gh release view "${{ github.ref_name }}" --json body -q .body)
+
+          { printf '%s\n\n' "$section"; printf '%s\n' "$existing_notes"; } \
+            | gh release edit "${{ github.ref_name }}" --repo "${{ github.repository }}" --notes-file -
