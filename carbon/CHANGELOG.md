@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `parse()`, `yylex()`, and `error()` are now properly declared before use in the compiler's own
+  generated C (`grammar.y`'s prologue for the latter two; a small `Makefile.am` rule injecting
+  `parse()`'s prototype into bison's generated `grammar.h`, since old bison has no portable way to
+  put arbitrary declarations there). Relied on implicit-function-declaration being merely a warning
+  under `-std=gnu89`; a hard error under newer C standards (part of an ongoing audit into what
+  blocks moving off `gnu89`).
+- `expression_generate_casted()` now also recognizes `self.class`/bare `class` field access
+  (`TokenExpression` wrapping a `_CLASS` token with a resolved `class_decl`) as needing a cast to
+  its target type, the same way it already did for `SomeClass.class` literals. Every class's
+  generated struct redeclares its own `class` field with a more specific covariant type (`struct
+  XClass *`, not the base `struct Class *`) as a deliberate codegen convenience; type_check()
+  already verifies compatibility with the declared type, so the cast is always safe. Fixes
+  `co2-base`'s `BaseObject.getClass()` (and any other bare `return class;`-style code) without
+  needing a source-level workaround there.
+
 ### Changed
 
 - Migrated this codebase's own compiler sources off the `typedef Bool = int;` convention onto the

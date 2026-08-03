@@ -130,7 +130,16 @@ if CARBON_EXISTS
 	$(CARBON) --depend $(CARBON_FLAGS) $< $(builddir)/$@ >> $(builddir)/$@ || rm -f $(builddir)/$@;
 endif
 
+# bison (still generating against the pre-%code-block 2.3 skeleton on some
+# platforms) has no portable way to inject a plain C declaration into its
+# own generated grammar.h -- so Compiler.co2's `["grammar.h"] { int parse
+# (); }` extern binding (parse() is hand-written in this file's own
+# postamble, not part of bison's grammar itself) would otherwise compile
+# clean under -std=gnu89's implicit-declaration allowance but fail as an
+# undeclared-function error under any stricter/newer C standard. Append the
+# one missing prototype after bison (re)generates the header.
 grammar.h: grammar.c
+	echo 'int parse (void);' >> $@
 
 libcarbon_1_0_la_CPPFLAGS=-O0 -g3 -DO_DEBUG
 

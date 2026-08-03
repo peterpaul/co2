@@ -111,7 +111,7 @@ class BaseObject : Object {
 	}
 
 	Class getClass () {
-		return (Class) class;
+		return class;
 	}
 
 	unsigned hashCode () {

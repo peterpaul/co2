@@ -50,7 +50,24 @@ void expression_generate_casted (FILE *fp, Expression arg, Type target_type) {
 		// decl is a StructDeclaration or TypeDeclaration -- a C cast expression
 		// can't target a non-scalar aggregate type, so only cast the pointer-shaped
 		// forms (plain class decl, or unresolved/interface -> "struct X*"/"struct Object*").
-		if (target_object_type.decl && arg_object_type.decl && target_object_type.decl != arg_object_type.decl
+		//
+		// `self.class`/bare `class` (an inherited-field access -- see
+		// TokenExpression.generate_left()'s own `decl?.class_decl != null` check
+		// for "is this a class field access") always type-checks as the plain
+		// `Class` ObjectType (TokenExpression.type_check()'s `_CLASS` case just
+		// looks the field up like any other identifier), so target/arg decl are
+		// identical here and the check above alone would never cast. But every
+		// class's *generated struct* redeclares its own `class` field with a
+		// more specific covariant type (`struct XClass *`, not `struct Class
+		// *`) as a deliberate codegen convenience elsewhere -- a real, and
+		// always-safe, narrowing invisible to this function's Type-level view.
+		// `struct XClass` always starts with the common `struct Class` fields
+		// (same reasoning as the `SomeClass.class` branch below), so casting to
+		// whatever the target actually declares is always safe here too.
+		bool class_field_access = arg is_of TokenExpression && ((TokenExpression) arg).token.type == _CLASS
+			&& ((TokenExpression) arg).decl?.class_decl != null;
+		if (target_object_type.decl && arg_object_type.decl
+			&& (target_object_type.decl != arg_object_type.decl || class_field_access)
 			&& !(target_object_type.decl is_of StructDeclaration) && !(target_object_type.decl is_of TypeDeclaration)) {
 			fprintf (fp, "(");
 			target_type.generate (fp);

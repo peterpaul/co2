@@ -85,6 +85,8 @@
   extern char *yytext;
   extern void yyerror(const char *);
   extern int yywrap(void);
+  extern int yylex(void);
+  extern int error(struct Token *token, char *msg, ...);
   extern void VariableDeclaration_set_type(void *_var, va_list *app);
   extern void Declaration_set_class_decl(void *_decl, va_list *app);
 
