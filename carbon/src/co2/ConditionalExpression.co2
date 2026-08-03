@@ -82,9 +82,14 @@ class ConditionalExpression : Expression {
 		// fprintf (fp, "(");
 		condition.generate (fp);
 		fprintf (fp, "?"); // TODO add spaces
-		then_expr.generate (fp);
+		// type_check() resolves `type` to whichever branch's type the other is
+		// compatible with, or their common base class when neither is directly
+		// compatible with the other -- cast both branches to it, since C's `?:`
+		// (unlike carbon's own type-checker) requires both branches to agree on
+		// exactly one pointer type when they're two different subclasses.
+		expression_generate_casted (fp, then_expr, type);
 		fprintf (fp, ":"); // TODO add spaces
-		else_expr.generate (fp);
+		expression_generate_casted (fp, else_expr, type);
 		// fprintf (fp, ")");
 	}
 }

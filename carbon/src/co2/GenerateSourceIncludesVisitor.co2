@@ -20,6 +20,8 @@ include co2/BaseCompileObjectVisitor
 include co2/Context
 include co2/HashSet
 include co2/CompilerResources
+include co2/BinaryExpression
+include co2/PrimitiveType
 
 class GenerateSourceIncludesVisitor : BaseCompileObjectVisitor {
 	Set set;
@@ -88,6 +90,23 @@ class GenerateSourceIncludesVisitor : BaseCompileObjectVisitor {
 	void visitObjectType (ObjectType type) {
 		if (type.decl) {
 			addFile (type.decl.file);
+		}
+	}
+
+	// `%`/`_REMAINDER` and `^`/`_POWER` on float operands codegen as calls to
+	// fmodf()/powf() (BinaryExpression.generate()) -- real libm functions, but
+	// unlike every other external declaration in this codebase they aren't
+	// modeled as a Declaration with an include_file (there's no `["math.h"]
+	// float fmodf(...)` anywhere for visitDeclaration() to have found), so
+	// nothing else in this visitor ever adds math.h to the include set.
+	void visitBinaryExpression (BinaryExpression expr) {
+		if (expr.type is_of PrimitiveType) {
+			PrimitiveType type = (PrimitiveType) expr.type;
+			if (type.token.type == _FLOAT
+				&& (expr.operator.type == '%' || expr.operator.type == _REMAINDER
+					|| expr.operator.type == '^' || expr.operator.type == _POWER)) {
+				set.add (new String ("<math.h>"));
+			}
 		}
 	}
 

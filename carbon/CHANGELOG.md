@@ -23,6 +23,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   already verifies compatibility with the declared type, so the cast is always safe. Fixes
   `co2-base`'s `BaseObject.getClass()` (and any other bare `return class;`-style code) without
   needing a source-level workaround there.
+- `ConditionalExpression.generate()` now casts both `?:` branches to the common type `type_check()`
+  already resolved for them (either branch's own type when directly compatible, or their nearest
+  common base class otherwise), instead of emitting each branch's code completely uncast. Harmless
+  under `-std=gnu89`; a hard error under newer C standards when the two branches are different
+  subclasses (`struct B *`/`struct C *` assigned to a `struct A *` common base).
+- `GenerateSourceIncludesVisitor` now emits `#include <math.h>` whenever a `%`/`^` (or their
+  compound-assign forms) binary expression on `float` operands is used anywhere in a file.
+  `BinaryExpression.generate()` codegens these as calls to `fmodf()`/`powf()`, but unlike every
+  other external declaration in this codebase they were never modeled with a `Declaration`/
+  `include_file` for the existing include-collection mechanism to find - so `math.h` was never
+  added, relying on implicit-function-declaration to paper over the missing prototypes.
 
 ### Changed
 
