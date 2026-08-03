@@ -14,7 +14,7 @@ AC_DEFUN([AC_PROG_CARBON],
 
 # AC_PROG_CC only supplies its own "-g -O2" default when CFLAGS is entirely
 # unset -- CI (translate.sh/build-and-test.sh) always passes an explicit
-# CFLAGS (currently -std=gnu89, for bootstrap-tarball compatibility -- see
+# CFLAGS (currently -std=gnu17, for bootstrap-tarball compatibility -- see
 # TODO.md), so this default only matters for a plain
 # autogen.sh/configure/make/install run with no CFLAGS override. Without it,
 # that path silently inherited whatever -std= the local compiler defaulted

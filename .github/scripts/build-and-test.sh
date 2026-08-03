@@ -24,7 +24,7 @@ set -euo pipefail
 
 REPO_ROOT="$(pwd)"
 HEAD_PREFIX="$WORKDIR/head-prefix"
-CFLAGS_COMMON="-std=gnu89 -g -O2"
+CFLAGS_COMMON="-std=gnu17 -g -O2"
 
 mkdir -p "$WORKDIR" "$HEAD_PREFIX"
 

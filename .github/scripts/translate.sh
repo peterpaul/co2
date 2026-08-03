@@ -58,7 +58,7 @@ set -euo pipefail
 REPO_ROOT="$(pwd)"
 BOOTSTRAP_PREFIX="$WORKDIR/bootstrap-prefix"
 HEAD_PREFIX="$WORKDIR/head-prefix"
-CFLAGS_COMMON="-std=gnu89 -g -O2"
+CFLAGS_COMMON="-std=gnu17 -g -O2"
 
 # TODO.md item #6: this repo has hit three separate case-insensitive-
 # filesystem naming collisions (macOS/Windows) across its history --

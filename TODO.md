@@ -9,7 +9,7 @@ This file only tracks what's still open.
 ## 1. GitHub Actions CI — fully green on all three platforms; a release pipeline now exists too
 
 `.github/workflows/ci.yml` + `.github/scripts/{translate.sh,build-and-test.sh}`.
-`CFLAGS="-std=gnu89 -g -O2"` throughout (see #2 — `-fcommon` confirmed unnecessary).
+`CFLAGS="-std=gnu17 -g -O2"` throughout (see #2 — `-fcommon` confirmed unnecessary, gnu17 migration done).
 
 **Two-stage architecture** (restructured from an earlier single-stage design that repeated the
 full bootstrap+translate dance independently on every OS — wasteful, and didn't scale to adding
@@ -157,7 +157,7 @@ run before moving to the next):
 
 All three platforms are now fully green.
 
-## 2. `-std=gnu89 -fcommon` masks real bugs in carbon's generated C — ALL WARNINGS FIXED (gnu17 migration itself still pending)
+## 2. `-std=gnu89 -fcommon` masked real bugs in carbon's generated C — ALL WARNINGS FIXED, gnu17 migration DONE
 
 Original framing here was wrong: `TypeCheckVisitor.co2` is actually a dead stub (never
 instantiated, zero references anywhere) — type-checking happens via a `type_check()` method on
@@ -454,24 +454,26 @@ come from three *independent* root causes, not one:
   `path`-global refactor to a lazy-singleton getter turned out to be unnecessary** — leaving it as
   documented direction below in case a *future* hand-written global runs into the same issue, but
   it's not blocking anything right now.
-- **`-std=gnu17` (dropping the `89`, keeping `-fcommon` or not) is a separate, bigger effort — not
-  yet attempted successfully.** Tried it directly (before Category G was fully fixed): its warnings
-  became **hard errors** under `gnu17` (`-Wincompatible-pointer-types` is error-by-default in modern
-  C dialects, not just a warning) — Category G is now fully fixed (see above), so this concern is
-  moot. What's left: `gnu17`'s stricter K&R-implicit-declaration rules surfaced entirely new errors
-  unrelated to any category here: `Compiler.c`'s call to `parse` (bison-generated `yyparse`'s
-  wrapper), `grammar.c`'s own call to `yylex`, and `grammar.y`'s call to `error` (the parser's error
-  hook) are all missing proper prototypes before use, relying on C89's implicit-declaration
-  leniency. Real, separate follow-on work: add proper forward declarations for these three, before
-  `gnu17` can be attempted again.
+- **`-std=gnu17` (dropping the `89`) — DONE, CI now pinned to it.** Tried it directly (before
+  Category G was fully fixed): its warnings became **hard errors** under `gnu17`
+  (`-Wincompatible-pointer-types` is error-by-default in modern C dialects, not just a warning) —
+  Category G is now fully fixed (see above), so this concern is moot. What was left: `gnu17`'s
+  stricter K&R-implicit-declaration rules surfaced entirely new errors unrelated to any category
+  here: `Compiler.c`'s call to `parse` (bison-generated `yyparse`'s wrapper), `grammar.c`'s own
+  call to `yylex`, and `grammar.y`'s call to `error` (the parser's error hook) were all missing
+  proper prototypes before use, relying on C89's implicit-declaration leniency. Fixed (proper
+  forward declarations for all three), released as part of `carbon-0.3.5`. `configure.ac` across
+  all three projects now defaults bare `CFLAGS` to `-std=gnu17` when the caller doesn't override
+  it; `.github/scripts/translate.sh` and `.github/scripts/build-and-test.sh` now pin
+  `CFLAGS_COMMON` to `-std=gnu17` explicitly too (previously `-std=gnu89`), verified green across
+  the full CI platform matrix (Linux, macOS, Windows).
 
-**Current recommended `CFLAGS`**: `-std=gnu89 -g -O2` (dropped `-fcommon` — verified above).
-Still `-std=gnu89`, not plain `c89`/`c17`, since GNU nested functions/`typeof`/statement-expressions
-are used throughout `Object.h`/`Interface.h`/carbon's own codegen (item #3, unaffected by any of
-this). **0 warnings remain** (Category G's last piece, `RefList.filter()`'s uncast return value, is
-now fixed — see above), down from a 368 original baseline. Moving to `-std=gnu17` is real, valuable,
-separate follow-on work (just the three missing prototypes noted above now), not attempted further
-this session. Full mechanism/history for all of this preserved at
+**Current recommended `CFLAGS`**: `-std=gnu17 -g -O2` (dropped `-fcommon` — verified above, and now
+CI's own pin, not just the local default). Still a GNU dialect, not plain `c17`, since GNU nested
+functions/`typeof`/statement-expressions are used throughout `Object.h`/`Interface.h`/carbon's own
+codegen (item #3, unaffected by any of this). **0 warnings remain** (Category G's last piece,
+`RefList.filter()`'s uncast return value, is now fixed — see above), down from a 368 original
+baseline. Full mechanism/history for all of this preserved at
 `~/.claude/plans/abundant-percolating-brooks.md`.
 
 ## 3. GNU nested functions force real GCC (excludes Clang, MSVC)
