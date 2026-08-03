@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `configure.ac` now defaults `CFLAGS` to `-g -O2 -std=gnu17` when the caller doesn't supply one, so
+  a plain `autogen.sh`/`configure`/`make` run gets a known-working modern C standard instead of
+  whatever the local compiler happens to default to (`gnu89` on some systems, as new as `gnu23` on
+  others — see the recent "modern C" audit fixes below and in carbon). CI's own explicit `CFLAGS`
+  (currently `-std=gnu89`, for bootstrap-tarball compatibility) is unaffected.
+
 ### Removed
 
 - `BaseObject.co2`'s `int true, false;` declaration. `true`/`false` are recognized natively by the

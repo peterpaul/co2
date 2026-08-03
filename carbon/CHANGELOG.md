@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `configure.ac` now defaults `CFLAGS` to `-g -O2 -std=gnu17` when the caller doesn't supply one, so
+  a plain `autogen.sh`/`configure`/`make` run gets a known-working modern C standard instead of
+  whatever the local compiler happens to default to (`gnu89` on some systems, as new as `gnu23` on
+  others — which is exactly how the fixes below were found in the first place). CI's own explicit
+  `CFLAGS` (currently `-std=gnu89`, for bootstrap-tarball compatibility) is unaffected.
+
 ### Fixed
 
 - `parse()`, `yylex()`, and `error()` are now properly declared before use in the compiler's own

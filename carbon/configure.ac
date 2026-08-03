@@ -12,6 +12,18 @@ AC_CONFIG_HEADERS([src/config.h])
 AC_DEFUN([AC_PROG_CARBON],
 	[AC_PATH_PROG(CARBON, carbon, no)])
 
+# AC_PROG_CC only supplies its own "-g -O2" default when CFLAGS is entirely
+# unset -- CI (translate.sh/build-and-test.sh) always passes an explicit
+# CFLAGS (currently -std=gnu89, for bootstrap-tarball compatibility -- see
+# TODO.md), so this default only matters for a plain
+# autogen.sh/configure/make/install run with no CFLAGS override. Without it,
+# that path silently inherited whatever -std= the local compiler defaulted
+# to (gnu89 on some systems, as new as gnu23 on others), which is exactly
+# what caused several codegen bugs to go unnoticed for years (see the recent
+# "modern C" audit fixes). Pin a known-working modern standard instead of
+# leaving it to chance; CI's own explicit CFLAGS is untouched either way.
+: ${CFLAGS="-g -O2 -std=gnu17"}
+
 # Checks for programs.
 AC_PROG_AWK
 AC_PROG_CC
