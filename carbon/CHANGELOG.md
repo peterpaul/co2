@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.5] - 2026-08-03
+
 ### Added
 
 - `configure.ac` now defaults `CFLAGS` to `-g -O2 -std=gnu17` when the caller doesn't supply one, so
@@ -228,7 +230,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial release.
 
-[Unreleased]: https://github.com/peterpaul/co2/compare/carbon-0.3.4...HEAD
+[Unreleased]: https://github.com/peterpaul/co2/compare/carbon-0.3.5...HEAD
+[0.3.5]: https://github.com/peterpaul/co2/compare/carbon-0.3.4...carbon-0.3.5
 [0.3.4]: https://github.com/peterpaul/co2/compare/carbon-0.3.3...carbon-0.3.4
 [0.3.3]: https://github.com/peterpaul/co2/compare/carbon-0.3.2...carbon-0.3.3
 [0.3.2]: https://github.com/peterpaul/co2/compare/carbon-0.3.1...carbon-0.3.2
